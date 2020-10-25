@@ -16,7 +16,8 @@
  * 5. 用移位操作替代除法操作
  * 
  * 这里有一个相关的优化问题：对于放大倍数特别多的（比如12倍），直接用bilinear resize效果并不好，迭代的使用则效果好，但速度也会变慢。能否进行优化？
- * 
+ * Imageshop大佬在(另一篇blog)[https://www.cnblogs.com/Imageshop/p/12589983.html]中有提到
+ * 连续做2倍的resize，并且2倍resize用的是特殊优化实现。
  */
 
 #include <stdio.h>

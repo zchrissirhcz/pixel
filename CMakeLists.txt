@@ -9,8 +9,8 @@ include("cmake/utils.cmake")
 
 add_executable(testbed
     #src/traverse_pixels.cpp
-    src/bilinear_resize.cpp
-    #src/bilinear_interpolation.cpp
+    #src/bilinear_resize.cpp
+    src/auto_contrast_colorscale.cpp
 )
 
 if(ANDROID)
