@@ -1,0 +1,42 @@
+#build binary folders
+build/vs2019-x64
+build/vs2017-x64
+build/vs2015-x64
+build/vs2013-x64
+build/xcode
+build/g++
+build/linux
+build/armeabi-v7a
+build/arm64-v8a
+build/android-arm64
+build/android-arm32
+build/sigmastar
+build/ohos-arm32
+build/ohos-arm64
+
+#images, models, etc
+assets/
+
+#IDE generated folder
+.vscode/
+.idea/
+cmake-build-debug/
+
+#c/c++ object files
+*.out.dSYM
+*.o
+*.out
+
+#python Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+#tex
+*.aux
+*.log
+*.synctex.gz
+*.toc
+
+#log files
+build/log.txt
