@@ -310,7 +310,12 @@ void perf_test()
         "=== NO NEON 1 ==="
         "\nElapsed time: " + to_string((int)elapsedTime) + " ms"
         "\n\n=== NO NEON 2 ===\n"
-        "\nElapsed time: " + to_string((int) elapsedTime2) + " ms";
+        "\nElapsed time: " + to_string((int)elapsedTime2) + " ms";
+
+#if __ARM_NEON
+    resultsString += "\n\n=== NEON intrinsics ===\n"
+        "\nElapsed time: " + to_string((int)elapsedTimeNeon) + " ms";
+#endif
 
     // Display results
     // std::string resultsString =
@@ -324,6 +329,10 @@ void perf_test()
     free(image.data);
     free(image_copy1.data);
     free(image_copy2.data);
+
+#if __ARM_NEON
+    free(image_copy3.data);
+#endif
 }
 
 int main(int, char*[])
