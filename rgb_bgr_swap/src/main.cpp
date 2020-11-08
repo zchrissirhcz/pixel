@@ -283,7 +283,7 @@ void perf_test()
         rgb_bgr_swap(&image_copy1);
     }
     auto elapsedTime = msElapsedTime(start);
-    save_image(&image_copy1, "non_neon.jpg");
+    save_image(&image_copy1, "none_neon.jpg");
 
     // C, speedup
     start = now();
@@ -291,7 +291,7 @@ void perf_test()
         rgb_bgr_swap2(&image_copy2);
     }
     auto elapsedTime2 = msElapsedTime(start);
-    save_image(&image_copy2, "non_neon2.jpg");
+    save_image(&image_copy2, "none_neon2.jpg");
 
 
 #if __ARM_NEON
