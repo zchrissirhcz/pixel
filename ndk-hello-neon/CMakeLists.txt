@@ -10,8 +10,6 @@ add_library(cpufeatures STATIC
             ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
 
 set(neon_SRCS src/helloneon-intrinsics.c)
-set_property(SOURCE ${neon_SRCS}
-APPEND_STRING PROPERTY COMPILE_FLAGS " -mfpu=neon")
 add_definitions("-DHAVE_NEON=1")
 
 
