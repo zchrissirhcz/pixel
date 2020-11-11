@@ -91,10 +91,23 @@ void test_vld() {
     printf("\n");
 }
 
+static void test_add() {
+    printf("----------------------------------------\n");
+    printf("show usage of vadd related intrinsics\n");
+    printf("----------------------------------------\n");
+
+    uint8x16_t data = vdupq_n_u8(230);
+    uint8x16_t offset = vmovq_n_u8(3);
+    data = vaddq_u8(data, offset);
+    print_uint8x16(data);
+}
+
 int main() {
     test_vdup();
 
     test_vld();
+
+    test_add();
 
     return 0;
 }
