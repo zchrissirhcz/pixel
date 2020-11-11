@@ -3,7 +3,8 @@
 **/build/*/
 
 #IDE generated folder
-.vscode/
+**/.vscode/
+
 .idea/
 cmake-build-debug/
 
