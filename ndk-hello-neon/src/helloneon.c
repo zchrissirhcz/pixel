@@ -31,9 +31,10 @@ static double now_ms(void)
 }
 
 // this is a FIR filter implemented in C
+// 这就是一维卷积！
 static void fir_filter_c(short* output, const short* input, const short* kernel, int width, int kernelSize)
 {
-    int  offset = -kernelSize/2;
+    int offset = -kernelSize/2;
     for (int i=0; i<width; i++) {
         int sum = 0;
         for (int j=0; j<kernelSize; j++) {
@@ -43,41 +44,61 @@ static void fir_filter_c(short* output, const short* input, const short* kernel,
     }
 }
 
-int main()
+static void fir_filter_c_fast(short* output, const short* input, const short* kernel, int width, int kernelSize)
 {
+    int offset = -kernelSize/2;
+    const short* buf = input + offset;
+    for (int i=0; i<width; i++) {
+        int sum = 0;
+        for (int j=0; j<kernelSize; j++) {
+            sum += kernel[j]*buf[j];
+        }
+        output[i] = (short)((sum + 0x8000) >> 16);
+        buf++;
+    }
+}
+
+
+
+static void perf_fir_filter(const int fir_iterations)
+{
+    printf("-----------------------------\n");
+    printf("perf with fir_iterations=%d\n", fir_iterations);
+    printf("-----------------------------\n");
+
     char* str;
     char buffer[512];
 
     const int fir_kernel_size = 32;
     const int fir_output_size = 2560;
     const int fir_input_size = (fir_output_size + fir_kernel_size);
-    const int fir_iterations = 600;
 
     short fir_input_0[fir_input_size];
+    // fir_input_0相当于是fir_input做padding
     const short* fir_input = fir_input_0 + (fir_kernel_size/2);
     short fir_output[fir_output_size];
     short fir_output_expected[fir_output_size];
 
-    static const short  fir_kernel[fir_kernel_size] = { 
-        0x10, 0x20, 0x40, 0x70, 0x8c, 0xa2, 0xce, 0xf0, 0xe9, 0xce, 0xa2, 0x8c, 070, 0x40, 0x20, 0x10,
-        0x10, 0x20, 0x40, 0x70, 0x8c, 0xa2, 0xce, 0xf0, 0xe9, 0xce, 0xa2, 0x8c, 070, 0x40, 0x20, 0x10 
+    static const short  fir_kernel[fir_kernel_size] = {
+        0x10, 0x20, 0x40, 0x70, 0x8c, 0xa2, 0xce, 0xf0, 0xe9, 0xce, 0xa2, 0x8c, 0x70, 0x40, 0x20, 0x10,
+        0x10, 0x20, 0x40, 0x70, 0x8c, 0xa2, 0xce, 0xf0, 0xe9, 0xce, 0xa2, 0x8c, 0x70, 0x40, 0x20, 0x10
     };
 
     // setup FIR input - whatever
     {
-        int  nn;
-        for (nn = 0; nn < fir_input_size; nn++) {
-            fir_input_0[nn] = (5*nn) & 255;
+        for (int i=0; i<fir_input_size; i++) {
+            fir_input_0[i] = (5*i) & 255;
         }
         fir_filter_c(fir_output_expected, fir_input, fir_kernel, fir_output_size, fir_kernel_size);
     }
 
+    //---------------------------------------------
     // Benchmark small FIR filter loop - C version
-    double t_start, t_cost_c, t_cost_neon;
+    //--------------------------------------------
+    double t_start, t_cost_c, t_cost_c_fast, t_cost_neon;
     t_start = now_ms();
     {
-        int  count = fir_iterations;
-        for (; count > 0; count--) {
+        for (int i=0; i<fir_iterations; i++) {
             fir_filter_c(fir_output, fir_input, fir_kernel, fir_output_size, fir_kernel_size);
         }
     }
@@ -87,13 +108,30 @@ int main()
     strlcpy(buffer, str, sizeof(buffer));
     free(str);
 
-    strlcat(buffer, "Neon version: ", sizeof(buffer));
 
-    // Benchmark small FIR filter loop - Neon version
+    //------------------------------------------------
+    // Benchmark small FIR filter loop - C fast
+    //------------------------------------------------
+    strlcat(buffer, "C fast version: ", sizeof(buffer));
     t_start = now_ms();
     {
-        int  count = fir_iterations;
-        for (; count > 0; count--) {
+        for (int i=0; i<fir_iterations; i++) {
+            fir_filter_c_fast(fir_output, fir_input, fir_kernel, fir_output_size, fir_kernel_size);
+        }
+    }
+    t_cost_c_fast = now_ms() - t_start;
+    asprintf(&str, "%g ms (x%g faster)\n", t_cost_c_fast, t_cost_c / (t_cost_c_fast < 1e-6 ? 1. : t_cost_c_fast));
+    strlcat(buffer, str, sizeof(buffer));
+    free(str);
+
+
+    //------------------------------------------------
+    // Benchmark small FIR filter loop - Neon version
+    //------------------------------------------------
+    strlcat(buffer, "Neon version: ", sizeof(buffer));
+    t_start = now_ms();
+    {
+        for (int i=0; i<fir_iterations; i++) {
             fir_filter_neon_intrinsics(fir_output, fir_input, fir_kernel, fir_output_size, fir_kernel_size);
         }
     }
@@ -104,11 +142,11 @@ int main()
 
     // check the result, just in case
     {
-        int  nn, fails = 0;
-        for (nn = 0; nn < fir_output_size; nn++) {
-            if (fir_output[nn] != fir_output_expected[nn]) {
+        int fails = 0;
+        for (int i=0; i<fir_output_size; i++) {
+            if (fir_output[i] != fir_output_expected[i]) {
                 if (++fails < 16) {
-                    printf("neon[%d] = %d expected %d", nn, fir_output[nn], fir_output_expected[nn]);
+                    printf("neon[%d] = %d expected %d", i, fir_output[i], fir_output_expected[i]);
                 }
             }
         }
@@ -116,6 +154,13 @@ int main()
     }
 
     printf("%s\n", buffer);
+}
+
+int main() {
+    perf_fir_filter(10);
+    perf_fir_filter(100);
+    perf_fir_filter(1000);
+    perf_fir_filter(10000);
 
     return 0;
 }
