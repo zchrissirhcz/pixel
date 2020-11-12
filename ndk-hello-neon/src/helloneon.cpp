@@ -22,6 +22,8 @@
 #include <cpu-features.h>
 #include "helloneon-intrinsics.h"
 
+#include "fastMalloc.h"
+
 // return current time in milliseconds
 static double now_ms(void)
 {
@@ -31,10 +33,9 @@ static double now_ms(void)
 }
 
 // this is a FIR filter implemented in C
-// 这就是一维卷积！
 static void fir_filter_c(short* output, const short* input, const short* kernel, int width, int kernelSize)
 {
-    int offset = -kernelSize/2;
+    int  offset = -kernelSize/2;
     for (int i=0; i<width; i++) {
         int sum = 0;
         for (int j=0; j<kernelSize; j++) {
@@ -57,8 +58,6 @@ static void fir_filter_c_fast(short* output, const short* input, const short* ke
         buf++;
     }
 }
-
-
 
 static void perf_fir_filter(const int fir_iterations)
 {
@@ -95,7 +94,7 @@ static void perf_fir_filter(const int fir_iterations)
     //---------------------------------------------
     // Benchmark small FIR filter loop - C version
     //--------------------------------------------
-    double t_start, t_cost_c, t_cost_c_fast, t_cost_neon;
+    double t_start, t_cost_c, t_cost_c_fast, t_cost_neon, t_cost_neon_fast;
     t_start = now_ms();
     {
         for (int i=0; i<fir_iterations; i++) {
@@ -140,6 +139,23 @@ static void perf_fir_filter(const int fir_iterations)
     strlcat(buffer, str, sizeof(buffer));
     free(str);
 
+
+    //------------------------------------------------
+    // Benchmark small FIR filter loop - Neon fast
+    //------------------------------------------------
+    strlcat(buffer, "Neon fast version: ", sizeof(buffer));
+    t_start = now_ms();
+    {
+        for (int i=0; i<fir_iterations; i++) {
+            fir_filter_neon_fast(fir_output, fir_input, fir_kernel, fir_output_size, fir_kernel_size);
+        }
+    }
+    t_cost_neon_fast = now_ms() - t_start;
+    asprintf(&str, "%g ms (x%g faster)\n", t_cost_neon_fast, t_cost_c / (t_cost_neon < 1e-6 ? 1. : t_cost_neon_fast));
+    strlcat(buffer, str, sizeof(buffer));
+    free(str);
+
+
     // check the result, just in case
     {
         int fails = 0;
@@ -160,7 +176,7 @@ int main() {
     perf_fir_filter(10);
     perf_fir_filter(100);
     perf_fir_filter(1000);
-    perf_fir_filter(10000);
+    //perf_fir_filter(10000);
 
     return 0;
 }
