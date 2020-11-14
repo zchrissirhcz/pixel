@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "NDK-r21b",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "clang-arm64",
+            "compileCommands": "${workspaceFolder}/build/android-arm64/compile_commands.json"
+        }
+    ],
+    "version": 4
+}

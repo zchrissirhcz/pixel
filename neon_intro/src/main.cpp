@@ -37,6 +37,26 @@ static void print_uint8x8x2(uint8x8x2_t data) {
     printf("\n");
 }
 
+static void print_float32x2(float32x2_t data)
+{
+    static float p[2];
+
+    vst1_f32(p, data);
+    for (int i=0; i<2; i++) {
+        printf("%f ", p[i]);
+    }
+}
+
+static void print_float32x4(float32x4_t data)
+{
+    static float p[4];
+
+    vst1q_f32(p, data);
+    for (int i=0; i<4; i++) {
+        printf("%f ", p[i]);
+    }
+}
+
 void test_vdup() {
     printf("----------------------------------------\n");
     printf("show usage of vdup related intrinsics\n");
@@ -56,6 +76,12 @@ void test_vdup() {
     // uint8x16_t vdupq_n_u8 (uint8_t value)
     uint8x16_t data3 = vdupq_n_u8(255);
     print_uint8x16(data3);
+
+    float32x2_t data4 = vdup_n_f32(456);
+    print_float32x2(data4);
+
+    float32x4_t data5 = vdupq_n_f32(456);
+    print_float32x4(data5);
 
     printf("\n");
 }

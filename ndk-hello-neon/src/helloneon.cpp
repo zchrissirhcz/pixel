@@ -18,8 +18,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <cpu-features.h>
 #include "helloneon-intrinsics.h"
 
 #include "fastMalloc.h"
