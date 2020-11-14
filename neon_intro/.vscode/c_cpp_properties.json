@@ -10,7 +10,7 @@
             "cStandard": "c11",
             "cppStandard": "c++11",
             "intelliSenseMode": "clang-arm64",
-            "compileCommands": "${workspaceFolder}/build/arm64-v8a/compile_commands.json"
+            "compileCommands": "${workspaceFolder}/build/android-arm64/compile_commands.json"
         }
     ],
     "version": 4
