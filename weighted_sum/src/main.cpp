@@ -4,6 +4,14 @@
 
 using namespace std;
 
+// return current time in milliseconds
+static double now_ms(void)
+{
+    struct timespec res;
+    clock_gettime(CLOCK_REALTIME, &res);
+    return 1000.0*res.tv_sec + (double)res.tv_nsec/1e6;
+}
+
 void arr_weighted_sum(const float* arr1, const float arr1_weight, const float* arr2, const float arr2_weight,
     int len, float* result_arr)
 {
@@ -74,6 +82,70 @@ void arr_weighted_sum_neon_intrinsic(const float* arr1, const float arr1_weight,
     }
 }
 
+void arr_weighted_sum_neon_intrinsic2(const float* arr1, const float arr1_weight, const float* arr2, const float arr2_weight,
+    int len, float* result_arr)
+{
+    int neon_len = len >> 2;  // len/4
+    //int remain = len - (neon_len<<2); // len%4, i.e. len-(len/4)*4
+    //int remain = len - (neon_len/2*2)*4;
+    int remain = len - ((neon_len/4)*4)*4;
+
+    // 每次处理4个元素，因此权值要拷贝4份到一个float32x4_t类型的变量中
+    float32x4_t arr1_w4 = vdupq_n_f32(arr1_weight);
+    float32x4_t arr2_w4 = vdupq_n_f32(arr2_weight);
+    // unroll with 4
+    asm volatile("prfm pldl1keep, [%0, #256]" : :"r"(arr1) :);
+    asm volatile("prfm pldl1keep, [%0, #256]" : :"r"(arr2) :);
+    do {
+        // 1
+        float32x4_t v11 = vld1q_f32(arr1);
+        float32x4_t v12 = vld1q_f32(arr2);
+        v11 = vmulq_f32(v11, arr1_w4);
+        v12 = vmulq_f32(v12, arr2_w4);
+        float32x4_t res1 = vaddq_f32(v11, v12);
+        vst1q_f32(result_arr, res1);
+
+        // 2
+        float32x4_t v21 = vld1q_f32(arr1+4);
+        float32x4_t v22 = vld1q_f32(arr2+4);
+        v21 = vmulq_f32(v21, arr1_w4);
+        v22 = vmulq_f32(v22, arr2_w4);
+        float32x4_t res2 = vaddq_f32(v21, v22);
+        vst1q_f32(result_arr+4, res2);
+
+        // 3
+        float32x4_t v31 = vld1q_f32(arr1+8);
+        float32x4_t v32 = vld1q_f32(arr2+8);
+        v31 = vmulq_f32(v31, arr1_w4);
+        v32 = vmulq_f32(v32, arr2_w4);
+        float32x4_t res3 = vaddq_f32(v31, v32);
+        vst1q_f32(result_arr+8, res3);
+
+        // 4
+        float32x4_t v41 = vld1q_f32(arr1+12);
+        float32x4_t v42 = vld1q_f32(arr2+12);
+        v41 = vmulq_f32(v41, arr1_w4);
+        v42 = vmulq_f32(v42, arr2_w4);
+        float32x4_t res4 = vaddq_f32(v41, v42);
+        vst1q_f32(result_arr+12, res4);
+
+        // --
+        arr1 += 16;
+        arr2 += 16;
+        result_arr += 16;
+        neon_len -= 4;
+    } while (neon_len>4);
+
+    // remain parts
+    for(; remain>0; remain--) {
+        *result_arr = (*arr1)*arr1_weight + (*arr2)*arr2_weight;
+        result_arr++;
+        arr1++;
+        arr2++;
+    }
+}
+
+
 int main() {
     //test_vdup();
     //test_vld();
@@ -117,15 +189,13 @@ int main() {
             fail_cnt++;
         }
     }
-    if (fail_cnt>0) { 
+    if (fail_cnt>0) {
         printf("fail count is %d\n", fail_cnt);
     } else {
         printf("result match\n");
     }
     printf("c impl cost %g ms\n", t_c);
     printf("neon impl cost %g ms\n", t_neon);
-
-
 
     return 0;
 }
