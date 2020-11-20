@@ -13,11 +13,12 @@ cd build
 Tested on MI8(QC845) armv8 mode
 
 ```
-android-arm64/demo: 1 file pushed, 0 skipped. 20.6 MB/s (13040 bytes in 0.001s)
+android-arm64/demo: 1 file pushed. 28.2 MB/s (1452016 bytes in 0.049s)
 [good] result match
-c impl cost 62.8491 ms
-neon impl cost 7.48022 ms
-neon impl2 cost 7.45947 ms
+[c naive] cost 62.6631 ms
+[c fast] cost 7.37915 ms
+[neon intrinsics] cost 7.43677 ms
+[neon intrinsics2] cost 7.39136 ms
 ```
 
 ## Reference

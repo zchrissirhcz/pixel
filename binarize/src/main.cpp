@@ -18,20 +18,20 @@ static double now_ms(void)
     return 1000.0*res.tv_sec + (double)res.tv_nsec/1e6;
 }
 
-void arr_weighted_sum(const float* arr1, const float arr1_weight, const float* arr2, const float arr2_weight,
-    int len, float* result_arr)
-{
-    for (int i=0; i<len; i++) {
-        result_arr[i] = arr1[i]*arr1_weight + arr2[i]*arr2_weight;
-    }
-}
-
-void binarize_c(unsigned char* buf, int h, int w) {
+void binarize_c_naive(unsigned char* buf, int h, int w) {
     int len = h*w*3;
     for (int i=0; i<len; i++) {
         if (buf[i]>0) {
             buf[i]=255;
         }
+    }
+}
+
+void binarize_c_fast(unsigned char* buf, int h, int w) {
+    int len = h*w*3;
+    for (int i=0; i<len; i++) {
+        *buf = *buf>0 ? 255: *buf;
+        buf++;
     }
 }
 
@@ -86,45 +86,64 @@ void binarize_neon_intrinsics2(unsigned char* buf, int h, int w) {
     }
 }
 
+int get_random_int(int a, int b) {
+    if (a>b) {
+        swap(a, b);
+    }
+    static random_device rd;
+    static default_random_engine engine(rd());
+    uniform_int_distribution<int> dist(a, b);
+    return dist(engine);
+}
 
-std::default_random_engine e(time(0)); 
-
-inline float rand_uniform(float min, float max) {
-  //return (static_cast<float>(rand()) / RAND_MAX) * (max - min) + min;
-  std::uniform_real_distribution<float> u(0, 1);   //0到1（包含）的均匀分布 uniform_real_distribution
-  return u(e) * (max - min) + min; 
+uint8_t get_random_uint8() {
+    return static_cast<uint8_t>(get_random_int(0, 255));
 }
 
 int main() {
-    
+
     int h = 640;
     int w = 480;
     const int len = h*w*3;
     unsigned char* data = (unsigned char*)malloc(len);
     for (int i=0; i<len; i++) {
-        data[i] = (unsigned char)rand_uniform(0, 255);
+        data[i] = get_random_uint8();
     }
 
     unsigned char* data_copy1 = (unsigned char*)malloc(len);
     unsigned char* data_copy2 = (unsigned char*)malloc(len);
     unsigned char* data_copy3 = (unsigned char*)malloc(len);
+    unsigned char* data_copy4 = (unsigned char*)malloc(len);
     memcpy(data_copy1, data, len);
     memcpy(data_copy2, data, len);
     memcpy(data_copy3, data, len);
+    memcpy(data_copy4, data, len);
 
     const int loop = 100;
 
-    double t_start, t_c, t_neon_intrinsics, t_neon_intrinsics2;
+    double t_start, t_c_naive, t_c_fast, t_neon_intrinsics, t_neon_intrinsics2;
     //==================================
-    // naive impl
+    // c naive impl
     //==================================
     {
         t_start = now_ms();
         for (int i=0; i<loop; i++) {
-            binarize_c(data_copy1, h, w);
+            binarize_c_naive(data_copy1, h, w);
         }
-        t_c = now_ms() - t_start;
+        t_c_naive = now_ms() - t_start;
     }
+
+    //==================================
+    // c fast impl
+    //==================================
+    {
+        t_start = now_ms();
+        for (int i=0; i<loop; i++) {
+            binarize_c_fast(data_copy2, h, w);
+        }
+        t_c_fast = now_ms() - t_start;
+    }
+
 
     //==================================
     // arm neon intrinsics impl
@@ -132,7 +151,7 @@ int main() {
     {
         t_start = now_ms();
         for (int i=0; i<loop; i++) {
-            binarize_neon_intrinsics(data_copy2, h, w);
+            binarize_neon_intrinsics(data_copy3, h, w);
         }
         t_neon_intrinsics = now_ms() - t_start;
     }
@@ -143,15 +162,20 @@ int main() {
     {
         t_start = now_ms();
         for (int i=0; i<loop; i++) {
-            binarize_neon_intrinsics2(data_copy3, h, w);
+            binarize_neon_intrinsics2(data_copy4, h, w);
         }
         t_neon_intrinsics2 = now_ms() - t_start;
     }
 
-
+    //=================================
+    // validate correctness
+    //=================================
     int fail_cnt = 0;
     for (int i=0; i<len; i++) {
-        if (data_copy1[i]!=data_copy2[i] || data_copy1[i]!=data_copy3[i]) {
+        if (data_copy1[i]!=data_copy2[i]
+                || data_copy1[i]!=data_copy3[i]
+                || data_copy1[i]!=data_copy4[i]
+        ) {
             fail_cnt++;
         }
     }
@@ -160,9 +184,20 @@ int main() {
     } else {
         fprintf(stdout, "[good] result match\n");
     }
-    printf("c impl cost %g ms\n", t_c);
-    printf("neon impl cost %g ms\n", t_neon_intrinsics);
-    printf("neon impl2 cost %g ms\n", t_neon_intrinsics2);
+    printf("[c naive] cost %g ms\n", t_c_naive);
+    printf("[c fast] cost %g ms\n", t_c_fast);
+    printf("[neon intrinsics] cost %g ms\n", t_neon_intrinsics);
+    printf("[neon intrinsics2] cost %g ms\n", t_neon_intrinsics2);
+
+
+    // ===========================
+    // clean ups
+    // ===========================
+    free(data);
+    free(data_copy1);
+    free(data_copy2);
+    free(data_copy3);
+    free(data_copy4);
 
     return 0;
 }
