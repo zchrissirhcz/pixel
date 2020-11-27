@@ -38,15 +38,17 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       shell: bash
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build . --config $BUILD_TYPE
+      run: |
+        cmake --build . --config $BUILD_TYPE
 
     - name: run tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
         script: |
-          chmod +x ./demo
-          ./demo
+          adb shell "mkdir -p /data/pixel"
+          adb push ./demo /data/pixel/demo
+          adb shell "cd /data/pixel; chmod +x ./demo; ./demo"
 
     #- name: Test
     #  working-directory: ${{runner.workspace}}/build
