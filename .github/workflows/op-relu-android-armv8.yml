@@ -41,14 +41,14 @@ jobs:
       run: |
         cmake --build . --config $BUILD_TYPE
 
-    - name: run tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 29
-        script: |
-          adb shell "mkdir -p /data/pixel"
-          adb push ./demo /data/pixel/demo
-          adb shell "cd /data/pixel; chmod +x ./demo; ./demo"
+#     - name: run tests
+#       uses: reactivecircus/android-emulator-runner@v2
+#       with:
+#         api-level: 29
+#         script: |
+#           adb shell "mkdir -p /data/pixel"
+#           adb push ./demo /data/pixel/demo
+#           adb shell "cd /data/pixel; chmod +x ./demo; ./demo"
 
     #- name: Test
     #  working-directory: ${{runner.workspace}}/build
