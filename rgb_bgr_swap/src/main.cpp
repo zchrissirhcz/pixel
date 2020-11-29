@@ -335,9 +335,40 @@ void perf_test()
 #endif
 }
 
+
+// 作为入门arm汇编的第一个函数，实现的功能是拷贝变量，把x拷贝到y
+// 分别对于armv7和armv8的inline assembly进行编写和参数理解。
+// https://stackoverflow.com/questions/65056624/confusion-about-different-clobber-description-for-arm-inline-assembly
+void asm_test()
+{
+    // 定义x和y都是int类型，对应32位。x和y分别是inline assembly的input和output
+    // 则arm32下的output、input，constraint用r
+    // arm64下的output、input，constraint用r，并且inline asm里面使用%w替代%
+    int x = 10;
+    int y = 0;
+
+#ifdef __aarch64__
+    asm volatile(
+        "mov %w[out], %w[in]"  // 这里，先前语法弄反了。语法是 mov dst, src
+        : [out] "=r"(y)    // output参数列表，只有一个y，起了一个别名叫做out。对应到r寄存器(32位通用寄存器,用%w替代%)
+        : [in] "r"(x)      // input参数列表，只有一个x，起了一个别名叫做in。对应到r寄存器(32位通用寄存器，用%w替代%)
+        : "x1" // aarch64，应该用wn或xn，n是具体的数字。虽然godbolt上看汇编，用rn结果和wn一样，但nihui说一般不用rn
+    );
+#else
+    asm volatile(
+        "mov %[out], %[in]"
+        : [out] "=r"(y)
+        : [in] "r"(x)
+        : "r2" // r0管用，并且用r1的话结果不对
+    );
+#endif
+    printf("y=%d\n", y);
+}
+
 int main(int, char*[])
 {
-    perf_test();
+    //perf_test();
+    asm_test();
 
     return 0;
 }
