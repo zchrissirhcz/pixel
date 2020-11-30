@@ -25,6 +25,11 @@ android-arm64/demo: 1 file pushed. 29.9 MB/s (1465104 bytes in 0.047s)
 [neon intrinsics2] cost 79.0083 ms
 ```
 
+## TODO
+和 NCNN 的 Relu 层的 NEON Intrinsics 实现对别。
+
 ## Reference
 
 https://stackoverflow.com/a/34505048/2999096
+
+[ncnn小课堂2：如何在ncnn中新建并推理单层](https://zhuanlan.zhihu.com/p/308469221)
