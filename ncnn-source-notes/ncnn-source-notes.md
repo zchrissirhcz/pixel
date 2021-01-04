@@ -18,6 +18,8 @@ ARM NEON 的几个入门帖：
 - https://blog.csdn.net/emsoften/article/details/51718763
 - https://aijishu.com/a/1060000000116427
 
+对应代码：以ncnn第一次git commit为主，有编译问题简单修复。
+
 **VSCode设置**
 
 这里对 VSCode 的设置做说明：怎样让它识别 `__ARM_NEON`宏，代码不要灰色显示？怎样跳转到`vld3_u8`这样的宏/函数定义？
@@ -96,6 +98,7 @@ step5: 消除红色波浪线
 Linux和早些时候的Windows上，VSCode不识别`__fp16`和`vld3_u8`等关键字，显示为红色波浪下划线。
 
 VSCode->文件->首选项->设置，搜索 `Intelli Sense Engine`，把 `Default` 改成 `Tag Parser`，红色波浪线就消失了！
+![](VSCode_Intelli_Sense_Engine.jpg)
 
 （其实是Intelli Sense的Parser的问题，https://github.com/microsoft/vscode-cpptools/issues/6506）
 
@@ -303,6 +306,117 @@ ncnn::Mat from_rgb_neon_intrinsics(const unsigned char* rgb, int w, int h)
 - `to_bgr2rgb()`
 
 ### 0x211 to_rgb 函数
+纯C naive实现；暂时没考虑SATURATE问题（为什么以及什么时候会导致溢出？）
+```c++
+/**
+ * Mat转buffer
+ * 维度：HWC => CHW
+ * 类型：float => uchar
+ * @param m
+ * @param rgb
+ */
+static void to_rgb_c(const ncnn::Mat& m, unsigned char* rgb)
+{
+    const float* ptr0 = m.channel(0);
+    const float* ptr1 = m.channel(1);
+    const float* ptr2 = m.channel(2);
 
+    int size = m.w * m.h;
+
+//#define SATURATE_CAST_UCHAR(X) (unsigned char)std::min(std::max((int)(X), 0), 255);
+#define SATURATE_CAST_UCHAR(X) (unsigned char)(X)
+    int remain = size;
+
+    for (; remain>0; remain--)
+    {
+        rgb[0] = SATURATE_CAST_UCHAR(*ptr0);
+        rgb[1] = SATURATE_CAST_UCHAR(*ptr1);
+        rgb[2] = SATURATE_CAST_UCHAR(*ptr2);
+
+        rgb += 3;
+        ptr0++;
+        ptr1++;
+        ptr2++;
+    }
+
+#undef SATURATE_CAST_UCHAR
+}
+```
+
+然后，不看ncnn源码的情况下，只参照 `from_rgb()` 和neon intrinsics的函数说明资料，写了如下实现：
+```c++
+
+void to_rgb_neon_intrinsics(const ncnn::Mat& m, unsigned char* rgb)
+{
+    const float* ptr0 = m.channel(0);
+    const float* ptr1 = m.channel(1);
+    const float* ptr2 = m.channel(2);
+
+    int size = m.w * m.h;
+    int nn = size >> 3;
+    int remain = size - (nn<<3);
+    for (; nn>0; nn--) {
+        // float => u8
+
+        // r
+        float32x4_t r1_f32 = vld1q_dup_f32(ptr0);
+        uint32x4_t r1_u32 = vcvtq_u32_f32(r1_f32);
+        uint16x4_t r1_u16 = vmovn_u32(r1_u32);
+
+        float32x4_t r2_f32 = vld1q_dup_f32(ptr0+4);
+        uint32x4_t r2_u32 = vcvtq_u32_f32(r2_f32);
+        uint16x4_t r2_u16 = vmovn_u32(r2_u32);
+
+        uint16x8_t r_16 = vcombine_u16(r1_u16, r2_u16);
+        uint8x8_t r_8 = vmovn_u16(r_16);
+
+        // g
+        float32x4_t g1_f32 = vld1q_dup_f32(ptr1);
+        uint32x4_t g1_u32 = vcvtq_u32_f32(g1_f32);
+        uint16x4_t g1_u16 = vmovn_u32(g1_u32);
+
+        float32x4_t g2_f32 = vld1q_dup_f32(ptr1+4);
+        uint32x4_t g2_u32 = vcvtq_u32_f32(g2_f32);
+        uint16x4_t g2_u16 = vmovn_u32(g2_u32);
+
+        uint16x8_t g_16 = vcombine_u16(g1_u16, g2_u16);
+        uint8x8_t g_8 = vmovn_u16(g_16);
+
+        // b
+        float32x4_t b1_f32 = vld1q_dup_f32(ptr2);
+        uint32x4_t b1_u32 = vcvtq_u32_f32(b1_f32);
+        uint16x4_t b1_u16 = vmovn_u32(b1_u32);
+
+        float32x4_t b2_f32 = vld1q_dup_f32(ptr2+4);
+        uint32x4_t b2_u32 = vcvtq_u32_f32(b2_f32);
+        uint16x4_t b2_u16 = vmovn_u32(b2_u32);
+
+        uint16x8_t b_16 = vcombine_u16(b1_u16, b2_u16);
+        uint8x8_t b_8 = vmovn_u16(b_16);
+
+        //
+        uint8x8x3_t _rgb;
+        _rgb.val[0] = r_8;
+        _rgb.val[1] = g_8;
+        _rgb.val[2] = b_8;
+        vst3_u8(rgb, _rgb);
+
+        rgb += 3*8;
+        ptr0 += 8;
+        ptr1 += 8;
+        ptr2 += 8;
+    }
+    for (; remain>0; remain--) {
+        rgb[0] = (unsigned char)(*ptr0);
+        rgb[1] = (unsigned char)(*ptr1);
+        rgb[2] = (unsigned char)(*ptr2);
+        rgb += 3;
+        ptr0++;
+        ptr1++;
+        ptr2++;
+    }
+}
+```
+测试图不变的情况下，结果有差异，但整图看，肉眼看不出区别。（为什么有差异？哪句导致的？）
 
 ### 0x212 to_bgr2rgb 函数
