@@ -76,11 +76,15 @@ step4: 改 c_cpp_properties.json
 }
 ```
 然后VSCode里打开任意一个.h/.c/.cpp文件，右下角状态栏选择NDK-r21b
+
 ![](VSCode_UseNdk_1.png)
+
 ![](VSCode_UseNdk_3.png)
 
 或者，关掉VSCode，删除.vscode目录，重新打开，过几秒会自动弹窗提示选择compile_commands.json文件：
+
 ![](VSCode_UseNdk_2.png)
+
 只不过这种情况下，`c_cpp_properties.json`里的编译器可能还是x86平台的编译器而不是NDK里的。
 
 step5: 消除红色波浪线
@@ -88,6 +92,8 @@ step5: 消除红色波浪线
 Linux和早些时候的Windows上，VSCode不识别`__fp16`和`vld3_u8`等关键字，显示为红色波浪下划线。
 
 VSCode->文件->首选项->设置，搜索 `Intelli Sense Engine`，把 `Default` 改成 `Tag Parser`，红色波浪线就消失了！
+
+（其实是Intelli Sense的Parser的问题，https://github.com/microsoft/vscode-cpptools/issues/6506）
 
 ## 0x2 Mat类的 from_pixels 函数
 `from_pixels()`的实现，是根据FLAG，调用不同的函数，其中最常用的是:
