@@ -22,9 +22,11 @@ ARM NEON 的几个入门帖：
 
 这里对 VSCode 的设置做说明：怎样让它识别 `__ARM_NEON`宏，代码不要灰色显示？怎样跳转到`vld3_u8`这样的宏/函数定义？
 
-step1: cmake版本
+<del>step1: cmake版本</del>
 
-确保cmake版本>3.9，如果有Python环境，可以`pip install cmake`快速安装
+<del>确保cmake版本>3.9，如果有Python环境，可以`pip install cmake`快速安装</del>
+
+推荐 cmake > 3.15 的版本，不过 @OFshare 测试发现低于3.9也可以用。
 
 step2: 生成 compile_commands.json 文件
 
@@ -32,7 +34,9 @@ CMakeLists.txt里添加`set(CMAKE_EXPORT_COMPILE_COMMANDS ON)`，或调用cmake�
 
 step3: VSCode 插件
 
-确保安装3个插件：C/C++, CMake Tools, CMake。
+确保安装3个插件：C/C++, CMake, <del>CMake Tools</del>
+
+经过 @OFshare 测试，CMake Tools不是必要的。
 
 step4: 改 c_cpp_properties.json
 
