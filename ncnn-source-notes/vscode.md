@@ -1,18 +1,11 @@
-## 0x1 准备
+## vscode 设置: 用于研读 ncnn arm 代码
 
 我觉得一套齐全的工具包括而不限于：
 GUI软件：VSCode, CLion, SourceTail, AndroidStudio, SmartGit;
 编译器：NDK-r21b; Clang / VS2019
 命令行：cmake, git, tig, ag
 
-ARM NEON 的几个入门帖：
-- https://blog.csdn.net/Roland_Sun/article/details/42921131
-- https://blog.csdn.net/emsoften/article/details/51718763
-- https://aijishu.com/a/1060000000116427
-
-对应代码：以ncnn第一次git commit为主，有编译问题简单修复。
-
-**vscode设置**
+这其中，VSCode又是很重要的一个工具：
 
 这里对 VSCode 的设置做说明：怎样让它识别 `__ARM_NEON`宏，代码不要灰色显示？怎样跳转到`vld3_u8`这样的宏/函数定义？
 
