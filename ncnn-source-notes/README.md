@@ -6,3 +6,4 @@
 ## 源码之外
 - [0x1 配置VSCode看ARM NEON代码](vscode.md)
 - [0x2 mingw-w64编译ncnn](mingw-w64.md)
+- [0x3 配置CLion用于查看和编译arm neon代码](clion.md)
