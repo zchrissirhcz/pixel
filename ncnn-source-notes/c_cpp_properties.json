@@ -18,16 +18,28 @@
             "compileCommands": "${workspaceFolder}/build/vs2019-x64/compile_commands.json"
         },
         {
-            "name": "NDK-r21b",
+            "name": "NDK-r21b-arm64-v8a",
             "includePath": [
                 "${workspaceFolder}/**"
             ],
             "defines": [],
-            "compilerPath": "E:/soft/Android/ndk-r21b/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe",
+            "compilerPath": "E:/soft/Android/ndk-r21b/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe --target=aarch64-linux-android",
             "cStandard": "c11",
             "cppStandard": "c++11",
             "intelliSenseMode": "clang-arm64",
-            "compileCommands": "build/android-arm64/compile_commands.json"
+            "compileCommands": "${workspaceFolder}/build/android-arm64/compile_commands.json"
+        },
+        {
+            "name": "NDK-r21b-armeabi-v7a",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "E:/soft/Android/ndk-r21b/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe --target=armv7-none-linux-androideabi24",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "clang-arm",
+            "compileCommands": "${workspaceFolder}/build/android-arm32/compile_commands.json"
         }
     ],
     "version": 4
