@@ -4,6 +4,8 @@
 
 怎样让 VSCode 识别 `__ARM_NEON`、`vld3_u8`等宏，并跳转到定义？
 
+尝试了一番，勉强能用（跳转、识别__ARM_NEON宏），但不完美（armv8完美使用，armv7 with neon时 intrinsic 报红色），CLion能识别也能编译似乎是更好选择，neovim + coc.vim 似乎也值得尝试。
+
 ## 配置步骤
 ### 步骤1：cmake 推荐 >= 3.15
 
@@ -19,7 +21,7 @@ CMakeLists.txt里添加`set(CMAKE_EXPORT_COMPILE_COMMANDS ON)`。
 
 或调用cmake时传入`-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`。
 
-Windows/Linux 平台 armeabi-v7a with neon 时会遇到 VSCode 不识别 `__ARM_NEON` 宏，在项目 CMakeLists.txt 添加即可：
+Windows/Linux 平台 armeabi-v7a with neon 时会遇到 VSCode 不识别 `__ARM_NEON` 宏，在项目 CMakeLists.txt 添加如下内容即可：
 ```cmake
 if (ANDROID_ARM_NEON)
     add_definitions(-D__ARM_NEON=1)
@@ -111,15 +113,6 @@ C/C++ 插件用于提供 IntelliSense 做语法高亮、调试、函数跳转等
 只不过这种情况下，`c_cpp_properties.json`里的编译器可能还是x86平台的编译器而不是NDK里的。
 
 
-### 步骤5：消除红色波浪线
-
-Linux和早些时候的Windows上，VSCode不识别`__fp16`和`vld3_u8`等关键字，显示为红色波浪下划线。
-
-VSCode->文件->首选项->设置，搜索 `Intelli Sense Engine`，把 `Default` 改成 `Tag Parser`，红色波浪线就消失了！
-![](VSCode_Intelli_Sense_Engine.jpg)
-
-（其实是Intelli Sense的Parser的问题，https://github.com/microsoft/vscode-cpptools/issues/6506）
-
 ## 一些问题排查
 ### 问题1：32位编译器不识别 `__ARM_NEON` 宏？
 
@@ -201,3 +194,61 @@ endif()
 ```
 
 P.S. 我在vscode 官方 issue 也提出问题了，https://github.com/microsoft/vscode-cpptools/issues/6742 ，还是比较期待 Intelli Sense 官方修复 armeabi-v7a with neon 的 parser。
+
+
+### 问题2：arm neon intrinsic 跳转定义，有两个？
+
+实际上 NDK armv7-eabi，一般用的时候，编译器内置了宏`__LITTLE_ENDIAN__`，定义等于1。
+
+```
+$ /e/soft/Android/ndk-r21b/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe --target=armv7-none-linux-androideabi24 -dM -E - < /dev/null | ag 'endian'
+#define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
+#define __LITTLE_ENDIAN__ 1
+#define __ORDER_BIG_ENDIAN__ 4321
+#define __ORDER_LITTLE_ENDIAN__ 1234
+#define __ORDER_PDP_ENDIAN__ 3412
+```
+
+因此，类似于 `__ARM_NEON`，这也是内置宏，也是没有被 Intelli Sense 识别。遗憾的是，这次不能通过在 当前项目的 CMakeLists.txt 中定义宏来让 Intelli Sense知道了。
+
+
+### 问题3：消除红色波浪线
+
+Linux和早些时候的Windows上，VSCode不识别`__fp16`和`vld3_u8`等关键字，显示为红色波浪下划线。
+
+VSCode->文件->首选项->设置，搜索 `Intelli Sense Engine`，把 `Default` 改成 `Tag Parser`，红色波浪线就消失了！
+![](VSCode_Intelli_Sense_Engine.jpg)
+
+（其实是Intelli Sense的Parser的问题，https://github.com/microsoft/vscode-cpptools/issues/6506）
+
+红色波浪线虽然消失带来新的问题：`__aarch64__`也被识别而不是灰色了。看来这不是我们需要的。
+
+
+### 问题4：未知寄存器名"q0"
+
+例如如下代码：
+```c++
+#include <arm_neon.h>
+#include <iostream>
+using namespace std;
+
+static void print_uint8x8(uint8x8_t data) {
+    static uint8_t p[8];
+
+    // void vst1_u8 (uint8_t * ptr, uint8x8_t val)
+    vst1_u8(p, data);
+    for (int i=0; i<8; i++) {
+        printf("%2d ", p[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    uint8x8_t data1 = vdup_n_u8(255);
+    print_uint8x8(data1);
+
+    return 0;
+}
+```
+
+这个问题是 Intelli Sense Parser 的问题，目前只能等官方修复。  帖子：https://github.com/microsoft/vscode-cpptools/issues/6506
