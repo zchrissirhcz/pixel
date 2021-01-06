@@ -51,7 +51,7 @@ step4: 改 c_cpp_properties.json
             "compileCommands": "${workspaceFolder}/build/vs2019-x64/compile_commands.json"
         },
         {
-            "name": "NDK-r21b",
+            "name": "NDK-r21b-arm64-v8a",
             "includePath": [
                 "${workspaceFolder}/**"
             ],
@@ -60,6 +60,18 @@ step4: 改 c_cpp_properties.json
             "cStandard": "c11",
             "cppStandard": "c++11",
             "intelliSenseMode": "clang-arm64",
+            "compileCommands": "build/android-arm64/compile_commands.json"
+        },
+        {
+            "name": "NDK-r21b-armeabi-v7a",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "E:/soft/Android/ndk-r21b/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "clang-arm",
             "compileCommands": "build/android-arm64/compile_commands.json"
         }
     ],
@@ -78,7 +90,22 @@ step4: 改 c_cpp_properties.json
 
 只不过这种情况下，`c_cpp_properties.json`里的编译器可能还是x86平台的编译器而不是NDK里的。
 
-step5: 消除红色波浪线
+step5:
+
+armeabi-v7a情况下，不识别 `__ARM_NEON`宏？
+临时解决办法：
+```cmake
+target_compile_definitions(ncnn PRIVATE __ARM_NEON)
+```
+检查了 armeabi-v7a 情况下的 compile_commands.json 文件，里面有`-DANDROID=1`但是没有`-D__ARM_NEON`，而 ndk的clang编译器内部其实有`#define ANDROID=1`。。
+
+实际上编译器还定义了`__arm`宏，代码中也能高亮识别。为什么`__ARM_NEON`不被识别？？
+
+
+我在vscode 官方 issue 也提出问题了，https://github.com/microsoft/vscode-cpptools/issues/6742
+
+
+step6: 消除红色波浪线
 
 Linux和早些时候的Windows上，VSCode不识别`__fp16`和`vld3_u8`等关键字，显示为红色波浪下划线。
 
