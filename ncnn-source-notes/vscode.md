@@ -4,7 +4,8 @@
 
 怎样让 VSCode 识别 `__ARM_NEON`、`vld3_u8`等宏，并跳转到定义？
 
-## cmake 推荐 >= 3.15
+## 配置步骤
+### 步骤1：cmake 推荐 >= 3.15
 
 低于 3.9 也能用但不推荐。
 
@@ -12,21 +13,28 @@
 ```bash
 pip install cmake
 ```
-## 生成 compile_commands.json 文件
+### 步骤2：生成 compile_commands.json 文件
 
 CMakeLists.txt里添加`set(CMAKE_EXPORT_COMPILE_COMMANDS ON)`。
 
-或调用cmake时传入`-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
+或调用cmake时传入`-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`。
 
-## VSCode 插件： C/C++ 和 CMake
+Windows/Linux 平台 armeabi-v7a with neon 时会遇到 VSCode 不识别 `__ARM_NEON` 宏，在项目 CMakeLists.txt 添加即可：
+```cmake
+if (ANDROID_ARM_NEON)
+    add_definitions(-D__ARM_NEON=1)
+endif()
+```
+
+### 步骤3：VSCode 插件： C/C++ 和 CMake
 
 CMake 插件用来给 `CMakeLists.txt` 和 `*.cmake` 做语法高亮。
 
 C/C++ 插件用于提供 IntelliSense 做语法高亮、调试、函数跳转等。
 
-## 改 .vscode/c_cpp_properties.json
+### 步骤4：改 .vscode/c_cpp_properties.json
 
-添加一个NDK的配置项。最重要的是编译器路径，以及指定`"intelliSenseMode": "clang-arm64"`。
+添加 NDK-r21b-armeabi-v7a 和 NDK-r21b-arm64-v8a 的配置项。
 
 例如在Windows下我的配置：
 ```json
@@ -55,11 +63,11 @@ C/C++ 插件用于提供 IntelliSense 做语法高亮、调试、函数跳转等
                 "${workspaceFolder}/**"
             ],
             "defines": [],
-            "compilerPath": "E:/soft/Android/ndk-r21b/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe",
+            "compilerPath": "E:/soft/Android/ndk-r21b/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe --target=aarch64-linux-android",
             "cStandard": "c11",
             "cppStandard": "c++11",
             "intelliSenseMode": "clang-arm64",
-            "compileCommands": "build/android-arm64/compile_commands.json"
+            "compileCommands": "${workspaceFolder}/build/android-arm64/compile_commands.json"
         },
         {
             "name": "NDK-r21b-armeabi-v7a",
@@ -67,16 +75,29 @@ C/C++ 插件用于提供 IntelliSense 做语法高亮、调试、函数跳转等
                 "${workspaceFolder}/**"
             ],
             "defines": [],
-            "compilerPath": "E:/soft/Android/ndk-r21b/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe",
+            "compilerPath": "E:/soft/Android/ndk-r21b/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe --target=armv7-none-linux-androideabi24",
             "cStandard": "c11",
             "cppStandard": "c++11",
             "intelliSenseMode": "clang-arm",
-            "compileCommands": "build/android-arm64/compile_commands.json"
+            "compileCommands": "${workspaceFolder}/build/android-arm32/compile_commands.json"
         }
     ],
     "version": 4
 }
 ```
+
+重要字段解释：
+
+- `compilerPath`:编译器路径。对于NDK来说，同一个编译器有多种abi（armeabi-v7a, arm64-v8a, x86, x86_64等），指定`target`后才能让 Intelli Sense 正常工程
+```json
+//"compilerPath": "E:/soft/Android/ndk-r21b/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe", // 这样会报找不到 stdio.h 
+```
+
+- `"intelliSenseMode"`：告诉Intelli Sense使用哪种Parser
+
+- `compileCommands`：指定 comile_commands.json 文件路径
+
+
 然后VSCode里打开任意一个.h/.c/.cpp文件，右下角状态栏选择NDK-r21b
 
 ![](VSCode_UseNdk_1.png)
@@ -89,7 +110,18 @@ C/C++ 插件用于提供 IntelliSense 做语法高亮、调试、函数跳转等
 
 只不过这种情况下，`c_cpp_properties.json`里的编译器可能还是x86平台的编译器而不是NDK里的。
 
-## 32位编译器不识别 `__ARM_NEON` 宏？
+
+### 步骤5：消除红色波浪线
+
+Linux和早些时候的Windows上，VSCode不识别`__fp16`和`vld3_u8`等关键字，显示为红色波浪下划线。
+
+VSCode->文件->首选项->设置，搜索 `Intelli Sense Engine`，把 `Default` 改成 `Tag Parser`，红色波浪线就消失了！
+![](VSCode_Intelli_Sense_Engine.jpg)
+
+（其实是Intelli Sense的Parser的问题，https://github.com/microsoft/vscode-cpptools/issues/6506）
+
+## 一些问题排查
+### 问题1：32位编译器不识别 `__ARM_NEON` 宏？
 
 前面在 `.vscode/c_cpp_properties.json` 中创建的 NDK-r21b-armeabi-v7a 配置项，使用了`clang-arm`，在调用 `build/android-arm32-build.cmd` 生成 `compile_commands.json` 后，VSCode 仍不识别`__ARM_NEON`宏。
 
@@ -169,13 +201,3 @@ endif()
 ```
 
 P.S. 我在vscode 官方 issue 也提出问题了，https://github.com/microsoft/vscode-cpptools/issues/6742 ，还是比较期待 Intelli Sense 官方修复 armeabi-v7a with neon 的 parser。
-
-
-## 消除红色波浪线
-
-Linux和早些时候的Windows上，VSCode不识别`__fp16`和`vld3_u8`等关键字，显示为红色波浪下划线。
-
-VSCode->文件->首选项->设置，搜索 `Intelli Sense Engine`，把 `Default` 改成 `Tag Parser`，红色波浪线就消失了！
-![](VSCode_Intelli_Sense_Engine.jpg)
-
-（其实是Intelli Sense的Parser的问题，https://github.com/microsoft/vscode-cpptools/issues/6506）
