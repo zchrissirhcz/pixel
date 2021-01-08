@@ -372,3 +372,39 @@ void to_rgb_neon_intrinsics(const ncnn::Mat& m, unsigned char* rgb)
 
 
 ### 0x212 to_bgr2rgb 函数
+
+
+
+
+
+## from_pixels_roi_resize 函数
+https://github.com/Tencent/ncnn/issues/2556
+
+看到 issue #2556 的提问后，看了 from_pixels_roi_resize 的实现，它的作用是从 HWC 维度顺序的 uchar 数据，把指定的 ROI 区域内的数据， resize 到 target_height * target_width 大小，然后再转为 CHW 维度顺序的 float 类型的 ncnn::Mat对象。
+
+期间尝试理解 Mat 类的 elemsize 和 elempack 字段的含义：
+elemsize: sizeof(当前data实际类型)，也就是bit数量除以8。
+elempack: 把当前data实际类型看做向量时，元素的数量，也就是lane的数量
+
+来看一下官方 wiki 给的说明：
+https://github.com/Tencent/ncnn/wiki/element-packing
+
+
+|C|elemsize|elempack|
+|---|---|---|
+|double|8|1|
+|float|4|1|
+|int|4|1|
+|short|2|1|
+|signed char|1|1|
+
+|arm neon|elemsize|elempack|
+|---|---|---|
+|float64x2_t|16|2|
+|float32x4_t|16|4|
+|int32x4_t|16|4|
+|float16x4_t|8|4|
+|int8x8_t|8|8|
+
+例如 `float64x2_t`类型，占据128bit，也就是16字节(128/8=16)，这就是 elemsize=16;
+把它看做一个vector，里面有2个元素，因此elempack=2。
