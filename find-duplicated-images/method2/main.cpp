@@ -211,6 +211,7 @@ void find_similar_images()
     }
 
     // use find-union-set algorithm to form groups, each group shares similar features
+    // https://juejin.cn/post/6844904004674125837
     printf("--- find-union-set\n");
     vector<int> speaker(len);
     for (int i=0; i<len; i++) {
