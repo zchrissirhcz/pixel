@@ -1,6 +1,8 @@
 # ncnn::Mat 类
 
-## 0x2 Mat类的 from_pixels 函数
+[TOC]
+
+## 0x20 Mat类的 from_pixels 函数
 `from_pixels()`的实现，是根据FLAG，调用不同的函数，其中最常用的是:
 - `from_rgb()`
 - `from_rgb2bgr()`
@@ -373,15 +375,55 @@ void to_rgb_neon_intrinsics(const ncnn::Mat& m, unsigned char* rgb)
 
 ### 0x212 to_bgr2rgb 函数
 
+和 `to_bgr()` 基本一致，仅仅是写入目标位置时，交换B和R通道顺序。
+
+## 0x22 yuv420sp 和 RGB24 互转
+
+### 0x221 nv21 转 rgb
+
+`yuv420sp2rgb()`
+
+```C++
+// BT.601 YUV to RGB reference
+// R = 1.164 * yy + 1.596 * vv
+// G = 1.164 * yy - 0.813 * vv - 0.391 * uu
+// B = 1.164 * yy              + 2.018 * uu
+
+// ?
+// R = Y + (1.370705 * (V-128))
+// G = Y - (0.698001 * (V-128)) - (0.337633 * (U-128))
+// B = Y + (1.732446 * (U-128))
+
+// ?
+// R = ((Y << 6) + 87.72512 * (V-128)) >> 6
+// G = ((Y << 6) - 44.672064 * (V-128) - 21.608512 * (U-128)) >> 6
+// B = ((Y << 6) + 110.876544 * (U-128)) >> 6
+
+// ?
+// R = ((Y << 6) + 90 * (V-128)) >> 6
+// G = ((Y << 6) - 46 * (V-128) - 22 * (U-128)) >> 6
+// B = ((Y << 6) + 113 * (U-128)) >> 6
+
+// ?
+// R = (yy + 90 * vv) >> 6
+// G = (yy - 46 * vv - 22 * uu) >> 6
+// B = (yy + 113 * uu) >> 6
+```
+（TODO）需要参考libyuv。了解bt.601，bt.709，full range 和 tv range
+
+### 0x222 rgb 转 nv21
+(TODO)
 
 
+## 0x23 from_pixels_roi_resize 函数
 
-
-## from_pixels_roi_resize 函数
+### 0x231 issue #2565
 https://github.com/Tencent/ncnn/issues/2556
 
 看到 issue #2556 的提问后，看了 from_pixels_roi_resize 的实现，它的作用是从 HWC 维度顺序的 uchar 数据，把指定的 ROI 区域内的数据， resize 到 target_height * target_width 大小，然后再转为 CHW 维度顺序的 float 类型的 ncnn::Mat对象。
 
+
+### 0x232 elemsize 和 elempack
 期间尝试理解 Mat 类的 elemsize 和 elempack 字段的含义：
 elemsize: sizeof(当前data实际类型)，也就是bit数量除以8。
 elempack: 把当前data实际类型看做向量时，元素的数量，也就是lane的数量
