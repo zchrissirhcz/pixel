@@ -1,1 +1,6 @@
-build/
+build/CMakeFiles
+build/Makefile
+build/CMakeCache.txt
+build/cmake_install.cmake
+build/libphash.a
+build/main
