@@ -6,10 +6,11 @@
 
 
 // References
-// 1. Chapter 23 in "Intermediate C Programming", by YungSiang-Lu, Chinese tranlation edition
-// 2. https://www.cnblogs.com/wainiwann/p/7086844.html
-// 3. https://github.com/vallentin/LoadBMP
-// 4. opencv/modules/imgcodecs/src/grfmt_bmp.hpp
+// 1. https://wiki.multimedia.cx/index.php/BMP
+// 2. Chapter 23 in "Intermediate C Programming", by YungSiang-Lu, Chinese tranlation edition
+// 3. https://www.cnblogs.com/wainiwann/p/7086844.html
+// 4. https://github.com/vallentin/LoadBMP
+// 5. opencv/modules/imgcodecs/src/grfmt_bmp.hpp
 
 
 typedef struct BMP_file_header
@@ -372,7 +373,129 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
 
 
 
-void _pxl_encode_bmp(const char* fn, int line_align, int h, int w, int c, const unsigned char* buffer, bool swap_bgr)
+void _pxl_encode_bmp(const char* fn, int ht, int wt, int cn, const unsigned char* buf, int read_linebytes, bool swap_bgr)
 {
+    //void nc_image_save_bmp(const uchar* buf, uint read_linebytes) {
+    int height = ht;
+    int width = wt;
+    int channels = cn;
+    FILE* fout = NULL;
+    
+    do {
+        fout = fopen(fn, "wb");
+        if (fout==NULL) {
+            PIXEL_LOGE("fopen failed"); break;
+        }
 
+        if (read_linebytes<width*channels) {
+            PIXEL_LOGE("the given read_linebytes is not valid"); break;
+        }
+
+        unsigned char hd[54] = { //bmp header
+            'B', 'M', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //bmp file header, 14 bytes
+            40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 //bmp info header, 40 bytes
+        };
+        unsigned int size = 54 + height*width*channels;
+        if (channels == 1) {
+            size += 1024; //256 colors * 4 bytes, 256 palette is 1<<8, 8 is bpp
+        }
+
+        hd[2] = (uint8_t)(size);
+        hd[3] = (uint8_t)(size>>8);
+        hd[4] = (uint8_t)(size>>16);
+        hd[5] = (uint8_t)(size>>24);
+
+        if (channels == 3) {
+            hd[10] = 54;
+        }
+        else if (channels == 1) {
+            hd[10] = (uint8_t)(1078);
+            hd[11] = (uint8_t)(1078 >> 8);
+        }
+
+        hd[18] = (uint8_t)(width);
+        hd[19] = (uint8_t)(width>>8);
+        hd[20] = (uint8_t)(width>>16);
+        hd[21] = (uint8_t)(width>>24);
+
+        hd[22] = (uint8_t)(height);
+        hd[23] = (uint8_t)(height>>8);
+        hd[24] = (uint8_t)(height>>16);
+        hd[25] = (uint8_t)(height>>24);
+
+        hd[26] = 1;
+        hd[28] = (uint8_t)channels*8;
+
+        if (1!=fwrite(hd, 54, 1, fout)) {
+            PIXEL_LOGE("fwrite failed"); break;
+        }
+
+        if (channels == 1) { //colorize with palette, required only when channels==1
+            uint8_t color_cnt = 0;
+            uint8_t palette[1024];
+            for (int i = 0; i < 256; i++) {
+                palette[i * 4] = i;
+                palette[i * 4+1] = i;
+                palette[i * 4+2] = i;
+                palette[i * 4+3] = 0;
+            }
+            if (fwrite(palette, 1024, 1, fout)!=1) {
+                PIXEL_LOGE("fwrite failed"); break;
+            }
+        }
+
+        char bmp_pad[3] = {0, 0, 0};
+        uint32_t write_linebytes = align_up(width*channels, 4);
+        uint32_t line_limit = width * channels;
+        uint32_t line_pad = write_linebytes - line_limit;
+
+        bool fwrite_valid = true;
+        const uint8_t* src_line = buf + (height-1)*read_linebytes;
+        
+        if (channels==3 && swap_bgr) {
+            
+            for (int y=height-1; y!=-1 && fwrite_valid; y--) {
+                for (int x=0; x<line_limit && fwrite_valid; x+=channels) {
+                    // BGR -> RGB
+                    if (fwrite(src_line+x+2, 1, 1, fout)!=1) {
+                        fwrite_valid = false;
+                        PIXEL_LOGE("fwrite failed");
+                    }
+                    if (fwrite(src_line+x+1, 1, 1, fout)!=1) {
+                        fwrite_valid = false;
+                        PIXEL_LOGE("fwrite failed");
+                    }
+                    if (fwrite(src_line+x, 1, 1, fout)!=1) {
+                        fwrite_valid = false;
+                        PIXEL_LOGE("fwrite failed");
+                    }
+                }
+                if (fwrite(bmp_pad, 1, line_pad, fout)!=line_pad) {
+                    fwrite_valid =false;
+                    PIXEL_LOGE("fwrite failed");
+                }
+                src_line -= read_linebytes;
+            }
+        }
+        else {
+            for(int y=height-1; y!=-1 && fwrite_valid; y--) {
+                if (fwrite(src_line, line_limit, 1, fout) != 1) {
+                    fwrite_valid = false;
+                    PIXEL_LOGE("fwrite failed");
+                }
+                if (fwrite(bmp_pad, 1, line_pad, fout) != line_pad) {
+                    fwrite_valid = false;
+                    PIXEL_LOGE("fwrite failed");
+                }
+                src_line -= read_linebytes;
+            }
+            if (!fwrite_valid) {
+                break;
+            }
+        }
+    } while (0);
+
+    if (fout!=NULL) {
+        fclose(fout);
+    }
 }

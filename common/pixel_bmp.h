@@ -19,7 +19,7 @@ extern "C" {
 void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, unsigned char** _buffer, bool swap_bgr);
 
 // encode .bmp image efile
-void _pxl_encode_bmp(const char* fn, int line_align, int h, int w, int c, const unsigned char* buffer, bool swap_bgr);
+void _pxl_encode_bmp(const char* fn, int h, int w, int c, const unsigned char* buf, int read_linebytes, bool swap_bgr);
 
 #ifdef __cplusplus
 }
