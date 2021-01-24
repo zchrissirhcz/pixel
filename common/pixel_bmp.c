@@ -289,10 +289,10 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
         height = bmp_info_header->height;
         width  = bmp_info_header->width;
         src_channel = bpp / 8;
-        int src_linebytes = align_up(width*src_channel, 4);
+        int src_linebytes = _pxl_align_up(width*src_channel, 4);
         if (bmp_image.palette==NULL) {
             dst_channel = 3;
-            int dst_linebytes = align_up(width*dst_channel, line_align);
+            int dst_linebytes = _pxl_align_up(width*dst_channel, line_align);
             unsigned char bmp_gap[3] = {0};
             int src_gap = src_linebytes - width*src_channel;
             int buf_size = dst_linebytes * height;
@@ -323,7 +323,7 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
             // then get real color from palette
             dst_channel = src_channel; // 1
             int buf_size = src_linebytes * height;
-            int dst_linebytes = align_up(width*dst_channel, line_align);
+            int dst_linebytes = _pxl_align_up(width*dst_channel, line_align);
             bmp_image.data = (unsigned char*)malloc(buf_size);
             if (0==fread(bmp_image.data, buf_size, 1, fin)) {
                PIXEL_LOGE("fread failed when read pixel color indices"); break;
@@ -445,7 +445,7 @@ void _pxl_encode_bmp(const char* fn, int ht, int wt, int cn, const unsigned char
         }
 
         char bmp_pad[3] = {0, 0, 0};
-        uint32_t write_linebytes = align_up(width*channels, 4);
+        uint32_t write_linebytes = _pxl_align_up(width*channels, 4);
         uint32_t line_limit = width * channels;
         uint32_t line_pad = write_linebytes - line_limit;
 

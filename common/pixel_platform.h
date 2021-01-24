@@ -34,7 +34,7 @@ static void _pxl_swap_bytes(void* pv, size_t n)
 #define _PXL_SWAP_BYTES(x) _pxl_swap_bytes(&(x), sizeof(x));
 
 
-static int inline align_up(int x, int n) {
+static int inline _pxl_align_up(int x, int n) {
     return ((x + n - 1) / n ) * n;
 }
 
