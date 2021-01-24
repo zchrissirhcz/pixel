@@ -292,8 +292,6 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
         if (bmp_image.palette==NULL) {
             dst_channel = 3;
             int dst_linebytes = align_up(width*dst_channel, line_align);
-            PIXEL_LOGE("width=%d, dst_channel=%d, line_align=%d, width*dst_channel=%d, dst_linebytes=%d",
-                width, dst_channel, line_align, width*dst_channel, dst_linebytes);
             unsigned char bmp_gap[3] = {0};
             int src_gap = src_linebytes - width*src_channel;
             int buf_size = dst_linebytes * height;
@@ -323,34 +321,34 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
             // reading pixel color indices into bmp_image.data
             // then get real color from palette
             dst_channel = src_channel; // 1
-            int buf_size = src_linebytes*height;
+            int buf_size = src_linebytes * height;
             int dst_linebytes = align_up(width*dst_channel, line_align);
             bmp_image.data = (unsigned char*)malloc(buf_size);
             if (0==fread(bmp_image.data, buf_size, 1, fin)) {
                PIXEL_LOGE("fread failed when read pixel color indices"); break;
             }
-            int idx_r, idx_g, idx_b;
-            unsigned char* data = bmp_image.data;
+
             buffer = (unsigned char*)malloc(dst_linebytes * height);
-            int src_lineskip = src_linebytes - src_channel * width;
             if (buffer==NULL) {
                 PIXEL_LOGE("malloc failed"); break;
             }
+            int line_limit = dst_channel * width;
+            int src_lineskip = src_linebytes - src_channel * width;
+            int dst_lineskip = dst_linebytes - line_limit;
+            unsigned char* dst_line = buffer + (height-1)*dst_linebytes;
+            unsigned char* src_line = bmp_image.data;
             for (int y=height-1; y!=-1; y--) {
-                for (int x=0; x<dst_linebytes; x+=dst_channel) {
+                for (int x=0; x<line_limit; x+=dst_channel) {
                     if (dst_channel==3) {
-                        idx_r = y*dst_linebytes + x;
-                        idx_g = idx_r + 1;
-                        idx_b = idx_r + 2;
-                        buffer[idx_r] = bmp_image.palette[*data].red;
-                        buffer[idx_g] = bmp_image.palette[*data].green;
-                        buffer[idx_b] = bmp_image.palette[*data].blue;
+                        dst_line[x]   = bmp_image.palette[src_line[x]].red;
+                        dst_line[x+1] = bmp_image.palette[src_line[x]].green;
+                        dst_line[x+2] = bmp_image.palette[src_line[x]].blue;
                     } else if (dst_channel==1) {
-                        buffer[y*dst_linebytes + x] = bmp_image.palette[*data].red;
+                        dst_line[x] = bmp_image.palette[src_line[x]].red;
                     }
-                    data++;
                 }
-                data += src_lineskip;
+                src_line += src_linebytes;
+                dst_line -= dst_linebytes;
             }
         }
 
@@ -370,4 +368,11 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
     *_w = width;
     *_c = dst_channel;
     *_buffer = buffer;
+}
+
+
+
+void _pxl_encode_bmp(const char* fn, int line_align, int h, int w, int c, const unsigned char* buffer, bool swap_bgr)
+{
+
 }
