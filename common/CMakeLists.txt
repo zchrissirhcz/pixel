@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 include("utils.cmake")
 
-option(USE_ASAN "use address sanitizer?" ON)
+option(USE_ASAN "use address sanitizer?" OFF)
 
 if (USE_ASAN)
     # https://stackoverflow.com/a/65019152/2999096
@@ -21,7 +21,6 @@ add_executable(demo
     pixel_bmp.c
     pixel_bmp.h
     pixel_bmp_test.cpp
-    loadbmp.h
 )
 
 set(dep_libs "")

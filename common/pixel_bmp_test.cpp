@@ -1,5 +1,6 @@
 #include "pixel_bmp.h"
 #include "pixel_log.h"
+#include "pixel_benchmark.h"
 #include <opencv2/opencv.hpp>
 
 void test_decode_bmp()
@@ -22,8 +23,10 @@ void test_decode_bmp()
         size.height = height;
         size.width = width;
         cv::Mat mat(size, CV_8UC3, buffer);
+#ifdef SHOW_RESULT
         cv::imshow("image", mat);
         cv::waitKey(0);
+#endif
         free(buffer);
     }
 
@@ -46,8 +49,10 @@ void test_decode_bmp()
         size.width = width;
         int step = _pxl_align_up(width*channel, align); //!! important
         cv::Mat mat(size, CV_8UC3, buffer, step);
+#ifdef SHOW_RESULT
         cv::imshow("image", mat);
         cv::waitKey(0);
+#endif
         free(buffer);
     }
 
@@ -69,8 +74,10 @@ void test_decode_bmp()
         size.height = height;
         size.width = width;
         cv::Mat mat(size, CV_8UC1, buffer);
+#ifdef SHOW_RESULT
         cv::imshow("image", mat);
         cv::waitKey(0);
+#endif
         free(buffer);
     }
 
@@ -93,8 +100,10 @@ void test_decode_bmp()
         int step = _pxl_align_up(width*channel, align); //!! important
         cv::Mat mat(size, CV_8UC1, buffer, step);
         PIXEL_LOGD("outsize, buffer is %p", buffer);
+#ifdef SHOW_RESULT
         cv::imshow("image", mat);
         cv::waitKey(0);
+#endif
         free(buffer);
     }
 }
@@ -211,9 +220,12 @@ void prepare_not_aligned_images()
 int main(){
     //prepare_not_aligned_images();
 
+    double t_start = get_current_time();
     test_decode_bmp();
+    double t_cost = get_current_time() - t_start;
+    PIXEL_LOGD("time cost: %lf ms", t_cost);
 
-    test_encode_bmp();
-
+    //test_encode_bmp();
+    
     return 0;
 }
