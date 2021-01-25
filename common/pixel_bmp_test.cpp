@@ -220,9 +220,9 @@ void prepare_not_aligned_images()
 int main(){
     //prepare_not_aligned_images();
 
-    double t_start = get_current_time();
+    double t_start = pixel_get_current_time();
     test_decode_bmp();
-    double t_cost = get_current_time() - t_start;
+    double t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("time cost: %lf ms", t_cost);
 
     //test_encode_bmp();

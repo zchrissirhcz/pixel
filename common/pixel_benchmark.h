@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-static inline double get_current_time();
+static inline double pixel_get_current_time();
 
 #ifdef __cplusplus
 }
@@ -25,7 +25,7 @@ static inline double get_current_time();
 // implementation
 //--------------------------------------------------------------------------------
 #ifdef _WIN32
-static inline double get_current_time()
+static inline double pixel_get_current_time()
 {
     LARGE_INTEGER freq;
     LARGE_INTEGER pc;
@@ -36,14 +36,14 @@ static inline double get_current_time()
 }
 #else // _WIN32
 // expected to be more accurate
-static inline double get_current_time()
+static inline double pixel_get_current_time()
 {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return ts.tv_sec * 1000.0 + ts.tv_nsec/1000000.0;
 }
 // not that accurate
-static inline double get_current_time2()
+static inline double pixel_get_current_time2()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
