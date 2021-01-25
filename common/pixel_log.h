@@ -67,7 +67,11 @@ const static char* g_pixel_log_priority_str[7] = {
 // => filename
 //--------------------------------------------------------------------------------
 // only filename
-#define _PXL_FILE strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__
+#ifdef _MSC_VER
+    #define _PXL_FILE strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__
+#else
+    #define _PXL_FILE strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__
+#endif
 // contain folder name such as src/log.cpp
 //#define _FILE __FILE__
 
