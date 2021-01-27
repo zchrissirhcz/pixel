@@ -25,4 +25,4 @@ void pxl_encode_bmp(const char* fn, int h, int w, int c, const unsigned char* bu
 }
 #endif
 
-#endif
+#endif // PIXEL_BMP_H

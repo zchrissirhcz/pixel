@@ -3,11 +3,12 @@ cmake_minimum_required(VERSION 3.15)
 project(demo)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+
 
 include("utils.cmake")
 
 option(USE_ASAN "use address sanitizer?" OFF)
+option(USE_TIDY "use clang-tidy?" OFF)
 
 if (USE_ASAN)
     # https://stackoverflow.com/a/65019152/2999096
@@ -17,12 +18,21 @@ if (USE_ASAN)
     set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 endif()
 
+if (USE_TIDY)
+    set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+endif()
+
 add_executable(demo
     pixel_log.h
     #pixel_log_test.c
+    
     pixel_bmp.c
     pixel_bmp.h
-    pixel_bmp_test.cpp
+    #pixel_bmp_test.cpp
+
+    pixel_jpg.c
+    pixel_jpg.h
+    pixel_jpg_test.cpp
 )
 
 set(dep_libs "")

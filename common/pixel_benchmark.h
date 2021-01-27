@@ -1,3 +1,6 @@
+#ifndef PIXEL_BENCHMARK_H
+#define PIXEL_BENCHMARK_H
+
 #include <time.h>
 
 #ifdef _WIN32
@@ -51,3 +54,5 @@ static inline double pixel_get_current_time2()
     return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
 }
 #endif // _WIN32
+
+#endif // PIXEL_BENCHMARK_H
