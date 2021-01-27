@@ -5,20 +5,20 @@
 #include <inttypes.h>
 
 // https://stackoverflow.com/a/12792056/2999096
-static inline int _pxl_is_little_endian()
+static inline int pxl_is_little_endian()
 {
     volatile uint32_t data=0x01234567;
     return (*((uint8_t*)(&data))) == 0x67;
 }
 
-static inline int _pxl_is_big_endian()
+static inline int pxl_is_big_endian()
 {
-    return 1 - _pxl_is_little_endian();
+    return 1 - pxl_is_little_endian();
 }
 
 
 // https://stackoverflow.com/a/2182581/2999096
-static void _pxl_swap_bytes(void* pv, size_t n)
+static void pxl_swap_bytes(void* pv, size_t n)
 {
     PIXEL_ASSERT(n>0, "n>0 required");
 
@@ -31,10 +31,10 @@ static void _pxl_swap_bytes(void* pv, size_t n)
         p[hi] = tmp;
     }
 }
-#define _PXL_SWAP_BYTES(x) _pxl_swap_bytes(&(x), sizeof(x));
+#define PXL_SWAP_BYTES(x) pxl_swap_bytes(&(x), sizeof(x));
 
 
-static int inline _pxl_align_up(int x, int n) {
+static int inline pxl_align_up(int x, int n) {
     return ((x + n - 1) / n ) * n;
 }
 

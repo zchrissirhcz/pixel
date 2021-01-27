@@ -69,7 +69,7 @@ typedef struct BMP_image
 // @param line_align: when storing result buffer, line align. (only 1 and 4 are valid)
 // @param _buffer: result buffer, should be NULL when passing in, and should be free by user
 // @param swap_bgr: when the bmp is BGR (bpp=24) and swap_bgr is 1, then swap b and r, gain RGB buffer
-void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, unsigned char** _buffer, bool swap_bgr)
+void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, unsigned char** _buffer, bool swap_bgr)
 {
     FILE* fin = NULL;
     int height = 0;
@@ -133,23 +133,23 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
         // parse file_size
         bmp_file_header->file_size = (uint32_t)hd[2]<<0 | (uint32_t)hd[3]<<8 | (uint32_t)hd[4]<<16 | (uint32_t)hd[5]<<24;
         
-        int big_endian = _pxl_is_big_endian();
+        int big_endian = pxl_is_big_endian();
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_file_header->file_size);
+            PXL_SWAP_BYTES(bmp_file_header->file_size);
         }
 
         // parse reserved
         bmp_file_header->reserved[0] = (uint16_t)hd[6]<<0 | (uint16_t)hd[7]<<8;
         bmp_file_header->reserved[1] = (uint16_t)hd[8]<<0 | (uint16_t)hd[9]<<8;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_file_header->reserved[0]);
-            _PXL_SWAP_BYTES(bmp_file_header->reserved[1]);
+            PXL_SWAP_BYTES(bmp_file_header->reserved[0]);
+            PXL_SWAP_BYTES(bmp_file_header->reserved[1]);
         }
 
         // parse offset
         bmp_file_header->offset = (uint32_t)hd[10]<<0 | (uint32_t)hd[11]<<8 | (uint32_t)hd[12]<<16 | (uint32_t)hd[13]<<24;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_file_header->offset);
+            PXL_SWAP_BYTES(bmp_file_header->offset);
         }
 
         // ----------------------------------------------------------------------
@@ -177,7 +177,7 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
         hd = bmp_info_header_buf;
         bmp_info_header->header_size = (uint32_t)hd[0]<<0 | (uint32_t)hd[1]<<8 | (uint32_t)hd[2]<<16 | (uint32_t)hd[3]<<24;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_info_header->header_size);
+            PXL_SWAP_BYTES(bmp_info_header->header_size);
         }
         if (bmp_info_header->header_size!=40) {
             PIXEL_LOGE("invalid header size. only 40 is valid"); break;
@@ -186,7 +186,7 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
         // parse width and validate
         bmp_info_header->width = (uint32_t)hd[4]<<0 | (uint32_t)hd[5]<<8 | (uint32_t)hd[6]<<16 | (uint32_t)hd[7]<<24;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_info_header->width);
+            PXL_SWAP_BYTES(bmp_info_header->width);
         }
         if (bmp_info_header->width <= 0) {
             PIXEL_LOGE("invalid width, >0 required, but got %d", bmp_info_header->width); break;
@@ -195,7 +195,7 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
         // parse height and validate
         bmp_info_header->height = (uint32_t)hd[8]<<0 | (uint32_t)hd[9]<<8 | (uint32_t)hd[10]<<16 | (uint32_t)hd[11]<<24;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_info_header->height);
+            PXL_SWAP_BYTES(bmp_info_header->height);
         }
         if (bmp_info_header->height <= 0) {
             PIXEL_LOGE("invalid height, >0 required, but got %d", bmp_info_header->height); break;
@@ -204,7 +204,7 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
         // parse num_planes and validate
         bmp_info_header->num_planes = (uint16_t)hd[12]<<0 | (uint16_t)hd[13]<<8;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_info_header->num_planes);
+            PXL_SWAP_BYTES(bmp_info_header->num_planes);
         }
         if (bmp_info_header->num_planes!=1) {
             PIXEL_LOGE("invalid num_planes, must be 1"); break;
@@ -213,7 +213,7 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
         // parse bits_per_pixel and validate
         bmp_info_header->bits_per_pixel = (uint16_t)hd[14]<<0 | (uint16_t)hd[15]<<8;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_info_header->bits_per_pixel);
+            PXL_SWAP_BYTES(bmp_info_header->bits_per_pixel);
         }
         int bpp = bmp_info_header->bits_per_pixel;
         if (bpp!=8 && bpp!=24 && bpp!=32) {
@@ -223,7 +223,7 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
         // parse compression_type and validate
         bmp_info_header->compression_type = (uint32_t)hd[16]<<0 | (uint32_t)hd[17]<<8 | (uint32_t)hd[18]<<16 | (uint32_t)hd[19]<<24;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_info_header->compression_type);
+            PXL_SWAP_BYTES(bmp_info_header->compression_type);
         }
         if (bmp_info_header->compression_type != BMP_RGB) {
             PIXEL_LOGE("not supported compression_type, only BMP_RGB supported now"); break;
@@ -232,31 +232,31 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
         // parse image_size
         bmp_info_header->image_size = (uint32_t)hd[20]<<0 | (uint32_t)hd[21]<<8 | (uint32_t)hd[22]<<16 | (uint32_t)hd[23]<<24;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_info_header->image_size);
+            PXL_SWAP_BYTES(bmp_info_header->image_size);
         }
 
         // parse x_resolution
         bmp_info_header->x_resolution = (uint32_t)hd[24]<<0 | (uint32_t)hd[25]<<8 | (uint32_t)hd[26]<<16 | (uint32_t)hd[27]<<24;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_info_header->x_resolution);
+            PXL_SWAP_BYTES(bmp_info_header->x_resolution);
         }
 
         // parse y_resolution
         bmp_info_header->y_resolution = (uint32_t)hd[28]<<0 | (uint32_t)hd[29]<<8 | (uint32_t)hd[30]<<16 | (uint32_t)hd[31]<<24;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_info_header->y_resolution);
+            PXL_SWAP_BYTES(bmp_info_header->y_resolution);
         }
 
         // parse num_colors
         bmp_info_header->num_colors = (uint32_t)hd[32]<<0 | (uint32_t)hd[33]<<8 | (uint32_t)hd[34]<<16 | (uint32_t)hd[35]<<24;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_info_header->num_colors);
+            PXL_SWAP_BYTES(bmp_info_header->num_colors);
         }
 
         // parse num_important_colors
         bmp_info_header->num_important_colors = (uint32_t)hd[36]<<0 | (uint32_t)hd[37]<<8 | (uint32_t)hd[38]<<16 | (uint32_t)hd[39]<<24;
         if (big_endian) {
-            _PXL_SWAP_BYTES(bmp_info_header->num_important_colors);
+            PXL_SWAP_BYTES(bmp_info_header->num_important_colors);
         }
 
         // ----------------------------------------------------------------------
@@ -289,10 +289,10 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
         height = bmp_info_header->height;
         width  = bmp_info_header->width;
         src_channel = bpp / 8;
-        int src_linebytes = _pxl_align_up(width*src_channel, 4);
+        int src_linebytes = pxl_align_up(width*src_channel, 4);
         if (bmp_image.palette==NULL) {
             dst_channel = 3;
-            int dst_linebytes = _pxl_align_up(width*dst_channel, line_align);
+            int dst_linebytes = pxl_align_up(width*dst_channel, line_align);
             unsigned char bmp_gap[3] = {0};
             int src_gap = src_linebytes - width*src_channel;
             int buf_size = dst_linebytes * height;
@@ -323,7 +323,7 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
             // then get real color from palette
             dst_channel = src_channel; // 1
             int buf_size = src_linebytes * height;
-            int dst_linebytes = _pxl_align_up(width*dst_channel, line_align);
+            int dst_linebytes = pxl_align_up(width*dst_channel, line_align);
             bmp_image.data = (unsigned char*)malloc(buf_size);
             if (0==fread(bmp_image.data, buf_size, 1, fin)) {
                PIXEL_LOGE("fread failed when read pixel color indices"); break;
@@ -373,7 +373,7 @@ void _pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, 
 
 
 
-void _pxl_encode_bmp(const char* fn, int ht, int wt, int cn, const unsigned char* buf, int read_linebytes, bool swap_bgr)
+void pxl_encode_bmp(const char* fn, int ht, int wt, int cn, const unsigned char* buf, int read_linebytes, bool swap_bgr)
 {
     //void nc_image_save_bmp(const uchar* buf, uint read_linebytes) {
     int height = ht;
@@ -445,7 +445,7 @@ void _pxl_encode_bmp(const char* fn, int ht, int wt, int cn, const unsigned char
         }
 
         char bmp_pad[3] = {0, 0, 0};
-        uint32_t write_linebytes = _pxl_align_up(width*channels, 4);
+        uint32_t write_linebytes = pxl_align_up(width*channels, 4);
         uint32_t line_limit = width * channels;
         uint32_t line_pad = write_linebytes - line_limit;
 
