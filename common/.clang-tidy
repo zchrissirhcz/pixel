@@ -1,0 +1,11 @@
+{
+    #Checks: 'clang-diagnostic-*,clang-analyzer-*', 
+    Checks: 'cert-dcl37-c', 
+    CheckOptions: [
+        {
+            # 检查和编译器保留字冲突的标识符
+            key: cert-dcl37-c.AggressiveDependentMemberLookup,
+            value: 'true'
+        }
+    ]
+}

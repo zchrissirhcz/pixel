@@ -26,3 +26,6 @@ __pycache__/
 
 #log files
 **/log.txt
+
+#clangd cache
+**/.cache/
