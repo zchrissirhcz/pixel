@@ -29,3 +29,6 @@ __pycache__/
 
 #clangd cache
 **/.cache/
+
+#un-published file
+**/utils.cmake
