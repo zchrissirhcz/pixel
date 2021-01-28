@@ -3,6 +3,9 @@
 #include "pixel_benchmark.h"
 #include <opencv2/opencv.hpp>
 
+//jpg encode/decode tutorial
+//https://zhuanlan.zhihu.com/p/27296876
+
 
 //http://www.robertstocker.co.uk/jpeg/jpeg_new_7.htm
 /*
@@ -33,12 +36,68 @@ static void pxl_ycbcr_to_rgb(uint8_t y, uint8_t cb, uint8_t cr, uint8_t* _r, uin
     *_b = (uint8_t)(y + 1.772 * (cb - 128));
 }
 
+// faster than OpenCV, while result not exactly the same as opencv
+static void pxl_downsample2x_c1(uint8_t* src, uint8_t* dst, int src_h, int src_w, int src_linebytes)
+{
+    int dst_h = src_h / 2;
+    int dst_w = src_w / 2;
+    for (int i = 0; i < dst_h; i++) {
+        for (int j = 0; j < dst_w; j++) {
+            int dst_idx = i * dst_w + j;
+            int src_idx1 = 2 * i * src_linebytes + 2 * j;
+            int src_idx2 = src_idx1 + 1;
+            int src_idx3 = src_idx1 + src_linebytes;
+            int src_idx4 = src_idx1 + src_linebytes + 1;
+            int val = ((int)(src[src_idx1]) + (int)(src[src_idx2]) + (int)(src[src_idx3]) + (int)(src[src_idx4])) / 4;
+            if (val > 255) {
+                val = 255;
+            }
+            dst[dst_idx] = (uint8_t)val;
+        }
+    }
+}
+
+
+// DCT:¿Î…¢”‡œ“±‰ªª
+// https://blog.csdn.net/tengfei0973/article/details/103186028
+void pxl_dct(int* signal, int signal_len, float* result)
+{
+    int* x = signal;
+    int N = signal_len;
+    float* X = result;
+
+    float alpha[2] = {
+        sqrtf(1.0f / N), //coeff when k=0
+        sqrtf(2.0f / N)  //coeff when k!=0
+    };
+    const float PI = acos(-1);
+
+    float A;
+    for (int k = 0; k < N; k++) {
+        if (k == 0){
+            A = alpha[0];
+        }
+        else {
+            A = alpha[1];
+        }
+        float sum = 0;
+        for (int n = 0; n < N; n++) {
+            sum += x[n] * cos(PI * (2 * n + 1) * k / 2 * N);
+        }
+        X[k] = A * sum;
+    }
+}
+
+
+//#define SHOW_RESULT
+
 
 int main() {
     PIXEL_LOGD("hello, jpg!");
 
     // cv::Mat src = cv::imread("duck.jpg");
-    cv::Mat src = cv::imread("girl.jpg");
+    //cv::Mat src = cv::imread("river_bank.jpg");
+    cv::Mat src = cv::imread("paris.jpg");
 
     cv::Size size = src.size();
     int h = size.height;
@@ -58,6 +117,7 @@ int main() {
     
     unsigned char y, cb, cr;
 
+    double t_start = pixel_get_current_time();
     for (int i=0; i<h; i++) {
         for (int j=0; j<w; j++) {
             int idx = i*linebytes + j*3;
@@ -78,16 +138,50 @@ int main() {
     half_size.width = size.width / 2;
 
     cv::Mat half_cb_mat;
+
+    double t_ocv_resize_start = pixel_get_current_time();
     cv::resize(cb_mat, half_cb_mat, half_size);
+    double t_ocv_resize_cost = pixel_get_current_time() - t_ocv_resize_start;
 
     cv::Mat half_cr_mat;
     cv::resize(cr_mat, half_cr_mat, half_size);
+    
+    
+    cv::Mat downsampled_cb(half_size, CV_8UC1);
+    double t_pxl_downsample_start = pixel_get_current_time();
+    pxl_downsample2x_c1(cb_mat.data, downsampled_cb.data, cb_mat.rows, cb_mat.cols, cb_mat.step[0]);
+    double t_pxl_downsample_cost = pixel_get_current_time() - t_pxl_downsample_start;
 
+    double t_cost = pixel_get_current_time() - t_start;
+
+    printf("total time %lf ms, opencv resize cb %lf ms, naive downsample2x cost %lf ms\n", t_cost, t_ocv_resize_cost, t_pxl_downsample_cost);
+
+    cv::imwrite("paris_opencv_resized_cb.bmp", half_cb_mat);
+    cv::imwrite("paris_pixel_resized_cb.bmp", downsampled_cb);
+
+#ifdef SHOW_RESULT
+    cv::namedWindow("image");
+    cv::moveWindow("image", 100, 100);
     cv::imshow("image", src);
+
+    cv::namedWindow("y");
+    cv::moveWindow("y", 100, 100);
     cv::imshow("y", y_mat);
+
+    cv::namedWindow("cb");
+    cv::moveWindow("cb", 100, 100);
     cv::imshow("cb", half_cb_mat);
+
+    cv::namedWindow("cr");
+    cv::moveWindow("cr", 100, 100);
     cv::imshow("cr", half_cr_mat);
+
+    cv::namedWindow("downsampled_cb");
+    cv::moveWindow("downsampled_cb", 100, 100);
+    cv::imshow("downsampled_cb", downsampled_cb);
+
     cv::waitKey(0);
+#endif
 
     return 0;
 }
