@@ -1,7 +1,7 @@
 #  Pixel
 
-A collection of programs that tries to speed up image processing.
+This repos contains some separate programs about basic image processing.
 
-For learning purpose only.
+It is mainly for personal learning purpuse, and I will keep writing both naive(pure C) and ARM NEON optimized version of them.
 
-Corrections, Watching and making Pull Requests are welcome.
+Feel free to create issue / watch / make pull request for this repo.
