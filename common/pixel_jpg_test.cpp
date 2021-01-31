@@ -58,7 +58,7 @@ static void pxl_downsample2x_c1(uint8_t* src, uint8_t* dst, int src_h, int src_w
 }
 
 
-// DCT:ÀëÉ¢ÓàÏÒ±ä»»
+// DCT:ç¦»æ•£ä½™å¼¦å˜æ¢
 // https://blog.csdn.net/tengfei0973/article/details/103186028
 void pxl_dct(int* signal, int signal_len, float* result)
 {
