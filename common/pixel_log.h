@@ -18,6 +18,8 @@
  *      PXL_LOGFMT_FULL
  *      PXL_LOGFMT_MEDIUM
  *      PXL_LOGFMT_SIMPLE
+ *  3. PXL_APPLOG macro
+ *      If defined to none-zero, will use both stdio and android log, otherwise only stdio
  * [Note]
  *  1. `PXL_` is for internal usage macros
  *  2. `PIXEL_` is for public usage macros
@@ -66,6 +68,12 @@ const static char* g_pixel_log_priority_str[7] = {
 #define PXL_LOGFMT_FULL            0
 #define PXL_LOGFMT_MEDIUM          1
 #define PXL_LOGFMT_SIMPLE          0
+
+//--------------------------------------------------------------------------------
+// => turn on/off log in app logcat
+// [user setting]
+//--------------------------------------------------------------------------------
+#define PXL_APPLOG                0
 
 //--------------------------------------------------------------------------------
 // => filename
@@ -130,7 +138,7 @@ static inline char* timenow() {
 // => log template for all levels
 //--------------------------------------------------------------------------------
 // the full format log
-#ifdef ANDROID
+#if ANDROID && PXL_APPLOG
 #define PXL_LOGT_FULL(priority, fmt, tag, fd, color, ...) do { \
         __android_log_print(priority, tag, PXL_LOG_FULL_FMT(fmt), PXL_LOG_FULL_ARGS(tag, color, priority), ##__VA_ARGS__); \
         fprintf(fd, PXL_LOG_FULL_FMT(fmt), PXL_LOG_FULL_ARGS(tag, color, priority), ##__VA_ARGS__); \
@@ -144,7 +152,7 @@ static inline char* timenow() {
 #endif
 
 // the medium format log
-#ifdef ANDROID
+#if ANDROID && PXL_APPLOG
 #define PXL_LOGT_MEDIUM(priority, fmt, tag, fd, color, ...) do { \
         __android_log_print(priority, tag, PXL_LOG_MEDIUM_FMT(fmt), PXL_LOG_MEDIUM_ARGS(tag, color, priority), ##__VA_ARGS__); \
         fprintf(fd, PXL_LOG_MEDIUM_FMT(fmt), PXL_LOG_MEDIUM_ARGS(tag, color, priority), ##__VA_ARGS__); \
@@ -158,7 +166,7 @@ static inline char* timenow() {
 #endif
 
 // simple format log
-#ifdef ANDROID
+#if ANDROID && PXL_APPLOG
 #define PXL_LOGT_SIMPLE(priority, fmt, ...) do { \
        __android_log_print(priority, PXL_MODULE_TAG, fmt, ##__VA_ARGS__); \
        fprintf(stderr, (fmt "\n"), ##__VA_ARGS__); \
