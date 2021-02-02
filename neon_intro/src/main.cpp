@@ -1,8 +1,5 @@
-#include <iostream>
-
+#include <stdio.h>
 #include <arm_neon.h>
-
-using namespace std;
 
 static void print_uint8x8(uint8x8_t data) {
     static uint8_t p[8];

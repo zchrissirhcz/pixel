@@ -8,4 +8,5 @@ add_executable(demo
     src/main.cpp
 )
 
+target_include_directories(demo PUBLIC ${CMAKE_SOURCE_DIR}/..)
 

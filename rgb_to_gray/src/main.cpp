@@ -1,6 +1,3 @@
-#include <iostream>
-#include <string>
-#include <chrono>
 #include <stdlib.h>
 
 #if __ARM_NEON
@@ -18,7 +15,8 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-using namespace std;
+#include "common/pixel_log.h"
+#include "common/pixel_benchmark.h"
 
 typedef struct RGBImage {
     int h, w;
@@ -29,16 +27,6 @@ typedef struct GrayImage {
     int h, w;
     unsigned char* data;
 } GrayImage;
-
-double msElapsedTime(chrono::system_clock::time_point start) {
-    auto end = chrono::system_clock::now();
-
-    return chrono::duration_cast<chrono::milliseconds>(end - start).count();
-}
-
-chrono::system_clock::time_point now() {
-    return chrono::system_clock::now();
-}
 
 void rgb_to_gray(RGBImage* rgb, GrayImage* gray) {
     int n = rgb->h * rgb->w;
@@ -93,7 +81,7 @@ RGBImage load_image(const char* filename)
     int channels;
     image.data = stbi_load(filename, &image.w, &image.h, &channels, 0);
 
-    printf("-- loaded image %s, height=%d, width=%d\n",
+    PIXEL_LOGD("-- loaded image %s, height=%d, width=%d",
         filename, image.h, image.w);
     return image;
 }
@@ -140,42 +128,30 @@ void perf_test()
     // Invoke dotProduct and measure performance
     // int lastResult = 0;
 
-    auto start = now();
+    double t_start = pixel_get_current_time();
     for (int i = 0; i < trials; i++) {
         rgb_to_gray(&image, &gray1);
     }
-    auto elapsedTime = msElapsedTime(start);
+    double elapsedTime = pixel_get_current_time() - t_start;
     save_image(&image_copy1, "none_neon.jpg");
 
 #if __ARM_NEON
     // With NEON intrinsics
     // Invoke dotProductNeon and measure performance
     // int lastResultNeon = 0;
-    start = now();
+    start = pixel_get_current_time();
     for (int i = 0; i < trials; i++) {
         rgb_to_gray_neon(&image_copy3);
     }
-    auto elapsedTimeNeon = msElapsedTime(start);
+    double elapsedTimeNeon = pixel_get_current_time() - t_start;
     save_image(&image_copy3, "neon.jpg");
 #endif // __ARM_NEON
 
-    std::string resultsString =
-        "=== NO NEON 1 ==="
-        "\nElapsed time: " + to_string((int)elapsedTime) + " ms";
+    PIXEL_LOGD("no neon impl time cost %lf ms", elapsedTime)
 
 #if __ARM_NEON
-    resultsString += "\n\n=== NEON intrinsics ===\n"
-        "\nElapsed time: " + to_string((int)elapsedTimeNeon) + " ms";
+    PIXEL_LOGD("neon impl time cost %lf ms", elapsedTimeNeon);
 #endif
-
-    // Display results
-    // std::string resultsString =
-    //        "----==== NO NEON ====----\nResult: "
-    //        "\nElapsed time: " + to_string((int) elapsedTime) + " ms"
-    //        "\n\n----==== NEON ====----\n"
-    //        "\nElapsed time: " + to_string((int) elapsedTimeNeon) + " ms";
-
-    std::cout << resultsString << std::endl;
 
     free(image.data);
     free(image_copy1.data);

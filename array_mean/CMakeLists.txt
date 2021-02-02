@@ -11,5 +11,5 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(demo
     src/main.cpp
-    src/fc_log.c
 )
+target_include_directories(demo PUBLIC ${CMAKE_SOURCE_DIR}/..)

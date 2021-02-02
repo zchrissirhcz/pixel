@@ -3,20 +3,16 @@
 #include <string.h>
 #include <time.h>
 
-#include <iostream>
-#include <chrono>
 #include <random>
 #include <arm_neon.h>
 
-using namespace std;
+#include "common/pixel_log.h"
+#include "common/pixel_benchmark.h"
 
-// return current time in milliseconds
-static double now_ms(void)
-{
-    struct timespec res;
-    clock_gettime(CLOCK_REALTIME, &res);
-    return 1000.0*res.tv_sec + (double)res.tv_nsec/1e6;
-}
+using std::uniform_int_distribution;
+using std::default_random_engine;
+using std::random_device;
+using std::uniform_real_distribution;
 
 namespace int8 {
     void op_relu_c_naive(int8_t* buf, int len) {
@@ -148,7 +144,7 @@ namespace float32 {
 
 int get_random_int(int a, int b) {
     if (a>b) {
-        swap(a, b);
+        std::swap(a, b);
     }
     static random_device rd;
     static default_random_engine engine(rd());
@@ -166,7 +162,7 @@ int8_t get_random_int8() {
 
 float get_random_float(float a, float b) {
     if (a>b) {
-        swap(a, b);
+        std::swap(a, b);
     }
     static random_device rd;
     static default_random_engine engine(rd());
@@ -202,22 +198,22 @@ void test_op_relu_int8() {
     // c naive impl
     //==================================
     {
-        t_start = now_ms();
+        t_start = pixel_get_current_time();
         for (int i=0; i<loop; i++) {
             int8::op_relu_c_naive(data_copy1, len);
         }
-        t_c_naive = now_ms() - t_start;
+        t_c_naive = pixel_get_current_time() - t_start;
     }
 
     //==================================
     // c fast impl
     //==================================
     {
-        t_start = now_ms();
+        t_start = pixel_get_current_time();
         for (int i=0; i<loop; i++) {
             int8::op_relu_c_fast(data_copy2, len);
         }
-        t_c_fast = now_ms() - t_start;
+        t_c_fast = pixel_get_current_time() - t_start;
     }
 
 
@@ -225,22 +221,22 @@ void test_op_relu_int8() {
     // arm neon intrinsics impl
     //==================================
     {
-        t_start = now_ms();
+        t_start = pixel_get_current_time();
         for (int i=0; i<loop; i++) {
             int8::op_relu_neon_intrinsics(data_copy3, len);
         }
-        t_neon_intrinsics = now_ms() - t_start;
+        t_neon_intrinsics = pixel_get_current_time() - t_start;
     }
 
     //==================================
     // arm neon intrinsics impl
     //==================================
     {
-        t_start = now_ms();
+        t_start = pixel_get_current_time();
         for (int i=0; i<loop; i++) {
             int8::op_relu_neon_intrinsics2(data_copy4, len);
         }
-        t_neon_intrinsics2 = now_ms() - t_start;
+        t_neon_intrinsics2 = pixel_get_current_time() - t_start;
     }
 
     //=================================
@@ -256,14 +252,14 @@ void test_op_relu_int8() {
         }
     }
     if (fail_cnt>0) {
-        fprintf(stderr, "[bad] fail count is %d\n", fail_cnt);
+        PIXEL_LOGE("[bad] fail count is %d", fail_cnt);
     } else {
-        fprintf(stdout, "[good] result match\n");
+        PIXEL_LOGD("[good] result match");
     }
-    printf("[c naive] cost %g ms\n", t_c_naive);
-    printf("[c fast] cost %g ms\n", t_c_fast);
-    printf("[neon intrinsics] cost %g ms\n", t_neon_intrinsics);
-    printf("[neon intrinsics2] cost %g ms\n", t_neon_intrinsics2);
+    PIXEL_LOGD("[c naive] cost %g ms", t_c_naive);
+    PIXEL_LOGD("[c fast] cost %g ms", t_c_fast);
+    PIXEL_LOGD("[neon intrinsics] cost %g ms", t_neon_intrinsics);
+    PIXEL_LOGD("[neon intrinsics2] cost %g ms", t_neon_intrinsics2);
 
 
     // ===========================
@@ -305,22 +301,22 @@ void test_op_relu_float() {
     // c naive impl
     //==================================
     {
-        t_start = now_ms();
+        t_start = pixel_get_current_time();
         for (int i=0; i<loop; i++) {
             float32::op_relu_c_naive(data_copy1, len);
         }
-        t_c_naive = now_ms() - t_start;
+        t_c_naive = pixel_get_current_time() - t_start;
     }
 
     //==================================
     // c fast impl
     //==================================
     {
-        t_start = now_ms();
+        t_start = pixel_get_current_time();
         for (int i=0; i<loop; i++) {
             float32::op_relu_c_fast(data_copy2, len);
         }
-        t_c_fast = now_ms() - t_start;
+        t_c_fast = pixel_get_current_time() - t_start;
     }
 
 
@@ -328,22 +324,22 @@ void test_op_relu_float() {
     // arm neon intrinsics impl
     //==================================
     {
-        t_start = now_ms();
+        t_start = pixel_get_current_time();
         for (int i=0; i<loop; i++) {
             float32::op_relu_neon_intrinsics(data_copy3, len);
         }
-        t_neon_intrinsics = now_ms() - t_start;
+        t_neon_intrinsics = pixel_get_current_time() - t_start;
     }
 
     //==================================
     // arm neon intrinsics impl
     //==================================
     {
-        t_start = now_ms();
+        t_start = pixel_get_current_time();
         for (int i=0; i<loop; i++) {
             float32::op_relu_neon_intrinsics2(data_copy4, len);
         }
-        t_neon_intrinsics2 = now_ms() - t_start;
+        t_neon_intrinsics2 = pixel_get_current_time() - t_start;
     }
 
     //=================================
@@ -359,14 +355,14 @@ void test_op_relu_float() {
         }
     }
     if (fail_cnt>0) {
-        fprintf(stderr, "[bad] fail count is %d\n", fail_cnt);
+        PIXEL_LOGE("[bad] fail count is %d", fail_cnt);
     } else {
-        fprintf(stdout, "[good] result match\n");
+        PIXEL_LOGD("[good] result match");
     }
-    printf("[c naive] cost %g ms\n", t_c_naive);
-    printf("[c fast] cost %g ms\n", t_c_fast);
-    printf("[neon intrinsics] cost %g ms\n", t_neon_intrinsics);
-    printf("[neon intrinsics2] cost %g ms\n", t_neon_intrinsics2);
+    PIXEL_LOGD("[c naive] cost %g ms", t_c_naive);
+    PIXEL_LOGD("[c fast] cost %g ms", t_c_fast);
+    PIXEL_LOGD("[neon intrinsics] cost %g ms", t_neon_intrinsics);
+    PIXEL_LOGD("[neon intrinsics2] cost %g ms", t_neon_intrinsics2);
 
 
     // ===========================

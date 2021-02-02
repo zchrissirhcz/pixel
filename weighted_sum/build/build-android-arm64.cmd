@@ -3,8 +3,6 @@
 set ANDROID_NDK=E:/soft/Android/ndk-r21b
 set TOOLCHAIN=%ANDROID_NDK%/build/cmake/android.toolchain.cmake
 
-REM echo "=== TOOLCHAIN is: $TOOLCHAIN"
-
 set BUILD_DIR=android-arm64
 if not exist %BUILD_DIR% md %BUILD_DIR%
 cd %BUILD_DIR%

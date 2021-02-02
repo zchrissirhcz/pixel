@@ -1,16 +1,7 @@
-#include <iostream>
-#include <chrono>
 #include <arm_neon.h>
 
-using namespace std;
-
-// return current time in milliseconds
-static double now_ms(void)
-{
-    struct timespec res;
-    clock_gettime(CLOCK_REALTIME, &res);
-    return 1000.0*res.tv_sec + (double)res.tv_nsec/1e6;
-}
+#include "common/pixel_log.h"
+#include "common/pixel_benchmark.h"
 
 void arr_weighted_sum(const float* arr1, const float arr1_weight, const float* arr2, const float arr2_weight,
     int len, float* result_arr)
@@ -168,19 +159,19 @@ int main() {
     int count = 1000;
 
     {
-        t_start = now_ms();
+        t_start = pixel_get_current_time();
         for (int i=0; i<count; i++) {
             arr_weighted_sum(arr1, 0.5, arr2, 0.2, len, res1);
         }
-        t_c = now_ms() - t_start;
+        t_c = pixel_get_current_time() - t_start;
     }
 
     {
-        t_start = now_ms();
+        t_start = pixel_get_current_time();
         for (int i=0; i<count; i++) {
             arr_weighted_sum_neon_intrinsic(arr1, 0.5, arr2, 0.2, len, res2);
         }
-        t_neon = now_ms() - t_start;
+        t_neon = pixel_get_current_time() - t_start;
     }
 
     int fail_cnt = 0;
@@ -190,12 +181,12 @@ int main() {
         }
     }
     if (fail_cnt>0) {
-        printf("fail count is %d\n", fail_cnt);
+        PIXEL_LOGD("fail count is %d", fail_cnt);
     } else {
-        printf("result match\n");
+        PIXEL_LOGD("result match");
     }
-    printf("c impl cost %g ms\n", t_c);
-    printf("neon impl cost %g ms\n", t_neon);
+    PIXEL_LOGD("c impl cost %g ms", t_c);
+    PIXEL_LOGD("neon impl cost %g ms", t_neon);
 
     return 0;
 }

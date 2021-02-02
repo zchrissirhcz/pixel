@@ -2,9 +2,12 @@
 
 
 Tested on MI8 (QC845) for 1001 trials, image size 353 x 500
-- no neon: 264 ms
-- neon: 50 ms
-
+```
+-- loaded image 000001.jpg, height=500, width=353
+no neon1 impl time cost 229.106927 ms
+no neon2 impl time cost 114.606823 ms
+neon intrinsics impl time cost 48.314219 ms
+```
 
 ## Ref links
 

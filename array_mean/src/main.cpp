@@ -4,15 +4,12 @@
 #include <stddef.h>
 #include <time.h>
 
-#include <iostream>
-
-#include "fc_log.h"
+#include "common/pixel_benchmark.h"
+#include "common/pixel_log.h"
 
 #ifdef __ARM_NEON //will this macro be defined in T3's device?
 #include<arm_neon.h>
 #endif
-
-using namespace std;
 
 float get_random_float(float s, float t){
     float v = (float)(rand()) / RAND_MAX;
@@ -215,7 +212,7 @@ int main() {
         //printf("data[%d]=%d\n", i, data[i]);
     }
 
-    long t_start;
+    double t_start;
     const int COUNT = 100;
     float res1, res2;
 
@@ -223,26 +220,26 @@ int main() {
     // naive
     //----------------------------------------
     {
-        t_start = fc_gettime();
+        t_start = pixel_get_current_time();
         for (int i=0; i<COUNT; i++) {
             res1 = mean_naive(data, N);
         }
-        printf("mean_naive cost %lu ms\n", fc_gettime() - t_start);
+        PIXEL_LOGD("mean_naive cost %lf ms", pixel_get_current_time() - t_start);
     }
 
     //----------------------------------------
     // naive
     //----------------------------------------
     {
-        t_start = fc_gettime();
+        t_start = pixel_get_current_time();
         for (int i=0; i<COUNT; i++) {
             res2 = mean_neon(data, N);
         }
-        printf("mean_neon cost %lu ms\n", fc_gettime() - t_start);
+        PIXEL_LOGD("mean_neon cost %lf ms", pixel_get_current_time() - t_start);
     }
 
-    cout << "mean_naive returns " << res1 << endl;
-    cout << "mean_neon  returns " << res2 << endl;
+    PIXEL_LOGD("mean_naive returns %lf", res1);
+    PIXEL_LOGD("mean_neon  returns %lf", res2);
 
     return 0;
 }
