@@ -32,7 +32,10 @@ add_executable(demo
 
     pixel_jpg.c
     pixel_jpg.h
-    pixel_jpg_test.cpp
+    #pixel_jpg_test.cpp
+
+    pixel_rng.h
+    pixel_rng_test.cpp
 )
 
 set(dep_libs "")
