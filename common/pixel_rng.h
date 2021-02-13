@@ -2,7 +2,7 @@
 * Portable random number generator
 * slightly modifed from https://github.com/rdadolf/prng/blob/master/prng.h
 * and know it from https://github.com/Tencent/ncnn/blob/master/tests/prng.h
-* 
+*
 * Usage:
 *
     PIXEL_SRAND(7767517); // or other seed. must set this, or you'll keep gettting same value
@@ -45,7 +45,7 @@ static inline uint64_t pxl_rng_rand(pxl_rng_rand_t* state) {
 
     for (r=0; r<new_rands; r++) {
         i = state->i;
-        state->s[i&PXL_RNG_RAND_SMASK] = 
+        state->s[i&PXL_RNG_RAND_SMASK] =
             state->s[(i+PXL_RNG_RAND_SSIZE-PXL_RNG_LAG1) & PXL_RNG_RAND_SMASK] +
             state->s[(i+PXL_RNG_RAND_SSIZE-PXL_RNG_LAG2) & PXL_RNG_RAND_SMASK];
         state->i++;
@@ -78,13 +78,13 @@ static pxl_rng_rand_t g_pxl_rng_rand_state;
 
 static float pixel_random_float(float a, float b)
 {
-    float random = ((float)PXL_RAND()) / (float)uint64_t(-1); // RAND_MAX;
+    float random = ((float)PXL_RAND()) / (float)((uint64_t)(-1)); // RAND_MAX;
     float diff = b - a;
     float r = random * diff;
     return a + r;
 }
 
-static uint8_t pixel_random_uint8(uint8_t a, uint8_t b) 
+static uint8_t pixel_random_uint8(uint8_t a, uint8_t b)
 {
     return (uint8_t)pixel_random_float(a, b);
 }
