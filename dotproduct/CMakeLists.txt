@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 project(assignment3)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2")
@@ -16,6 +16,7 @@ target_include_directories(testbed
         ${CMAKE_SOURCE_DIR}/..
         ${CMAKE_SOURCE_DIR}/MIPP/src
         ${CMAKE_SOURCE_DIR}/eigen
+        ${CMAKE_SOURCE_DIR}/xsimd/include
 )
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")

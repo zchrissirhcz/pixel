@@ -13,16 +13,22 @@ I implement this function by calling SIMD wrapper functions, from 3 libraries:
 With `/AVX2` enabled, I test the performance of these implementations in both Release and Debug mode. Specifically, I use `len=200000000`, and got:
 
 Release Mode:
->impl1(Naive),   result is -5290.376953, time cost is 221.296500 ms
-impl2(OpenCV),  result is -5290.970215, time cost is 66.737100 ms
-impl4(MIPP),    result is -5290.970703, time cost is 65.687000 ms
-impl5(Eigen),   result is -5290.747070, time cost is 74.621900 ms
+>time cost for random assign is 2438.699400 ms
+impl1(Naive),   result is -5290.376953, time cost is 223.822600 ms
+impl2(OpenCV),  result is -5291.503906, time cost is 73.623500 ms
+impl4(MIPP),    result is -5291.504395, time cost is 68.850600 ms
+impl5(Eigen),   result is -5290.747070, time cost is 65.757400 ms
+impl6(xsimd),   result is -5291.503906, time cost is 66.209500 ms
 
 Debug Mode:
->impl1(Naive),   result is -5290.376953, time cost is 498.087700 ms
-impl2(OpenCV),  result is -5290.986328, time cost is 1607.252700 ms
-impl4(MIPP),    result is -5290.986816, time cost is 3864.709700 ms
-impl5(Eigen),   result is -5290.748047, time cost is 2963.119900 ms
+>time cost for random assign is 11423.765500 ms
+impl1(Naive),   result is -5290.376953, time cost is 506.001200 ms
+impl2(OpenCV),  result is -5291.520020, time cost is 1650.197400 ms
+impl4(MIPP),    result is -5291.520508, time cost is 3944.401800 ms
+impl5(Eigen),   result is -5290.748047, time cost is 3000.024400 ms
+impl6(xsimd),   result is -5291.520508, time cost is 7662.899600 ms
+
+对比发现，在 Debug 模式下，各种 SIMD Wrapper 都比 naive 实现要慢 3~15 倍。
 
 ---
 

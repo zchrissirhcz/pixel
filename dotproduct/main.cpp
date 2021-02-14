@@ -10,6 +10,7 @@
 
 #include "mipp.h"
 #include <Eigen/Dense>
+#include "xsimd/xsimd.hpp"
 
 float dotproduct1(size_t len, float* va, float* vb)
 {
@@ -19,13 +20,14 @@ float dotproduct1(size_t len, float* va, float* vb)
     }
     return sum;
 }
-
+// OpenCV universal intrinsics based implementation
 float dotproduct2(size_t len, float* va, float* vb)
 {
     size_t step = sizeof(cv::v_float32)/sizeof(float);
-    //printf("step is %zu\n", step);
     cv::v_float32 v_sum = cv::vx_setzero_f32();
-    for (size_t i=0; i<len; i+=step)
+
+    size_t vec_size = len - len % step;
+    for (size_t i=0; i< vec_size; i+=step)
     {
         cv::v_float32 v1 = cv::vx_load(va+i);
         cv::v_float32 v2 = cv::vx_load(vb+i);
@@ -34,8 +36,7 @@ float dotproduct2(size_t len, float* va, float* vb)
 
     float sum = cv::v_reduce_sum(v_sum);
 
-    size_t remain_begin = len -1 - (len % step);
-    for (size_t i=remain_begin; i<len; i++) {
+    for (size_t i= vec_size; i<len; i++) {
         sum += va[i] * vb[i];
     }
 
@@ -97,9 +98,11 @@ float dotproduct4(size_t len, float* va, float* vb)
 {
     constexpr int step = mipp::N<float>();
     //printf("--- mipp::N<float>() is %d\n", mipp::N<float>());
-    mipp::Reg<float> ra, rb, rc;
+    size_t vec_size = len - len % step;
+    mipp::Reg<float> rc;
+    mipp::Reg<float> ra, rb;
     rc.set0();
-    for (size_t i=0; i<len; i+=step) {
+    for (size_t i=0; i< vec_size; i+=step) {
         ra.load(va + i);
         rb.load(vb + i);
         rc += ra * rb;
@@ -107,8 +110,7 @@ float dotproduct4(size_t len, float* va, float* vb)
 
     float sum = rc.sum();
 
-    size_t remain_begin = len -1 - (len % step);
-    for (size_t i=remain_begin; i<len; i++) {
+    for (size_t i= vec_size; i<len; i++) {
         sum += va[i] * vb[i];
     }
 
@@ -122,6 +124,32 @@ float dotproduct5(size_t len, float* va, float* vb)
     Eigen::Map<Eigen::Matrix<float, 1, Eigen::Dynamic, Eigen::RowMajor>> vvb(vb, len);
     float res = vva.dot(vvb);
     return res;
+}
+
+// xsimd based implementation
+float dotproduct6(size_t len, float* va, float* vb)
+{
+    constexpr size_t simd_size = xsimd::simd_type<float>::size;
+    size_t vec_size = len - len % simd_size;
+
+    xsimd::batch<float, simd_size> vres;
+    for (size_t i = 0; i < simd_size; i++) {
+        vres[i] = 0;
+    }
+    for (size_t i=0; i<vec_size; i+=simd_size)
+    {
+        auto vva = xsimd::load_unaligned(va + i);
+        auto vvb = xsimd::load_unaligned(vb + i);
+        vres += vva * vvb;
+    }
+    float sum = 0;
+    for (size_t i = 0; i < simd_size; i++) {
+        sum += vres[i];
+    }
+    for (size_t i = vec_size; i < len; i++) {
+        sum += va[i] * vb[i];
+    }
+    return sum;
 }
 
 static void opencv_simd_test()
@@ -148,6 +176,7 @@ int main() {
     //opencv_simd_test();
 
     size_t len = 200000000; //200M
+    //size_t len = 9;
     float* va = (float*)malloc(sizeof(float)*len);
     float* vb = (float*)malloc(sizeof(float)*len);
 
@@ -189,6 +218,11 @@ int main() {
     res = dotproduct5(len, va, vb);
     t_cost = pixel_get_current_time() - t_start;
     printf("impl5(Eigen),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
+
+    t_start = pixel_get_current_time();
+    res = dotproduct6(len, va, vb);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("impl6(xsimd),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
 
     free(va);
     free(vb);
