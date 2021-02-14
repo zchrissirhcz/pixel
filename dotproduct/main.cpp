@@ -8,6 +8,8 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/simd_intrinsics.hpp>
 
+#include "mipp.h"
+#include <Eigen/Dense>
 
 float dotproduct1(size_t len, float* va, float* vb)
 {
@@ -21,7 +23,7 @@ float dotproduct1(size_t len, float* va, float* vb)
 float dotproduct2(size_t len, float* va, float* vb)
 {
     size_t step = sizeof(cv::v_float32)/sizeof(float);
-    printf("step is %zu\n", step);
+    //printf("step is %zu\n", step);
     cv::v_float32 v_sum = cv::vx_setzero_f32();
     for (size_t i=0; i<len; i+=step)
     {
@@ -40,6 +42,7 @@ float dotproduct2(size_t len, float* va, float* vb)
     return sum;
 }
 
+#ifdef __ARM_NEON
 float dotproduct3(size_t len, float* va, float* vb)
 {
     int segments = len / 4;
@@ -87,8 +90,41 @@ float dotproduct3(size_t len, float* va, float* vb)
 
     return sum;
 }
+#endif
 
-static void simd_test()
+// MIPP based implementation
+float dotproduct4(size_t len, float* va, float* vb)
+{
+    constexpr int step = mipp::N<float>();
+    //printf("--- mipp::N<float>() is %d\n", mipp::N<float>());
+    mipp::Reg<float> ra, rb, rc;
+    rc.set0();
+    for (size_t i=0; i<len; i+=step) {
+        ra.load(va + i);
+        rb.load(vb + i);
+        rc += ra * rb;
+    }
+
+    float sum = rc.sum();
+
+    size_t remain_begin = len -1 - (len % step);
+    for (size_t i=remain_begin; i<len; i++) {
+        sum += va[i] * vb[i];
+    }
+
+    return sum;
+}
+
+// Eigen based implementation
+float dotproduct5(size_t len, float* va, float* vb)
+{
+    Eigen::Map<Eigen::Matrix<float, 1, Eigen::Dynamic, Eigen::RowMajor>> vva(va, len);
+    Eigen::Map<Eigen::Matrix<float, 1, Eigen::Dynamic, Eigen::RowMajor>> vvb(vb, len);
+    float res = vva.dot(vvb);
+    return res;
+}
+
+static void opencv_simd_test()
 {
     using namespace cv;
 #ifdef CV_SIMD
@@ -109,7 +145,7 @@ static void simd_test()
 }
 
 int main() {
-    simd_test();
+    //opencv_simd_test();
 
     size_t len = 200000000; //200M
     float* va = (float*)malloc(sizeof(float)*len);
@@ -130,17 +166,29 @@ int main() {
     t_start = pixel_get_current_time();
     res = dotproduct1(len, va, vb);
     t_cost = pixel_get_current_time() - t_start;
-    printf("impl1, result is %.6f, time cost is %lf ms\n", res, t_cost);
+    printf("impl1(Naive),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
 
     t_start = pixel_get_current_time();
     res = dotproduct2(len, va, vb);
     t_cost = pixel_get_current_time() - t_start;
-    printf("impl2, result is %.6f, time cost is %lf ms\n", res, t_cost);
+    printf("impl2(OpenCV),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
 
+#ifdef __ARM_NEON
     t_start = pixel_get_current_time();
     res = dotproduct3(len, va, vb);
     t_cost = pixel_get_current_time() - t_start;
-    printf("impl3, result is %.6f, time cost is %lf ms\n", res, t_cost);
+    printf("impl3(neon intrin),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
+#endif
+
+    t_start = pixel_get_current_time();
+    res = dotproduct4(len, va, vb);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("impl4(MIPP),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
+
+    t_start = pixel_get_current_time();
+    res = dotproduct5(len, va, vb);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("impl5(Eigen),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
 
     free(va);
     free(vb);
