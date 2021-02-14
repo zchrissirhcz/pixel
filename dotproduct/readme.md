@@ -4,6 +4,8 @@
 
 [使用OpenCV中的universal intrinsics为算法提速 (3)](https://mp.weixin.qq.com/s?src=11&timestamp=1613301941&ver=2890&signature=NacoD9gG2TtepdxxvAzYPATCU-fW7DHosaJFqEg7u0fXcAUiVwnhjScV43Zkf*NI-rr5nLI0e2l7epFcz3g4Gv*VnnPosSTTtLt0kR2cdlhf8wqSN7Jq8DbJDLLKah3x&new=1)
 
+[Universal intrinsics - OpenCV Docs Page](https://docs.opencv.org/master/df/d91/group__core__hal__intrin.html)
+
 ## no -mavx2
 CV_SIMD is : 1
 CV_SIMD_WIDTH is : 16
