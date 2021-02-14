@@ -9,6 +9,7 @@ I implement this function by calling SIMD wrapper functions, from 3 libraries:
 - [OpenCV universal intrinsics](https://docs.opencv.org/master/df/d91/group__core__hal__intrin.html)
 - [MIPP](https://github.com/aff3ct/MIPP)
 - [Eigen](http://gitlab.com/libeigen/eigen)
+- [xsimd](https://github.com/xtensor-stack/xsimd)
 
 With `/AVX2` enabled, I test the performance of these implementations in both Release and Debug mode. Specifically, I use `len=200000000`, and got:
 
@@ -30,6 +31,18 @@ impl6(xsimd),   result is -5291.520508, time cost is 7662.899600 ms
 
 对比发现，在 Debug 模式下，各种 SIMD Wrapper 都比 naive 实现要慢 3~15 倍。
 
+## 暂时没尝试的
+- [highway](https://github.com/google/highway)
+- [Simd](https://github.com/ermig1979/Simd)
+- [OpenBLAS](https://github.com/xianyi/OpenBLAS)
+- [Vc](https://github.com/VcDevel/Vc)
+- [libsimdpp](https://github.com/p12tic/libsimdpp)
+- [std-simd](https://github.com/VcDevel/std-simd)
+- [psimd](https://github.com/Maratyszcza/psimd) 只有128位，NNPACK作者出品；似乎比较简单；但很久不更新了
+- [pure_simd](https://github.com/eatingtomatoes/pure_simd) 需要C++17
+- [generic_simd](https://github.com/genericsimd/generic_simd) 很大程度上用C实现的。但不支持neon
+- [kr8md](https://github.com/njroussel/Kr8md/blob/master/include/kr8md/intrinsic_types.h) 实现比较简单，似乎可以参考
+- [tsimd](https://github.com/jeffamstutz/tsimd) 作者有在2018 cppcon做演讲
 ---
 
 ## Deprecated results
