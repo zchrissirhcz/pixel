@@ -8,9 +8,20 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/simd_intrinsics.hpp>
 
+#ifdef USE_MIPP
 #include "mipp.h"
+#endif
+
 #include <Eigen/Dense>
 #include "xsimd/xsimd.hpp"
+
+#ifdef _MSC_VER
+#define USE_SSE 1
+#endif
+
+#ifdef USE_SSE
+#include <xmmintrin.h> // SSE
+#endif
 
 float dotproduct1(size_t len, float* va, float* vb)
 {
@@ -20,12 +31,12 @@ float dotproduct1(size_t len, float* va, float* vb)
     }
     return sum;
 }
+
 // OpenCV universal intrinsics based implementation
 float dotproduct2(size_t len, float* va, float* vb)
 {
     size_t step = sizeof(cv::v_float32)/sizeof(float);
     cv::v_float32 v_sum = cv::vx_setzero_f32();
-
     size_t vec_size = len - len % step;
     for (size_t i=0; i< vec_size; i+=step)
     {
@@ -45,6 +56,34 @@ float dotproduct2(size_t len, float* va, float* vb)
 
 #ifdef __ARM_NEON
 float dotproduct3(size_t len, float* va, float* vb)
+{
+    const size_t step = 4; // 128 / sizeof(float)
+    size_t vec_size = len - len % step;
+    float32x4_t vres = vdupq_n_f32(0);
+    float32x4_t v1;
+    float32x4_t v2;
+    float32x4_t vtmp;
+    for (size_t i = 0; i < vec_size; i+=step) {
+        v1 = vld1q_f32(va + i);
+        v2 = vld1q_f32(vb + i);
+        vtmp = vmulq_f32(v1, v2);
+        vres = vaddq_f32(vtmp, vres);
+    }
+
+    float sum_lst[4];
+    vst1q_f32(sum_lst, vres);
+    
+    float sum = 0;
+    for (size_t i = 0; i < step; i++) {
+        sum += sum_lst[i];
+    }
+    for (size_t i = vec_size; i < len; i++) {
+        sum += va[i] * vb[i];
+    }
+    return sum;
+}
+
+float dotproduct3_cache(size_t len, float* va, float* vb)
 {
     int segments = len / 4;
     int remain = len - (segments/4*4)*4;
@@ -93,6 +132,7 @@ float dotproduct3(size_t len, float* va, float* vb)
 }
 #endif
 
+#ifdef USE_MIPP
 // MIPP based implementation
 float dotproduct4(size_t len, float* va, float* vb)
 {
@@ -116,6 +156,7 @@ float dotproduct4(size_t len, float* va, float* vb)
 
     return sum;
 }
+#endif
 
 // Eigen based implementation
 float dotproduct5(size_t len, float* va, float* vb)
@@ -132,10 +173,11 @@ float dotproduct6(size_t len, float* va, float* vb)
     constexpr size_t simd_size = xsimd::simd_type<float>::size;
     size_t vec_size = len - len % simd_size;
 
-    xsimd::batch<float, simd_size> vres;
-    for (size_t i = 0; i < simd_size; i++) {
-        vres[i] = 0;
-    }
+    //xsimd::batch<float, simd_size> vres;
+    //for (size_t i = 0; i < simd_size; i++) {
+    //    vres[i] = 0;
+    //}
+    xsimd::batch<float, simd_size> vres(0.f);
     for (size_t i=0; i<vec_size; i+=simd_size)
     {
         auto vva = xsimd::load_unaligned(va + i);
@@ -152,6 +194,36 @@ float dotproduct6(size_t len, float* va, float* vb)
     return sum;
 }
 
+#ifdef USE_SSE
+// SSE based implementation
+float dotproduct7(size_t len, float* va, float* vb)
+{
+    const size_t step = 4; // 128 / sizeof(float)
+    size_t vec_size = len - len % step;
+    __m128 vacc = _mm_setzero_ps();
+    __m128 v1;
+    __m128 v2;
+    for (size_t i=0; i<vec_size; i+=step) {
+        v1 = _mm_loadu_ps(va + i);
+        v2 = _mm_loadu_ps(vb + i);
+        vacc = _mm_add_ps(_mm_mul_ps(v1, v2), vacc);
+    }
+
+    float sum_lst[step];
+    _mm_store_ps(sum_lst, vacc);
+
+    float sum = 0;
+    for (size_t i = 0; i < step; i++) {
+        sum += sum_lst[i];
+    }
+
+    for (size_t i = vec_size; i < len; i++) {
+        sum += va[i] * vb[i];
+    }
+    return sum;
+}
+#endif
+ 
 static void opencv_simd_test()
 {
     using namespace cv;
@@ -206,13 +278,15 @@ int main() {
     t_start = pixel_get_current_time();
     res = dotproduct3(len, va, vb);
     t_cost = pixel_get_current_time() - t_start;
-    printf("impl3(neon intrin),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
+    printf("impl3(neon),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
 #endif
 
+#ifdef USE_MIPP
     t_start = pixel_get_current_time();
     res = dotproduct4(len, va, vb);
     t_cost = pixel_get_current_time() - t_start;
     printf("impl4(MIPP),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
+#endif
 
     t_start = pixel_get_current_time();
     res = dotproduct5(len, va, vb);
@@ -223,6 +297,13 @@ int main() {
     res = dotproduct6(len, va, vb);
     t_cost = pixel_get_current_time() - t_start;
     printf("impl6(xsimd),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
+
+#ifdef USE_SSE
+    t_start = pixel_get_current_time();
+    res = dotproduct7(len, va, vb);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("impl7(sse),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
+#endif
 
     free(va);
     free(vb);

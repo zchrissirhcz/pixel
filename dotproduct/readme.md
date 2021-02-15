@@ -31,6 +31,29 @@ impl6(xsimd),   result is -5291.520508, time cost is 7662.899600 ms
 
 对比发现，在 Debug 模式下，各种 SIMD Wrapper 都比 naive 实现要慢 3~15 倍。
 
+一种快速的优化方法是开启**内联优化**, `/Ob3` (VS2019才支持, [ref](https://docs.microsoft.com/fr-fr/cpp/build/reference/ob-inline-function-expansion?view=msvc-160))
+
+After setting `/Ob3` for MSVC16 project property, debug mode result:
+```
+time cost for random assign is 11280.405600 ms
+impl1(Naive),   result is -5290.376953, time cost is 503.579000 ms
+impl2(OpenCV),  result is -5291.520020, time cost is 172.810900 ms
+impl4(MIPP),    result is -5291.520508, time cost is 1005.270700 ms
+impl5(Eigen),   result is -5290.748047, time cost is 260.357800 ms
+impl6(xsimd),   result is -5291.520508, time cost is 1266.117400 ms
+```
+
+如果只开SSE，在Debug模式，`/Ob3`内联优化：
+```
+time cost for random assign is 11483.795500 ms
+impl1(Naive),   result is -5290.376953, time cost is 519.258500 ms
+impl2(OpenCV),  result is -5289.963867, time cost is 328.571300 ms
+impl4(MIPP),    result is -5290.376953, time cost is 1139.231900 ms
+impl5(Eigen),   result is -5291.520508, time cost is 493.596100 ms
+impl6(xsimd),   result is -5289.963379, time cost is 1114.844500 ms
+impl7(sse),     result is -5289.963379, time cost is 243.068300 ms
+```
+
 ## 暂时没尝试的
 - [highway](https://github.com/google/highway)
 - [Simd](https://github.com/ermig1979/Simd)
