@@ -5,7 +5,7 @@ I would like to calculate the dot-product result of two float32 array:
 float dotproduct(size_t len, float* va, float* vb)
 ```
 
-I implement this function by calling SIMD wrapper functions, from 3 libraries:
+I implement this function by calling SIMD wrapper functions, from 4 libraries:
 - [OpenCV universal intrinsics](https://docs.opencv.org/master/df/d91/group__core__hal__intrin.html)
 - [MIPP](https://github.com/aff3ct/MIPP)
 - [Eigen](http://gitlab.com/libeigen/eigen)
