@@ -8,7 +8,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/simd_intrinsics.hpp>
 
-//#define USE_MIPP
+#define USE_MIPP
 #ifdef USE_MIPP
 #include "mipp.h"
 #endif
@@ -233,15 +233,15 @@ float dotproduct8(size_t len, float* va, float* vb)
     const size_t step = 4; // 128 / sizeof(float)
     size_t vec_size = len - len % step;
     v_float32x4 v1, v2;
-    v_float32x4 vres = v_setzero_f32();
+    v_float32x4 vres = vq_setzero_f32();
     for (size_t i = 0; i < vec_size; i += step) {
-        v1 = v_load_f32(va + i);
-        v2 = v_load_f32(vb + i);
-        //vres = v_add_f32(v_mul_f32(v1, v2), vres);
-        vres = v_fmadd_f32(v1, v2, vres);
+        v1 = vq_load_f32(va + i);
+        v2 = vq_load_f32(vb + i);
+        //vres = vq_add_f32(v_mul_f32(v1, v2), vres);
+        vres = vq_fmadd_f32(v1, v2, vres);
     }
     float sum_lst[step];
-    v_store_f32(sum_lst, vres);
+    vq_store_f32(sum_lst, vres);
     float sum = 0;
     for (size_t i = 0; i < step; i++) {
         sum += sum_lst[i];
@@ -337,7 +337,7 @@ int main() {
     t_start = pixel_get_current_time();
     res = dotproduct8(len, va, vb);
     t_cost = pixel_get_current_time() - t_start;
-    printf("impl8(pixel_simd),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
+    printf("impl8(pixel),\tresult is %.6f, time cost is %.6lf ms\n", res, t_cost);
 
 #if defined(PIXEL_NEON)
     printf("defined PIXEL_NEON\n");

@@ -1,7 +1,12 @@
 @echo off
 
-set ANDROID_NDK=D:/soft/Android/ndk-r21b
+if not defined ANDROID_NDK (
+    set ANDROID_NDK=E:/soft/Android/ndk-r21b
+)
 set TOOLCHAIN=%ANDROID_NDK%/build/cmake/android.toolchain.cmake
+
+echo "ANDROID_NDK is %ANDROID_NDK%"
+echo "TOOLCHAIN is: %TOOLCHAIN%"
 
 set BUILD_DIR=android-arm64
 if not exist %BUILD_DIR% md %BUILD_DIR%
