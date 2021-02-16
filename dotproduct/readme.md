@@ -122,3 +122,13 @@ impl2, result is -5289.429688, time cost is 191.786354 ms
 [使用OpenCV中的universal intrinsics为算法提速 (3)](https://mp.weixin.qq.com/s?src=11&timestamp=1613301941&ver=2890&signature=NacoD9gG2TtepdxxvAzYPATCU-fW7DHosaJFqEg7u0fXcAUiVwnhjScV43Zkf*NI-rr5nLI0e2l7epFcz3g4Gv*VnnPosSTTtLt0kR2cdlhf8wqSN7Jq8DbJDLLKah3x&new=1)
 
 [Universal intrinsics - OpenCV Docs Page](https://docs.opencv.org/master/df/d91/group__core__hal__intrin.html)
+
+[arm neon 数据类型介绍](https://blog.csdn.net/xiongtiancheng/article/details/76860386)
+
+[SSE指令集学习](https://blog.csdn.net/weixin_44470443/article/details/99819791)
+
+[Neon Intrinsics各函数介绍](https://blog.csdn.net/fengbingchun/article/details/38085781)
+
+[Intel @Intrinsics Guide 官方查询](https://software.intel.com/sites/landingpage/IntrinsicsGuide/)
+
+[Neon Intrinsics 官方查询](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/intrinsics)
