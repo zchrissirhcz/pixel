@@ -8,7 +8,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/simd_intrinsics.hpp>
 
-#define USE_MIPP
+//#define USE_MIPP
 #ifdef USE_MIPP
 #include "mipp.h"
 #endif
