@@ -370,8 +370,8 @@ static inline v_uint64x2    vq_cmpge_u64(v_uint64x2 v1, v_uint64x2 v2);
 
 //----------------------------------------------------------------------
 // bitselect(mask, v1, v2)
-// selects each bit for the destination from the first operand 
-// if the corresponding bit of the destination is 1, 
+// selects each bit for the destination from the first operand
+// if the corresponding bit of the destination is 1,
 // or from the second operand if the corresponding bit of the destination is 0.
 //----------------------------------------------------------------------
 // 8bytes(64bits) part
@@ -684,7 +684,7 @@ inline v_uint16x8 vq_fmadd_u16(v_uint16x8 v1, v_uint16x8 v2, v_uint16x8 v3) {
 #endif
 }
 
-inline v_uint32x4 vq_fmadd_u32(v_uint32x4 v1, v_uint32x4 v2, v_uint32x4 v3) { 
+inline v_uint32x4 vq_fmadd_u32(v_uint32x4 v1, v_uint32x4 v2, v_uint32x4 v3) {
 #ifdef __ARM_FEATURE_FMA
     return vmlaq_u32(v3, v1, v2);
 #else
@@ -802,8 +802,8 @@ inline v_uint64x2 vq_cmpge_u64(v_uint64x2 v1, v_uint64x2 v2) { return vcgeq_u64(
 
 //----------------------------------------------------------------------
 // bitselect(mask, v1, v2)
-// selects each bit for the destination from the first operand 
-// if the corresponding bit of the destination is 1, 
+// selects each bit for the destination from the first operand
+// if the corresponding bit of the destination is 1,
 // or from the second operand if the corresponding bit of the destination is 0.
 //----------------------------------------------------------------------
 // 8bytes(64bits) part
@@ -834,45 +834,45 @@ inline v_uint64x1 vq_bitselect_u64(v_uint64x2 mask, v_uint64x2 v1, v_uint64x2 v2
 // assign all element to zero
 //----------------------------------------------------------------------
 // 8bytes(64bits) part
-inline v_int8x8 vd_setzero_s8() { 
+inline v_int8x8 vd_setzero_s8() {
     v_int8x8 v;
     v.data_[0] = 0; v.data_[1] = 0; v.data_[2] = 0; v.data_[3] = 0;
     v.data_[4] = 0; v.data_[5] = 0; v.data_[6] = 0; v.data_[7] = 0;
     return v;
 }
 
-inline v_int16x4 vd_setzero_s16() { 
+inline v_int16x4 vd_setzero_s16() {
     v_int16x4 v;
     v.data_[0] = 0; v.data_[1] = 0; v.data_[2] = 0; v.data_[3] = 0;
     return v;
 }
 
-inline v_int32x2 vd_setzero_s32() { 
+inline v_int32x2 vd_setzero_s32() {
     v_int32x2 v;
     v.data_[0] = 0; v.data_[1] = 0;
     return v;
 }
 
-inline v_int64x1 vd_setzero_s64() { 
+inline v_int64x1 vd_setzero_s64() {
     v_int64x1 v;
     v.data_[0] = 0;
     return v;
 }
 
-inline v_float32x2 vd_setzero_f32() { 
+inline v_float32x2 vd_setzero_f32() {
     v_float32x2 v;
     v.data_[0] = 0.f; v.data_[1] = 0.f;
     return v;
 }
 
-inline v_uint8x8 vd_setzero_u8() { 
+inline v_uint8x8 vd_setzero_u8() {
     v_uint8x8 v;
     v.data_[0] = 0; v.data_[1] = 0; v.data_[2] = 0; v.data_[3] = 0;
     v.data_[4] = 0; v.data_[5] = 0; v.data_[6] = 0; v.data_[7] = 0;
     return v;
 }
 
-inline v_uint16x4 vd_setzero_u16() { 
+inline v_uint16x4 vd_setzero_u16() {
     v_uint16x4 v;
     v.data_[0] = 0; v.data_[1] = 0; v.data_[2] = 0; v.data_[3] = 0;
     return v;
@@ -1911,7 +1911,7 @@ inline v_uint32x4 vq_fmadd_u32(v_uint32x4 v1, v_uint32x4 v2, v_uint32x4 v3) {
 }
 
 inline v_uint64x2 vq_fmadd_u64(v_uint64x2 v1, v_uint64x2 v2, v_uint64x2 v3) {
-    v_int64x2 v;
+    v_uint64x2 v;
     v.data_[0] = (v1.data_[0] * v2.data_[0]) + v3.data_[0];
     v.data_[1] = (v1.data_[1] * v2.data_[1]) + v3.data_[1];
     return v;
@@ -1923,23 +1923,23 @@ inline v_uint64x2 vq_fmadd_u64(v_uint64x2 v1, v_uint64x2 v2, v_uint64x2 v3) {
 // 8bytes(64bits) part
 inline v_uint8x8 vd_cmplt_s8(v_int8x8 v1, v_int8x8 v2) {
     v_uint8x8 v;
-    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xffffffff : 0;
-    v.data_[4] = (v1.data_[4] < v2.data_[4]) ? 0xffffffff : 0;
-    v.data_[5] = (v1.data_[5] < v2.data_[5]) ? 0xffffffff : 0;
-    v.data_[6] = (v1.data_[6] < v2.data_[6]) ? 0xffffffff : 0;
-    v.data_[7] = (v1.data_[7] < v2.data_[7]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xff : 0;
+    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xff : 0;
+    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xff : 0;
+    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xff : 0;
+    v.data_[4] = (v1.data_[4] < v2.data_[4]) ? 0xff : 0;
+    v.data_[5] = (v1.data_[5] < v2.data_[5]) ? 0xff : 0;
+    v.data_[6] = (v1.data_[6] < v2.data_[6]) ? 0xff : 0;
+    v.data_[7] = (v1.data_[7] < v2.data_[7]) ? 0xff : 0;
     return v;
 }
 
 inline v_uint16x4 vd_cmplt_s16(v_int16x4 v1, v_int16x4 v2) {
     v_uint16x4 v;
-    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffff : 0;
+    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffff : 0;
+    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffff : 0;
+    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xffff : 0;
     return v;
 }
 
@@ -1952,7 +1952,7 @@ inline v_uint32x2 vd_cmplt_s32(v_int32x2 v1, v_int32x2 v2) {
 
 inline v_uint64x1 vd_cmplt_s64(v_int64x1 v1, v_int64x1 v2) {
     v_uint64x1 v;
-    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffffffffffff : 0;
     return v;
 }
 
@@ -1965,23 +1965,23 @@ inline v_uint32x2 vd_cmplt_f32(v_float32x2 v1, v_float32x2 v2) {
 
 inline v_uint8x8 vd_cmplt_u8(v_uint8x8 v1, v_uint8x8 v2) {
     v_uint8x8 v;
-    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xffffffff : 0;
-    v.data_[4] = (v1.data_[4] < v2.data_[4]) ? 0xffffffff : 0;
-    v.data_[5] = (v1.data_[5] < v2.data_[5]) ? 0xffffffff : 0;
-    v.data_[6] = (v1.data_[6] < v2.data_[6]) ? 0xffffffff : 0;
-    v.data_[7] = (v1.data_[7] < v2.data_[7]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xff : 0;
+    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xff : 0;
+    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xff : 0;
+    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xff : 0;
+    v.data_[4] = (v1.data_[4] < v2.data_[4]) ? 0xff : 0;
+    v.data_[5] = (v1.data_[5] < v2.data_[5]) ? 0xff : 0;
+    v.data_[6] = (v1.data_[6] < v2.data_[6]) ? 0xff : 0;
+    v.data_[7] = (v1.data_[7] < v2.data_[7]) ? 0xff : 0;
     return v;
 }
 
 inline v_uint16x4 vd_cmplt_u16(v_uint16x4 v1, v_uint16x4 v2) {
     v_uint16x4 v;
-    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffff : 0;
+    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffff : 0;
+    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffff : 0;
+    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xffff : 0;
     return v;
 }
 
@@ -1994,47 +1994,47 @@ inline v_uint32x2 vd_cmplt_u32(v_uint32x2 v1, v_uint32x2 v2) {
 
 inline v_uint64x1 vd_cmplt_u64(v_uint64x1 v1, v_uint64x1 v2) {
     v_uint64x1 v;
-    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffffffffffff : 0;
     return v;
 }
 
 // 16bytes(128bits) part
 inline v_uint8x16 vq_cmplt_s8(v_int8x16 v1, v_int8x16 v2) {
     v_uint8x16 v;
-    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xffffffff : 0;
-    v.data_[4] = (v1.data_[4] < v2.data_[4]) ? 0xffffffff : 0;
-    v.data_[5] = (v1.data_[5] < v2.data_[5]) ? 0xffffffff : 0;
-    v.data_[6] = (v1.data_[6] < v2.data_[6]) ? 0xffffffff : 0;
-    v.data_[7] = (v1.data_[7] < v2.data_[7]) ? 0xffffffff : 0;
-    v.data_[8] = (v1.data_[8] < v2.data_[8]) ? 0xffffffff : 0;
-    v.data_[9] = (v1.data_[9] < v2.data_[9]) ? 0xffffffff : 0;
-    v.data_[10] = (v1.data_[10] < v2.data_[10]) ? 0xffffffff : 0;
-    v.data_[11] = (v1.data_[11] < v2.data_[11]) ? 0xffffffff : 0;
-    v.data_[12] = (v1.data_[12] < v2.data_[12]) ? 0xffffffff : 0;
-    v.data_[13] = (v1.data_[13] < v2.data_[13]) ? 0xffffffff : 0;
-    v.data_[14] = (v1.data_[14] < v2.data_[14]) ? 0xffffffff : 0;
-    v.data_[15] = (v1.data_[15] < v2.data_[15]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xff : 0;
+    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xff : 0;
+    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xff : 0;
+    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xff : 0;
+    v.data_[4] = (v1.data_[4] < v2.data_[4]) ? 0xff : 0;
+    v.data_[5] = (v1.data_[5] < v2.data_[5]) ? 0xff : 0;
+    v.data_[6] = (v1.data_[6] < v2.data_[6]) ? 0xff : 0;
+    v.data_[7] = (v1.data_[7] < v2.data_[7]) ? 0xff : 0;
+    v.data_[8] = (v1.data_[8] < v2.data_[8]) ? 0xff : 0;
+    v.data_[9] = (v1.data_[9] < v2.data_[9]) ? 0xff : 0;
+    v.data_[10] = (v1.data_[10] < v2.data_[10]) ? 0xff : 0;
+    v.data_[11] = (v1.data_[11] < v2.data_[11]) ? 0xff : 0;
+    v.data_[12] = (v1.data_[12] < v2.data_[12]) ? 0xff : 0;
+    v.data_[13] = (v1.data_[13] < v2.data_[13]) ? 0xff : 0;
+    v.data_[14] = (v1.data_[14] < v2.data_[14]) ? 0xff : 0;
+    v.data_[15] = (v1.data_[15] < v2.data_[15]) ? 0xff : 0;
     return v;
 }
 
 inline v_uint16x8 vq_cmplt_s16(v_int16x8 v1, v_int16x8 v2) {
     v_uint16x8 v;
-    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xffffffff : 0;
-    v.data_[4] = (v1.data_[4] < v2.data_[4]) ? 0xffffffff : 0;
-    v.data_[5] = (v1.data_[5] < v2.data_[5]) ? 0xffffffff : 0;
-    v.data_[6] = (v1.data_[6] < v2.data_[6]) ? 0xffffffff : 0;
-    v.data_[7] = (v1.data_[7] < v2.data_[7]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffff : 0;
+    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffff : 0;
+    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffff : 0;
+    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xffff : 0;
+    v.data_[4] = (v1.data_[4] < v2.data_[4]) ? 0xffff : 0;
+    v.data_[5] = (v1.data_[5] < v2.data_[5]) ? 0xffff : 0;
+    v.data_[6] = (v1.data_[6] < v2.data_[6]) ? 0xffff : 0;
+    v.data_[7] = (v1.data_[7] < v2.data_[7]) ? 0xffff : 0;
     return v;
 }
 
 inline v_uint32x4 vq_cmplt_s32(v_int32x4 v1, v_int32x4 v2) {
-    v_uint16x8 v;
+    v_uint32x4 v;
     v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
     v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffff : 0;
     v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffffffff : 0;
@@ -2043,14 +2043,14 @@ inline v_uint32x4 vq_cmplt_s32(v_int32x4 v1, v_int32x4 v2) {
 }
 
 inline v_uint64x2 vq_cmplt_s64(v_int64x2 v1, v_int64x2 v2) {
-    v_uint16x8 v;
-    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffff : 0;
+    v_uint64x2 v;
+    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffffffffffff : 0;
+    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffffffffffff : 0;
     return v;
 }
 
 inline v_uint32x4 vq_cmplt_f32(v_float32x4 v1, v_float32x4 v2) {
-    v_uint16x8 v;
+    v_uint32x4 v;
     v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
     v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffff : 0;
     v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffffffff : 0;
@@ -2060,35 +2060,35 @@ inline v_uint32x4 vq_cmplt_f32(v_float32x4 v1, v_float32x4 v2) {
 
 inline v_uint8x16 vq_cmplt_u8(v_uint8x16 v1, v_uint8x16 v2) {
     v_uint8x16 v;
-    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xffffffff : 0;
-    v.data_[4] = (v1.data_[4] < v2.data_[4]) ? 0xffffffff : 0;
-    v.data_[5] = (v1.data_[5] < v2.data_[5]) ? 0xffffffff : 0;
-    v.data_[6] = (v1.data_[6] < v2.data_[6]) ? 0xffffffff : 0;
-    v.data_[7] = (v1.data_[7] < v2.data_[7]) ? 0xffffffff : 0;
-    v.data_[8] = (v1.data_[8] < v2.data_[8]) ? 0xffffffff : 0;
-    v.data_[9] = (v1.data_[9] < v2.data_[9]) ? 0xffffffff : 0;
-    v.data_[10] = (v1.data_[10] < v2.data_[10]) ? 0xffffffff : 0;
-    v.data_[11] = (v1.data_[11] < v2.data_[11]) ? 0xffffffff : 0;
-    v.data_[12] = (v1.data_[12] < v2.data_[12]) ? 0xffffffff : 0;
-    v.data_[13] = (v1.data_[13] < v2.data_[13]) ? 0xffffffff : 0;
-    v.data_[14] = (v1.data_[14] < v2.data_[14]) ? 0xffffffff : 0;
-    v.data_[15] = (v1.data_[15] < v2.data_[15]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xff : 0;
+    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xff : 0;
+    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xff : 0;
+    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xff : 0;
+    v.data_[4] = (v1.data_[4] < v2.data_[4]) ? 0xff : 0;
+    v.data_[5] = (v1.data_[5] < v2.data_[5]) ? 0xff : 0;
+    v.data_[6] = (v1.data_[6] < v2.data_[6]) ? 0xff : 0;
+    v.data_[7] = (v1.data_[7] < v2.data_[7]) ? 0xff : 0;
+    v.data_[8] = (v1.data_[8] < v2.data_[8]) ? 0xff : 0;
+    v.data_[9] = (v1.data_[9] < v2.data_[9]) ? 0xff : 0;
+    v.data_[10] = (v1.data_[10] < v2.data_[10]) ? 0xff : 0;
+    v.data_[11] = (v1.data_[11] < v2.data_[11]) ? 0xff : 0;
+    v.data_[12] = (v1.data_[12] < v2.data_[12]) ? 0xff : 0;
+    v.data_[13] = (v1.data_[13] < v2.data_[13]) ? 0xff : 0;
+    v.data_[14] = (v1.data_[14] < v2.data_[14]) ? 0xff : 0;
+    v.data_[15] = (v1.data_[15] < v2.data_[15]) ? 0xff : 0;
     return v;
 }
 
 inline v_uint16x8 vq_cmplt_u16(v_uint16x8 v1, v_uint16x8 v2) {
     v_uint16x8 v;
-    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xffffffff : 0;
-    v.data_[4] = (v1.data_[4] < v2.data_[4]) ? 0xffffffff : 0;
-    v.data_[5] = (v1.data_[5] < v2.data_[5]) ? 0xffffffff : 0;
-    v.data_[6] = (v1.data_[6] < v2.data_[6]) ? 0xffffffff : 0;
-    v.data_[7] = (v1.data_[7] < v2.data_[7]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffff : 0;
+    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffff : 0;
+    v.data_[2] = (v1.data_[2] < v2.data_[2]) ? 0xffff : 0;
+    v.data_[3] = (v1.data_[3] < v2.data_[3]) ? 0xffff : 0;
+    v.data_[4] = (v1.data_[4] < v2.data_[4]) ? 0xffff : 0;
+    v.data_[5] = (v1.data_[5] < v2.data_[5]) ? 0xffff : 0;
+    v.data_[6] = (v1.data_[6] < v2.data_[6]) ? 0xffff : 0;
+    v.data_[7] = (v1.data_[7] < v2.data_[7]) ? 0xffff : 0;
     return v;
 }
 
@@ -2103,8 +2103,8 @@ inline v_uint32x4 vq_cmplt_u32(v_uint32x4 v1, v_uint32x4 v2) {
 
 inline v_uint64x2 vq_cmplt_u64(v_uint64x2 v1, v_uint64x2 v2) {
     v_uint64x2 v;
-    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] < v2.data_[0]) ? 0xffffffffffffffff : 0;
+    v.data_[1] = (v1.data_[1] < v2.data_[1]) ? 0xffffffffffffffff : 0;
     return v;
 }
 
@@ -2114,23 +2114,23 @@ inline v_uint64x2 vq_cmplt_u64(v_uint64x2 v1, v_uint64x2 v2) {
 // 8bytes(64bits) part
 inline v_uint8x8 vd_cmple_s8(v_int8x8 v1, v_int8x8 v2) {
     v_uint8x8 v;
-    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] <= v2.data_[3]) ? 0xffffffff : 0;
-    v.data_[4] = (v1.data_[4] <= v2.data_[4]) ? 0xffffffff : 0;
-    v.data_[5] = (v1.data_[5] <= v2.data_[5]) ? 0xffffffff : 0;
-    v.data_[6] = (v1.data_[6] <= v2.data_[6]) ? 0xffffffff : 0;
-    v.data_[7] = (v1.data_[7] <= v2.data_[7]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xff : 0;
+    v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xff : 0;
+    v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xff : 0;
+    v.data_[3] = (v1.data_[3] <= v2.data_[3]) ? 0xff : 0;
+    v.data_[4] = (v1.data_[4] <= v2.data_[4]) ? 0xff : 0;
+    v.data_[5] = (v1.data_[5] <= v2.data_[5]) ? 0xff : 0;
+    v.data_[6] = (v1.data_[6] <= v2.data_[6]) ? 0xff : 0;
+    v.data_[7] = (v1.data_[7] <= v2.data_[7]) ? 0xff : 0;
     return v;
 }
 
 inline v_uint16x4 vd_cmple_s16(v_int16x4 v1, v_int16x4 v2) {
     v_uint16x4 v;
-    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] <= v2.data_[3]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffff : 0;
+    v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xffff : 0;
+    v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xffff : 0;
+    v.data_[3] = (v1.data_[3] <= v2.data_[3]) ? 0xffff : 0;
     return v;
 }
 
@@ -2143,7 +2143,7 @@ inline v_uint32x2 vd_cmple_s32(v_int32x2 v1, v_int32x2 v2) {
 
 inline v_uint64x1 vd_cmple_s64(v_int64x1 v1, v_int64x1 v2) {
     v_uint64x1 v;
-    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffffffffffffffff : 0;
     return v;
 }
 
@@ -2156,23 +2156,23 @@ inline v_uint32x2 vd_cmple_f32(v_float32x2 v1, v_float32x2 v2) {
 
 inline v_uint8x8 vd_cmple_u8(v_uint8x8 v1, v_uint8x8 v2) {
     v_uint8x8 v;
-    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] <= v2.data_[3]) ? 0xffffffff : 0;
-    v.data_[4] = (v1.data_[4] <= v2.data_[4]) ? 0xffffffff : 0;
-    v.data_[5] = (v1.data_[5] <= v2.data_[5]) ? 0xffffffff : 0;
-    v.data_[6] = (v1.data_[6] <= v2.data_[6]) ? 0xffffffff : 0;
-    v.data_[7] = (v1.data_[7] <= v2.data_[7]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xff : 0;
+    v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xff : 0;
+    v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xff : 0;
+    v.data_[3] = (v1.data_[3] <= v2.data_[3]) ? 0xff : 0;
+    v.data_[4] = (v1.data_[4] <= v2.data_[4]) ? 0xff : 0;
+    v.data_[5] = (v1.data_[5] <= v2.data_[5]) ? 0xff : 0;
+    v.data_[6] = (v1.data_[6] <= v2.data_[6]) ? 0xff : 0;
+    v.data_[7] = (v1.data_[7] <= v2.data_[7]) ? 0xff : 0;
     return v;
 }
 
 inline v_uint16x4 vd_cmple_u16(v_uint16x4 v1, v_uint16x4 v2) {
     v_uint16x4 v;
-    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] <= v2.data_[3]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffff : 0;
+    v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xffff : 0;
+    v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xffff : 0;
+    v.data_[3] = (v1.data_[3] <= v2.data_[3]) ? 0xffff : 0;
     return v;
 }
 
@@ -2185,47 +2185,47 @@ inline v_uint32x2 vd_cmple_u32(v_uint32x2 v1, v_uint32x2 v2) {
 
 inline v_uint64x1 vd_cmple_u64(v_uint64x1 v1, v_uint64x1 v2) {
     v_uint64x1 v;
-    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffffffffffffffff : 0;
     return v;
 }
 
 // 16bytes(128bits) part
 inline v_uint8x16 vq_cmple_s8(v_int8x16 v1, v_int8x16 v2) {
     v_uint8x16 v;
-    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] <= v2.data_[3]) ? 0xffffffff : 0;
-    v.data_[4] = (v1.data_[4] <= v2.data_[4]) ? 0xffffffff : 0;
-    v.data_[5] = (v1.data_[5] <= v2.data_[5]) ? 0xffffffff : 0;
-    v.data_[6] = (v1.data_[6] <= v2.data_[6]) ? 0xffffffff : 0;
-    v.data_[7] = (v1.data_[7] <= v2.data_[7]) ? 0xffffffff : 0;
-    v.data_[8] = (v1.data_[8] <= v2.data_[8]) ? 0xffffffff : 0;
-    v.data_[9] = (v1.data_[9] <= v2.data_[9]) ? 0xffffffff : 0;
-    v.data_[10] = (v1.data_[10] <= v2.data_[10]) ? 0xffffffff : 0;
-    v.data_[11] = (v1.data_[11] <= v2.data_[11]) ? 0xffffffff : 0;
-    v.data_[12] = (v1.data_[12] <= v2.data_[12]) ? 0xffffffff : 0;
-    v.data_[13] = (v1.data_[13] <= v2.data_[13]) ? 0xffffffff : 0;
-    v.data_[14] = (v1.data_[14] <= v2.data_[14]) ? 0xffffffff : 0;
-    v.data_[15] = (v1.data_[15] <= v2.data_[15]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xff : 0;
+    v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xff : 0;
+    v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xff : 0;
+    v.data_[3] = (v1.data_[3] <= v2.data_[3]) ? 0xff : 0;
+    v.data_[4] = (v1.data_[4] <= v2.data_[4]) ? 0xff : 0;
+    v.data_[5] = (v1.data_[5] <= v2.data_[5]) ? 0xff : 0;
+    v.data_[6] = (v1.data_[6] <= v2.data_[6]) ? 0xff : 0;
+    v.data_[7] = (v1.data_[7] <= v2.data_[7]) ? 0xff : 0;
+    v.data_[8] = (v1.data_[8] <= v2.data_[8]) ? 0xff : 0;
+    v.data_[9] = (v1.data_[9] <= v2.data_[9]) ? 0xff : 0;
+    v.data_[10] = (v1.data_[10] <= v2.data_[10]) ? 0xff : 0;
+    v.data_[11] = (v1.data_[11] <= v2.data_[11]) ? 0xff : 0;
+    v.data_[12] = (v1.data_[12] <= v2.data_[12]) ? 0xff : 0;
+    v.data_[13] = (v1.data_[13] <= v2.data_[13]) ? 0xff : 0;
+    v.data_[14] = (v1.data_[14] <= v2.data_[14]) ? 0xff : 0;
+    v.data_[15] = (v1.data_[15] <= v2.data_[15]) ? 0xff : 0;
     return v;
 }
 
 inline v_uint16x8 vq_cmple_s16(v_int16x8 v1, v_int16x8 v2) {
     v_uint16x8 v;
-    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xffffffff : 0;
-    v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xffffffff : 0;
-    v.data_[3] = (v1.data_[3] <= v2.data_[3]) ? 0xffffffff : 0;
-    v.data_[4] = (v1.data_[4] <= v2.data_[4]) ? 0xffffffff : 0;
-    v.data_[5] = (v1.data_[5] <= v2.data_[5]) ? 0xffffffff : 0;
-    v.data_[6] = (v1.data_[6] <= v2.data_[6]) ? 0xffffffff : 0;
-    v.data_[7] = (v1.data_[7] <= v2.data_[7]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffff : 0;
+    v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xffff : 0;
+    v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xffff : 0;
+    v.data_[3] = (v1.data_[3] <= v2.data_[3]) ? 0xffff : 0;
+    v.data_[4] = (v1.data_[4] <= v2.data_[4]) ? 0xffff : 0;
+    v.data_[5] = (v1.data_[5] <= v2.data_[5]) ? 0xffff : 0;
+    v.data_[6] = (v1.data_[6] <= v2.data_[6]) ? 0xffff : 0;
+    v.data_[7] = (v1.data_[7] <= v2.data_[7]) ? 0xffff : 0;
     return v;
 }
 
 inline v_uint32x4 vq_cmple_s32(v_int32x4 v1, v_int32x4 v2) {
-    v_uint16x8 v;
+    v_uint32x4 v;
     v.data_[0] = (v1.data_[0] <= v2.data_[0]) ? 0xffffffff : 0;
     v.data_[1] = (v1.data_[1] <= v2.data_[1]) ? 0xffffffff : 0;
     v.data_[2] = (v1.data_[2] <= v2.data_[2]) ? 0xffffffff : 0;
@@ -2334,7 +2334,7 @@ inline v_uint32x2 vd_cmpgt_s32(v_int32x2 v1, v_int32x2 v2) {
 
 inline v_uint64x1 vd_cmpgt_s64(v_int64x1 v1, v_int64x1 v2) {
     v_uint64x1 v;
-    v.data_[0] = (v1.data_[0] > v2.data_[0]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] > v2.data_[0]) ? 0xffffffffffffffff : 0;
     return v;
 }
 
@@ -2376,7 +2376,7 @@ inline v_uint32x2 vd_cmpgt_u32(v_uint32x2 v1, v_uint32x2 v2) {
 
 inline v_uint64x1 vd_cmpgt_u64(v_uint64x1 v1, v_uint64x1 v2) {
     v_uint64x1 v;
-    v.data_[0] = (v1.data_[0] > v2.data_[0]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] > v2.data_[0]) ? 0xffffffffffffffff : 0;
     return v;
 }
 
@@ -2485,8 +2485,8 @@ inline v_uint32x4 vq_cmpgt_u32(v_uint32x4 v1, v_uint32x4 v2) {
 
 inline v_uint64x2 vq_cmpgt_u64(v_uint64x2 v1, v_uint64x2 v2) {
     v_uint64x2 v;
-    v.data_[0] = (v1.data_[0] > v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] > v2.data_[1]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] > v2.data_[0]) ? 0xffffffffffffffff : 0;
+    v.data_[1] = (v1.data_[1] > v2.data_[1]) ? 0xffffffffffffffff : 0;
     return v;
 }
 
@@ -2525,7 +2525,7 @@ inline v_uint32x2 vd_cmpge_s32(v_int32x2 v1, v_int32x2 v2) {
 
 inline v_uint64x1 vd_cmpge_s64(v_int64x1 v1, v_int64x1 v2) {
     v_uint64x1 v;
-    v.data_[0] = (v1.data_[0] >= v2.data_[0]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] >= v2.data_[0]) ? 0xffffffffffffffff : 0;
     return v;
 }
 
@@ -2617,8 +2617,8 @@ inline v_uint32x4 vq_cmpge_s32(v_int32x4 v1, v_int32x4 v2) {
 
 inline v_uint64x2 vq_cmpge_s64(v_int64x2 v1, v_int64x2 v2) {
     v_uint64x2 v;
-    v.data_[0] = (v1.data_[0] >= v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] >= v2.data_[1]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] >= v2.data_[0]) ? 0xffffffffffffffff : 0;
+    v.data_[1] = (v1.data_[1] >= v2.data_[1]) ? 0xffffffffffffffff : 0;
     return v;
 }
 
@@ -2676,15 +2676,15 @@ inline v_uint32x4 vq_cmpge_u32(v_uint32x4 v1, v_uint32x4 v2) {
 
 inline v_uint64x2 vq_cmpge_u64(v_uint64x2 v1, v_uint64x2 v2) {
     v_uint64x2 v;
-    v.data_[0] = (v1.data_[0] >= v2.data_[0]) ? 0xffffffff : 0;
-    v.data_[1] = (v1.data_[1] >= v2.data_[1]) ? 0xffffffff : 0;
+    v.data_[0] = (v1.data_[0] >= v2.data_[0]) ? 0xffffffffffffffff : 0;
+    v.data_[1] = (v1.data_[1] >= v2.data_[1]) ? 0xffffffffffffffff : 0;
     return v;
 }
 
 //----------------------------------------------------------------------
 // bitselect(mask, v1, v2)
-// selects each bit for the destination from the first operand 
-// if the corresponding bit of the destination is 1, 
+// selects each bit for the destination from the first operand
+// if the corresponding bit of the destination is 1,
 // or from the second operand if the corresponding bit of the destination is 0.
 //----------------------------------------------------------------------
 // 8bytes(64bits) part
