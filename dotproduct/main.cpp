@@ -75,7 +75,7 @@ float dotproduct3(size_t len, float* va, float* vb)
 
     float sum_lst[4];
     vst1q_f32(sum_lst, vres);
-    
+
     float sum = 0;
     for (size_t i = 0; i < step; i++) {
         sum += sum_lst[i];
@@ -252,7 +252,7 @@ float dotproduct8(size_t len, float* va, float* vb)
     }
     return sum;
 }
- 
+
 static void opencv_simd_test()
 {
     using namespace cv;
@@ -274,6 +274,24 @@ static void opencv_simd_test()
 }
 
 int main() {
+
+    float c1[4] = {12.0f,12.0f,12.0f,12.0f};
+    float c2[4] = {13.0f,12.0f,9.0f,12.0f};
+    float32x4_t t1,t2;
+    uint32x4_t rq;
+    t1 = vld1q_f32(c1);
+    t2 = vld1q_f32(c2);
+    rq = vceqq_f32(t1,t2);
+    printf("start\n");
+    for( int i = 0;i < 4; i++){
+        printf("%u\n",rq[i]);
+    }
+    printf("end\n");
+
+    return 0;
+}
+
+int main2() {
     //opencv_simd_test();
 
     size_t len = 200000000; //200M
