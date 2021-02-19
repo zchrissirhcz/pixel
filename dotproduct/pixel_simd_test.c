@@ -25,7 +25,7 @@ static int check_array_equal(size_t len, float* data, float* gt);
 
 // relu
 static void relu_naive(size_t len, float* input, float* output);
-static void relu_aaive(size_t len, float* input, float* output);
+static void relu_asimd(size_t len, float* input, float* output);
 static void relu_psimd(size_t len, float* input, float* output);
 static void test_relu_32();
 
@@ -167,6 +167,52 @@ void relu_asimd(size_t len, float* input, float* output) {
     }
 }
 
+// nearly no optimization effect, sometimes inverse-optimization.
+void relu_asimd_fast(size_t len, float* input, float* output) {
+    size_t vec_size = 0;
+#ifdef PIXEL_SIMD_NEON
+    float* sd_input = input;
+    float* sd_output = output;
+    //const size_t step = PIXEL_VQ_BYTES / sizeof(float);
+    const size_t step = 16;
+    vec_size = len - len % step;
+    float32x4_t zero = vdupq_n_f32(0);
+    float32x4_t mask1, mask2, mask3, mask4;
+    float32x4_t v11, v12;
+    float32x4_t v21, v22;
+    float32x4_t v31, v32;
+    float32x4_t v41, v42;
+    for (size_t i=0; i<vec_size; i+=step) {
+        v11 = vld1q_f32(sd_input);
+        mask1 = vcltq_f32(v11, zero);
+        v12 = vbslq_f32(mask1, zero, v11);
+        vst1q_f32(sd_output, v12);
+
+        v21 = vld1q_f32(sd_input+4);
+        mask2 = vcltq_f32(v21, zero);
+        v22 = vbslq_f32(mask2, zero, v21);
+        vst1q_f32(sd_output+4, v22);
+
+        v31 = vld1q_f32(sd_input+8);
+        mask3 = vcltq_f32(v31, zero);
+        v32 = vbslq_f32(mask3, zero, v31);
+        vst1q_f32(sd_output+8, v32);
+
+        v41 = vld1q_f32(sd_input+12);
+        mask4 = vcltq_f32(v41, zero);
+        v42 = vbslq_f32(mask4, zero, v41);
+        vst1q_f32(sd_output+12, v42);
+
+        sd_input += 16;
+        sd_output += 16;
+    }
+#elif defined(PIXEL_SIMD_SSE)
+#endif
+    for (size_t i=vec_size; i<len; i++) {
+        output[i] = (input[i] > 0) ? input[i] : 0;
+    }
+}
+
 void relu_inplace_naive(size_t len, float* data) {
     for (size_t i=0; i<len; i++) {
         data[i] = (data[i] > 0) ? data[i] : 0;
@@ -242,6 +288,73 @@ void weighted_sum_asimd(size_t len, const float* arr1, const float weight1, cons
     }
 }
 
+// nearly no effect, even inverse-optimization.
+void weighted_sum_asimd_fast(size_t len, const float* arr1, const float weight1, const float* arr2, const float weight2, float* res)
+{
+    size_t vec_size = 0;
+#ifdef PIXEL_SIMD_NEON
+    const float* ptr1 = arr1;
+    const float* ptr2 = arr2;
+    float* pres = res;
+    //const size_t step = PIXEL_VQ_BYTES / sizeof(float);
+    const int step = 16;
+    vec_size = len - len % step;
+    float32x4_t v_weight1 = vdupq_n_f32(weight1);
+    float32x4_t v_weight2 = vdupq_n_f32(weight2);
+    float32x4_t v11, v12, v1res;
+    float32x4_t v21, v22, v2res;
+    float32x4_t v31, v32, v3res;
+    float32x4_t v41, v42, v4res;
+    for (size_t i=0; i<vec_size; i+=step) {
+        v11 = vld1q_f32(ptr1);
+        v12 = vld1q_f32(ptr2);
+        v11 = vmulq_f32(v11, v_weight1);
+        v12 = vmulq_f32(v12, v_weight2);
+
+        v1res = vaddq_f32(v11, v12);
+        vst1q_f32(pres, v1res);
+
+        ///
+
+        v21 = vld1q_f32(ptr1+4);
+        v22 = vld1q_f32(ptr2+4);
+        v21 = vmulq_f32(v21, v_weight1);
+        v22 = vmulq_f32(v22, v_weight2);
+
+        v2res = vaddq_f32(v21, v22);
+        vst1q_f32(pres+4, v2res);
+
+        ///
+
+        v31 = vld1q_f32(ptr1+8);
+        v32 = vld1q_f32(ptr2+8);
+        v31 = vmulq_f32(v31, v_weight1);
+        v32 = vmulq_f32(v32, v_weight2);
+
+        v3res = vaddq_f32(v31, v32);
+        vst1q_f32(pres+8, v3res);
+
+        ///
+
+        v41 = vld1q_f32(ptr1+12);
+        v42 = vld1q_f32(ptr2+12);
+        v41 = vmulq_f32(v41, v_weight1);
+        v42 = vmulq_f32(v42, v_weight2);
+
+        v4res = vaddq_f32(v41, v42);
+        vst1q_f32(pres+12, v4res);
+
+        ptr1 += 16;
+        ptr2 += 16;
+        pres += 16;
+    }
+#elif defined(PIXEL_SIMD_SSE)
+#endif
+    for (size_t i=vec_size; i<len; i++) {
+        res[i] = arr1[i]*weight1 + arr2[i]*weight2;
+    }
+}
+
 void weighted_sum_psimd(size_t len, const float* arr1, const float weight1, const float* arr2, const float weight2, float* res)
 {
     const size_t step = PIXEL_VQ_BYTES / sizeof(float);
@@ -270,6 +383,7 @@ int check_array_equal(size_t len, float* data, float* gt)
     for (size_t i=0; i<len; i++) {
         if (data[i]!=gt[i]) {
             cnt++;
+            printf("expect %.4lf, got %.4lf\n", gt[i], data[i]);
         }
     }
     return cnt;
@@ -340,16 +454,17 @@ void test_relu_f32()
     printf("relu_naive, time cost is %.6lf ms\n", t_cost);
 
     t_start = pixel_get_current_time();
+    //relu_asimd(len, input, output_asimd);
+    relu_asimd_fast(len, input, output_asimd);
+    t_cost = pixel_get_current_time() - t_start;
+    not_equal_count = check_array_equal(len, output_asimd, output_naive);
+    printf("relu_asimd, not_equal_count=%d, time cost is %.6lf ms\n", not_equal_count, t_cost);
+
+    t_start = pixel_get_current_time();
     relu_psimd(len, input, output_psimd);
     t_cost = pixel_get_current_time() - t_start;
     not_equal_count = check_array_equal(len, output_psimd, output_naive);
     printf("relu_psimd, not_equal_count=%d, time cost is %.6lf ms\n", not_equal_count, t_cost);
-
-    t_start = pixel_get_current_time();
-    relu_asimd(len, input, output_asimd);
-    t_cost = pixel_get_current_time() - t_start;
-    not_equal_count = check_array_equal(len, output_asimd, output_naive);
-    printf("relu_asimd, not_equal_count=%d, time cost is %.6lf ms\n", not_equal_count, t_cost);
 }
 
 void test_relu_inplace_f32()
@@ -368,7 +483,6 @@ void test_relu_inplace_f32()
     }
     double r_cost = pixel_get_current_time() - r_start;
     printf("time cost for random assign is %.6lf ms\n", r_cost);
-
 
     memcpy(data_naive, data, buf_len);
     memcpy(data_psimd, data, buf_len);
@@ -404,6 +518,7 @@ void test_weighted_sum()
 {
     // prepare data
     const size_t len = 11484;
+    //const size_t len = 9;
     const size_t buf_size = sizeof(float)*len;
     float* arr1 = (float*)malloc(buf_size);
     float* arr2 = (float*)malloc(buf_size);
@@ -433,7 +548,8 @@ void test_weighted_sum()
     printf("weighted_sum_naive, time cost is %.6lf ms\n", t_cost);
 
     t_start = pixel_get_current_time();
-    weighted_sum_asimd(len, arr1, weight1, arr2, weight2, res_asimd);
+    //weighted_sum_asimd(len, arr1, weight1, arr2, weight2, res_asimd);
+    weighted_sum_asimd_fast(len, arr1, weight1, arr2, weight2, res_asimd);
     t_cost = pixel_get_current_time() - t_start;
     not_equal_count = check_array_equal(len, res_asimd, res_naive);
     printf("weighted_sum_asimd, not_equal_count=%d, time cost is %.6lf ms\n", not_equal_count, t_cost);
@@ -451,11 +567,14 @@ void test_weighted_sum()
     free(res_psimd);
 }
 
+
+
 int main() {
     //test_dotproduct_f32();
-    //test_relu_f32();
+    test_relu_f32();
     //test_relu_inplace_f32();
-    test_weighted_sum();
+    //test_weighted_sum();
+    //test_rgb2gray();
 
     return 0;
 }
