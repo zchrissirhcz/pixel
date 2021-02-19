@@ -44,3 +44,8 @@ elseif (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
 endif()
 find_package(OpenCV REQUIRED)
 target_link_libraries(testbed ${OpenCV_LIBS})
+
+
+add_library(simple STATIC
+    simple.c
+)

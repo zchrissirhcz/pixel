@@ -156,7 +156,7 @@ inline v_int64x1     vd_setvalue_s64(int64_t value) {
 }
 
 inline v_float32x2   vd_setvalue_f32(float value) {
-    v_int32x2 v;
+    v_float32x2 v;
     v.val[0] = value; v.val[1] = value;
     return v;
 }
@@ -244,7 +244,7 @@ inline v_uint32x4    vq_setvalue_u32(uint32_t value) {
 }
 
 inline v_uint64x2    vq_setvalue_u64(uint64_t value) {
-    v_uint64x4 v;
+    v_uint64x2 v;
     v.val[0] = value; v.val[1] = value;
     return v;
 }
