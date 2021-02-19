@@ -15,8 +15,12 @@
 #define PIXEL_SIMD_SSE
 #endif
 
-#if ((defined(__ARM_NEON__) || defined(__ARM_NEON)) && 0)
+#if ((defined(__ARM_NEON__) || defined(__ARM_NEON)))
 #define PIXEL_SIMD_NEON
+#endif
+
+#if !defined(PIXEL_SIMD_SSE) && !(defined(PIXEL_SIMD_NEON))
+#define PIXEL_SIMD_SIMU
 #endif
 
 // SSE determination
@@ -36,7 +40,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+//#define PIXEL_VD_BYTES 8
 #define PIXEL_VQ_BYTES 16
+//#define PIXEL_VO_BYTES 32
+//#define PIXEL_VS_BYTES 64
 
 //----------------------------------------------------------------------
 // => type definitions
