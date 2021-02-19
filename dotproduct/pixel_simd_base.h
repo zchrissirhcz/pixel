@@ -132,6 +132,31 @@ static inline v_uint32x4    vq_setzero_u32();
 static inline v_uint64x2    vq_setzero_u64();
 
 //----------------------------------------------------------------------
+// assign all element to value
+//----------------------------------------------------------------------
+// 8bytes(64bits) part
+static inline v_int8x8      vd_setvalue_s8(int8_t value);
+static inline v_int16x4     vd_setvalue_s16(int16_t value);
+static inline v_int32x2     vd_setvalue_s32(int32_t value);
+static inline v_int64x1     vd_setvalue_s64(int64_t value);
+static inline v_float32x2   vd_setvalue_f32(float value);
+static inline v_uint8x8     vd_setvalue_u8(uint8_t value);
+static inline v_uint16x4    vd_setvalue_u16(uint16_t value);
+static inline v_uint32x2    vd_setvalue_u32(uint32_t value);
+static inline v_uint64x1    vd_setvalue_u64(uint64_t value);
+
+// 16bytes(128bits) part
+static inline v_int8x16     vq_setvalue_s8(int8_t value);
+static inline v_int16x8     vq_setvalue_s16(int16_t value);
+static inline v_int32x4     vq_setvalue_s32(int32_t value);
+static inline v_int64x2     vq_setvalue_s64(int64_t value);
+static inline v_float32x4   vq_setvalue_f32(float value);
+static inline v_uint8x16    vq_setvalue_u8(uint8_t value);
+static inline v_uint16x8    vq_setvalue_u16(uint16_t value);
+static inline v_uint32x4    vq_setvalue_u32(uint32_t value);
+static inline v_uint64x2    vq_setvalue_u64(uint64_t value);
+
+//----------------------------------------------------------------------
 // copy data, memory => register
 //----------------------------------------------------------------------
 // 8bytes(64bits) part

@@ -127,6 +127,129 @@ inline v_uint64x2 vq_setzero_u64() {
 }
 
 //----------------------------------------------------------------------
+// assign all element to value
+//----------------------------------------------------------------------
+// 8bytes(64bits) part
+inline v_int8x8      vd_setvalue_s8(int8_t value) {
+    v_int8x8 v;
+    v.data_[0] = value; v.data_[1] = value; v.data_[2] = value; v.data_[3] = value;
+    v.data_[4] = value; v.data_[5] = value; v.data_[6] = value; v.data_[7] = value;
+    return v;
+}
+
+inline v_int16x4     vd_setvalue_s16(int16_t value) {
+    v_int16x4 v;
+    v.data_[0] = value; v.data_[1] = value; v.data_[2] = value; v.data_[3] = value;
+    return v;
+}
+
+inline v_int32x2     vd_setvalue_s32(int32_t value) {
+    v_int32x2 v;
+    v.data_[0] = value; v.data_[1] = value;
+    return v;
+}
+
+inline v_int64x1     vd_setvalue_s64(int64_t value) { 
+    v_int64x1 v;
+    v.data_[0] = value;
+    return v;
+}
+
+inline v_float32x2   vd_setvalue_f32(float value) {
+    v_int32x2 v;
+    v.data_[0] = value; v.data_[1] = value;
+    return v;
+}
+
+inline v_uint8x8     vd_setvalue_u8(uint8_t value) { 
+    v_uint8x8 v;
+    v.data_[0] = value; v.data_[1] = value; v.data_[2] = value; v.data_[3] = value;
+    v.data_[4] = value; v.data_[5] = value; v.data_[6] = value; v.data_[7] = value;
+    return v;
+}
+
+inline v_uint16x4    vd_setvalue_u16(uint16_t value) {
+    v_uint16x4 v;
+    v.data_[0] = value; v.data_[1] = value; v.data_[2] = value; v.data_[3] = value;
+    return v;
+}
+
+inline v_uint32x2    vd_setvalue_u32(uint32_t value) {
+    v_uint32x2 v;
+    v.data_[0] = value; v.data_[1] = value;
+    return v;
+}
+
+inline v_uint64x1    vd_setvalue_u64(uint64_t value) { 
+    v_uint64x1 v;
+    v.data_[0] = value;
+    return v;
+}
+
+// 16bytes(128bits) part
+inline v_int8x16     vq_setvalue_s8(int8_t value) {
+    v_int8x16 v;
+    v.data_[0] = value; v.data_[1] = value; v.data_[2] = value; v.data_[3] = value;
+    v.data_[4] = value; v.data_[5] = value; v.data_[6] = value; v.data_[7] = value;
+    v.data_[8] = value; v.data_[9] = value; v.data_[10] = value; v.data_[11] = value;
+    v.data_[12] = value; v.data_[13] = value; v.data_[14] = value; v.data_[15] = value;
+    return v;
+}
+
+inline v_int16x8     vq_setvalue_s16(int16_t value) {
+    v_int16x8 v;
+    v.data_[0] = value; v.data_[1] = value; v.data_[2] = value; v.data_[3] = value;
+    v.data_[4] = value; v.data_[5] = value; v.data_[6] = value; v.data_[7] = value;
+    return v;
+}
+
+inline v_int32x4     vq_setvalue_s32(int32_t value) {
+    v_int32x4 v;
+    v.data_[0] = value; v.data_[1] = value; v.data_[2] = value; v.data_[3] = value;
+    return v;
+}
+
+inline v_int64x2     vq_setvalue_s64(int64_t value) {
+    v_int64x2 v;
+    v.data_[0] = value; v.data_[1] = value;
+    return v;
+}
+
+inline v_float32x4   vq_setvalue_f32(float value) { 
+    v_float32x4 v;
+    v.data_[0] = value; v.data_[1] = value; v.data_[2] = value; v.data_[3] = value;
+    return v;
+}
+
+inline v_uint8x16    vq_setvalue_u8(uint8_t value) { 
+    v_uint8x16 v;
+    v.data_[0] = value; v.data_[1] = value; v.data_[2] = value; v.data_[3] = value;
+    v.data_[4] = value; v.data_[5] = value; v.data_[6] = value; v.data_[7] = value;
+    v.data_[8] = value; v.data_[9] = value; v.data_[10] = value; v.data_[11] = value;
+    v.data_[12] = value; v.data_[13] = value; v.data_[14] = value; v.data_[15] = value;
+    return v;
+}
+
+inline v_uint16x8    vq_setvalue_u16(uint16_t value) {
+    v_uint16x8 v;
+    v.data_[0] = value; v.data_[1] = value; v.data_[2] = value; v.data_[3] = value;
+    v.data_[4] = value; v.data_[5] = value; v.data_[6] = value; v.data_[7] = value;
+    return v;
+}
+
+inline v_uint32x4    vq_setvalue_u32(uint32_t value) { 
+    v_uint32x4 v;
+    v.data_[0] = value; v.data_[1] = value; v.data_[2] = value; v.data_[3] = value;
+    return v;
+}
+
+inline v_uint64x2    vq_setvalue_u64(uint64_t value) {
+    v_uint64x4 v;
+    v.data_[0] = value; v.data_[1] = value;
+    return v;
+}
+
+//----------------------------------------------------------------------
 // copy data, memory => register
 //----------------------------------------------------------------------
 // 8bytes(64bits) part
