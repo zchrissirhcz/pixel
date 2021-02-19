@@ -15,7 +15,7 @@
 #define PIXEL_SSE
 #endif
 
-#if ((defined(__ARM_NEON__) || defined(__ARM_NEON)) && 1)
+#if ((defined(__ARM_NEON__) || defined(__ARM_NEON)) && 0)
 #define PIXEL_NEON
 #endif
 
@@ -928,7 +928,7 @@ inline v_int32x2 vd_load_s32(const int32_t* data) {
     return v;
 }
 
-inline v_int64x1 vd_load_s64(const int32_t* data) {
+inline v_int64x1 vd_load_s64(const int64_t* data) {
     v_int64x1 v;
     v.data_[0] = data[0];
     return v;
@@ -960,7 +960,7 @@ inline v_uint32x2 vd_load_u32(const uint32_t* data) {
     return v;
 }
 
-inline v_uint64x1 vd_load_u64(const uint32_t* data) {
+inline v_uint64x1 vd_load_u64(const uint64_t* data) {
     v_uint64x1 v;
     v.data_[0] = data[0];
     return v;
@@ -1071,15 +1071,15 @@ inline void vq_store_s8(int8_t* data, v_int8x16 v) {
     memcpy(data, v.data_, sizeof(v.data_));
 }
 
-inline void vq_store_s16(int8_t* data, v_int16x8 v) {
+inline void vq_store_s16(int16_t* data, v_int16x8 v) {
     memcpy(data, v.data_, sizeof(v.data_));
 }
 
-inline void vq_store_s32(int8_t* data, v_int32x4 v) {
+inline void vq_store_s32(int32_t* data, v_int32x4 v) {
     memcpy(data, v.data_, sizeof(v.data_));
 }
 
-inline void vq_store_s64(int8_t* data, v_int64x2 v) {
+inline void vq_store_s64(int64_t* data, v_int64x2 v) {
     data[0] = v.data_[0];
     data[1] = v.data_[1];
 }
@@ -1096,15 +1096,15 @@ inline void vq_store_u8 (uint8_t* data, v_uint8x16 v) {
     memcpy(data, v.data_, sizeof(v.data_));
 }
 
-inline void vq_store_u16(uint8_t* data, v_uint16x8 v) {
+inline void vq_store_u16(uint16_t* data, v_uint16x8 v) {
     memcpy(data, v.data_, sizeof(v.data_));
 }
 
-inline void vq_store_u32(uint8_t* data, v_uint32x4 v) {
+inline void vq_store_u32(uint32_t* data, v_uint32x4 v) {
     memcpy(data, v.data_, sizeof(v.data_));
 }
 
-inline void vq_store_u64(uint8_t* data, v_uint64x2 v) {
+inline void vq_store_u64(uint64_t* data, v_uint64x2 v) {
     data[0] = v.data_[0];
     data[1] = v.data_[1];
 }
@@ -2706,15 +2706,15 @@ inline v_uint32x2 vd_bitselect_u32(v_uint32x2 mask, v_uint32x2 v1, v_uint32x2 v2
 inline v_uint64x1 vd_bitselect_u64(v_uint64x1 mask, v_uint64x1 v1, v_uint64x1 v2);
 
 // 16bytes(128bits) part
-inline v_int8x8 vq_bitselect_s8(v_uint8x16 mask, v_int8x16 v1, v_int8x16 v2);
-inline v_int16x4 vq_bitselect_s16(v_uint16x8 mask, v_int16x8 v1, v_int16x8 v2);
-inline v_int32x2 vq_bitselect_s32(v_uint32x4 mask, v_int32x4 v1, v_int32x4 v2);
-inline v_int64x1 vq_bitselect_s64(v_uint64x2 mask, v_int64x2 v1, v_int64x2 v2);
-inline v_float32x2 vq_bitselect_f32(v_uint32x4 mask, v_float32x4 v1, v_float32x4 v2);
-inline v_uint8x8 vq_bitselect_u8(v_uint8x16 mask, v_uint8x16 v1, v_uint8x16 v2);
-inline v_uint16x4 vq_bitselect_u16(v_uint16x8 mask, v_uint16x8 v1, v_uint16x8 v2);
-inline v_uint32x2 vq_bitselect_u32(v_uint32x4 mask, v_uint32x4 v1, v_uint32x4 v2);
-inline v_uint64x1 vq_bitselect_u64(v_uint64x2 mask, v_uint64x2 v1, v_uint64x2 v2);
+inline v_int8x16 vq_bitselect_s8(v_uint8x16 mask, v_int8x16 v1, v_int8x16 v2);
+inline v_int16x8 vq_bitselect_s16(v_uint16x8 mask, v_int16x8 v1, v_int16x8 v2);
+inline v_int32x4 vq_bitselect_s32(v_uint32x4 mask, v_int32x4 v1, v_int32x4 v2);
+inline v_int64x2 vq_bitselect_s64(v_uint64x2 mask, v_int64x2 v1, v_int64x2 v2);
+inline v_float32x4 vq_bitselect_f32(v_uint32x4 mask, v_float32x4 v1, v_float32x4 v2);
+inline v_uint8x16 vq_bitselect_u8(v_uint8x16 mask, v_uint8x16 v1, v_uint8x16 v2);
+inline v_uint16x8 vq_bitselect_u16(v_uint16x8 mask, v_uint16x8 v1, v_uint16x8 v2);
+inline v_uint32x4 vq_bitselect_u32(v_uint32x4 mask, v_uint32x4 v1, v_uint32x4 v2);
+inline v_uint64x2 vq_bitselect_u64(v_uint64x2 mask, v_uint64x2 v1, v_uint64x2 v2);
 
 #endif // PIXEL_NEON
 

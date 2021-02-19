@@ -8,24 +8,10 @@
 
 #define PIXEL_LOGD(fmt, ...) fprintf(stderr, (fmt "\n"))
 
-// #ifdef _MSC_VER
-// #define PIXEL_SSE
-// #elif defined(__ARM_NEON)
-// #define PIXEL_NEON
-// #endif
-
-// #ifdef PIXEL_SSE
-// #include <intrin.h>
-// #endif
-
-// #ifdef PIXEL_NEON
-// #include <arm_neon.h>
-// #endif
-
 static void test_dotproduct_f32();
 
 //_naive: naive implementation
-//_psimd: pixel_simd implementation
+//_psimd: pixel_simd implementation. will be optimized to simd by compiler.
 //_asimd: sse and neon mixed implementation
 static float dotproduct_naive(size_t len, float* va, float* vb);
 static float dotproduct_psimd(size_t len, float* va, float* vb);
@@ -49,8 +35,8 @@ float dotproduct_psimd(size_t len, float* va, float* vb) {
     for (size_t i=0; i<vec_size; i+=step) {
         v1 = vq_load_f32(va + i);
         v2 = vq_load_f32(vb + i);
-        //vres = vq_fmadd_f32(v1, v2, vres);
-        vres = vq_add_f32(vq_mul_f32(v1, v2), vres);
+        vres = vq_fmadd_f32(v1, v2, vres);
+        //vres = vq_add_f32(vq_mul_f32(v1, v2), vres);
     }
     
     float sum_lst[step];
