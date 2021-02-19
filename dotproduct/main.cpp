@@ -273,7 +273,7 @@ static void opencv_simd_test()
 #endif
 }
 
-int main() {
+int main2() {
 
     float c1[4] = {12.0f,12.0f,12.0f,12.0f};
     float c2[4] = {13.0f,12.0f,9.0f,12.0f};
@@ -291,7 +291,7 @@ int main() {
     return 0;
 }
 
-int main2() {
+int main() {
     //opencv_simd_test();
 
     size_t len = 200000000; //200M

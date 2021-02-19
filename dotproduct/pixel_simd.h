@@ -15,7 +15,7 @@
 #define PIXEL_SSE
 #endif
 
-#if ((defined(__ARM_NEON__) || defined(__ARM_NEON)) && 0)
+#if ((defined(__ARM_NEON__) || defined(__ARM_NEON)) && 1)
 #define PIXEL_NEON
 #endif
 
@@ -31,6 +31,9 @@
 #else
     #include <stdint.h>
 #endif
+
+#include <stdlib.h>
+#include <string.h>
 
 //----------------------------------------------------------------------
 // => type definitions
@@ -125,12 +128,12 @@ static inline v_uint64x2    vq_setzero_u64();
 static inline v_int8x8      vd_load_s8 (const int8_t*   data);
 static inline v_int16x4     vd_load_s16(const int16_t*  data);
 static inline v_int32x2     vd_load_s32(const int32_t*  data);
-static inline v_int64x1     vd_load_s64(const int32_t*  data);
+static inline v_int64x1     vd_load_s64(const int64_t*  data);
 static inline v_float32x2   vd_load_f32(const float*    data);
 static inline v_uint8x8     vd_load_u8 (const uint8_t*  data);
 static inline v_uint16x4    vd_load_u16(const uint16_t* data);
 static inline v_uint32x2    vd_load_u32(const uint32_t* data);
-static inline v_uint64x1    vd_load_u64(const uint32_t* data);
+static inline v_uint64x1    vd_load_u64(const uint64_t* data);
 
 // 16bytes(128bits) part
 static inline v_int8x16     vq_load_s8 (const int8_t*   data);
@@ -159,14 +162,14 @@ static inline void  vd_store_u64(uint64_t* data,  v_uint64x1  v);
 
 // 16bytes(128bits) part
 static inline void  vq_store_s8 (int8_t*    data, v_int8x16   v);
-static inline void  vq_store_s16(int8_t*    data, v_int16x8   v);
-static inline void  vq_store_s32(int8_t*    data, v_int32x4   v);
-static inline void  vq_store_s64(int8_t*    data, v_int64x2   v);
+static inline void  vq_store_s16(int16_t*    data, v_int16x8   v);
+static inline void  vq_store_s32(int32_t*    data, v_int32x4   v);
+static inline void  vq_store_s64(int64_t*    data, v_int64x2   v);
 static inline void  vq_store_f32(float*     data, v_float32x4 v);
 static inline void  vq_store_u8 (uint8_t*   data, v_uint8x16  v);
-static inline void  vq_store_u16(uint8_t*   data, v_uint16x8  v);
-static inline void  vq_store_u32(uint8_t*   data, v_uint32x4  v);
-static inline void  vq_store_u64(uint8_t*   data, v_uint64x2  v);
+static inline void  vq_store_u16(uint16_t*   data, v_uint16x8  v);
+static inline void  vq_store_u32(uint32_t*   data, v_uint32x4  v);
+static inline void  vq_store_u64(uint64_t*   data, v_uint64x2  v);
 
 //----------------------------------------------------------------------
 // add(v1, v2), return v1[i] + v2[i]
@@ -200,23 +203,19 @@ static inline v_uint64x2    vq_add_u64(v_uint64x2 v1, v_uint64x2 v2);
 static inline v_int8x8      vd_mul_s8 (v_int8x8 v1, v_int8x8 v2);
 static inline v_int16x4     vd_mul_s16(v_int16x4 v1, v_int16x4 v2);
 static inline v_int32x2     vd_mul_s32(v_int32x2 v1, v_int32x2 v2);
-static inline v_int64x1     vd_mul_s64(v_int64x1 v1, v_int64x1 v2);
 static inline v_float32x2   vd_mul_f32(v_float32x2 v1, v_float32x2 v2);
 static inline v_uint8x8     vd_mul_u8 (v_uint8x8 v1, v_uint8x8 v2);
 static inline v_uint16x4    vd_mul_u16(v_uint16x4 v1, v_uint16x4 v2);
 static inline v_uint32x2    vd_mul_u32(v_uint32x2 v1, v_uint32x2 v2);
-static inline v_uint64x1    vd_mul_u64(v_uint64x1 v1, v_uint64x1 v2);
 
 // 16bytes(128bits) part
 static inline v_int8x16     vq_mul_s8 (v_int8x16 v1, v_int8x16 v2);
 static inline v_int16x8     vq_mul_s16(v_int16x8 v1, v_int16x8 v2);
 static inline v_int32x4     vq_mul_s32(v_int32x4 v1, v_int32x4 v2);
-static inline v_int64x2     vq_mul_s64(v_int64x2 v1, v_int64x2 v2);
 static inline v_float32x4   vq_mul_f32(v_float32x4 v1, v_float32x4 v2);
 static inline v_uint8x16    vq_mul_u8 (v_uint8x16 v1, v_uint8x16 v2);
 static inline v_uint16x8    vq_mul_u16(v_uint16x8 v1, v_uint16x8 v2);
 static inline v_uint32x4    vq_mul_u32(v_uint32x4 v1, v_uint32x4 v2);
-static inline v_uint64x2    vq_mul_u64(v_uint64x2 v1, v_uint64x2 v2);
 
 //----------------------------------------------------------------------
 // sub(v1, v2), return v1[i] - v2[i]
@@ -261,12 +260,10 @@ static inline v_uint64x1    vd_fmadd_u64(v_uint64x1 v1, v_uint64x1 v2, v_uint64x
 static inline v_int8x16     vq_fmadd_s8 (v_int8x16 v1, v_int8x16 v2, v_int8x16 v3);
 static inline v_int16x8     vq_fmadd_s16(v_int16x8 v1, v_int16x8 v2, v_int16x8 v3);
 static inline v_int32x4     vq_fmadd_s32(v_int32x4 v1, v_int32x4 v2, v_int32x4 v3);
-static inline v_int64x2     vq_fmadd_s64(v_int64x2 v1, v_int64x2 v2, v_int64x2 v3);
 static inline v_float32x4   vq_fmadd_f32(v_float32x4 v1, v_float32x4 v2, v_float32x4 v3);
 static inline v_uint8x16    vq_fmadd_u8 (v_uint8x16 v1, v_uint8x16 v2, v_uint8x16 v3);
 static inline v_uint16x8    vq_fmadd_u16(v_uint16x8 v1, v_uint16x8 v2, v_uint16x8 v3);
 static inline v_uint32x4    vq_fmadd_u32(v_uint32x4 v1, v_uint32x4 v2, v_uint32x4 v3);
-static inline v_uint64x2    vq_fmadd_u64(v_uint64x2 v1, v_uint64x2 v2, v_uint64x2 v3);
 
 //----------------------------------------------------------------------
 // cmplt(v1, v2), return (v1[i] < v2[i])? 1...1 : 0...0
@@ -386,15 +383,15 @@ static inline v_uint32x2    vd_bitselect_u32(v_uint32x2 mask, v_uint32x2 v1, v_u
 static inline v_uint64x1    vd_bitselect_u64(v_uint64x1 mask, v_uint64x1 v1, v_uint64x1 v2);
 
 // 16bytes(128bits) part
-static inline v_int8x8      vq_bitselect_s8(v_uint8x16 mask, v_int8x16 v1, v_int8x16 v2);
-static inline v_int16x4     vq_bitselect_s16(v_uint16x8 mask, v_int16x8 v1, v_int16x8 v2);
-static inline v_int32x2     vq_bitselect_s32(v_uint32x4 mask, v_int32x4 v1, v_int32x4 v2);
-static inline v_int64x1     vq_bitselect_s64(v_uint64x2 mask, v_int64x2 v1, v_int64x2 v2);
-static inline v_float32x2   vq_bitselect_f32(v_uint32x4 mask, v_float32x4 v1, v_float32x4 v2);
-static inline v_uint8x8     vq_bitselect_u8(v_uint8x16 mask, v_uint8x16 v1, v_uint8x16 v2);
-static inline v_uint16x4    vq_bitselect_u16(v_uint16x8 mask, v_uint16x8 v1, v_uint16x8 v2);
-static inline v_uint32x2    vq_bitselect_u32(v_uint32x4 mask, v_uint32x4 v1, v_uint32x4 v2);
-static inline v_uint64x1    vq_bitselect_u64(v_uint64x2 mask, v_uint64x2 v1, v_uint64x2 v2);
+static inline v_int8x16      vq_bitselect_s8(v_uint8x16 mask, v_int8x16 v1, v_int8x16 v2);
+static inline v_int16x8     vq_bitselect_s16(v_uint16x8 mask, v_int16x8 v1, v_int16x8 v2);
+static inline v_int32x4     vq_bitselect_s32(v_uint32x4 mask, v_int32x4 v1, v_int32x4 v2);
+static inline v_int64x2     vq_bitselect_s64(v_uint64x2 mask, v_int64x2 v1, v_int64x2 v2);
+static inline v_float32x4   vq_bitselect_f32(v_uint32x4 mask, v_float32x4 v1, v_float32x4 v2);
+static inline v_uint8x16     vq_bitselect_u8(v_uint8x16 mask, v_uint8x16 v1, v_uint8x16 v2);
+static inline v_uint16x8    vq_bitselect_u16(v_uint16x8 mask, v_uint16x8 v1, v_uint16x8 v2);
+static inline v_uint32x4    vq_bitselect_u32(v_uint32x4 mask, v_uint32x4 v1, v_uint32x4 v2);
+static inline v_uint64x2    vq_bitselect_u64(v_uint64x2 mask, v_uint64x2 v1, v_uint64x2 v2);
 
 
 //----------------------------------------------------------------------
@@ -433,12 +430,12 @@ inline v_uint64x2 vq_setzero_u64() { return vdupq_n_u64(0); }
 inline v_int8x8 vd_load_s8 (const int8_t* data) { return vld1_s8(data); }
 inline v_int16x4 vd_load_s16(const int16_t* data) { return vld1_s16(data); }
 inline v_int32x2 vd_load_s32(const int32_t* data) { return vld1_s32(data); }
-inline v_int64x1 vd_load_s64(const int32_t* data) { return vld1_s64(data); }
+inline v_int64x1 vd_load_s64(const int64_t* data) { return vld1_s64(data); }
 inline v_float32x2 vd_load_f32(const float* data) { return vld1_f32(data); }
 inline v_uint8x8 vd_load_u8 (const uint8_t* data) { return vld1_u8(data); }
 inline v_uint16x4 vd_load_u16(const uint16_t* data) { return vld1_u16(data); }
 inline v_uint32x2 vd_load_u32(const uint32_t* data) { return vld1_u32(data); }
-inline v_uint64x1 vd_load_u64(const uint32_t* data) { return vld1_u64(data); }
+inline v_uint64x1 vd_load_u64(const uint64_t* data) { return vld1_u64(data); }
 
 // 16bytes(128bits) part
 inline v_int8x16 vq_load_s8 (const int8_t* data) { return vld1q_s8(data); }
@@ -467,14 +464,14 @@ inline void vd_store_u64(uint64_t* data, v_uint64x1 v) { vst1_u64(data, v); }
 
 // 16bytes(128bits) part
 inline void vq_store_s8(int8_t* data, v_int8x16 v) { vst1q_s8(data, v); }
-inline void vq_store_s16(int8_t* data, v_int16x8 v) { vst1q_s16(data, v); }
-inline void vq_store_s32(int8_t* data, v_int32x4 v) { vst1q_s32(data, v); }
-inline void vq_store_s64(int8_t* data, v_int64x2 v) { vst1q_s64(data, v); }
+inline void vq_store_s16(int16_t* data, v_int16x8 v) { vst1q_s16(data, v); }
+inline void vq_store_s32(int32_t* data, v_int32x4 v) { vst1q_s32(data, v); }
+inline void vq_store_s64(int64_t* data, v_int64x2 v) { vst1q_s64(data, v); }
 inline void vq_store_f32(float* data, v_float32x4 v) { vst1q_f32(data, v); }
 inline void vq_store_u8(uint8_t* data, v_uint8x16 v) { vst1q_u8(data, v); }
-inline void vq_store_u16(uint8_t* data, v_uint16x8 v) { vst1q_u16(data, v); }
-inline void vq_store_u32(uint8_t* data, v_uint32x4 v) { vst1q_u32(data, v); }
-inline void vq_store_u64(uint8_t* data, v_uint64x2 v) { vst1q_u64(data, v); }
+inline void vq_store_u16(uint16_t* data, v_uint16x8 v) { vst1q_u16(data, v); }
+inline void vq_store_u32(uint32_t* data, v_uint32x4 v) { vst1q_u32(data, v); }
+inline void vq_store_u64(uint64_t* data, v_uint64x2 v) { vst1q_u64(data, v); }
 
 //----------------------------------------------------------------------
 // add(v1, v2), return v1[i] + v2[i]
@@ -508,23 +505,19 @@ inline v_uint64x2 vq_add_u64(v_uint64x2 v1, v_uint64x2 v2) { return vaddq_u64(v1
 inline v_int8x8 vd_mul_s8(v_int8x8 v1, v_int8x8 v2) { return vmul_s8(v1, v2); }
 inline v_int16x4 vd_mul_s16(v_int16x4 v1, v_int16x4 v2) { return vmul_s16(v1, v2); }
 inline v_int32x2 vd_mul_s32(v_int32x2 v1, v_int32x2 v2) { return vmul_s32(v1, v2); }
-inline v_int64x1 vd_mul_s64(v_int64x1 v1, v_int64x1 v2) { return vmul_s64(v1, v2); }
 inline v_float32x2 vd_mul_f32(v_float32x2 v1, v_float32x2 v2) { return vmul_f32(v1, v2); }
 inline v_uint8x8 vd_mul_u8(v_uint8x8 v1, v_uint8x8 v2) { return vmul_u8(v1, v2); }
 inline v_uint16x4 vd_mul_u16(v_uint16x4 v1, v_uint16x4 v2) { return vmul_u16(v1, v2); }
 inline v_uint32x2 vd_mul_u32(v_uint32x2 v1, v_uint32x2 v2) { return vmul_u32(v1, v2); }
-inline v_uint64x1 vd_mul_u64(v_uint64x1 v1, v_uint64x1 v2) { return vmul_u64(v1, v2); }
 
 // 16bytes(128bits) part
 inline v_int8x16 vq_mul_s8(v_int8x16 v1, v_int8x16 v2) { return vmulq_s8(v1, v2); }
 inline v_int16x8 vq_mul_s16(v_int16x8 v1, v_int16x8 v2) { return vmulq_s16(v1, v2); }
 inline v_int32x4 vq_mul_s32(v_int32x4 v1, v_int32x4 v2) { return vmulq_s32(v1, v2); }
-inline v_int64x2 vq_mul_s64(v_int64x2 v1, v_int64x2 v2) { return vmulq_s64(v1, v2); }
 inline v_float32x4 vq_mul_f32(v_float32x4 v1, v_float32x4 v2) { return vmulq_f32(v1, v2); }
 inline v_uint8x16 vq_mul_u8 (v_uint8x16 v1, v_uint8x16 v2) { return vmulq_u8(v1, v2); }
 inline v_uint16x8 vq_mul_u16(v_uint16x8 v1, v_uint16x8 v2) { return vmulq_u16(v1, v2); }
 inline v_uint32x4 vq_mul_u32(v_uint32x4 v1, v_uint32x4 v2) { return vmulq_u32(v1, v2); }
-inline v_uint64x2 vq_mul_u64(v_uint64x2 v1, v_uint64x2 v2) { return vmulq_u64(v1, v2); }
 
 //----------------------------------------------------------------------
 // sub(v1, v2), return v1[i] - v2[i]
@@ -579,14 +572,6 @@ inline v_int32x2 vd_fmadd_s32(v_int32x2 v1, v_int32x2 v2, v_int32x2 v3) {
 #endif
 }
 
-inline v_int64x1 vd_fmadd_s64(v_int64x1 v1, v_int64x1 v2, v_int64x1 v3) {
-#ifdef __ARM_FEATURE_FMA
-    return vmla_s64(v3, v1, v2);
-#else
-    return vadd_s64(vmul_s64(v1, v2), v3);
-#endif
-}
-
 inline v_float32x2 vd_fmadd_f32(v_float32x2 v1, v_float32x2 v2, v_float32x2 v3) {
 #ifdef __ARM_FEATURE_FMA
     return vmla_f32(v3, v1, v2);
@@ -619,23 +604,6 @@ inline v_uint32x2 vd_fmadd_u32(v_uint32x2 v1, v_uint32x2 v2, v_uint32x2 v3) {
 #endif
 }
 
-inline v_uint64x1 vd_fmadd_u64(v_uint64x1 v1, v_uint64x1 v2, v_uint64x1 v3) {
-#ifdef __ARM_FEATURE_FMA
-    return vmla_u64(v3, v1, v2);
-#else
-    return vadd_u64(vmul_u64(v1, v2), v3);
-#endif
-}
-
-// 16bytes(128bits) part
-inline v_int8x16 vq_fmadd_s8(v_int8x16 v1, v_int8x16 v2, v_int8x16 v3) {
-#ifdef __ARM_FEATURE_FMA
-    return vmlaq_s8(v3, v1, v2);
-#else
-    return vaddq_s8(vmulq_s8(v1, v2), v3);
-#endif
-}
-
 inline v_int16x8 vq_fmadd_s16(v_int16x8 v1, v_int16x8 v2, v_int16x8 v3) {
 #ifdef __ARM_FEATURE_FMA
     return vmlaq_s16(v3, v1, v2);
@@ -649,14 +617,6 @@ inline v_int32x4 vq_fmadd_s32(v_int32x4 v1, v_int32x4 v2, v_int32x4 v3) {
     return vmlaq_s32(v3, v1, v2);
 #else
     return vaddq_s32(vmulq_s32(v1, v2), v3);
-#endif
-}
-
-inline v_int64x2 vq_fmadd_s64(v_int64x2 v1, v_int64x2 v2, v_int64x2 v2) {
-#ifdef __ARM_FEATURE_FMA
-    return vmlaq_s64(v3, v1, v2);
-#else
-    return vaddq_s64(vmulq_s64(v1, v2), v3);
 #endif
 }
 
@@ -689,14 +649,6 @@ inline v_uint32x4 vq_fmadd_u32(v_uint32x4 v1, v_uint32x4 v2, v_uint32x4 v3) {
     return vmlaq_u32(v3, v1, v2);
 #else
     return vaddq_u32(vmulq_u32(v1, v2), v3);
-#endif
-}
-
-inline v_uint64x2 vq_fmadd_u64(v_uint64x2 v1, v_uint64x2 v2, v_uint64x2 v3) {
-#ifdef __ARM_FEATURE_FMA
-    return vmlaq_u64(v3, v1, v2);
-#else
-    return vaddq_u64(vmulq_f32(v1, v2), v3);
 #endif
 }
 
@@ -818,15 +770,15 @@ inline v_uint32x2 vd_bitselect_u32(v_uint32x2 mask, v_uint32x2 v1, v_uint32x2 v2
 inline v_uint64x1 vd_bitselect_u64(v_uint64x1 mask, v_uint64x1 v1, v_uint64x1 v2) { return vbsl_u64(mask, v1, v2); }
 
 // 16bytes(128bits) part
-inline v_int8x8 vq_bitselect_s8(v_uint8x16 mask, v_int8x16 v1, v_int8x16 v2) { return vbslq_s8(mask, v1, v2); }
-inline v_int16x4 vq_bitselect_s16(v_uint16x8 mask, v_int16x8 v1, v_int16x8 v2) { return vbslq_s16(mask, v1, v2); }
-inline v_int32x2 vq_bitselect_s32(v_uint32x4 mask, v_int32x4 v1, v_int32x4 v2) { return vbslq_s32(mask, v1, v2); }
-inline v_int64x1 vq_bitselect_s64(v_uint64x2 mask, v_int64x2 v1, v_int64x2 v2) { return vbslq_s64(mask, v1, v2); }
-inline v_float32x2 vq_bitselect_f32(v_uint32x4 mask, v_float32x4 v1, v_float32x4 v2) { return vbslq_f32(mask, v1, v2); }
-inline v_uint8x8 vq_bitselect_u8(v_uint8x16 mask, v_uint8x16 v1, v_uint8x16 v2) { return vbslq_u8(mask, v1, v2); }
-inline v_uint16x4 vq_bitselect_u16(v_uint16x8 mask, v_uint16x8 v1, v_uint16x8 v2) { return vbslq_u16(mask, v1, v2); }
-inline v_uint32x2 vq_bitselect_u32(v_uint32x4 mask, v_uint32x4 v1, v_uint32x4 v2) { return vbslq_u32(mask, v1, v2); }
-inline v_uint64x1 vq_bitselect_u64(v_uint64x2 mask, v_uint64x2 v1, v_uint64x2 v2) { return vbslq_u64(mask, v1, v2); }
+inline v_int8x16 vq_bitselect_s8(v_uint8x16 mask, v_int8x16 v1, v_int8x16 v2) { return vbslq_s8(mask, v1, v2); }
+inline v_int16x8 vq_bitselect_s16(v_uint16x8 mask, v_int16x8 v1, v_int16x8 v2) { return vbslq_s16(mask, v1, v2); }
+inline v_int32x4 vq_bitselect_s32(v_uint32x4 mask, v_int32x4 v1, v_int32x4 v2) { return vbslq_s32(mask, v1, v2); }
+inline v_int64x2 vq_bitselect_s64(v_uint64x2 mask, v_int64x2 v1, v_int64x2 v2) { return vbslq_s64(mask, v1, v2); }
+inline v_float32x4 vq_bitselect_f32(v_uint32x4 mask, v_float32x4 v1, v_float32x4 v2) { return vbslq_f32(mask, v1, v2); }
+inline v_uint8x16 vq_bitselect_u8(v_uint8x16 mask, v_uint8x16 v1, v_uint8x16 v2) { return vbslq_u8(mask, v1, v2); }
+inline v_uint16x8 vq_bitselect_u16(v_uint16x8 mask, v_uint16x8 v1, v_uint16x8 v2) { return vbslq_u16(mask, v1, v2); }
+inline v_uint32x4 vq_bitselect_u32(v_uint32x4 mask, v_uint32x4 v1, v_uint32x4 v2) { return vbslq_u32(mask, v1, v2); }
+inline v_uint64x2 vq_bitselect_u64(v_uint64x2 mask, v_uint64x2 v1, v_uint64x2 v2) { return vbslq_u64(mask, v1, v2); }
 
 #else // mimic of neon
 
@@ -909,19 +861,19 @@ inline v_int16x8 vq_setzero_s16() {
 
 inline v_int32x4 vq_setzero_s32() {
     v_int32x4 v;
-    v.data_[1] = 0; v.data_[1] = 0; v.data_[2] = 0; v.data_[3] = 0;
+    v.data_[0] = 0; v.data_[1] = 0; v.data_[2] = 0; v.data_[3] = 0;
     return v;
 }
 
 inline v_int64x2 vq_setzero_s64() {
     v_int64x2 v;
-    v.data_[1] = 0; v.data_[1] = 0;
+    v.data_[0] = 0; v.data_[1] = 0;
     return v;
 }
 
 inline v_float32x4 vq_setzero_f32() {
     v_float32x4 v;
-    v.data_[1] = 0.f; v.data_[1] = 0.f; v.data_[2] = 0.f; v.data_[3] = 0.f;
+    v.data_[0] = 0.f; v.data_[1] = 0.f; v.data_[2] = 0.f; v.data_[3] = 0.f;
     return v;
 }
 
@@ -943,13 +895,13 @@ inline v_uint16x8 vq_setzero_u16() {
 
 inline v_uint32x4 vq_setzero_u32() {
     v_uint32x4 v;
-    v.data_[1] = 0; v.data_[1] = 0; v.data_[2] = 0; v.data_[3] = 0;
+    v.data_[0] = 0; v.data_[1] = 0; v.data_[2] = 0; v.data_[3] = 0;
     return v;
 }
 
 inline v_uint64x2 vq_setzero_u64() {
     v_uint64x2 v;
-    v.data_[1] = 0; v.data_[1] = 0;
+    v.data_[0] = 0; v.data_[1] = 0;
     return v;
 }
 
@@ -1133,7 +1085,11 @@ inline void vq_store_s64(int8_t* data, v_int64x2 v) {
 }
 
 inline void vq_store_f32(float* data, v_float32x4 v) {
+    //memcpy(data, v.data_, sizeof(v.data_));
     data[0] = v.data_[0];
+    data[1] = v.data_[1];
+    data[2] = v.data_[2];
+    data[3] = v.data_[3];
 }
 
 inline void vq_store_u8 (uint8_t* data, v_uint8x16 v) {
@@ -1377,12 +1333,6 @@ inline v_int32x2 vd_mul_s32(v_int32x2 v1, v_int32x2 v2) {
     return v;
 }
 
-inline v_int64x1 vd_mul_s64(v_int64x1 v1, v_int64x1 v2) {
-    v_int64x1 v;
-    v.data_[0] = v1.data_[0] * v2.data_[0];
-    return v;
-}
-
 inline v_float32x2 vd_mul_f32(v_float32x2 v1, v_float32x2 v2) {
     v_float32x2 v;
     v.data_[0] = v1.data_[0] * v2.data_[0];
@@ -1416,12 +1366,6 @@ inline v_uint32x2 vd_mul_u32(v_uint32x2 v1, v_uint32x2 v2) {
     v_uint32x2 v;
     v.data_[0] = v1.data_[0] * v2.data_[0];
     v.data_[1] = v1.data_[1] * v2.data_[1];
-    return v;
-}
-
-inline v_uint64x1 vd_mul_u64(v_uint64x1 v1, v_uint64x1 v2) {
-    v_uint64x1 v;
-    v.data_[0] = v1.data_[0] * v2.data_[0];
     return v;
 }
 
@@ -1466,13 +1410,6 @@ inline v_int32x4 vq_mul_s32(v_int32x4 v1, v_int32x4 v2) {
     v.data_[1] = v1.data_[1] * v2.data_[1];
     v.data_[2] = v1.data_[2] * v2.data_[2];
     v.data_[3] = v1.data_[3] * v2.data_[3];
-    return v;
-}
-
-inline v_int64x2 vq_mul_s64(v_int64x2 v1, v_int64x2 v2) {
-    v_int64x2 v;
-    v.data_[0] = v1.data_[0] * v2.data_[0];
-    v.data_[1] = v1.data_[1] * v2.data_[1];
     return v;
 }
 
@@ -1525,13 +1462,6 @@ inline v_uint32x4 vq_mul_u32(v_uint32x4 v1, v_uint32x4 v2) {
     v.data_[1] = v1.data_[1] * v2.data_[1];
     v.data_[2] = v1.data_[2] * v2.data_[2];
     v.data_[3] = v1.data_[3] * v2.data_[3];
-    return v;
-}
-
-inline v_uint64x2 vq_mul_u64(v_uint64x2 v1, v_uint64x2 v2) {
-    v_uint64x2 v;
-    v.data_[0] = v1.data_[0] * v2.data_[0];
-    v.data_[1] = v1.data_[1] * v2.data_[1];
     return v;
 }
 
@@ -1851,13 +1781,6 @@ inline v_int32x4 vq_fmadd_s32(v_int32x4 v1, v_int32x4 v2, v_int32x4 v3) {
     return v;
 }
 
-inline v_int64x2 vq_fmadd_s64(v_int64x2 v1, v_int64x2 v2, v_int64x2 v3) {
-    v_int64x2 v;
-    v.data_[0] = (v1.data_[0] * v2.data_[0]) + v3.data_[0];
-    v.data_[1] = (v1.data_[1] * v2.data_[1]) + v3.data_[1];
-    return v;
-}
-
 inline v_float32x4 vq_fmadd_f32(v_float32x4 v1, v_float32x4 v2, v_float32x4 v3) {
     v_float32x4 v;
     v.data_[0] = (v1.data_[0] * v2.data_[0]) + v3.data_[0];
@@ -1907,13 +1830,6 @@ inline v_uint32x4 vq_fmadd_u32(v_uint32x4 v1, v_uint32x4 v2, v_uint32x4 v3) {
     v.data_[1] = (v1.data_[1] * v2.data_[1]) + v3.data_[1];
     v.data_[2] = (v1.data_[2] * v2.data_[2]) + v3.data_[2];
     v.data_[3] = (v1.data_[3] * v2.data_[3]) + v3.data_[3];
-    return v;
-}
-
-inline v_uint64x2 vq_fmadd_u64(v_uint64x2 v1, v_uint64x2 v2, v_uint64x2 v3) {
-    v_uint64x2 v;
-    v.data_[0] = (v1.data_[0] * v2.data_[0]) + v3.data_[0];
-    v.data_[1] = (v1.data_[1] * v2.data_[1]) + v3.data_[1];
     return v;
 }
 
