@@ -79,26 +79,26 @@ typedef uint64x2_t  v_uint64x2;
 #else
 
 // (mock of) 8 byte align required. 64bit registers
-typedef struct v_int8x8     { int8_t data_[8];  } v_int8x8;
-typedef struct v_int16x4    { int16_t data_[4]; } v_int16x4;
-typedef struct v_int32x2    { int32_t data_[2]; } v_int32x2;
-typedef struct v_int64x1    { int64_t data_[1]; } v_int64x1;
-typedef struct v_float32x2  { float data_[2];   } v_float32x2;
-typedef struct v_uint8x8    { uint8_t data_[8]; } v_uint8x8;
-typedef struct v_uint16x4   { uint16_t data_[4];} v_uint16x4;
-typedef struct v_uint32x2   { uint32_t data_[2];} v_uint32x2;
-typedef struct v_uint64x1   { uint64_t data_[1];} v_uint64x1;
+typedef struct v_int8x8     { int8_t val[8];  } v_int8x8;
+typedef struct v_int16x4    { int16_t val[4]; } v_int16x4;
+typedef struct v_int32x2    { int32_t val[2]; } v_int32x2;
+typedef struct v_int64x1    { int64_t val[1]; } v_int64x1;
+typedef struct v_float32x2  { float val[2];   } v_float32x2;
+typedef struct v_uint8x8    { uint8_t val[8]; } v_uint8x8;
+typedef struct v_uint16x4   { uint16_t val[4];} v_uint16x4;
+typedef struct v_uint32x2   { uint32_t val[2];} v_uint32x2;
+typedef struct v_uint64x1   { uint64_t val[1];} v_uint64x1;
 
 // (mock of) 16 byte align required. 128bit registers
-typedef struct v_int8x16    { int8_t data_[16]; } v_int8x16;
-typedef struct v_int16x8    { int16_t data_[8]; } v_int16x8;
-typedef struct v_int32x4    { int32_t data_[4]; } v_int32x4;
-typedef struct v_int64x2    { int64_t data_[2]; } v_int64x2;
-typedef struct v_float32x4  { float data_[4];   } v_float32x4;
-typedef struct v_uint8x16   { uint8_t data_[16];} v_uint8x16;
-typedef struct v_uint16x8   { uint16_t data_[8];} v_uint16x8;
-typedef struct v_uint32x4   { uint32_t data_[4];} v_uint32x4;
-typedef struct v_uint64x2   { uint64_t data_[2];} v_uint64x2;
+typedef struct v_int8x16    { int8_t val[16]; } v_int8x16;
+typedef struct v_int16x8    { int16_t val[8]; } v_int16x8;
+typedef struct v_int32x4    { int32_t val[4]; } v_int32x4;
+typedef struct v_int64x2    { int64_t val[2]; } v_int64x2;
+typedef struct v_float32x4  { float val[4];   } v_float32x4;
+typedef struct v_uint8x16   { uint8_t val[16];} v_uint8x16;
+typedef struct v_uint16x8   { uint16_t val[8];} v_uint16x8;
+typedef struct v_uint32x4   { uint32_t val[4];} v_uint32x4;
+typedef struct v_uint64x2   { uint64_t val[2];} v_uint64x2;
 
 #endif // PIXEL_SIMD_NEON
 
