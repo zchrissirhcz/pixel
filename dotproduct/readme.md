@@ -132,3 +132,9 @@ impl2, result is -5289.429688, time cost is 191.786354 ms
 [Intel @Intrinsics Guide 官方查询](https://software.intel.com/sites/landingpage/IntrinsicsGuide/)
 
 [Neon Intrinsics 官方查询](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/intrinsics)
+
+
+## pixel_simd_test result:
+dotproduct_naive,       result is -5290.376953, time cost is 218.209427 ms
+dotproduct_psimd,       result is -5289.963379, time cost is 124.562136 ms
+dotproduct_asimd,       result is -5289.963379, time cost is 125.290000 ms
