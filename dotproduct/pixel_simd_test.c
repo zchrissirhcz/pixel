@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include <math.h>
 
 #define PIXEL_LOGD(fmt, ...) fprintf(stderr, (fmt "\n"))
 
@@ -22,6 +24,8 @@ static void test_dotproduct_f32();
 
 // utils
 static int check_array_equal(size_t len, float* data, float* gt);
+static bool nearly_equal_absolutely(float a, float b, float epsilon);
+static bool nearly_equal_normally(float a, float b, float epsilon);
 
 // relu
 static void relu_naive(size_t len, float* input, float* output);
@@ -177,7 +181,7 @@ void relu_asimd_fast(size_t len, float* input, float* output) {
     const size_t step = 16;
     vec_size = len - len % step;
     float32x4_t zero = vdupq_n_f32(0);
-    float32x4_t mask1, mask2, mask3, mask4;
+    uint32x4_t mask1, mask2, mask3, mask4;
     float32x4_t v11, v12;
     float32x4_t v21, v22;
     float32x4_t v31, v32;
@@ -206,9 +210,23 @@ void relu_asimd_fast(size_t len, float* input, float* output) {
 
         sd_input += 16;
         sd_output += 16;
+#else // still no optimization effect
+        float32x4x4_t vin = vld4q_f32(sd_input);
+        float32x4x4_t vout;
+        uint32x4x4_t mask;
+        mask.val[0] = vcltq_f32(vin.val[0], zero);
+        mask.val[1] = vcltq_f32(vin.val[1], zero);
+        mask.val[2] = vcltq_f32(vin.val[2], zero);
+        mask.val[3] = vcltq_f32(vin.val[3], zero);
+        vout.val[0] = vbslq_f32(mask.val[0], zero, vin.val[0]);
+        vout.val[1] = vbslq_f32(mask.val[1], zero, vin.val[1]);
+        vout.val[2] = vbslq_f32(mask.val[2], zero, vin.val[2]);
+        vout.val[3] = vbslq_f32(mask.val[3], zero, vin.val[3]);
+        vst4q_f32(sd_output, vout);
+
+        sd_input += 16;
+        sd_output += 16;
 #endif
-        float32x4x4_t vld4q_f32(sd_input);
-        vet
     }
 #elif defined(PIXEL_SIMD_SSE)
 #endif
@@ -261,6 +279,7 @@ void relu_inplace_psimd(size_t len, float* data) {
     }
 }
 
+// res[i] = arr1[i] * weight1 + arr2[i] * weight2
 void weighted_sum_naive(size_t len, const float* arr1, const float weight1, const float* arr2, const float weight2, float* res)
 {
     for (size_t i=0; i<len; i++) {
@@ -303,13 +322,13 @@ void weighted_sum_asimd_fast(size_t len, const float* arr1, const float weight1,
     //const size_t step = PIXEL_VQ_BYTES / sizeof(float);
     const int step = 16;
     vec_size = len - len % step;
-    float32x4_t v_weight1 = vdupq_n_f32(weight1);
-    float32x4_t v_weight2 = vdupq_n_f32(weight2);
-    float32x4_t v11, v12, v1res;
-    float32x4_t v21, v22, v2res;
-    float32x4_t v31, v32, v3res;
-    float32x4_t v41, v42, v4res;
+
+    // float32x4_t v11, v12, v1res;
+    // float32x4_t v21, v22, v2res;
+    // float32x4_t v31, v32, v3res;
+    // float32x4_t v41, v42, v4res;
     for (size_t i=0; i<vec_size; i+=step) {
+#if 0
         v11 = vld1q_f32(ptr1);
         v12 = vld1q_f32(ptr2);
         v11 = vmulq_f32(v11, v_weight1);
@@ -351,6 +370,42 @@ void weighted_sum_asimd_fast(size_t len, const float* arr1, const float weight1,
         ptr1 += 16;
         ptr2 += 16;
         pres += 16;
+#else
+        float32x4x4_t v1 = vld4q_f32(ptr1); //第一个数组的数据
+        float32x4x4_t v2 = vld4q_f32(ptr2); //第二个数组的数据
+        float32x4_t v_weight1 = vdupq_n_f32(weight1); // 权值向量化
+        float32x4_t v_weight2 = vdupq_n_f32(weight2); // 第二个权值向量化
+        float32x4x4_t vout; // 存结果
+        
+    #if 0 //如下4句，结果正确
+        vout.val[0] = vaddq_f32(vmulq_f32(v1.val[0], v_weight1), vmulq_f32(v2.val[0], v_weight2));
+        vout.val[1] = vaddq_f32(vmulq_f32(v1.val[1], v_weight1), vmulq_f32(v2.val[1], v_weight2));
+        vout.val[2] = vaddq_f32(vmulq_f32(v1.val[2], v_weight1), vmulq_f32(v2.val[2], v_weight2));
+        vout.val[3] = vaddq_f32(vmulq_f32(v1.val[3], v_weight1), vmulq_f32(v2.val[3], v_weight2));
+    #else //这4句，结果不对了。  fma 这样用似乎不对？
+        // vout.val[0] = vmlaq_f32(vmulq_f32(v1.val[0], v_weight1), v2.val[0], v_weight2);
+        // vout.val[1] = vmlaq_f32(vmulq_f32(v1.val[1], v_weight1), v2.val[1], v_weight2);
+        // vout.val[2] = vmlaq_f32(vmulq_f32(v1.val[2], v_weight1), v2.val[2], v_weight2);
+        // vout.val[3] = vmlaq_f32(vmulq_f32(v1.val[3], v_weight1), v2.val[3], v_weight2);
+
+        vout.val[0] = vfmaq_f32(vmulq_f32(v1.val[0], v_weight1), v2.val[0], v_weight2);
+        vout.val[1] = vfmaq_f32(vmulq_f32(v1.val[1], v_weight1), v2.val[1], v_weight2);
+        vout.val[2] = vfmaq_f32(vmulq_f32(v1.val[2], v_weight1), v2.val[2], v_weight2);
+        vout.val[3] = vfmaq_f32(vmulq_f32(v1.val[3], v_weight1), v2.val[3], v_weight2);
+
+        // float32x4_t t0 = vmulq_f32(v1.val[0], v_weight1);
+        // vout.val[0] = vfmaq_f32(t0, v2.val[0], v_weight2);
+        // float32x4_t t1 = vmulq_f32(v1.val[1], v_weight1);
+        // vout.val[1] = vfmaq_f32(t1, v2.val[1], v_weight2);
+        // float32x4_t t2 = vmulq_f32(v1.val[2], v_weight1);
+        // vout.val[2] = vfmaq_f32(t2, v2.val[2], v_weight2);
+        // float32x4_t t3 = vmulq_f32(v1.val[3], v_weight1);
+        // vout.val[3] = vfmaq_f32(t3, v2.val[3], v_weight2);
+
+        vst4q_f32(pres, vout);
+    #endif
+        ptr1 += 16;  ptr2 += 16; pres += 16;
+#endif
     }
 #elif defined(PIXEL_SIMD_SSE)
 #endif
@@ -372,7 +427,7 @@ void weighted_sum_psimd(size_t len, const float* arr1, const float weight1, cons
         v2 = vq_load_f32(arr2+i);
         v1 = vq_mul_f32(v1, v_weight1);
         v2 = vq_mul_f32(v2, v_weight2);
-        vres = vaddq_f32(v1, v2);
+        vres = vq_add_f32(v1, v2);
         vq_store_f32(res+i, vres);
     }
     
@@ -381,11 +436,27 @@ void weighted_sum_psimd(size_t len, const float* arr1, const float weight1, cons
     }
 }
 
+bool nearly_equal_absolutely(float a, float b, float epsilon) {
+    return fabs(a - b) <= epsilon;
+}
+
+bool nearly_equal_normally(float a, float b, float epsilon) {
+    if (a == b)
+        return true;
+
+    float diff = (float)fabs(a - b);
+    if (diff <= epsilon)
+        return true;
+    float max_val = (fabs(a)>fabs(b)) ? fabs(a) : fabs(b);
+    return diff < epsilon * max_val;
+}
+
 int check_array_equal(size_t len, float* data, float* gt)
 {
     int cnt = 0;
     for (size_t i=0; i<len; i++) {
-        if (data[i]!=gt[i]) {
+        //if (data[i]!=gt[i]) {
+        if (!nearly_equal_absolutely(data[i], gt[i], 0.001)) {
             cnt++;
             printf("expect %.4lf, got %.4lf\n", gt[i], data[i]);
         }
@@ -575,9 +646,9 @@ void test_weighted_sum()
 
 int main() {
     //test_dotproduct_f32();
-    test_relu_f32();
+    //test_relu_f32();
     //test_relu_inplace_f32();
-    //test_weighted_sum();
+    test_weighted_sum();
     //test_rgb2gray();
 
     return 0;
