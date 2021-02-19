@@ -183,6 +183,7 @@ void relu_asimd_fast(size_t len, float* input, float* output) {
     float32x4_t v31, v32;
     float32x4_t v41, v42;
     for (size_t i=0; i<vec_size; i+=step) {
+#if 0        
         v11 = vld1q_f32(sd_input);
         mask1 = vcltq_f32(v11, zero);
         v12 = vbslq_f32(mask1, zero, v11);
@@ -205,6 +206,9 @@ void relu_asimd_fast(size_t len, float* input, float* output) {
 
         sd_input += 16;
         sd_output += 16;
+#endif
+        float32x4x4_t vld4q_f32(sd_input);
+        vet
     }
 #elif defined(PIXEL_SIMD_SSE)
 #endif
