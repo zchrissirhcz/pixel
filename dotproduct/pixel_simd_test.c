@@ -28,7 +28,7 @@ float dotproduct_naive(size_t len, float* va, float* vb) {
 float dotproduct_psimd(size_t len, float* va, float* vb) {
     float sum = 0;
 
-    const size_t step = 4;
+    const size_t step = PIXEL_VQ_BYTES / sizeof(float);
     size_t vec_size = len - len % step;
     v_float32x4 v1, v2;
     v_float32x4 vres = vq_setzero_f32();
@@ -39,7 +39,7 @@ float dotproduct_psimd(size_t len, float* va, float* vb) {
         //vres = vq_add_f32(vq_mul_f32(v1, v2), vres);
     }
     
-    float sum_lst[step];
+    float sum_lst[PIXEL_VQ_BYTES];
     vq_store_f32(sum_lst, vres);
     for (size_t i=0; i<step; i++) {
         sum += sum_lst[i];
@@ -55,7 +55,7 @@ float dotproduct_asimd(size_t len, float* va, float* vb) {
     float sum = 0;
     size_t vec_size = 0;
 #ifdef PIXEL_NEON
-    const size_t step = 4;
+    const size_t step = PIXEL_VQ_BYTES / sizeof(float);
     vec_size = len - len % step;
     float32x4_t v1, v2;
     float32x4_t vres = vdupq_n_f32(0);
@@ -71,7 +71,7 @@ float dotproduct_asimd(size_t len, float* va, float* vb) {
         sum += sum_lst[i];
     }
 #elif defined(PIXEL_SSE)
-    const size_t step = 4;
+    const size_t step = PIXEL_VQ_BYTES / sizeof(float);
     vec_size = len - len % step;
     __m128 v1, v2;
     __m128 vres = _mm_setzero_ps();
@@ -80,7 +80,7 @@ float dotproduct_asimd(size_t len, float* va, float* vb) {
         v2 = _mm_loadu_ps(vb + i);
         vres = _mm_add_ps(_mm_mul_ps(v1, v2), vres);
     }
-    float sum_lst[step];
+    float sum_lst[PIXEL_VQ_BYTES];
     _mm_store_ps(sum_lst, vres);
     for (size_t i=0; i<step; i++) {
         sum += sum_lst[i];

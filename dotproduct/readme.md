@@ -138,3 +138,22 @@ impl2, result is -5289.429688, time cost is 191.786354 ms
 dotproduct_naive,       result is -5290.376953, time cost is 218.209427 ms
 dotproduct_psimd,       result is -5289.963379, time cost is 124.562136 ms
 dotproduct_asimd,       result is -5289.963379, time cost is 125.290000 ms
+
+
+pc debug:
+time cost for random assign is 11402.249000 ms
+dotproduct_naive,       result is -5290.376953, time cost is 507.913000 ms
+dotproduct_psimd,       result is -5289.963379, time cost is 7737.797700 ms
+dotproduct_asimd,       result is -5289.963379, time cost is 209.881200 ms
+
+**注** Debug模式下，如果运行的是 模拟SIMD 分支，由于没有编译优化，速度仍然很慢。Release模式下会自动优化为SIMD，速度是快的。为了在Debug模式下提速，仍然要封装。。相当于说，SIMD模拟器，仅仅是为了排查SIMD写错了或精度不够的情况。
+
+| 编译器     | 优化？ | SIMD | 备注 |
+| ----------| ------- | ------ | ---------------- |
+| VS, 32bit | Debug | MMX可用；SSE可用 | - |
+| VS, 32bit | Release | MMX可用；SSE可用 | - |
+| VS, 64bit | Debug | MMX不可用 | MMX 用模拟实现 |
+| VS, 64bit | Release | MMX不可用 | MMX 用模拟实现 |
+
+
+优先级：封装neon和模拟; VS 64位SSE封装; VS32位MMX封装。
