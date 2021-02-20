@@ -1,6 +1,6 @@
 # Binarize
 
-快速把uchar类型矩阵中非0元素变为FF，0元素变为0
+对uchar类型的数组做单向二值化：大于阈值thresh的更新为255。
 
 ## Build
 ```
