@@ -3,13 +3,14 @@
 #include <string.h>
 #include <time.h>
 
-#include <arm_neon.h>
-
 #include "common/pixel_log.h"
 #include "common/pixel_benchmark.h"
+#include "dotproduct/pixel_simd.h"
+#include "common/pixel_check.h"
+
 #include <opencv2/opencv.hpp>
 
-void binarize_c_naive(size_t len, unsigned char* buf, unsigned char thresh) {
+void binarize_naive(size_t len, unsigned char* buf, unsigned char thresh) {
     for (size_t i=0; i<len; i++) {
         if (buf[i]>thresh) {
             buf[i]=255;
@@ -17,29 +18,57 @@ void binarize_c_naive(size_t len, unsigned char* buf, unsigned char thresh) {
     }
 }
 
-void binarize_c_fast(size_t len, unsigned char* buf, unsigned char thresh) {
+void binarize_fast(size_t len, unsigned char* buf, unsigned char thresh) {
     for (size_t i=0; i<len; i++) {
         *buf = *buf>thresh ? 255: *buf;
         buf++;
     }
 }
 
-void binarize_neon_intrinsics(size_t len, unsigned char* buf, unsigned char thresh) {
+void binarize_asimd(size_t len, unsigned char* buf, unsigned char thresh) {
+    size_t vec_size = 0;
+#ifdef PIXEL_SIMD_NEON
+    const size_t step = 16;
+    vec_size = len - len % step;
     uint8x16_t vthresh = vdupq_n_u8(thresh);
     uint8x16_t ff = vdupq_n_u8(255);
-    for (int i=0; i+15<len; i+=16) {
+    for (size_t i=0; i<len; i+=step) {
         uint8x16_t value = vld1q_u8(buf);
         uint8x16_t mask = vcgtq_u8(value, vthresh);
         value = vbslq_u8(mask, ff, value);
         vst1q_u8(buf, value);
-        buf += 16;
+        buf += step;
     }
-
-    int remain = len % 16;
-    for (int i=0; i<remain; i++) {
-        if (*buf>0) {
+#endif
+    for (size_t i=vec_size; i<len; i++) {
+        if (*buf>thresh) {
             *buf = 255;
         }
+        buf++;
+    }
+}
+
+void binarize_psimd(size_t len, unsigned char* buf, unsigned char thresh)
+{
+    const size_t step = PIXEL_VQ_BYTES / sizeof(uint8_t);
+    size_t vec_size = len - len % step;
+    v_uint8x16 value;
+    v_uint8x16 mask;
+    v_uint8x16 vthresh = vq_setvalue_u8(thresh);
+    uint8x16_t ff = vdupq_n_u8(255);
+    for (size_t i=0; i<vec_size; i+=step) {
+        value = vq_load_u8(buf);
+        mask = vq_cmpgt_u8(value, vthresh);
+        value = vq_bitselect_u8(mask, ff, value);
+        vq_store_u8(buf, value);
+        buf += step;
+    }
+
+    for (size_t i=vec_size; i<len; i++) {
+        if ((*buf)>thresh) {
+            *buf = 255;
+        }
+        buf++;
     }
 }
 
@@ -52,10 +81,6 @@ int main() {
     int w = size.width;
     const size_t len = h * w;
     const size_t buf_size = len * sizeof(unsigned char);
-    // unsigned char* data = (unsigned char*)malloc(buf_size);
-    // for (size_t i=0; i<len; i++) {
-    //     data[i] = get_random_uint8();
-    // }
     unsigned char* data = gray.data;
 
     unsigned char* data_copy1 = (unsigned char*)malloc(buf_size);
@@ -67,61 +92,44 @@ int main() {
     memcpy(data_copy3, data, buf_size);
     memcpy(data_copy4, data, buf_size);
 
-    double t_start, t_c_naive, t_c_fast, t_neon_intrinsics, t_neon_intrinsics2;
+    double t_start;
     const int loop = 10;
     unsigned char thresh = 150;
-    //==================================
-    // c naive impl
-    //==================================
-    {
-        t_start = pixel_get_current_time();
-        for (int i=0; i<loop; i++) {
-            binarize_c_naive(len, data_copy1, thresh);
-        }
-        t_c_naive = pixel_get_current_time() - t_start;
+    // plain C imple
+    t_start = pixel_get_current_time();
+    for (int i=0; i<loop; i++) {
+        binarize_naive(len, data_copy1, thresh);
     }
+    double t_naive = pixel_get_current_time() - t_start;
+    
+    // fast C impl
+    t_start = pixel_get_current_time();
+    for (int i=0; i<loop; i++) {
+        binarize_fast(len, data_copy2, thresh);
+    }
+    double t_fast = pixel_get_current_time() - t_start;
+    int not_equal_count_fast = check_array_equal_u8(len, data_copy2, data_copy1);
 
-    //==================================
-    // c fast impl
-    //==================================
-    {
-        t_start = pixel_get_current_time();
-        for (int i=0; i<loop; i++) {
-            binarize_c_fast(len, data_copy2, thresh);
-        }
-        t_c_fast = pixel_get_current_time() - t_start;
+    // asimd impl
+    t_start = pixel_get_current_time();
+    for (int i=0; i<loop; i++) {
+        binarize_asimd(len, data_copy3, thresh);
     }
+    double t_asimd = pixel_get_current_time() - t_start;
+    int not_equal_count_asimd = check_array_equal_u8(len, data_copy3, data_copy1);
 
-    //==================================
-    // arm neon intrinsics impl
-    //==================================
-    {
-        t_start = pixel_get_current_time();
-        for (int i=0; i<loop; i++) {
-            binarize_neon_intrinsics(len, data_copy3, thresh);
-        }
-        t_neon_intrinsics = pixel_get_current_time() - t_start;
+    // psimd impl
+    t_start = pixel_get_current_time();
+    for (int i=0; i<loop; i++) {
+        binarize_psimd(len, data_copy4, thresh);
     }
+    double t_psimd = pixel_get_current_time() - t_start;
+    int not_equal_count_psimd = check_array_equal_u8(len, data_copy4, data_copy1);
 
-    //=================================
-    // validate correctness
-    //=================================
-    int fail_cnt = 0;
-    for (size_t i=0; i<len; i++) {
-        if (data_copy1[i]!=data_copy2[i]
-                || data_copy1[i]!=data_copy3[i]
-        ) {
-            fail_cnt++;
-        }
-    }
-    if (fail_cnt>0) {
-        PIXEL_LOGE("[bad] fail count is %d", fail_cnt);
-    } else {
-        PIXEL_LOGD("[good] result match");
-    }
-    PIXEL_LOGD("[c naive] cost %g ms", t_c_naive);
-    PIXEL_LOGD("[c fast] cost %g ms", t_c_fast);
-    PIXEL_LOGD("[neon intrinsics] cost %g ms", t_neon_intrinsics);
+    PIXEL_LOGD("naive C impl cost %.6lf ms\n", t_naive);
+    PIXEL_LOGD("fast C impl cost %.6lf ms, mismatch count=%d\n", t_fast, not_equal_count_fast);
+    PIXEL_LOGD("asimd impl cost %.6lf ms, mismatch count=%d\n", t_asimd, not_equal_count_asimd);
+    PIXEL_LOGD("psimd impl cost %.6lf ms, mismatch count=%d\n", t_psimd, not_equal_count_psimd);
 
 
     cv::Mat result(size, CV_8UC1, data_copy2);
@@ -130,7 +138,6 @@ int main() {
     // ===========================
     // clean ups
     // ===========================
-    //free(data);
     free(data_copy1);
     free(data_copy2);
     free(data_copy3);
