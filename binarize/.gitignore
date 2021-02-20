@@ -1,3 +1,6 @@
 !.vscode/
 .vscode/*
 !.vscode/c_cpp_properties.json
+build/*.bmp
+build/*.png
+build/*.jpg

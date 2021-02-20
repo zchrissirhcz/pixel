@@ -5,20 +5,18 @@
 ## Build
 ```
 cd build
-.\build-android-arm64.bat
-.\run-android-arm64.bat
+./android-arm64-build.sh
+./android-arm64-run.sh
 ```
 
 ## Result
 Tested on MI8(QC845) armv8 mode
 
 ```
-android-arm64/demo: 1 file pushed. 28.2 MB/s (1452016 bytes in 0.049s)
-[good] result match
-[c naive] cost 62.6631 ms
-[c fast] cost 7.37915 ms
-[neon intrinsics] cost 7.43677 ms
-[neon intrinsics2] cost 7.39136 ms
+pixel/Debug | main.cpp, line 120 | [good] result match
+pixel/Debug | main.cpp, line 122 | [c naive] cost 1.49156 ms
+pixel/Debug | main.cpp, line 123 | [c fast] cost 0.113437 ms
+pixel/Debug | main.cpp, line 124 | [neon intrinsics] cost 0.11224 ms
 ```
 
 ## Reference
