@@ -1,6 +1,7 @@
 #include "pixel_simd.h"
 #include "common/pixel_fast_rng.h"
 #include "common/pixel_benchmark.h"
+#include "common/pixel_check.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,8 +10,6 @@
 #include <math.h>
 
 #define PIXEL_LOGD(fmt, ...) fprintf(stderr, (fmt "\n"))
-
-static void test_dotproduct_f32();
 
 //_naive: naive implementation
 //_psimd: pixel_simd implementation. will be optimized to simd by compiler.
@@ -21,11 +20,6 @@ static float dotproduct_naive(size_t len, float* va, float* vb);
 static float dotproduct_asimd(size_t len, float* va, float* vb);
 static float dotproduct_psimd(size_t len, float* va, float* vb);
 static void test_dotproduct_f32();
-
-// utils
-static int check_array_equal(size_t len, float* data, float* gt);
-static bool nearly_equal_absolutely(float a, float b, float epsilon);
-static bool nearly_equal_normally(float a, float b, float epsilon);
 
 // relu
 static void relu_naive(size_t len, float* input, float* output);
@@ -436,34 +430,6 @@ void weighted_sum_psimd(size_t len, const float* arr1, const float weight1, cons
     }
 }
 
-bool nearly_equal_absolutely(float a, float b, float epsilon) {
-    return fabs(a - b) <= epsilon;
-}
-
-bool nearly_equal_normally(float a, float b, float epsilon) {
-    if (a == b)
-        return true;
-
-    float diff = (float)fabs(a - b);
-    if (diff <= epsilon)
-        return true;
-    float max_val = (fabs(a)>fabs(b)) ? fabs(a) : fabs(b);
-    return diff < epsilon * max_val;
-}
-
-int check_array_equal(size_t len, float* data, float* gt)
-{
-    int cnt = 0;
-    for (size_t i=0; i<len; i++) {
-        //if (data[i]!=gt[i]) {
-        if (!nearly_equal_absolutely(data[i], gt[i], 0.001)) {
-            cnt++;
-            printf("expect %.4lf, got %.4lf\n", gt[i], data[i]);
-        }
-    }
-    return cnt;
-}
-
 void test_dotproduct_f32()
 {
     size_t len = 200000000; //200M
@@ -643,13 +609,11 @@ void test_weighted_sum()
 }
 
 
-
 int main() {
     //test_dotproduct_f32();
     //test_relu_f32();
     //test_relu_inplace_f32();
-    test_weighted_sum();
-    //test_rgb2gray();
+    //test_weighted_sum();
 
     return 0;
 }

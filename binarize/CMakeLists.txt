@@ -7,7 +7,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_executable(testbed
     src/main.cpp
 )
-target_include_directories(testbed PUBLIC ${CMAKE_SOURCE_DIR}/..)
+target_include_directories(testbed 
+    PUBLIC
+        ${CMAKE_SOURCE_DIR}/..
+        ${CMAKE_SOURCE_DIR}
+)
 
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
