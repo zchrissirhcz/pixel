@@ -6,9 +6,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 11)
 
 add_executable(testbed
-    rgb2gray.h
-    rgb2gray.c
-    rgb2gray_test.cpp
+    # rgb2gray.h
+    # rgb2gray.c
+    # rgb2gray_test.cpp
+    #rgb2bgr.h
+    #rgb2bgr.c
+    rgb2bgr_test.cpp
 )
 target_include_directories(testbed
     PUBLIC

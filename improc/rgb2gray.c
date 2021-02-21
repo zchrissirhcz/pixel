@@ -112,12 +112,45 @@ void pixel_rgb2gray_fixed_asimd(unsigned char* rgb_buf, size_t height, size_t wi
             vst1_u8(gray_line+j, v_gray);
         }
     #endif
-        for (size_t j=vec_size; j<rgb_use_linebytes; j++) {
-            gray_line[j] = (weight_r*rgb_line[j] + weight_g*rgb_line[j+1] + weight_b*rgb_line[j+2]) >> 8;
+        size_t dst_idx = vec_size/3;
+        size_t src_idx = vec_size;
+        for (; dst_idx<width; dst_idx++, src_idx+=3) {
+            gray_line[dst_idx] = (weight_r*rgb_line[src_idx] + weight_g*rgb_line[src_idx+1] + weight_b*rgb_line[src_idx+2]) >> 8;
         }
         rgb_line += rgb_linebytes;
         gray_line += gray_linebytes;
     }
+}
+
+//https://computer-vision-talks.com/2011-02-08-a-very-fast-bgra-to-grayscale-conversion-on-iphone/
+void pixel_rgb2gray_fixed_asm(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
+{
+    // int num_pixels = height * width;
+    // asm volatile(
+    //     "lsr          %2, %2, #3      \n"
+    //     "# build the three constants: \n"
+    //     "mov         r4, #28          \n" // Blue channel multiplier
+    //     "mov         r5, #151         \n" // Green channel multiplier
+    //     "mov         r6, #77          \n" // Red channel multiplier
+    //     "vdup.8      d4, r4           \n"
+    //     "vdup.8      d5, r5           \n"
+    //     "vdup.8      d6, r6           \n"
+    //     ".loop:                       \n"
+    //     "# load 8 pixels:             \n"
+    //     "vld4.8      {d0-d3}, [%1]!   \n"
+    //     "# do the weight average:     \n"
+    //     "vmull.u8    q7, d0, d4       \n"
+    //     "vmlal.u8    q7, d1, d5       \n"
+    //     "vmlal.u8    q7, d2, d6       \n"
+    //     "# shift and store:           \n"
+    //     "vshrn.u16   d7, q7, #8       \n" // Divide q3 by 256 and store in the d7
+    //     "vst1.8      {d7}, [%0]!      \n"
+    //     "subs        %2, %2, #1       \n" // Decrement iteration count
+    //     "bne         .loop            \n" // Repeat unil iteration count is not zero
+    //     :
+    //     : "r"(gray_buf), "r"(rgb_buf), "r"(num_pixels)
+    //     : "r4", "r5", "r6"
+    // );
 }
 
 static inline uint8_t min3(uint8_t r, uint8_t g, uint8_t b) {
