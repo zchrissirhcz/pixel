@@ -66,8 +66,8 @@ const static char* g_pixel_log_priority_str[7] = {
 // [user setting]
 //--------------------------------------------------------------------------------
 #define PXL_LOGFMT_FULL            0
-#define PXL_LOGFMT_MEDIUM          1
-#define PXL_LOGFMT_SIMPLE          0
+#define PXL_LOGFMT_MEDIUM          0
+#define PXL_LOGFMT_SIMPLE          1
 
 //--------------------------------------------------------------------------------
 // => turn on/off log in app logcat
