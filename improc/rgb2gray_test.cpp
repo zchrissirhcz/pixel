@@ -34,8 +34,8 @@ int main() {
     cv::Mat gray4(size, CV_8UC1);
 
     double t_start = pixel_get_current_time();
-    //rgb_to_gray_naive(rgb_buf, height, width, rgb_linebytes, gray_buf, gray_linebytes);
-    rgb_to_gray_fixed(rgb_buf, height, width, rgb_linebytes, gray_buf, gray_linebytes);
+    //pixel_rgb2gray_naive(rgb_buf, height, width, rgb_linebytes, gray_buf, gray_linebytes);
+    pixel_rgb2gray_fixed(rgb_buf, height, width, rgb_linebytes, gray_buf, gray_linebytes);
     double t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2gray naive, size h=%zu, w=%zu, time cost %.6lf ms\n", height, width, t_cost);
     //cv::imwrite("sky_gray.bmp", gray);
@@ -43,7 +43,7 @@ int main() {
     
     gray_buf = gray2.data;
     t_start = pixel_get_current_time();
-    rgb_to_gray_fixed_asimd(rgb_buf, height, width, rgb_linebytes, gray_buf, gray_linebytes);
+    pixel_rgb2gray_fixed_asimd(rgb_buf, height, width, rgb_linebytes, gray_buf, gray_linebytes);
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2gray asimd, size h=%zu, w=%zu, time cost %.6lf ms\n", height, width, t_cost);
     //cv::imwrite("sky_gray_asimd.bmp", gray);
