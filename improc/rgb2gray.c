@@ -2,11 +2,11 @@
 #include <stdint.h>
 #include "dotproduct/pixel_simd.h"
 
-static void rgb_to_gray_fast2(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes);
-static void f_rgb_to_gray(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes, int mode);
+static void pixel_rgb2gray_fast2(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes);
+static void HYW_rgb2gray(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes, int mode);
 
 
-void rgb_to_gray_naive(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
+void pixel_rgb2gray_naive(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
 {
     for (size_t i=0; i<height; i++) {
         for (size_t j=0; j<width; j++) {
@@ -24,7 +24,7 @@ void rgb_to_gray_naive(unsigned char* rgb_buf, size_t height, size_t width, size
 }
 
 
-void rgb_to_gray_fixed(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
+void pixel_rgb2gray_fixed(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
 {
     for (size_t i=0; i<height; i++) {
         for (size_t j=0; j<width; j++) {
@@ -57,7 +57,7 @@ void rgb_to_gray_fixed(unsigned char* rgb_buf, size_t height, size_t width, size
     }
 }
 
-void rgb_to_gray_fixed2(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
+void pixel_rgb2gray_fixed2(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
 {
     const static int wr = (int)(0.299 * 256 + 0.5);
     const static int wg = (int)(0.587 * 256 + 0.5);
@@ -75,7 +75,7 @@ void rgb_to_gray_fixed2(unsigned char* rgb_buf, size_t height, size_t width, siz
     }
 }
 
-void rgb_to_gray_fixed_asimd(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
+void pixel_rgb2gray_fixed_asimd(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
 {
     size_t rgb_use_linebytes = width * 3;
 
@@ -132,7 +132,8 @@ static inline uint8_t max3(uint8_t r, uint8_t g, uint8_t b) {
     return res;
 }
 
-void f_rgb_to_gray(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes, int mode)
+// 《图像视频滤镜与人像美颜美妆算法解析》 by Hu Yaowu et al.  `HYW` is short for its author.
+void HYW_rgb2gray(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes, int mode)
 {
     switch(mode) {
         case 0: // 均值灰度化
