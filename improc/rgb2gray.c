@@ -1,5 +1,10 @@
 #include "rgb2gray.h"
 #include <stdint.h>
+#include "dotproduct/pixel_simd.h"
+
+static void rgb_to_gray_fast2(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes);
+static void f_rgb_to_gray(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes, int mode);
+
 
 void rgb_to_gray_naive(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
 {
@@ -19,7 +24,7 @@ void rgb_to_gray_naive(unsigned char* rgb_buf, size_t height, size_t width, size
 }
 
 
-void rgb_to_gray_fast(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
+void rgb_to_gray_fixed(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
 {
     for (size_t i=0; i<height; i++) {
         for (size_t j=0; j<width; j++) {
@@ -52,7 +57,7 @@ void rgb_to_gray_fast(unsigned char* rgb_buf, size_t height, size_t width, size_
     }
 }
 
-void rgb_to_gray_fast2(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
+void rgb_to_gray_fixed2(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
 {
     const static int wr = (int)(0.299 * 256 + 0.5);
     const static int wg = (int)(0.587 * 256 + 0.5);
@@ -70,17 +75,48 @@ void rgb_to_gray_fast2(unsigned char* rgb_buf, size_t height, size_t width, size
     }
 }
 
-void rgb_to_gray_asimd(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
+void rgb_to_gray_fixed_asimd(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes)
 {
     size_t rgb_use_linebytes = width * 3;
+
+    const unsigned char weight_r = 77;
+    const unsigned char weight_g = 151;
+    const unsigned char weight_b = 28;
+    const int shift_right = 8;
+#ifdef PIXEL_SIMD_NEON
+    uint8x8_t v_weight_r = vdup_n_u8(weight_r);
+    uint8x8_t v_weight_g = vdup_n_u8(weight_g);
+    uint8x8_t v_weight_b = vdup_n_u8(weight_b);
+    uint8x8x3_t v_rgb;
+    uint16x8_t v_tmp;
+    uint8x8_t v_gray;
+#endif
+
+    unsigned char* rgb_line = rgb_buf;
+    unsigned char* gray_line = gray_buf;
     for (size_t i=0; i<height; i++) {
         size_t vec_size = 0;
     #ifdef PIXEL_SIMD_NEON
-        //TODO
+        const size_t step = 24;
+        vec_size = rgb_use_linebytes - rgb_use_linebytes%step;
+        for (size_t j=0; j<vec_size; j+=step) {
+            v_rgb = vld3_u8(rgb_line+j);
+            v_tmp = vmull_u8(v_rgb.val[0], v_weight_r);
+            v_tmp = vmlal_u8(v_tmp, v_rgb.val[1], v_weight_g);
+            v_tmp = vmlal_u8(v_tmp, v_rgb.val[2], v_weight_b);
+
+            //uint8x8_t vshrn_n_u16 (uint16x8_t __a, const int __b);
+            //uint8x8_t vqshrn_n_u16 (uint16x8_t __a, const int __b);
+            //v_gray = vshrq_n_u16(v_gray, shift_right);
+            v_gray = vshrn_n_u16(v_tmp, 8);
+            vst1_u8(gray_line+j, v_gray);
+        }
     #endif
         for (size_t j=vec_size; j<rgb_use_linebytes; j++) {
-            //TODO
+            gray_line[j] = (weight_r*rgb_line[j] + weight_g*rgb_line[j+1] + weight_b*rgb_line[j+2]) >> 8;
         }
+        rgb_line += rgb_linebytes;
+        gray_line += gray_linebytes;
     }
 }
 

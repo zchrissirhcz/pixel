@@ -1,20 +1,25 @@
-pixel/Debug | rgb2gray_test.cpp, line 26 | rgb2gray, size h=328, w=450, time cost 0.319000 ms
-pixel/Debug | rgb2gray_test.cpp, line 26 | rgb2gray, size h=328, w=450, time cost 0.249000 ms
-pixel/Debug | rgb2gray_test.cpp, line 26 | rgb2gray, size h=328, w=450, time cost 0.178000 ms
+# rgb2gray
 
+image size: h=4032, w=3024
 
+| id | implementation | time cost |
+| ---| -------------- | ---------- |
+| 1  | float       |  42 ms   |
+| 2  | fixed point[<sup>1</sup>](#refer-anchor-1) | 11 ms |
+| 3  | fixed point + arm neon[<sup>2</sup>](#refer-anchor-2) | 10~13 ms |
+| 4  | opencv 4.5.0 | 7~13 ms |
+| 5  | float + assembly[<sup>3</sup>](#refer-anchor-3) | 14 ms |
 
-pixel/Debug | rgb2gray_test.cpp, line 26 | rgb2gray, size h=4032, w=3024, time cost 27.691000 ms
-pixel/Debug | rgb2gray_test.cpp, line 26 | rgb2gray, size h=4032, w=3024, time cost 19.311000 ms
-pixel/Debug | rgb2gray_test.cpp, line 26 | rgb2gray, size h=4032, w=3024, time cost 13.602000 ms
+## References
 
----
+<div id="refer-anchor-1"></div>
 
-android:
+- [1] [SSE图像算法优化系列一：一段BGR2Y的SIMD代码解析。](https://www.cnblogs.com/Imageshop/p/6261719.html)
 
-pixel/Debug | rgb2gray_test.cpp, line 27 | rgb2gray, size h=4032, w=3024, time cost 10.090156 ms
+<div id="refer-anchor-2"></div>
 
+- [2] [Tencent/ncnn - mat_pixel.cpp](https://github.com/Tencent/ncnn/blob/31bc57b1e293e726b318cf93fdcd6154f2188477/src/mat_pixel.cpp#L780-L790)
 
-https://zhuanlan.zhihu.com/p/129033980
+<div id="refer-anchor-3"></div>
 
-https://zhuanlan.zhihu.com/p/126336107
+- [3] [Ldpe2G/ArmNeonOptimization](https://github.com/Ldpe2G/ArmNeonOptimization/blob/6f20bfd79327b1b1a5267880651ff2b31b6c15d6/armAssembly/assemblyEx2Rgb2Gray.cpp#L81-L227)
