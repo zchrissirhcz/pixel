@@ -12,7 +12,7 @@ cmake -G Ninja \
     -DANDROID_LD=lld \
     -DANDROID_ABI="arm64-v8a" \
     -DANDROID_PLATFORM=android-24 \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_BUILD_TYPE=Debuug \
     ../..
 
 #ninja

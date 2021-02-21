@@ -31,9 +31,27 @@ image size: h=4032, w=3024
 - [4] [【AI PC端算法优化】三，深入优化RGB转灰度图算法](https://zhuanlan.zhihu.com/p/129033980)
 
 - [5] [-01-RGB彩色图像转换为灰度图像【ARM NEON加速】](https://blog.csdn.net/vacajk/article/details/56484061)
+
+- [6] [A survery fast BGRA to grayscale conversion on iPhone](https://computer-vision-talks.com/2011-02-08-a-very-fast-bgra-to-grayscale-conversion-on-iphone/)
 ## rgb2bgr
 
+image size: h=4032, w=3024
 
+**rgb2bgr** naive impl cost 23.7891 ms
+
+| id | implementation | release time cost | debug time cost |
+| --- | -------------- | --------- | -------------|
+| 1   | naive          | 20.3 ms|    190 ms |
+| 2   | index optimized| 13/24 ms |  90 ms |
+| 3   | neon intrinsic | 14 ms  |    270 ms |
+
+
+**rgb2bgr_inplace**
+
+| id | implementation | release time cost | debug time cost |
+| --- | -------------- | --------- | ---------- |
+| 1   | naive          | 10 ms    |   134 ms |
+| 2   | naive2         | 11 ms    |    43 ms |
 
 ### References
 
