@@ -157,3 +157,22 @@ dotproduct_asimd,       result is -5289.963379, time cost is 209.881200 ms
 
 
 优先级：封装neon和模拟; VS 64位SSE封装; VS32位MMX封装。
+
+
+## NEON Notes
+### 1. 怎样使用 `float32x4x4_t` 类型数据？
+除了load/store，没找到其他相关的intrinsics的参数是 `float32x4x4_t` 类型。怎么用呢？访问`.val[i]`即可读写。
+
+```c++
+float32x4x4_t v = vld4d(data); //512 bit
+//v.val[0] 当做一个 Q 寄存器用
+```
+
+### 2. mla 和 fma 区别？
+仅在 android arm64 测试。vmlaq 和 vfmaq 分别被调用，生成的汇编有所区别，vmlaq 生成的是 fmul 和 fadd 两条指令，vfmaq 则生成了一条 mla 指令，有时会产生浮点精度差别：
+
+![](mla_fma_asm_diff.png)
+
+
+如果以指令数量越少越好为标准，那么应该用 `vqfma` 系列。
+

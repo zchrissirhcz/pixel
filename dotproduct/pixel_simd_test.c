@@ -430,6 +430,7 @@ void weighted_sum_psimd(size_t len, const float* arr1, const float weight1, cons
     }
 }
 
+
 void test_dotproduct_f32()
 {
     size_t len = 200000000; //200M
