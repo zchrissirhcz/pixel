@@ -123,8 +123,11 @@ void rgb2bgr_asm(unsigned char* src_buf, size_t height, size_t width, size_t src
     unsigned char* src_linebuf = src_buf;
     unsigned char* dst_linebuf = dst_buf;
     const size_t step = 48;
-    size_t vec_size = used_linebytes - used_linebytes % step;
+    size_t remain = used_linebytes % step;
+    size_t vec_size = used_linebytes - remain;
     size_t pre_neon_len = vec_size / step;
+    size_t src_line_gap = src_linebytes - used_linebytes;
+    size_t dst_line_gap = dst_linebytes - used_linebytes;
     for (size_t i=0; i<height; i++) {
         size_t neon_len = pre_neon_len;
         __asm__ volatile(
@@ -144,11 +147,13 @@ void rgb2bgr_asm(unsigned char* src_buf, size_t height, size_t width, size_t src
             "2"(neon_len)
             : "cc", "memory", "v0", "v1", "v2"
         );
-        for (size_t j=vec_size; j<used_linebytes; j+=3) {
+        for (size_t j=0; j<remain; j+=3) {
             dst_linebuf[j] = src_linebuf[j+2];
             dst_linebuf[j+1] = src_linebuf[j+1];
             dst_linebuf[j+2] = src_linebuf[j];
         }
+        dst_linebuf += dst_line_gap;
+        src_linebuf += src_line_gap;
     }
 #endif
 }
@@ -261,8 +266,10 @@ void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width, size_t
     size_t used_linebytes = width * 3;
     unsigned char* linebuf = buf;
     const size_t step = 48;
-    size_t vec_size = used_linebytes - used_linebytes % step;
+    size_t remain = used_linebytes % step;
+    size_t vec_size = used_linebytes - remain;
     size_t pre_neon_len = vec_size / step;
+    size_t line_gap = linebytes - used_linebytes;
     for (size_t i=0; i<height; i++) {
         size_t neon_len = pre_neon_len;
         __asm__ volatile(
@@ -280,11 +287,12 @@ void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width, size_t
             "1"(neon_len)
             : "cc", "memory", "v0", "v1", "v2"
         );
-        for (size_t j=vec_size; j<used_linebytes; j+=3) {
+        for (size_t j=0; j<remain; j+=3) {
             unsigned char tmp = linebuf[j];
             linebuf[j] = linebuf[j+2];
             linebuf[j+2] = tmp;
         }
+        linebuf += line_gap;
     }
 #endif
 }

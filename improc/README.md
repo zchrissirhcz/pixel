@@ -6,13 +6,15 @@
 
 image size: h=4032, w=3024
 
-| id | implementation | time cost |
-| ---| -------------- | ---------- |
-| 1  | float       |  42 ms   |
-| 2  | fixed point[<sup>1</sup>](#refer-anchor-1) | 11 ms |
-| 3  | fixed point + arm neon[<sup>2</sup>](#refer-anchor-2) | 10~13 ms |
-| 4  | opencv 4.5.0 | 7~13 ms |
-| 5  | float + assembly[<sup>3</sup>](#refer-anchor-3) | 14 ms |
+| id | implementation | armv8 release | armv8 debug | armv7 release | armv7 debug |
+| ---| -------------- | ---------- | ----------- | ------------ | ------------ |
+| 1  | float       |  42 ms   |    |  57 ms  |   208 ms |
+| 2  | fixed point[<sup>1</sup>](#refer-anchor-1) | 11 ms |   |  30 ms | 203 ms |
+| 3  | fixed point + arm neon[<sup>2</sup>](#refer-anchor-2) | 10~13 ms |  | 9.7 ms | 87 ms |
+| 4  | opencv 4.5.0 | 7~13 ms |  |  11 ms | 12 ms |
+| 5  | asm     |    |       |     10 ms |  12 ms |
+| 6  | float + assembly[<sup>3</sup>](#refer-anchor-3) | 14 ms | - | - | - |
+
 
 ### References
 
