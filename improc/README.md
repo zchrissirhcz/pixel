@@ -44,15 +44,17 @@ image size: h=4032, w=3024
 | 1   | naive          | 20.3 ms|    190 ms |
 | 2   | index optimized| 13/24 ms |  90 ms |
 | 3   | neon intrinsic | 33 ms  |    270 ms |
-
+| 4   | asm            | 19 ms  |  19 ms |
+| 5   | opencv         | 16 ms  |  18 ms |
 
 **rgb2bgr_inplace**
 
-| id | implementation | release time cost | debug time cost |
-| --- | -------------- | --------- | ---------- |
-| 1   | naive          | 10 ms    |   134 ms |
-| 2   | naive2         | 11 ms    |    43 ms |
-| 3   | asm            | 5.5 ms   |    6 ms  |
+| id | implementation | release time cost | debug time cost | 备注 |
+| --- | -------------- | --------- | ---------- | -------- |
+| 1   | naive          | 10 ms    |   134 ms |  - |
+| 2   | naive2         | 11 ms    |    43 ms |  - |
+| 3   | asm            | 5.5 ms   |    6 ms  |  **比OpenCV快5倍** |
+| 4   | opencv         | 27 ms    |    29 ms | - |
 
 ### References
 
