@@ -37,7 +37,7 @@ image size: h=4032, w=3024
 
 image size: h=4032, w=3024
 
-**rgb2bgr** naive impl cost 23.7891 ms
+**rgb2bgr**
 
 | id | implementation | release time cost | debug time cost |
 | --- | -------------- | --------- | -------------|
@@ -57,3 +57,22 @@ image size: h=4032, w=3024
 ### References
 
 - [性能优化篇（4）：NEON优化案例——图像颜色转换之RGB到BGR（aarch64版）](https://blog.csdn.net/wohenfanjian/article/details/103407259)
+
+## Neon Notes
+
+1. arm64 汇编和 arm32 汇编，写法有差别，要分开写。
+
+2. 汇编里的自增(+=)操作：
+   - arm32是`!`，例如 `[%1]!`；
+   - arm64指定增加的字节数，例如 st3 存储后，自增 48 字节：
+   ```asm
+   st3    { v0.16b, v1.16b, v2.16b }, [%0], #48
+   ```
+
+3. 如何使用 `float32x4x4_t` 这样的“长”类型：
+    把它当做是数组，也就是
+    ```c++
+    typedef struct float32x4x4_t {
+        float32x4_t val[4];
+    } float32x4x4_t;
+    ```
