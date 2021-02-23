@@ -288,29 +288,3 @@ void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width, size_t
     }
 #endif
 }
-
-// void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width, size_t linebytes) {
-//     size_t len = height * width;
-//     int segments = len / 8;
-//     for (int i=0; i+7<len; i+=8) {
-//         asm volatile(
-//             "0:                          \n"
-//             "vld3.u8 {d0-d2}, [%1]!       \n"
-//             "vswp d0, d2                 \n"
-//             "vst3.u8 {d0-d2}, [%1]!  \n"
-//             : "+r"(buf)
-//             :
-//             :"cc", "memory", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13"
-//         );
-
-//         buf += 24;
-//     }
-
-//     int remain = len % 8;
-//     for (int i=0; i<remain; i++) {
-//         unsigned char t = buf[0];
-//         buf[0] = buf[2];
-//         buf[2] = t;
-//         buf += 3;
-//     }
-// }
