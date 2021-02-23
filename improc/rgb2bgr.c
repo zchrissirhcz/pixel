@@ -79,6 +79,80 @@ void rgb2bgr_asimd(unsigned char* src_buf, size_t height, size_t width, size_t s
     }
 }
 
+void rgb2bgr_asm_naive(unsigned char* src_buf, size_t height, size_t width, size_t src_linebytes, unsigned char* dst_buf, size_t dst_linebytes)
+{
+#ifdef __aarch64__
+    size_t used_linebytes = width * 3;
+    unsigned char* src_linebuf = src_buf;
+    unsigned char* dst_linebuf = dst_buf;
+    for (size_t i=0; i<height; i++) {
+        const size_t step = 48;
+        size_t vec_size = used_linebytes - used_linebytes % step;
+        for (size_t j=0; j<vec_size; j+=step) {
+            __asm__ volatile(
+                "ld3    { v0.16b, v1.16b, v2.16b }, [%1]\n"
+                "mov    v3.16b, v0.16b       \n"
+                "mov    v0.16b, v2.16b       \n"
+                "mov    v2.16b, v3.16b        \n"
+                "st3    { v0.16b, v1.16b, v2.16b }, [%0]"
+                : "=r"(dst_linebuf), //%0
+                "=r"(src_linebuf)    //%1
+                : "0"(dst_linebuf),
+                "1"(src_linebuf)
+                : "cc", "memory", "v0", "v1", "v2"
+            );
+            src_linebuf += step;
+            dst_linebuf += step;
+        }
+        for (size_t j=vec_size; j<used_linebytes; j+=3) {
+            dst_linebuf[j] = src_linebuf[j+2];
+            dst_linebuf[j+1] = src_linebuf[j+1];
+            dst_linebuf[j+2] = src_linebuf[j];
+        }
+    }
+#endif
+}
+
+// still slow than naive implementation
+// disassembling naive implementation is required.
+// ref https://aijishu.com/a/1060000000116431
+void rgb2bgr_asm(unsigned char* src_buf, size_t height, size_t width, size_t src_linebytes, unsigned char* dst_buf, size_t dst_linebytes)
+{
+#ifdef __aarch64__
+    size_t used_linebytes = width * 3;
+    unsigned char* src_linebuf = src_buf;
+    unsigned char* dst_linebuf = dst_buf;
+    const size_t step = 48;
+    size_t vec_size = used_linebytes - used_linebytes % step;
+    size_t pre_neon_len = vec_size / step;
+    for (size_t i=0; i<height; i++) {
+        size_t neon_len = pre_neon_len;
+        __asm__ volatile(
+            "0: \n"
+            "ld3    { v0.16b, v1.16b, v2.16b }, [%1], #48 \n"
+            "mov    v3.16b, v0.16b       \n"
+            "mov    v0.16b, v2.16b       \n"
+            "mov    v2.16b, v3.16b        \n"
+            "st3    { v0.16b, v1.16b, v2.16b }, [%0], #48 \n"
+            "subs       %2, %2, #1              \n"
+            "bne    0b  \n"
+            : "=r"(dst_linebuf), //%0
+            "=r"(src_linebuf),    //%1
+            "=r"(neon_len)   //%2
+            : "0"(dst_linebuf),
+            "1"(src_linebuf),
+            "2"(neon_len)
+            : "cc", "memory", "v0", "v1", "v2"
+        );
+        for (size_t j=vec_size; j<used_linebytes; j+=3) {
+            dst_linebuf[j] = src_linebuf[j+2];
+            dst_linebuf[j+1] = src_linebuf[j+1];
+            dst_linebuf[j+2] = src_linebuf[j];
+        }
+    }
+#endif
+}
+
 void rgb2bgr_inplace_naive(unsigned char* buf, size_t height, size_t width, size_t linebytes)
 {
     unsigned char tmp = 0;
@@ -179,6 +253,40 @@ void rgb2bgr_inplace_naive2(unsigned char* buf, size_t height, size_t width, siz
             b3+=3;
         }
     }
+}
+
+void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width, size_t linebytes)
+{
+#ifdef __aarch64__
+    size_t used_linebytes = width * 3;
+    unsigned char* linebuf = buf;
+    const size_t step = 48;
+    size_t vec_size = used_linebytes - used_linebytes % step;
+    size_t pre_neon_len = vec_size / step;
+    for (size_t i=0; i<height; i++) {
+        size_t neon_len = pre_neon_len;
+        __asm__ volatile(
+            "0: \n"
+            "ld3    { v0.16b, v1.16b, v2.16b }, [%0] \n"
+            "mov    v3.16b, v0.16b       \n"
+            "mov    v0.16b, v2.16b       \n"
+            "mov    v2.16b, v3.16b        \n"
+            "st3    { v0.16b, v1.16b, v2.16b }, [%0], #48 \n"
+            "subs       %1, %1, #1              \n"
+            "bne    0b  \n"
+            : "=r"(linebuf), //%0
+            "=r"(neon_len)   //%1
+            : "0"(linebuf),
+            "1"(neon_len)
+            : "cc", "memory", "v0", "v1", "v2"
+        );
+        for (size_t j=vec_size; j<used_linebytes; j+=3) {
+            unsigned char tmp = linebuf[j];
+            linebuf[j] = linebuf[j+2];
+            linebuf[j+2] = tmp;
+        }
+    }
+#endif
 }
 
 // void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width, size_t linebytes) {
