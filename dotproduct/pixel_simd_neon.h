@@ -289,23 +289,31 @@ inline v_uint32x4 vq_fmadd_u32(v_uint32x4 v1, v_uint32x4 v2, v_uint32x4 v3) {
 inline v_uint8x8 vd_cmplt_s8(v_int8x8 v1, v_int8x8 v2) { return vclt_s8(v1, v2); }
 inline v_uint16x4 vd_cmplt_s16(v_int16x4 v1, v_int16x4 v2) { return vclt_s16(v1, v2); }
 inline v_uint32x2 vd_cmplt_s32(v_int32x2 v1, v_int32x2 v2) { return vclt_s32(v1, v2); }
+#ifdef __aarch64__
 inline v_uint64x1 vd_cmplt_s64(v_int64x1 v1, v_int64x1 v2) { return vclt_s64(v1, v2); }
+#endif
 inline v_uint32x2 vd_cmplt_f32(v_float32x2 v1, v_float32x2 v2) { return vclt_f32(v1, v2); }
 inline v_uint8x8 vd_cmplt_u8(v_uint8x8 v1, v_uint8x8 v2) { return vclt_u8(v1, v2); }
 inline v_uint16x4 vd_cmplt_u16(v_uint16x4 v1, v_uint16x4 v2) { return vclt_u16(v1, v2); }
 inline v_uint32x2 vd_cmplt_u32(v_uint32x2 v1, v_uint32x2 v2) { return vclt_u32(v1, v2); }
+#ifdef __aarch64__
 inline v_uint64x1 vd_cmplt_u64(v_uint64x1 v1, v_uint64x1 v2) { return vclt_u64(v1, v2); }
+#endif
 
 // 16bytes(128bits) part
 inline v_uint8x16 vq_cmplt_s8(v_int8x16 v1, v_int8x16 v2) { return vcltq_s8(v1, v2); }
 inline v_uint16x8 vq_cmplt_s16(v_int16x8 v1, v_int16x8 v2) { return vcltq_s16(v1, v2); }
 inline v_uint32x4 vq_cmplt_s32(v_int32x4 v1, v_int32x4 v2) { return vcltq_s32(v1, v2); }
+#ifdef __aarch64__
 inline v_uint64x2 vq_cmplt_s64(v_int64x2 v1, v_int64x2 v2) { return vcltq_s64(v1, v2); }
+#endif
 inline v_uint32x4 vq_cmplt_f32(v_float32x4 v1, v_float32x4 v2) { return vcltq_f32(v1, v2); }
 inline v_uint8x16 vq_cmplt_u8(v_uint8x16 v1, v_uint8x16 v2) { return vcltq_u8(v1, v2); }
 inline v_uint16x8 vq_cmplt_u16(v_uint16x8 v1, v_uint16x8 v2) { return vcltq_u16(v1, v2); }
 inline v_uint32x4 vq_cmplt_u32(v_uint32x4 v1, v_uint32x4 v2) { return vcltq_u32(v1, v2); }
+#ifdef __aarch64__
 inline v_uint64x2 vq_cmplt_u64(v_uint64x2 v1, v_uint64x2 v2) { return vcltq_u64(v1, v2); }
+#endif
 
 //----------------------------------------------------------------------
 // cmple(v1, v2), return (v1[i] <= v2[i])? 1...1 : 0...0
@@ -314,23 +322,31 @@ inline v_uint64x2 vq_cmplt_u64(v_uint64x2 v1, v_uint64x2 v2) { return vcltq_u64(
 inline v_uint8x8 vd_cmple_s8(v_int8x8 v1, v_int8x8 v2) { return vcle_s8(v1, v2); }
 inline v_uint16x4 vd_cmple_s16(v_int16x4 v1, v_int16x4 v2) { return vcle_s16(v1, v2); }
 inline v_uint32x2 vd_cmple_s32(v_int32x2 v1, v_int32x2 v2) { return vcle_s32(v1, v2); }
+#ifdef __aarch64__
 inline v_uint64x1 vd_cmple_s64(v_int64x1 v1, v_int64x1 v2) { return vcle_s64(v1, v2); }
+#endif
 inline v_uint32x2 vd_cmple_f32(v_float32x2 v1, v_float32x2 v2) { return vcle_f32(v1, v2); }
 inline v_uint8x8 vd_cmple_u8(v_uint8x8 v1, v_uint8x8 v2) { return vcle_u8(v1, v2); }
 inline v_uint16x4 vd_cmple_u16(v_uint16x4 v1, v_uint16x4 v2) { return vcle_u16(v1, v2); }
 inline v_uint32x2 vd_cmple_u32(v_uint32x2 v1, v_uint32x2 v2) { return vcle_u32(v1, v2); }
+#ifdef __aarch64__
 inline v_uint64x1 vd_cmple_u64(v_uint64x1 v1, v_uint64x1 v2) { return vcle_u64(v1, v2); }
+#endif
 
 // 16bytes(128bits) part
 inline v_uint8x16 vq_cmple_s8(v_int8x16 v1, v_int8x16 v2) { return vcleq_s8(v1, v2); }
 inline v_uint16x8 vq_cmple_s16(v_int16x8 v1, v_int16x8 v2) { return vcleq_s16(v1, v2); }
 inline v_uint32x4 vq_cmple_s32(v_int32x4 v1, v_int32x4 v2) { return vcleq_s32(v1, v2); }
+#ifdef __aarch64__
 inline v_uint64x2 vq_cmple_s64(v_int64x2 v1, v_int64x2 v2) { return vcleq_s64(v1, v2); }
+#endif
 inline v_uint32x4 vq_cmple_f32(v_float32x4 v1, v_float32x4 v2) { return vcleq_s32(v1, v2); }
 inline v_uint8x16 vq_cmple_u8(v_uint8x16 v1, v_uint8x16 v2) { return vcleq_u8(v1, v2); }
 inline v_uint16x8 vq_cmple_u16(v_uint16x8 v1, v_uint16x8 v2) { return vcleq_u16(v1, v2); }
 inline v_uint32x4 vq_cmple_u32(v_uint32x4 v1, v_uint32x4 v2) { return vcleq_u32(v1, v2); }
+#ifdef __aarch64__
 inline v_uint64x2 vq_cmple_u64(v_uint64x2 v1, v_uint64x2 v2) { return vcleq_u64(v1, v2); }
+#endif
 
 //----------------------------------------------------------------------
 // cmpgt(v1, v2), return (v1[i] > v2[i])? 1...1 : 0...0
@@ -339,23 +355,31 @@ inline v_uint64x2 vq_cmple_u64(v_uint64x2 v1, v_uint64x2 v2) { return vcleq_u64(
 inline v_uint8x8 vd_cmpgt_s8(v_int8x8 v1, v_int8x8 v2) { return vcgt_s8(v1, v2);}
 inline v_uint16x4 vd_cmpgt_s16(v_int16x4 v1, v_int16x4 v2) { return vcgt_s16(v1, v2);}
 inline v_uint32x2 vd_cmpgt_s32(v_int32x2 v1, v_int32x2 v2) { return vcgt_s32(v1, v2);}
+#ifdef __aarch64__
 inline v_uint64x1 vd_cmpgt_s64(v_int64x1 v1, v_int64x1 v2) { return vcgt_s64(v1, v2);}
+#endif
 inline v_uint32x2 vd_cmpgt_f32(v_float32x2 v1, v_float32x2 v2) { return vcgt_f32(v1, v2);}
 inline v_uint8x8 vd_cmpgt_u8(v_uint8x8 v1, v_uint8x8 v2) { return vcgt_u8(v1, v2);}
 inline v_uint16x4 vd_cmpgt_u16(v_uint16x4 v1, v_uint16x4 v2) { return vcgt_u16(v1, v2);}
 inline v_uint32x2 vd_cmpgt_u32(v_uint32x2 v1, v_uint32x2 v2) { return vcgt_u32(v1, v2);}
+#ifdef __aarch64__
 inline v_uint64x1 vd_cmpgt_u64(v_uint64x1 v1, v_uint64x1 v2) { return vcgt_u64(v1, v2);}
+#endif
 
 // 16bytes(128bits) part
 inline v_uint8x16 vq_cmpgt_s8(v_int8x16 v1, v_int8x16 v2) { return vcgtq_s8(v1, v2);}
 inline v_uint16x8 vq_cmpgt_s16(v_int16x8 v1, v_int16x8 v2) { return vcgtq_s16(v1, v2);}
 inline v_uint32x4 vq_cmpgt_s32(v_int32x4 v1, v_int32x4 v2) { return vcgtq_s32(v1, v2);}
+#ifdef __aarch64__
 inline v_uint64x2 vq_cmpgt_s64(v_int64x2 v1, v_int64x2 v2) { return vcgtq_s64(v1, v2);}
+#endif
 inline v_uint32x4 vq_cmpgt_f32(v_float32x4 v1, v_float32x4 v2) { return vcgtq_f32(v1, v2);}
 inline v_uint8x16 vq_cmpgt_u8(v_uint8x16 v1, v_uint8x16 v2) { return vcgtq_u8(v1, v2);}
 inline v_uint16x8 vq_cmpgt_u16(v_uint16x8 v1, v_uint16x8 v2) { return vcgtq_u16(v1, v2);}
 inline v_uint32x4 vq_cmpgt_u32(v_uint32x4 v1, v_uint32x4 v2) { return vcgtq_u32(v1, v2);}
+#ifdef __aarch64__
 inline v_uint64x2 vq_cmpgt_u64(v_uint64x2 v1, v_uint64x2 v2) { return vcgtq_u64(v1, v2);}
+#endif
 
 //----------------------------------------------------------------------
 // cmpge(v1, v2), return (v1[i] >= v2[i])? 1...1 : 0...0
@@ -364,23 +388,31 @@ inline v_uint64x2 vq_cmpgt_u64(v_uint64x2 v1, v_uint64x2 v2) { return vcgtq_u64(
 inline v_uint8x8 vd_cmpge_s8(v_int8x8 v1, v_int8x8 v2) { return vcge_s8(v1, v2); }
 inline v_uint16x4 vd_cmpge_s16(v_int16x4 v1, v_int16x4 v2) { return vcge_s16(v1, v2); }
 inline v_uint32x2 vd_cmpge_s32(v_int32x2 v1, v_int32x2 v2) { return vcge_s32(v1, v2); }
+#ifdef __aarch64__
 inline v_uint64x1 vd_cmpge_s64(v_int64x1 v1, v_int64x1 v2) { return vcge_s64(v1, v2); }
+#endif
 inline v_uint32x2 vd_cmpge_f32(v_float32x2 v1, v_float32x2 v2) { return vcge_f32(v1, v2); }
 inline v_uint8x8 vd_cmpge_u8(v_uint8x8 v1, v_uint8x8 v2) { return vcge_u8(v1, v2); }
 inline v_uint16x4 vd_cmpge_u16(v_uint16x4 v1, v_uint16x4 v2) { return vcge_u16(v1, v2); }
 inline v_uint32x2 vd_cmpge_u32(v_uint32x2 v1, v_uint32x2 v2) { return vcge_u32(v1, v2); }
+#ifdef __aarch64__
 inline v_uint64x1 vd_cmpge_u64(v_uint64x1 v1, v_uint64x1 v2) { return vcge_u64(v1, v2); }
+#endif
 
 // 16bytes(128bits) part
 inline v_uint8x16 vq_cmpge_s8(v_int8x16 v1, v_int8x16 v2) { return vcgeq_s8(v1, v2); }
 inline v_uint16x8 vq_cmpge_s16(v_int16x8 v1, v_int16x8 v2) { return vcgeq_s16(v1, v2); }
 inline v_uint32x4 vq_cmpge_s32(v_int32x4 v1, v_int32x4 v2) { return vcgeq_s32(v1, v2); }
+#ifdef __aarch64__
 inline v_uint64x2 vq_cmpge_s64(v_int64x2 v1, v_int64x2 v2) { return vcgeq_s64(v1, v2); }
+#endif
 inline v_uint32x4 vq_cmpge_f32(v_float32x4 v1, v_float32x4 v2) { return vcgeq_f32(v1, v2); }
 inline v_uint8x16 vq_cmpge_u8(v_uint8x16 v1, v_uint8x16 v2) { return vcgeq_u8(v1, v2); }
 inline v_uint16x8 vq_cmpge_u16(v_uint16x8 v1, v_uint16x8 v2) { return vcgeq_u16(v1, v2); }
 inline v_uint32x4 vq_cmpge_u32(v_uint32x4 v1, v_uint32x4 v2) { return vcgeq_u32(v1, v2); }
+#ifdef __aarch64__
 inline v_uint64x2 vq_cmpge_u64(v_uint64x2 v1, v_uint64x2 v2) { return vcgeq_u64(v1, v2); }
+#endif
 
 //----------------------------------------------------------------------
 // bitselect(mask, v1, v2)
