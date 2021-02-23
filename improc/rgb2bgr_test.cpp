@@ -1,4 +1,3 @@
-#if 0
 #include <stdio.h>
 #include "common/pixel_cpu_affinity.h"
 #include "common/pixel_benchmark.h"
@@ -9,7 +8,7 @@
 
 #include "rgb2bgr.h"
 
-int main0() {
+int main() {
     size_t mask = 0;
     for (int i = 0; i < 8; ++i) {
       if (i >= 5) {
@@ -27,12 +26,13 @@ int main0() {
     cv::Mat mat_naive = cv::Mat(size, CV_8UC3);
     cv::Mat mat_idxopt = cv::Mat(size, CV_8UC3);
     cv::Mat mat_asimd = cv::Mat(size, CV_8UC3);
+    cv::Mat mat_asm = cv::Mat(size, CV_8UC3);
 
     size_t dst_linebytes = width * 3;
     unsigned char* src_buf = image.data;
     unsigned char* dst_buf;
 
-    double t_start, t_cost1, t_cost2, t_cost3;
+    double t_start, t_cost1, t_cost2, t_cost3, t_cost4;
 
     dst_buf = mat_naive.data;
     t_start = pixel_get_current_time();
@@ -52,36 +52,49 @@ int main0() {
     t_cost3 = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2bgr, asimd cost %.4lf ms", t_cost3);
 
+    dst_buf = mat_asm.data;
+    t_start = pixel_get_current_time();
+    rgb2bgr_asm(src_buf, height, width, src_linebytes, dst_buf, dst_linebytes);
+    t_cost4 = pixel_get_current_time() - t_start;
+    PIXEL_LOGD("rgb2bgr, asm cost %.4lf ms", t_cost4);
+
     cv::imwrite("sky_rgb_naive.bmp", mat_naive);
     cv::imwrite("sky_rgb_idxopt.bmp", mat_idxopt);
     cv::imwrite("sky_rgb_asimd.bmp", mat_asimd);
+    cv::imwrite("sky_rgb_asm.bmp", mat_asm);
 
     // ---------
-    double t_cost4, t_cost5;
-    cv::Mat image_shadow4 = image.clone();
+    double t_cost5, t_cost6, t_cost7;
     cv::Mat image_shadow5 = image.clone();
-
-    t_start = pixel_get_current_time();
-    src_buf = image_shadow4.data;
-    rgb2bgr_inplace_naive(src_buf, height, width, src_linebytes);
-    t_cost4 = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2bgr_inplace, naive impl cost %.4lf ms", t_cost4);
+    cv::Mat image_shadow6 = image.clone();
+    cv::Mat image_shadow7 = image.clone();
 
     t_start = pixel_get_current_time();
     src_buf = image_shadow5.data;
-    rgb2bgr_inplace_naive2(src_buf, height, width, src_linebytes);
+    rgb2bgr_inplace_naive(src_buf, height, width, src_linebytes);
     t_cost5 = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2bgr_inplace, naive2 impl cost %.4lf ms", t_cost5);
+    PIXEL_LOGD("rgb2bgr_inplace, naive impl cost %.4lf ms", t_cost5);
 
-    cv::imwrite("sky_rgb4.bmp", image_shadow4);
+    t_start = pixel_get_current_time();
+    src_buf = image_shadow6.data;
+    rgb2bgr_inplace_naive2(src_buf, height, width, src_linebytes);
+    t_cost6 = pixel_get_current_time() - t_start;
+    PIXEL_LOGD("rgb2bgr_inplace, naive2 impl cost %.4lf ms", t_cost6);
+
+    t_start = pixel_get_current_time();
+    src_buf = image_shadow7.data;
+    rgb2bgr_inplace_asm(src_buf, height, width, src_linebytes);
+    t_cost7 = pixel_get_current_time() - t_start;
+    PIXEL_LOGD("rgb2bgr_inplace, asm impl cost %.4lf ms", t_cost7);
+
     cv::imwrite("sky_rgb5.bmp", image_shadow5);
-
-
+    cv::imwrite("sky_rgb6.bmp", image_shadow6);
+    cv::imwrite("sky_rgb7.bmp", image_shadow7);
 
 
     return 0;
 }
-#endif
+
 
 
 #include <arm_neon.h>
@@ -91,8 +104,7 @@ int main0() {
 
 static void swap_u8();
 
-
-int main() {
+int main1() {
     swap_u8();
 
     return 0;

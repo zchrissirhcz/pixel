@@ -2,7 +2,7 @@
 
 set BUILD_DIR=android-arm64
 set DST_DIR=/data/pixel
-set EXE_FILE=demo
+set EXE_FILE=testbed
 
 adb shell "mkdir -p %DST_DIR%"
 adb push %BUILD_DIR%/%EXE_FILE% %DST_DIR%

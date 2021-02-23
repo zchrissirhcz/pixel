@@ -43,7 +43,7 @@ image size: h=4032, w=3024
 | --- | -------------- | --------- | -------------|
 | 1   | naive          | 20.3 ms|    190 ms |
 | 2   | index optimized| 13/24 ms |  90 ms |
-| 3   | neon intrinsic | 14 ms  |    270 ms |
+| 3   | neon intrinsic | 33 ms  |    270 ms |
 
 
 **rgb2bgr_inplace**
@@ -52,6 +52,7 @@ image size: h=4032, w=3024
 | --- | -------------- | --------- | ---------- |
 | 1   | naive          | 10 ms    |   134 ms |
 | 2   | naive2         | 11 ms    |    43 ms |
+| 3   | asm            | 5.5 ms   |    6 ms  |
 
 ### References
 
