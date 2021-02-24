@@ -41,7 +41,7 @@ image size: h=4032, w=3024
 
 **rgb2bgr**
 
-| id | implementation | release time cost | debug time cost |
+| id | implementation | armv8 release | armv8 debug |
 | --- | -------------- | --------- | -------------|
 | 1   | naive          | 20.3 ms|    190 ms |
 | 2   | index optimized| 13/24 ms |  90 ms |
@@ -51,7 +51,7 @@ image size: h=4032, w=3024
 
 **rgb2bgr_inplace**
 
-| id | implementation | release time cost | debug time cost | 备注 |
+| id | implementation | armv8 release | armv8 debug | 备注 |
 | --- | -------------- | --------- | ---------- | -------- |
 | 1   | naive          | 10 ms    |   134 ms |  - |
 | 2   | naive2         | 11 ms    |    43 ms |  - |
@@ -61,6 +61,37 @@ image size: h=4032, w=3024
 ### References
 
 - [性能优化篇（4）：NEON优化案例——图像颜色转换之RGB到BGR（aarch64版）](https://blog.csdn.net/wohenfanjian/article/details/103407259)
+
+## Neon Links
+
+**Intrinscs**:
+
+- [Neon Intrinsics查询 - 官方在线版](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/intrinsics)
+
+- [Neon Intrinsics查询 - fengbingchun整理版，部分带sse等价解释](https://blog.csdn.net/fengbingchun/article/details/38085781)
+
+- [Neon Intrinsics - 按类型整理 - EmSoftEn的博客](https://blog.csdn.net/emsoften/article/details/51718763)
+
+**Assembler**:
+
+- [arm汇编入门帖 - asm volatile形式 - Roland_Sun的博客](https://blog.csdn.net/Roland_Sun/article/details/42921131)
+
+- [arm内联汇编入门(上) - 梁德澎](https://aijishu.com/a/1060000000116427)
+
+- [arm内联汇编入门(下) - 梁德澎](https://aijishu.com/a/1060000000116431)
+
+- [ARM GCC 内联汇编参考手册 - 中文翻译版](https://github.com/tidyjiang8/arm-gcc-inline-assembler/blob/master/src/arm-gcc-inline-assembler.md)
+
+**全能系列**
+
+- [AI移动端优化 - 知乎 - 章小龙 & BBuf & 圈圈虫等](https://www.zhihu.com/people/zxloas/posts)
+
+- [arm官方文档 armv8-a 系列教程](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/neon-programmers-guide-for-armv8-a)
+
+**TODO系列**
+
+- 查询 armv7 所有汇编指令？
+- 查询 armv8 所有汇编指令？
 
 ## Neon Notes
 
@@ -74,7 +105,7 @@ image size: h=4032, w=3024
    ```
 
 3. 如何使用 `float32x4x4_t` 这样的“长”类型：
-    把它当做是数组，也就是
+    把它当做是数组，随后访问`.val[i]`字段：
     ```c++
     typedef struct float32x4x4_t {
         float32x4_t val[4];
