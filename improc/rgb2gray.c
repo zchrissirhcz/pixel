@@ -195,6 +195,35 @@ void pixel_rgb2gray_fixed_asm0(unsigned char* rgb_buf, size_t height, size_t wid
 {
 #ifdef __ARM_NEON
     #ifdef __aarch64__
+    __asm__ volatile(
+        "lsr          %2, %2, #3      \n"
+        "# build the three constants: \n"
+        "mov         r4, #77          \n" // Blue channel multiplier
+        "mov         r5, #151         \n" // Green channel multiplier
+        "mov         r6, #28          \n" // Red channel multiplier
+        "vdup.u8      d4, r4           \n"
+        "vdup.u8      d5, r5           \n"
+        "vdup.u8      d6, r6           \n"
+        "0:                       \n"
+        "# load 8 pixels:             \n"
+        "vld3.u8      {d0-d2}, [%1]!   \n"
+        "# do the weight average:     \n"
+        "vmull.u8    q7, d0, d4       \n"
+        "vmlal.u8    q7, d1, d5       \n"
+        "vmlal.u8    q7, d2, d6       \n"
+        "# shift and store:           \n"
+        "vshrn.u16   d7, q7, #8       \n" // Divide q3 by 256 and store in the d7
+        "vst1.u8      {d7}, [%0]!      \n"
+        "subs        %2, #1       \n" // Decrement iteration count
+        "bne         0b            \n" // Repeat unil iteration count is not zero
+        : "=r"(gray_buf), //%0
+        "=r"(rgb_buf), //%1
+        "=r"(num_pixels) //%2
+        : "0"(gray_buf), 
+        "1"(rgb_buf),
+        "2"(num_pixels)
+        : "cc", "memory", "r4", "r5", "r6", "q0", "q1", "q2", "q3", "q7"
+    );
     #else
     size_t num_pixels = height * width;
     asm volatile(
