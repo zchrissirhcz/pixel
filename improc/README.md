@@ -111,6 +111,12 @@ image size: h=4032, w=3024
 
 - [arm官方文档 armv8-a 系列教程](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/neon-programmers-guide-for-armv8-a)
 
+- [armv7 mix assembly and intrinsic（汇编和intrinsic绑定）- ncnn文档](https://github.com/Tencent/ncnn/wiki/armv7-mix-assembly-and-intrinsic)
+
+- [aarch64 mix assembly and intrinsic（汇编和intrinsic绑定）- ncnn文档](https://github.com/Tencent/ncnn/wiki/aarch64-mix-assembly-and-intrinsic)
+
+- [arm a53 a55 双发射问题 - ncnn文档](https://github.com/Tencent/ncnn/wiki/arm-a53-a55-dual-issue)
+
 **TODO系列**
 
 - 查询 armv7 所有汇编指令？
@@ -156,3 +162,13 @@ typedef double float64_t;
 
 "ld3    { v0.16b, v1.16b, v2.16b }, [%1]\n"   // armv8汇编
 ```
+
+9. 关于 ARM NEON 和 VFP 有一些有趣的事实：
+    - 很多 arm 处理器都会带一个 DSP，或者类似的定制的硬件处理单元；DSP上没有系统，调试、同步都更加麻烦。
+    - ARMv7也不是全支持neon，也不是全支持vfp。如果有neon而没有vfp，那么不能做硬浮点。
+    - NEON SIMD比VFP的计算更高效（因为位数多了？），因而从ARMv7开始，VFP被弃用。VFP单元有时候也被叫做FPU，浮点计算单元。
+    - 有NEON或VFP的情况下，也不一定有fp16和fma扩展功能
+    - VFP的浮点数是严格IEEE754标准；NEON则不是严格IEEE754标准
+    - VFP的个别指令，是NEON无法替代的
+
+10. NEON指令和浮点指令，使用的是相同的寄存器
