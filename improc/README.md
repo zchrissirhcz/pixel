@@ -20,13 +20,9 @@ image size: h=4032, w=3024
 
 <div id="refer-anchor-1"></div>
 
-- [1] [SSE图像算法优化系列一：一段BGR2Y的SIMD代码解析。](https://www.cnblogs.com/Imageshop/p/6261719.html)
+- [1] [SSE图像算法优化系列一：一段BGR2Y的SIMD代码解析。](https://www.cnblogs.com/Imageshop/p/6261719.html)<div id="refer-anchor-2"></div>
 
-<div id="refer-anchor-2"></div>
-
-- [2] [Tencent/ncnn - mat_pixel.cpp](https://github.com/Tencent/ncnn/blob/31bc57b1e293e726b318cf93fdcd6154f2188477/src/mat_pixel.cpp#L780-L790)
-
-<div id="refer-anchor-3"></div>
+- [2] [Tencent/ncnn - mat_pixel.cpp](https://github.com/Tencent/ncnn/blob/31bc57b1e293e726b318cf93fdcd6154f2188477/src/mat_pixel.cpp#L780-L790)<div id="refer-anchor-3"></div>
 
 - [3] [Ldpe2G/ArmNeonOptimization](https://github.com/Ldpe2G/ArmNeonOptimization/blob/6f20bfd79327b1b1a5267880651ff2b31b6c15d6/armAssembly/assemblyEx2Rgb2Gray.cpp#L81-L227)
 
@@ -68,9 +64,13 @@ image size: h=4032, w=3024
 
 - [Neon Intrinsics查询 - 官方在线版](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/intrinsics)
 
-- [Neon Intrinsics查询 - fengbingchun整理版，部分带sse等价解释](https://blog.csdn.net/fengbingchun/article/details/38085781)
+- [Neon Intrinsics查询 - fengbingchun整理版，部分带sse等价解释](https://blog.csdn.net/fengbingchun/article/details/38085781)，部分intrinsics缺失
 
 - [Neon Intrinsics - 按类型整理 - EmSoftEn的博客](https://blog.csdn.net/emsoften/article/details/51718763)
+
+- [gcc在线文档 - ARM-NEON-Intrinsics](https://gcc.gnu.org/onlinedocs/gcc/ARM-NEON-Intrinsics.html) 已失效，gcc最新版已经找不到 ARM NEON Intrinsics了
+
+- [gcc-4.8.4 - ARM-NEON-Intrinsics](https://gcc.gnu.org/onlinedocs/gcc-4.8.4/gcc/ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics)，可访问
 
 **Assembler**:
 
@@ -81,6 +81,29 @@ image size: h=4032, w=3024
 - [arm内联汇编入门(下) - 梁德澎](https://aijishu.com/a/1060000000116431)
 
 - [ARM GCC 内联汇编参考手册 - 中文翻译版](https://github.com/tidyjiang8/arm-gcc-inline-assembler/blob/master/src/arm-gcc-inline-assembler.md)
+
+- [gcc在线文档 - 在C中使用汇编](https://gcc.gnu.org/onlinedocs/gcc/Using-Assembly-Language-with-C.html#Using-Assembly-Language-with-C)
+
+- [arm neon常用汇编指令 - 章小龙](https://zhuanlan.zhihu.com/p/64025085)
+
+| 指令类型 | A32/T32  |    A64   |
+| -------- | -------- |--------- |
+| 访存预取 | pld [%0, #192] |prfm pldl1keep, [%0, #192] |
+| 访存读   | vld1.s32 {q0}, [%0]! | ld1 {v1.4s}, [%0], #16 |
+| 访存写   | vst1.s32 {q0}, [%0]! | st1 {v1.4s}, [%0], #16 |
+| 浮点计算 | vmla.f32 q10, q14, %f18[0]<br/>vmul.f32 q0, q8, %e18[1] | fmla v6.4s, v8.4s, %18.s[0] <br/>fmul v21.4s, v21.4s, %18.s[1] |
+| 整型计算 | vmull.s16 q10, %P6, d0[0]<br/>vmlal.s16 q13, %P6, d0[1] | Smull v10.4s, %6.4h, v0.h[0]<br/>Smull2 v10.4s, %6.8h, v0.h[0]<br/>smlal v13.4s, %6.4h, v0.h[1]<br/>smlal2 v5.4s, %6.8h, v1.h[0] |
+| 搬运常数<br/>到寄存器 | vmov.f32 q6, #6.0<br/>vmov.s32 q7, #0| FMOV v11.4s, #6.0<br/>MOVI v10.4s, #0 |
+| 复制<br/>寄存器 | vdup.f32 q6, d0[0]<br/>vdup.f32 q6,r1|DUP v6.4s,v0.s[0]<br/>DUP v6.4s, w1|
+| 浮点最大最小值 | vmin.f32 q0, q0, q6<br/>vmax.f32 q0, q0, q7| FMAX v0.4s, v0.4s, v10.4s<br/>FMIN v0.4s, v0.4s, v11.4s|
+| 转置 | vtrn.s32 q0, q1<br/>vtrn.s32 q2, q3 | TRNI v5.4s, v7.4s, v8.4s<br/> TRN2 v6.4s, v7.4s, v8.4s |
+| 减法 | subs %0, #1 | subs %w0, %w0, #1 |
+| 加法 | Add %0, #16<br/>vadd.f32 q10, q10, q4|Add %x0, %x0, #16<br/>FADD V10.4S, V10.4S, v4.4s|
+|S8_2_s16 |vmovl.s8 q1, d0<br/>vmovl.s8 q1, d1| SSHLL V1.8H,V0.8B,#0<br/>SSHLL2 V1.8H,V0.16B,#0 |
+|s32_2_f32 | vcvt.f32.s32 q10, q10| scvtf v20.4s, v20.4s |
+|s32_2_s32 | vcvtr.s32.f32 s0, s0 | fcvtas v20.4s, v20.4s|
+|s32_2_s16 | vqmovn.s32 d20, q0 | sqxtn v7.4h, v20.4s<br/>sqxtn2 v7.8h, v21.4s|
+
 
 **全能系列**
 
@@ -111,3 +134,25 @@ image size: h=4032, w=3024
         float32x4_t val[4];
     } float32x4x4_t;
     ```
+
+4. arm32不支持double，arm64才支持，从`${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/9.0.8/include/arm_neon.h`知道：
+```c++
+typedef float float32_t;
+typedef __fp16 float16_t;
+#ifdef __aarch64__
+typedef double float64_t;                                                                                                          
+#endif
+```
+
+5. `poly8_t`和`poly16_t`这样的类型，常规计算用不到，它们是[为加密算法和CRC哈希校验准备的](https://stackoverflow.com/questions/22224282/arm-neon-and-poly8-t-and-poly16-t)。
+
+6. VFP寄存器armv7架构包含16个VFP寄存器（32bit），S0-S15。
+
+7. NEON和VFP的区别: VFP是加速浮点计算的硬件不具备数据并行能力，同时VFP更尽兴双精度浮点数（double）的计算，NEON只有单精度浮点计算能力。更多请参考 [stackoverflow:neon vs vfp](https://link.zhihu.com/?target=http%3A//stackoverflow.com/questions/4097034/arm-cortex-a8-whats-the-difference-between-vfp-and-neon)
+
+8. 区分arm32和arm64的汇编指令：带了前缀v的就是Armv7 32bit指令的标志，不带v的是arm64-v8a的。例如：
+```
+"vld3.u8    {d0-d2}, [%1]       \n"           // armv7汇编
+
+"ld3    { v0.16b, v1.16b, v2.16b }, [%1]\n"   // armv8汇编
+```
