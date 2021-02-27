@@ -1,22 +1,17 @@
 #include "rgb2gray.h"
 #include "dotproduct/pixel_simd.h"
 
-void rgb2bgr_naive(unsigned char* src_buf, size_t height, size_t width, size_t src_linebytes, unsigned char* dst_buf, size_t dst_linebytes)
+void rgb2bgr_naive(unsigned char* src_buf, size_t height, size_t width, unsigned char* dst_buf)
 {
-    size_t src_idx = 0;
-    size_t dst_idx = 0;
-    for (size_t i=0; i<height; i++) {
-        for (size_t j=0; j<width; j++) {
-            src_idx = i*src_linebytes + j*3;
-            dst_idx = i*dst_linebytes + j*3;
-            dst_buf[dst_idx+2] = src_buf[src_idx];
-            dst_buf[dst_idx+1] = src_buf[src_idx+1];
-            dst_buf[dst_idx]   = src_buf[src_idx+2];
-        }
+    size_t len = height * width * 3;
+    for (size_t i=0; i<len; i+=3) {
+        dst_buf[i+2] = src_buf[i];
+        dst_buf[i+1] = src_buf[i+1];
+        dst_buf[i]   = src_buf[i+2];
     }
 }
 
-void rgb2bgr_idxopt(unsigned char* src_buf, size_t height, size_t width, size_t src_linebytes, unsigned char* dst_buf, size_t dst_linebytes)
+void rgb2bgr_idxopt(unsigned char* src_buf, size_t height, size_t width, unsigned char* dst_buf)
 {
     size_t src_idx = 0;
     size_t dst_idx = 0;
@@ -26,26 +21,20 @@ void rgb2bgr_idxopt(unsigned char* src_buf, size_t height, size_t width, size_t 
     unsigned char* dst0 = dst_buf;
     unsigned char* dst1 = dst_buf+1;
     unsigned char* dst2 = dst_buf+2;
-    size_t src_gap = src_linebytes - width*3;
-    size_t dst_gap = dst_linebytes - width*3;
     for (size_t i=0; i<height; i++) {
         for (size_t j=0; j<width; j++) {
             *dst2 = *src0; dst2+=3; src0+=3;
             *dst1 = *src1; dst1+=3; src1+=3;
             *dst0 = *src2; dst0+=3; src2+=3;
         }
-        dst0+=dst_gap; dst1+=dst_gap; dst2+=dst_gap;
-        src0+=src_gap; src1+=src_gap; src2+=src_gap;
     }
 }
 
-void rgb2bgr_asimd(unsigned char* src_buf, size_t height, size_t width, size_t src_linebytes, unsigned char* dst_buf, size_t dst_linebytes)
+void rgb2bgr_asimd(unsigned char* src_buf, size_t height, size_t width, unsigned char* dst_buf)
 {
     size_t used_linebytes = width * 3;
     unsigned char* src_linebuf = src_buf;
     unsigned char* dst_linebuf = dst_buf;
-    size_t src_line_gap = src_linebytes - used_linebytes;
-    size_t dst_line_gap = dst_linebytes - used_linebytes;
 
 #ifdef PIXEL_SIMD_NEON
     uint8x8x3_t v;
@@ -74,8 +63,6 @@ void rgb2bgr_asimd(unsigned char* src_buf, size_t height, size_t width, size_t s
             dst_linebuf += 3;
             src_linebuf += 3;
         }
-        src_linebuf += src_line_gap;
-        dst_linebuf += dst_line_gap;
     }
 }
 
@@ -116,7 +103,7 @@ void rgb2bgr_asm_naive(unsigned char* src_buf, size_t height, size_t width, size
 // still slow than naive implementation
 // disassembling naive implementation is required.
 // ref https://aijishu.com/a/1060000000116431
-void rgb2bgr_asm(unsigned char* src_buf, size_t height, size_t width, size_t src_linebytes, unsigned char* dst_buf, size_t dst_linebytes)
+void rgb2bgr_asm(unsigned char* src_buf, size_t height, size_t width, unsigned char* dst_buf)
 {
 #ifdef __aarch64__
     size_t used_linebytes = width * 3;
@@ -126,8 +113,6 @@ void rgb2bgr_asm(unsigned char* src_buf, size_t height, size_t width, size_t src
     size_t remain = used_linebytes % step;
     size_t vec_size = used_linebytes - remain;
     size_t pre_neon_len = vec_size / step;
-    size_t src_line_gap = src_linebytes - used_linebytes;
-    size_t dst_line_gap = dst_linebytes - used_linebytes;
     for (size_t i=0; i<height; i++) {
         size_t neon_len = pre_neon_len;
         __asm__ volatile(
@@ -152,29 +137,24 @@ void rgb2bgr_asm(unsigned char* src_buf, size_t height, size_t width, size_t src
             dst_linebuf[j+1] = src_linebuf[j+1];
             dst_linebuf[j+2] = src_linebuf[j];
         }
-        dst_linebuf += dst_line_gap;
-        src_linebuf += src_line_gap;
     }
 #endif
 }
 
-void rgb2bgr_inplace_naive(unsigned char* buf, size_t height, size_t width, size_t linebytes)
+void rgb2bgr_inplace_naive(unsigned char* buf, size_t height, size_t width)
 {
     unsigned char tmp = 0;
-    size_t idx = 0;
-    for (size_t i=0; i<height; i++) {
-        for (size_t j=0; j<width; j++) {
-            idx = i*linebytes + j*3;
-            tmp = buf[idx];
-            buf[idx] = buf[idx+2];
-            buf[idx+2] = tmp;
-        }
+    size_t len = height * width *3;
+    for (size_t i=0; i<len; i+=3) {
+        tmp = buf[i];
+        buf[i] = buf[i+2];
+        buf[i+2] = tmp;
     }
 }
 
 // release mode: nearly same fast as rgb2bgr_inplace_naive
 // debug mode: 3x faster than rgb2bgr_inplace_naive
-void rgb2bgr_inplace_naive2(unsigned char* buf, size_t height, size_t width, size_t linebytes)
+void rgb2bgr_inplace_naive2(unsigned char* buf, size_t height, size_t width)
 {
     size_t used_linebytes = width * 3;
     size_t step = 12;
@@ -260,7 +240,7 @@ void rgb2bgr_inplace_naive2(unsigned char* buf, size_t height, size_t width, siz
     }
 }
 
-void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width, size_t linebytes)
+void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width)
 {
 #ifdef __aarch64__
     size_t used_linebytes = width * 3;
@@ -269,7 +249,6 @@ void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width, size_t
     size_t remain = used_linebytes % step;
     size_t vec_size = used_linebytes - remain;
     size_t pre_neon_len = vec_size / step;
-    size_t line_gap = linebytes - used_linebytes;
     for (size_t i=0; i<height; i++) {
         size_t neon_len = pre_neon_len;
         __asm__ volatile(
@@ -292,7 +271,6 @@ void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width, size_t
             linebuf[j] = linebuf[j+2];
             linebuf[j+2] = tmp;
         }
-        linebuf += line_gap;
     }
 #endif
 }

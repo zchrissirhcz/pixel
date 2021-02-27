@@ -23,10 +23,8 @@ int main() {
     cv::Size size = image_rgb.size();
     size_t height = (size_t)size.height;
     size_t width = (size_t)size.width;
-    size_t rgb_linebytes = width * 3;
 
     unsigned char* gray_buf = NULL;
-    size_t gray_linebytes = width;
 
     cv::Mat gray_naive(size, CV_8UC1);
     cv::Mat gray_fixed(size, CV_8UC1);
