@@ -39,21 +39,21 @@ int main() {
 
     gray_buf = gray_naive.data;
     t_start = pixel_get_current_time();
-    pixel_rgb2gray_naive(rgb_buf, height, width, rgb_linebytes, gray_buf, gray_linebytes);
+    pixel_rgb2gray_naive(rgb_buf, height, width, gray_buf);
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2gray naive, size h=%zu, w=%zu, time cost %.6lf ms\n", height, width, t_cost);
     cv::imwrite("sky_gray_naive.bmp", gray_naive);
 
     gray_buf = gray_fixed.data;
     t_start = pixel_get_current_time();
-    pixel_rgb2gray_fixed(rgb_buf, height, width, rgb_linebytes, gray_buf, gray_linebytes);
+    pixel_rgb2gray_fixed(rgb_buf, height, width, gray_buf);
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2gray fixed, size h=%zu, w=%zu, time cost %.6lf ms\n", height, width, t_cost);
     cv::imwrite("sky_gray_fixed.bmp", gray_fixed);
     
     gray_buf = gray_fixed_asimd.data;
     t_start = pixel_get_current_time();
-    pixel_rgb2gray_fixed_asimd(rgb_buf, height, width, rgb_linebytes, gray_buf, gray_linebytes);
+    pixel_rgb2gray_fixed_asimd(rgb_buf, height, width, gray_buf);
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2gray fixed asimd, size h=%zu, w=%zu, time cost %.6lf ms\n", height, width, t_cost);
     cv::imwrite("sky_gray_asimd.bmp", gray_fixed_asimd);
@@ -63,17 +63,10 @@ int main() {
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2gray, opencv, size h=%zu, w=%zu, time cost %.6lf ms\n", height, width, t_cost);
     cv::imwrite("sky_gray_opencv.bmp", gray_opencv);
-    
-    gray_buf = gray_fixed_asm0.data;
-    t_start = pixel_get_current_time();
-    pixel_rgb2gray_fixed_asm0(rgb_buf, height, width, rgb_linebytes, gray_buf, gray_linebytes);
-    t_cost = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2gray, fixed asm0, size h=%zu, w=%zu, time cost %.6lf ms\n", height, width, t_cost);
-    cv::imwrite("sky_gray_fixed_asm0.bmp", gray_fixed_asm0);
 
     gray_buf = gray_fixed_asm.data;
     t_start = pixel_get_current_time();
-    pixel_rgb2gray_fixed_asm(rgb_buf, height, width, rgb_linebytes, gray_buf, gray_linebytes);
+    pixel_rgb2gray_fixed_asm(rgb_buf, height, width, gray_buf);
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2gray, fixed asm, size h=%zu, w=%zu, time cost %.6lf ms\n", height, width, t_cost);
     cv::imwrite("sky_gray_fixed_asm.bmp", gray_fixed_asm);
