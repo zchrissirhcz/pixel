@@ -64,6 +64,13 @@ image size: h=4032, w=3024 @ XiaoMI8(QCOM845)
 
 - [On iOS how to quickly convert RGB24 to BGR24?](https://stackoverflow.com/a/11684331/2999096)
 
+## boxfilter
+
+
+### References
+
+- [移动端arm cpu优化学习笔记----一步步优化盒子滤波（Box Filter）](https://zhuanlan.zhihu.com/p/64522357)
+
 ## Neon Links
 
 **examples**
