@@ -2,8 +2,7 @@
 #include <stdint.h>
 #include "dotproduct/pixel_simd.h"
 
-static void pixel_rgb2gray_fast2(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes);
-static void HYW_rgb2gray(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes, int mode);
+static void HYW_rgb2gray(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf, int mode);
 
 
 void pixel_rgb2gray_naive(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf)
@@ -202,8 +201,10 @@ static inline uint8_t max3(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 // 《图像视频滤镜与人像美颜美妆算法解析》 by Hu Yaowu et al.  `HYW` is short for its author.
-void HYW_rgb2gray(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes, int mode)
+void HYW_rgb2gray(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf, int mode)
 {
+    size_t rgb_linebytes = width * 3;
+    size_t gray_linebytes = width;
     switch(mode) {
         case 0: // 均值灰度化
         {
