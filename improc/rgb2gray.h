@@ -7,16 +7,13 @@
 extern "C" {
 #endif
 
-void pixel_rgb2gray_naive(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes);
+void pixel_rgb2gray_naive(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf);
 
-void pixel_rgb2gray_fixed(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes);
+void pixel_rgb2gray_fixed(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf);
 
-void pixel_rgb2gray_fixed_asimd(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes);
+void pixel_rgb2gray_fixed_asimd(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf);
 
-void pixel_rgb2gray_fixed_asm(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes);
-
-void pixel_rgb2gray_fixed_asm0(unsigned char* rgb_buf, size_t height, size_t width, size_t rgb_linebytes, unsigned char* gray_buf, size_t gray_linebytes);
-
+void pixel_rgb2gray_fixed_asm(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf);
 
 #ifdef __cplusplus
 }
