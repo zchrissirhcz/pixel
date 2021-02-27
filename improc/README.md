@@ -8,10 +8,10 @@ image size: h=4032, w=3024
 
 | id | implementation | armv8 release | armv8 debug | armv7 release | armv7 debug |
 | ---| -------------- | ---------- | ----------- | ------------ | ------------ |
-| 1  | float       |  42 ms   |    |  57 ms  |   208 ms |
-| 2  | fixed point[<sup>1</sup>](#refer-anchor-1) | 11 ms |   |  30 ms | 203 ms |
-| 3  | fixed point + arm neon[<sup>2</sup>](#refer-anchor-2) | 10~13 ms |  | 9.7 ms | 87 ms |
-| 4  | opencv 4.5.0 | 7~13 ms |  |  11 ms | 12 ms |
+| 1  | float       |  42 ms   |  217 ms  |  57 ms  |   208 ms |
+| 2  | fixed point[<sup>1</sup>](#refer-anchor-1) | 11 ms | 172 ms  |  30 ms | 203 ms |
+| 3  | fixed point + arm neon[<sup>2</sup>](#refer-anchor-2) | 10~13 ms | 81 ms | 9.7 ms | 87 ms |
+| 4  | opencv 4.5.0 | 7~18 ms | 20 ms |  11 ms | 12 ms |
 | 5  | asm     |    |       |     10 ms |  12 ms |
 | 6  | float + assembly[<sup>3</sup>](#refer-anchor-3) | 14 ms | - | - | - |
 
@@ -37,28 +37,32 @@ image size: h=4032, w=3024
 
 **rgb2bgr**
 
-| id | implementation | armv8 release | armv8 debug |
-| --- | -------------- | --------- | -------------|
-| 1   | naive          | 20.3 ms|    190 ms |
-| 2   | index optimized| 13/24 ms |  90 ms |
-| 3   | neon intrinsic | 33 ms  |    270 ms |
-| 4   | asm            | 19 ms  |  19 ms |
-| 5   | opencv         | 16 ms  |  18 ms |
+| id | implementation | armv8 release | armv8 debug | armv7 release | armv7 debug |
+| --- | -------------- | --------- | -------------| --------------- | ----------- |
+| 1   | naive          | 20.3 ms|    190 ms |      |      |
+| 2   | index optimized| 13/24 ms |  90 ms |       |      |
+| 3   | neon intrinsic | 33 ms  |    270 ms |      |      |
+| 4   | asm            | 19 ms  |  19 ms |         |      |
+| 5   | opencv         | 16 ms  |  18 ms |         |      |
 
 **rgb2bgr_inplace**
 
-| id | implementation | armv8 release | armv8 debug | 备注 |
-| --- | -------------- | --------- | ---------- | -------- |
-| 1   | naive          | 10 ms    |   134 ms |  - |
-| 2   | naive2         | 11 ms    |    43 ms |  - |
-| 3   | asm            | 5.5 ms   |    6 ms  |  **比OpenCV快5倍** |
-| 4   | opencv         | 27 ms    |    29 ms | - |
+| id | implementation | armv8 release | armv8 debug | armv7 release | armv7 debug | 备注    |
+| --- | -------------- | ----------- | ------------ | ------------- | ----------- | ------- |
+| 1   | naive          | 10 ms    |   134 ms |      |       |      |
+| 2   | naive2         | 11 ms    |    43 ms |      |       |      |
+| 3   | asm            | 5.5 ms   |    6 ms  |      |       |  armv8 release **比OpenCV快5倍** |
+| 4   | opencv         | 27 ms    |    29 ms |      |       |      |
 
 ### References
 
 - [性能优化篇（4）：NEON优化案例——图像颜色转换之RGB到BGR（aarch64版）](https://blog.csdn.net/wohenfanjian/article/details/103407259)
 
 ## Neon Links
+
+**examples**
+
+[rgba2gray - neon](https://github.com/carlj/NEON-ASM-BGRA-to-Grayscale-conversion/blob/master/Classes/NEON_ASMViewController.m)
 
 **Intrinscs**:
 
@@ -94,7 +98,7 @@ image size: h=4032, w=3024
 | 浮点计算 | vmla.f32 q10, q14, %f18[0]<br/>vmul.f32 q0, q8, %e18[1] | fmla v6.4s, v8.4s, %18.s[0] <br/>fmul v21.4s, v21.4s, %18.s[1] |
 | 整型计算 | vmull.s16 q10, %P6, d0[0]<br/>vmlal.s16 q13, %P6, d0[1] | Smull v10.4s, %6.4h, v0.h[0]<br/>Smull2 v10.4s, %6.8h, v0.h[0]<br/>smlal v13.4s, %6.4h, v0.h[1]<br/>smlal2 v5.4s, %6.8h, v1.h[0] |
 | 搬运常数<br/>到寄存器 | vmov.f32 q6, #6.0<br/>vmov.s32 q7, #0| FMOV v11.4s, #6.0<br/>MOVI v10.4s, #0 |
-| 复制<br/>寄存器 | vdup.f32 q6, d0[0]<br/>vdup.f32 q6,r1|DUP v6.4s,v0.s[0]<br/>DUP v6.4s, w1|
+| 复制<br/>寄存器 | vdup.f32 q6, d0[0]<br/>vdup.f32 q6,r1(似乎写错了)|DUP v6.4s,v0.s[0]<br/>DUP v6.4s, w1|
 | 浮点最大最小值 | vmin.f32 q0, q0, q6<br/>vmax.f32 q0, q0, q7| FMAX v0.4s, v0.4s, v10.4s<br/>FMIN v0.4s, v0.4s, v11.4s|
 | 转置 | vtrn.s32 q0, q1<br/>vtrn.s32 q2, q3 | TRNI v5.4s, v7.4s, v8.4s<br/> TRN2 v6.4s, v7.4s, v8.4s |
 | 减法 | subs %0, #1 | subs %w0, %w0, #1 |
@@ -116,6 +120,8 @@ image size: h=4032, w=3024
 - [aarch64 mix assembly and intrinsic（汇编和intrinsic绑定）- ncnn文档](https://github.com/Tencent/ncnn/wiki/aarch64-mix-assembly-and-intrinsic)
 
 - [arm a53 a55 双发射问题 - ncnn文档](https://github.com/Tencent/ncnn/wiki/arm-a53-a55-dual-issue)
+
+- [NEON™ Programmer's Guide 1.0 (armv7 neon文档)](https://developer.arm.com/documentation/den0018/a/)
 
 **TODO系列**
 
