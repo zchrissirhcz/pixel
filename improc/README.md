@@ -4,13 +4,13 @@
 
 ## rgb2gray
 
-image size: h=4032, w=3024
+image size: h=4032, w=3024 @ XiaoMI8(QCOM845)
 
 | id | implementation | armv8 release | armv8 debug | armv7 release | armv7 debug |
 | ---| -------------- | ---------- | ----------- | ------------ | ------------ |
 | 1  | float       |  42 ms   |  157 ms  |  59 ms  |   152 ms |
 | 2  | fixed point[<sup>1</sup>](#refer-anchor-1) | 11 ms | 128 ms  |  30 ms | 119 ms |
-| 3  | fixed point + arm neon[<sup>2</sup>](#refer-anchor-2) | 10~13 ms | 81 ms | 9.5 ms | 80 ms |
+| 3  | fixed point + neon intrinsic[<sup>2</sup>](#refer-anchor-2) | 10~13 ms | 81 ms | 9.5 ms | 80 ms |
 | 4  | opencv 4.5.0 | 7-18 ms | 10-20 ms |  11 ms | 11 ms |
 | 5  | asm     | 9.4 ms |  9.4 ms   |     10 ms |  10 ms |
 | 6  | float + assembly[<sup>3</sup>](#refer-anchor-3) | 14 ms | - | - | - |
@@ -33,7 +33,7 @@ image size: h=4032, w=3024
 - [6] [A survery fast BGRA to grayscale conversion on iPhone](https://computer-vision-talks.com/2011-02-08-a-very-fast-bgra-to-grayscale-conversion-on-iphone/)
 ## rgb2bgr
 
-image size: h=4032, w=3024
+image size: h=4032, w=3024 @ XiaoMI8(QCOM845)
 
 **rgb2bgr**
 
@@ -57,6 +57,12 @@ image size: h=4032, w=3024
 ### References
 
 - [性能优化篇（4）：NEON优化案例——图像颜色转换之RGB到BGR（aarch64版）](https://blog.csdn.net/wohenfanjian/article/details/103407259)
+
+- [Arm blog - coding-for-neon---part-1-load-and-stores](https://community.arm.com/developer/ip-products/processors/b/processors-ip-blog/posts/coding-for-neon---part-1-load-and-stores)
+
+- [intrinsics-neon-swap-elements-in-vector - StackOverFlow](https://stackoverflow.com/questions/39514952/intrinsics-neon-swap-elements-in-vector/39519421#39519421)
+
+- [On iOS how to quickly convert RGB24 to BGR24?](https://stackoverflow.com/a/11684331/2999096)
 
 ## Neon Links
 
@@ -108,6 +114,8 @@ image size: h=4032, w=3024
 |s32_2_s32 | vcvtr.s32.f32 s0, s0 | fcvtas v20.4s, v20.4s|
 |s32_2_s16 | vqmovn.s32 d20, q0 | sqxtn v7.4h, v20.4s<br/>sqxtn2 v7.8h, v21.4s|
 
+- [Confusion about different clobber description for arm inline assembly - StackOverFlow](https://stackoverflow.com/questions/65056624/confusion-about-different-clobber-description-for-arm-inline-assembly)
+
 
 **全能系列**
 
@@ -122,6 +130,10 @@ image size: h=4032, w=3024
 - [arm a53 a55 双发射问题 - ncnn文档](https://github.com/Tencent/ncnn/wiki/arm-a53-a55-dual-issue)
 
 - [NEON™ Programmer's Guide 1.0 (armv7 neon文档)](https://developer.arm.com/documentation/den0018/a/)
+
+**Cache系列**
+
+- [性能优化篇（4）：NEON优化案例——图像颜色转换之RGB到BGR（aarch64版）](https://blog.csdn.net/wohenfanjian/article/details/103407259)
 
 **TODO系列**
 
