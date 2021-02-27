@@ -195,34 +195,34 @@ void pixel_rgb2gray_fixed_asm0(unsigned char* rgb_buf, size_t height, size_t wid
 {
 #ifdef __ARM_NEON
     #ifdef __aarch64__
-    __asm__ volatile(
-        "lsr          %2, %2, #3      \n"
-        "# build the three constants: \n"
-        "mov         r4, #77          \n" // Blue channel multiplier
-        "mov         r5, #151         \n" // Green channel multiplier
-        "mov         r6, #28          \n" // Red channel multiplier
-        "vdup.u8      d4, r4           \n"
-        "vdup.u8      d5, r5           \n"
-        "vdup.u8      d6, r6           \n"
-        "0:                       \n"
-        "# load 8 pixels:             \n"
-        "vld3.u8      {d0-d2}, [%1]!   \n"
-        "# do the weight average:     \n"
-        "vmull.u8    q7, d0, d4       \n"
-        "vmlal.u8    q7, d1, d5       \n"
-        "vmlal.u8    q7, d2, d6       \n"
-        "# shift and store:           \n"
-        "vshrn.u16   d7, q7, #8       \n" // Divide q3 by 256 and store in the d7
-        "vst1.u8      {d7}, [%0]!      \n"
-        "subs        %2, #1       \n" // Decrement iteration count
-        "bne         0b            \n" // Repeat unil iteration count is not zero
+    size_t num_pixels = height * width;
+    asm volatile(
+        "lsr %2, %2, #3 \n"
+        "# build three constant weights: \n"
+        "mov w4, #77 \n"
+        "mov w5, #151 \n"
+        "mov w6, #28 \n"
+        "dup v4.8b, w4 \n"
+        "dup v5.8b, w5 \n"
+        "dup v6.8b, w6 \n"
+        "0: \n"
+        "# load 8 pixels: \n"
+        "ld3 {v0.8b, v1.8b, v2.8b}, [%1], #24 \n"
+        "# do the weight average: \n"
+        "umull v7.8h, v0.8b, v4.8b \n"
+        "umlal v7.8h, v1.8b, v5.8b \n"
+        "umlal v7.8h, v2.8b, v6.8b \n"
+        "shrn v7.8b, v7.8h, #8 \n"
+        "st1 {v7.8b}, [%0], #8 \n"
+        "subs %w2, %w2, #1 \n"
+        "bne 0b \n"
         : "=r"(gray_buf), //%0
         "=r"(rgb_buf), //%1
         "=r"(num_pixels) //%2
         : "0"(gray_buf), 
         "1"(rgb_buf),
         "2"(num_pixels)
-        : "cc", "memory", "r4", "r5", "r6", "q0", "q1", "q2", "q3", "q7"
+        : "cc", "memory", "w4", "w5", "w6", "v0", "v1", "v2", "v4", "v5", "v6", "v7"
     );
     #else
     size_t num_pixels = height * width;
