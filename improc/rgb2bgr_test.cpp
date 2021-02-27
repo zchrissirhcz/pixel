@@ -21,7 +21,6 @@ int main() {
     cv::Size size = image.size();
     size_t height = (int)size.height;
     size_t width = (int)size.width;
-    size_t src_linebytes = width * 3;
 
     cv::Mat mat_naive = cv::Mat(size, CV_8UC3);
     cv::Mat mat_idxopt = cv::Mat(size, CV_8UC3);
@@ -29,7 +28,6 @@ int main() {
     cv::Mat mat_asm = cv::Mat(size, CV_8UC3);
     cv::Mat mat_opencv = cv::Mat(size, CV_8UC3);
 
-    size_t dst_linebytes = width * 3;
     unsigned char* src_buf = image.data;
     unsigned char* dst_buf;
 
@@ -37,25 +35,25 @@ int main() {
 
     dst_buf = mat_naive.data;
     t_start = pixel_get_current_time();
-    rgb2bgr_naive(src_buf, height, width, src_linebytes, dst_buf, dst_linebytes);
+    rgb2bgr_naive(src_buf, height, width, dst_buf);
     t_cost1 = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2bgr, naive impl cost %.4lf ms", t_cost1);
 
     dst_buf = mat_idxopt.data;
     t_start = pixel_get_current_time();
-    rgb2bgr_idxopt(src_buf, height, width, src_linebytes, dst_buf, dst_linebytes);
+    rgb2bgr_idxopt(src_buf, height, width, dst_buf);
     t_cost2 = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2bgr, idxopt cost %.4lf ms", t_cost2);
 
     dst_buf = mat_asimd.data;
     t_start = pixel_get_current_time();
-    rgb2bgr_asimd(src_buf, height, width, src_linebytes, dst_buf, dst_linebytes);
+    rgb2bgr_asimd(src_buf, height, width, dst_buf);
     t_cost3 = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2bgr, asimd cost %.4lf ms", t_cost3);
 
     dst_buf = mat_asm.data;
     t_start = pixel_get_current_time();
-    rgb2bgr_asm(src_buf, height, width, src_linebytes, dst_buf, dst_linebytes);
+    rgb2bgr_asm(src_buf, height, width, dst_buf);
     t_cost4 = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2bgr, asm cost %.4lf ms", t_cost4);
 
@@ -68,6 +66,7 @@ int main() {
     cv::imwrite("sky_rgb_idxopt.bmp", mat_idxopt);
     cv::imwrite("sky_rgb_asimd.bmp", mat_asimd);
     cv::imwrite("sky_rgb_asm.bmp", mat_asm);
+    cv::imwrite("sky_rgb_opencv.bmp", mat_opencv);
 
     // ---------
     double t_cost6, t_cost7, t_cost8, t_cost9;
@@ -78,19 +77,19 @@ int main() {
 
     t_start = pixel_get_current_time();
     src_buf = image_shadow6.data;
-    rgb2bgr_inplace_naive(src_buf, height, width, src_linebytes);
+    rgb2bgr_inplace_naive(src_buf, height, width);
     t_cost6 = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2bgr_inplace, naive impl cost %.4lf ms", t_cost6);
 
     t_start = pixel_get_current_time();
     src_buf = image_shadow7.data;
-    rgb2bgr_inplace_naive2(src_buf, height, width, src_linebytes);
+    rgb2bgr_inplace_naive2(src_buf, height, width);
     t_cost7 = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2bgr_inplace, naive2 impl cost %.4lf ms", t_cost7);
 
     t_start = pixel_get_current_time();
     src_buf = image_shadow8.data;
-    rgb2bgr_inplace_asm(src_buf, height, width, src_linebytes);
+    rgb2bgr_inplace_asm(src_buf, height, width);
     t_cost8 = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2bgr_inplace, asm impl cost %.4lf ms", t_cost8);
 
@@ -99,10 +98,10 @@ int main() {
     t_cost9 = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2bgr_inplace, opencv cost %.4lf ms", t_cost9);
 
-    cv::imwrite("sky_rgb6.bmp", image_shadow6);
-    cv::imwrite("sky_rgb7.bmp", image_shadow7);
-    cv::imwrite("sky_rgb5.bmp", image_shadow8);
-    cv::imwrite("sky_rgb5.bmp", image_shadow9);
+    cv::imwrite("sky_rgb_inplace_naive.bmp", image_shadow6);
+    cv::imwrite("sky_rgb_inpalce_naive2.bmp", image_shadow7);
+    cv::imwrite("sky_rgb_inplace_asm.bmp", image_shadow8);
+    cv::imwrite("sky_rgb_inplace_opencv.bmp", image_shadow9);
 
     return 0;
 }
