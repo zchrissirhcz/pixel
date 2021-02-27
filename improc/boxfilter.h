@@ -1,0 +1,6 @@
+#ifndef PIXEL_IMPROC_BOXFILTER_H
+#define PIXEL_IMPROC_BOXFILTER_H
+
+
+
+#endif
