@@ -71,6 +71,10 @@ image size: h=4032, w=3024 @ XiaoMI8(QCOM845)
 
 - [移动端arm cpu优化学习笔记----一步步优化盒子滤波（Box Filter）](https://zhuanlan.zhihu.com/p/64522357)
 
+- [一份朴实无华的移动端盒子滤波算法优化笔记](https://zhuanlan.zhihu.com/p/170611395)
+
+- [基于NCNN的3x3可分离卷积再思考盒子滤波](https://zhuanlan.zhihu.com/p/181734867)
+
 ## Neon Links
 
 **examples**

@@ -1,5 +1,5 @@
 #include "rgb2gray.h"
-#include "dotproduct/pixel_simd.h"
+#include "simd/pixel_simd.h"
 
 void rgb2bgr_naive(unsigned char* src_buf, size_t height, size_t width, unsigned char* dst_buf)
 {
@@ -60,40 +60,6 @@ void rgb2bgr_asimd(unsigned char* src_buf, size_t height, size_t width, unsigned
         dst_buf += 3;
         src_buf += 3;
     }
-}
-
-void rgb2bgr_asm_naive(unsigned char* src_buf, size_t height, size_t width, size_t src_linebytes, unsigned char* dst_buf, size_t dst_linebytes)
-{
-#ifdef __aarch64__
-    size_t used_linebytes = width * 3;
-    unsigned char* src_linebuf = src_buf;
-    unsigned char* dst_linebuf = dst_buf;
-    for (size_t i=0; i<height; i++) {
-        const size_t step = 48;
-        size_t vec_size = used_linebytes - used_linebytes % step;
-        for (size_t j=0; j<vec_size; j+=step) {
-            __asm__ volatile(
-                "ld3    { v0.16b, v1.16b, v2.16b }, [%1]\n"
-                "mov    v3.16b, v0.16b       \n"
-                "mov    v0.16b, v2.16b       \n"
-                "mov    v2.16b, v3.16b        \n"
-                "st3    { v0.16b, v1.16b, v2.16b }, [%0]"
-                : "=r"(dst_linebuf), //%0
-                "=r"(src_linebuf)    //%1
-                : "0"(dst_linebuf),
-                "1"(src_linebuf)
-                : "cc", "memory", "v0", "v1", "v2"
-            );
-            src_linebuf += step;
-            dst_linebuf += step;
-        }
-        for (size_t j=vec_size; j<used_linebytes; j+=3) {
-            dst_linebuf[j] = src_linebuf[j+2];
-            dst_linebuf[j+1] = src_linebuf[j+1];
-            dst_linebuf[j+2] = src_linebuf[j];
-        }
-    }
-#endif
 }
 
 // still slow than naive implementation
