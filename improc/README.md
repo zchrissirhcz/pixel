@@ -39,20 +39,20 @@ image size: h=4032, w=3024
 
 | id | implementation | armv8 release | armv8 debug | armv7 release | armv7 debug |
 | --- | -------------- | --------- | -------------| --------------- | ----------- |
-| 1   | naive          | 25 ms |  26 ms |       |      |
-| 2   | index optimized| 19 ms |  18 ms |       |      |
-| 3   | neon intrinsic | 19 ms  | 19 ms |       |      |
-| 4   | asm            | 19 ms  | 18 ms |       |      |
-| 5   | opencv         | 15 ms  | 14 ms |       |      |
+| 1   | naive          |  25 ms  |  26 ms  |  27 ms  |  117 ms  |
+| 2   | index optimized|  19 ms  |  18 ms  |  25 ms  |  92 ms   |
+| 3   | neon intrinsic |  19 ms  |  19 ms  |  19 ms  |  41 ms   |
+| 4   | asm            |  19 ms  |  18 ms  |  20 ms  |  22 ms   |
+| 5   | opencv         |  15 ms  |  14 ms  |  15 ms  |  29 ms   |
 
 **rgb2bgr_inplace**
 
 | id | implementation | armv8 release | armv8 debug | armv7 release | armv7 debug | 备注    |
 | --- | -------------- | ----------- | ------------ | ------------- | ----------- | ------- |
-| 1   | naive          | 12 ms    |   12 ms |      |       |      |
-| 2   | naive2         | 12 ms    |   12 ms |      |       |      |
-| 3   | asm            | 6 ms     |   6 ms  |      |       |  armv8 release **比OpenCV快4倍** |
-| 4   | opencv         | 26 ms    |   24 ms |      |       |      |
+| 1   | naive          | 12 ms    |   12 ms |  14 ms  |  88 ms   |  |
+| 2   | naive2         | 12 ms    |   12 ms |  18 ms  |  40 ms   |  |
+| 3   | asm            | 6 ms     |   6 ms  |  6 ms   |  6 ms    |  **比OpenCV快4~5倍** |
+| 4   | opencv         | 26 ms    |   24 ms |  30 ms  |  33 ms   |      |
 
 ### References
 

@@ -119,7 +119,7 @@ void rgb2bgr_asm(unsigned char* src_buf, size_t height, size_t width, unsigned c
         "subs       %2, %2, #1              \n"
         "bne    0b  \n"
         : "=r"(dst_buf), //%0
-        "=r"(src_buf),    //%1
+        "=r"(src_buf),   //%1
         "=r"(neon_len)   //%2
         : "0"(dst_buf),
         "1"(src_buf),
@@ -127,6 +127,24 @@ void rgb2bgr_asm(unsigned char* src_buf, size_t height, size_t width, unsigned c
         : "cc", "memory", "v0", "v1", "v2"
     );
 #else
+    const size_t step = 24;
+    vec_size = total_len - total_len % step;
+    size_t neon_len = vec_size / step;
+    __asm__ volatile(
+        "0: \n"
+        "vld3.u8  {d0-d2}, [%1]! \n"
+        "vswp.u8  d0, d2 \n"
+        "vst3.u8  {d0-d2}, [%0]! \n"
+        "subs  %2, %2, #1 \n"
+        "bne  0b  \n"
+        : "=r"(dst_buf), //%0
+        "=r"(src_buf),   //%1
+        "=r"(neon_len)   //%2
+        : "0"(dst_buf),
+        "1"(src_buf),
+        "2"(neon_len)
+        : "cc", "memory", "q0", "q1", "q2"
+    );
 #endif
     done = vec_size;
 #endif
@@ -239,9 +257,11 @@ void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width)
 {
     size_t done = 0;
     size_t total_len = height * width * 3;
+#ifdef PIXEL_SIMD_NEON
+    size_t vec_size;
 #ifdef __aarch64__
     const size_t step = 48;
-    size_t vec_size = total_len - total_len % step;
+    vec_size = total_len - total_len % step;
     size_t neon_len = vec_size / step;
     __asm__ volatile(
         "0: \n"
@@ -258,9 +278,26 @@ void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width)
         "1"(neon_len)
         : "cc", "memory", "v0", "v1", "v2"
     );
+#else
+    const size_t step = 24;
+    vec_size = total_len - total_len % step;
+    size_t neon_len = vec_size / step;
+    __asm__ volatile(
+        "0: \n"
+        "vld3.u8  {d0-d2}, [%0] \n"
+        "vswp.u8  d0, d2 \n"
+        "vst3.u8  {d0-d2}, [%0]! \n"
+        "subs  %1, %1, #1 \n"
+        "bne  0b \n"
+        : "=r"(buf), //%0
+        "=r"(neon_len)   //%1
+        : "0"(buf),
+        "1"(neon_len)
+        : "cc", "memory", "q0", "q1", "q2"
+    );
+#endif // __aarch64__
     done = vec_size;
-#endif
-
+#endif // PIXEL_SIMD_NEON
     for ( ; done<total_len; done+=3) {
         unsigned char tmp = buf[0];
         buf[0] = buf[2];
