@@ -18,8 +18,8 @@ void threshold_gray_asimd(unsigned char* input_gray, size_t height, size_t width
 #ifdef PIXEL_SIMD_NEON
     size_t step = 16;
     size_t vec_size = total_len - total_len % step;
-    uint8x16_t v1, v2;
-    uint8x16_t vmask_gt, vmask_le;
+    uint8x16_t v1;
+    uint8x16_t vmask_gt;
     uint8x16_t vthresh = vdupq_n_u8(thresh);
     uint8x16_t vmaxval = vdupq_n_u8(maxval);
     uint8x16_t vminval = vdupq_n_u8(minval);
@@ -27,10 +27,8 @@ void threshold_gray_asimd(unsigned char* input_gray, size_t height, size_t width
         v1 = vld1q_u8(input_gray);
         input_gray += step;
         vmask_gt = vcgtq_u8(v1, vthresh);
-        v2 = vbslq_u8(vmask_gt, vmaxval, v1);
-        vmask_le = vmvnq_u8(vmask_gt); // Bitwise not
-        v2 = vbslq_u8(vmask_le, vminval, v2);
-        vst1q_u8(output_gray, v2);
+        v1 = vbslq_u8(vmask_gt, vmaxval, vminval);
+        vst1q_u8(output_gray, v1);
         output_gray += step;
     }
     done = vec_size;
@@ -76,11 +74,8 @@ void threshold_gray_asm(unsigned char* input_gray, size_t height, size_t width, 
         "0: \n"
         "vld1.u8 {q3}, [%0]! \n"
         "vcgt.u8 q4, q3, q0 \n" // vmask_gt
-        //"vmvn.u8 q5, q4 \n" // will cause wrong result
-        "vcle.u8 q5, q0, q3 \n" // vmask_le  // wierd, why vclt.u8 q5, q3, q0 generate wrong result?
-        "vbsl.u8 q3, q4, q1 \n" // > thresh, set to maxval
-        "vbsl.u8 q3, q5, q2 \n" // <= thresh, set to minval
-        "vst1.u8 {q3}, [%1]! \n"
+        "vbsl.u8 q4, q1, q2 \n"
+        "vst1.u8 {q4}, [%1]! \n"
         "subs %2, #1 \n"
         "bne 0b \n"
         : "=r"(input_gray), //%0
@@ -92,7 +87,7 @@ void threshold_gray_asm(unsigned char* input_gray, size_t height, size_t width, 
         "r"(thresh), //%6
         "r"(maxval), //%7
         "r"(minval) //%8
-        : "cc", "memory", "q0", "q1", "q2", "q3", "q4", "q5"
+        : "cc", "memory", "q0", "q1", "q2", "q3", "q4"
     );
     #endif // __aarch64__
     done = vec_size;
