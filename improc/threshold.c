@@ -50,8 +50,14 @@ void threshold_gray_asm(unsigned char* input_gray, size_t height, size_t width, 
     size_t neon_len = vec_size / step;
     #if __aarch64__
     __asm__ volatile(
+        "dup v0.16b, %w6 \n"
+        "dup v1.16b, %w7 \n"
+        "dup v2.16b, %w8 \n"
         "0: \n"
-        "#TODO....."
+        "ld1 {v3.16b}, [%0], #16 \n"
+        "cmhi v4.16b, v3.16b, v0.16b \n"
+        "bsl v4.16b, v1.16b, v2.16b \n"
+        "st1 {v4.16b}, [%1], #16 \n"
         "subs %w2, %w2, #1 \n"
         "bne 0b \n"
         : "=r"(input_gray), //%0
@@ -63,11 +69,10 @@ void threshold_gray_asm(unsigned char* input_gray, size_t height, size_t width, 
         "r"(thresh), //%6
         "r"(maxval), //%7
         "r"(minval) //%8
-        : "cc", "memory", "v0", "v1", "v2", "v3", "v4", "v5"
+        : "cc", "memory", "v0", "v1", "v2", "v3", "v4"
     );
     #else
     __asm__ volatile(
-        //"lsr    %2, %2, #3 \n"
         "vdup.u8 q0, %6 \n" //vthresh
         "vdup.u8 q1, %7 \n" //vmaxval
         "vdup.u8 q2, %8 \n" //vminval

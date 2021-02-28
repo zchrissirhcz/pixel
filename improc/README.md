@@ -79,9 +79,9 @@ OpenCV 4.5.1
 | id | implementation | PC release | armv8 release | armv8 debug | armv7 release | armv7 debug |
 | -- | ------------   | ---------  | ------------  | ----------- | ------------  | ----------- |
 | 1  | naive          |  4 ms      |     6 ms      |    62 ms    |   19 ms       |     58 ms   |
-| 2  | opencv         |  1~2 ms    |     6 ms      |     6 ms    |   5 ms        |     6 ms    |
-| 3  | neon intrinsic |  -         |     6 ms      |    35 ms    |   7 ms        |     35 ms   |
-| 4  | neon asm       |  -         |               |             |   7 ms        |     7 ms    |
+| 2  | opencv         |  1~2 ms    |     6 ms      |     6 ms    |   6 ms        |     6 ms    |
+| 3  | neon intrinsic |  -         |     6 ms      |    25 ms    |   6 ms        |     25 ms   |
+| 4  | neon asm       |  -         |     7 ms      |     7 ms    |   7 ms        |     7 ms    |
 
 ## boxfilter
 

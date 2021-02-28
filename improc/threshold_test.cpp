@@ -92,7 +92,7 @@ static void test() {
     unsigned char* asm_output_gray = (unsigned char*)malloc(MAXLEN);
     memset(asm_output_gray, 0, MAXLEN);
 
-#if 0
+#if 1
     uint8x16_t vthresh = vdupq_n_u8(thresh);
     uint8x16_t vmaxval = vdupq_n_u8(maxval);
     uint8x16_t vminval = vdupq_n_u8(minval);
@@ -112,6 +112,8 @@ static void test() {
     uint8x16_t v2 = vbslq_u8(vmask_gt, vmaxval, vminval);
     vst1q_u8(asm_output_gray, v2);
 #else
+    #if __aarch64__
+    #else
     __asm__ volatile(
         "vdup.u8 q0, %4 \n" //vthresh
         "vdup.u8 q1, %5 \n" //vmaxval
@@ -129,6 +131,7 @@ static void test() {
         "r"(minval) //%6
         : "cc", "memory", "q0", "q1", "q2", "q3", "q4", "q5"
     );
+    #endif
 #endif
 
     printf("input:\n");
