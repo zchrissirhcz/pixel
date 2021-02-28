@@ -29,7 +29,8 @@ target_include_directories(testbed
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
     if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-        set(OpenCV_DIR "/home/zz/soft/opencv-4.5.1/lib/cmake/opencv4" CACHE PATH "")
+        #set(OpenCV_DIR "/home/zz/soft/opencv-4.5.1/lib/cmake/opencv4" CACHE PATH "") # shared
+        set(OpenCV_DIR "/home/zz/soft/opencv-4.5.1-static/lib/cmake/opencv4" CACHE PATH "") # static
     elseif (ANDROID)
         set(OpenCV_DIR "/home/zz/soft/opencv-4.5.1-android/sdk/native/jni" CACHE PATH "")
     endif()

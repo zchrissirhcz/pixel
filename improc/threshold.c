@@ -1,11 +1,118 @@
 #include "threshold.h"
+#include "simd/pixel_simd.h"
 
-void threshold_gray(unsigned char* input_gray, size_t height, size_t width, unsigned char* output_gray, unsigned char thresh)
+void threshold_gray_naive(unsigned char* input_gray, size_t height, size_t width, unsigned char* output_gray, unsigned char thresh, unsigned char minval, unsigned char maxval)
 {
     size_t total_len = height * width;
     for (size_t done=0; done<total_len; done++) {
-        *output_gray = (input_gray[0]>thresh)?255:0;
+        *output_gray = (input_gray[0]>thresh) ? maxval : minval;
         input_gray++;
         output_gray++;
     }
+}
+
+void threshold_gray_asimd(unsigned char* input_gray, size_t height, size_t width, unsigned char* output_gray, unsigned char thresh, unsigned char minval, unsigned char maxval)
+{
+    size_t total_len = height * width;
+    size_t done = 0;
+#ifdef PIXEL_SIMD_NEON
+    size_t step = 16;
+    size_t vec_size = total_len - total_len % step;
+    uint8x16_t v1, v2;
+    uint8x16_t vmask_gt, vmask_le;
+    uint8x16_t vthresh = vdupq_n_u8(thresh);
+    uint8x16_t vmaxval = vdupq_n_u8(maxval);
+    uint8x16_t vminval = vdupq_n_u8(minval);
+    for (size_t i=0; i<vec_size; i+=step) {
+        v1 = vld1q_u8(input_gray);
+        input_gray += step;
+        vmask_gt = vcgtq_u8(v1, vthresh);
+        v2 = vbslq_u8(vmask_gt, vmaxval, v1);
+        vmask_le = vmvnq_u8(vmask_gt); // Bitwise not
+        v2 = vbslq_u8(vmask_le, vminval, v2);
+        vst1q_u8(output_gray, v2);
+        output_gray += step;
+    }
+    done = vec_size;
+#endif
+    for (; done<total_len; done++) {
+        *output_gray = (input_gray[0]>thresh) ? maxval : minval;
+        input_gray++;
+        output_gray++;
+    }
+}
+
+void threshold_gray_asm(unsigned char* input_gray, size_t height, size_t width, unsigned char* output_gray, unsigned char thresh, unsigned char minval, unsigned char maxval)
+{
+    size_t total_len = height * width;
+    size_t done = 0;
+#ifdef PIXEL_SIMD_NEON
+    size_t step = 16;
+    size_t vec_size = total_len - total_len % step;
+    size_t neon_len = vec_size / step;
+    #if __aarch64__
+    __asm__ volatile(
+        "0: \n"
+        "#TODO....."
+        "subs %w2, %w2, #1 \n"
+        "bne 0b \n"
+        : "=r"(input_gray), //%0
+        "=r"(output_gray), //%1
+        "=r"(neon_len) //%2
+        : "0"(input_gray),
+        "1"(output_gray),
+        "2"(neon_len),
+        "r"(thresh), //%6
+        "r"(maxval), //%7
+        "r"(minval) //%8
+        : "cc", "memory", "v0", "v1", "v2", "v3", "v4", "v5"
+    );
+    #else
+    __asm__ volatile(
+        //"lsr    %2, %2, #3 \n"
+        "vdup.u8 q0, %6 \n" //vthresh
+        "vdup.u8 q1, %7 \n" //vmaxval
+        "vdup.u8 q2, %8 \n" //vminval
+        "0: \n"
+        "vld1.u8 {q3}, [%0]! \n"
+        "vcgt.u8 q4, q3, q0 \n" // vmask_gt
+        //"vmvn.u8 q5, q4 \n" // will cause wrong result
+        "vcle.u8 q5, q0, q3 \n" // vmask_le  // wierd, why vclt.u8 q5, q3, q0 generate wrong result?
+        "vbsl.u8 q3, q4, q1 \n" // > thresh, set to maxval
+        "vbsl.u8 q3, q5, q2 \n" // <= thresh, set to minval
+        "vst1.u8 {q3}, [%1]! \n"
+        "subs %2, #1 \n"
+        "bne 0b \n"
+        : "=r"(input_gray), //%0
+        "=r"(output_gray), //%1
+        "=r"(neon_len) //%2
+        : "0"(input_gray),
+        "1"(output_gray),
+        "2"(neon_len),
+        "r"(thresh), //%6
+        "r"(maxval), //%7
+        "r"(minval) //%8
+        : "cc", "memory", "q0", "q1", "q2", "q3", "q4", "q5"
+    );
+    #endif // __aarch64__
+    done = vec_size;
+#endif // PIXEL_SIMD_NEON
+
+    for (; done<total_len; done++) {
+        *output_gray = (input_gray[0]>thresh) ? maxval : minval;
+        input_gray++;
+        output_gray++;
+    }
+}
+
+// --------------------------------
+
+void threshold_rgb(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf, unsigned char thresh, unsigned char minval, unsigned char maxval)
+{
+    //TODO
+}
+
+void threshold_gray_inplace(unsigned char* gray_buf, size_t height, size_t width, unsigned char thresh, unsigned char minval, unsigned char maxval)
+{
+    //TODO
 }

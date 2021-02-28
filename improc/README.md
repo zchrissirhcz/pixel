@@ -4,7 +4,9 @@
 
 ## rgb2gray
 
-image size: h=4032, w=3024 @ XiaoMI8(QCOM845)
+image size: h=4032, w=3024
+android device: XiaoMI8(QCOM845)
+OpenCV 4.5.1
 
 | id | implementation | armv8 release | armv8 debug | armv7 release | armv7 debug |
 | ---| -------------- | ---------- | ----------- | ------------ | ------------ |
@@ -33,7 +35,9 @@ image size: h=4032, w=3024 @ XiaoMI8(QCOM845)
 - [6] [A survery fast BGRA to grayscale conversion on iPhone](https://computer-vision-talks.com/2011-02-08-a-very-fast-bgra-to-grayscale-conversion-on-iphone/)
 ## rgb2bgr
 
-image size: h=4032, w=3024 @ XiaoMI8(QCOM845)
+image size: h=4032, w=3024
+android device: XiaoMI8(QCOM845)
+OpenCV 4.5.1
 
 **rgb2bgr**
 
@@ -64,9 +68,24 @@ image size: h=4032, w=3024 @ XiaoMI8(QCOM845)
 
 - [On iOS how to quickly convert RGB24 to BGR24?](https://stackoverflow.com/a/11684331/2999096)
 
+
+## threshold
+
+image size: h=4032, w=3024
+android=XiaoMI8(QCOM845),NDK-r21b
+PC=i5-8500, ubuntu20.04, clang11.0
+OpenCV 4.5.1
+
+| id | implementation | PC release | armv8 release | armv8 debug | armv7 release | armv7 debug |
+| -- | ------------   | ---------  | ------------  | ----------- | ------------  | ----------- |
+| 1  | naive          |  4 ms      |     6 ms      |    62 ms    |   19 ms       |     58 ms   |
+| 2  | opencv         |  1~2 ms    |     6 ms      |     6 ms    |   5 ms        |     6 ms    |
+| 3  | neon intrinsic |  -         |     6 ms      |    35 ms    |   7 ms        |     35 ms   |
+| 4  | neon asm       |  -         |               |             |   7 ms        |     7 ms    |
+
 ## boxfilter
 
-
+TBD
 ### References
 
 - [移动端arm cpu优化学习笔记----一步步优化盒子滤波（Box Filter）](https://zhuanlan.zhihu.com/p/64522357)
@@ -148,6 +167,7 @@ image size: h=4032, w=3024 @ XiaoMI8(QCOM845)
 
 **TODO系列**
 
+- 查询 armv7 所有 neon intrinsic 对应的汇编指令语法，见 [Neon Programmer's Guide 1.0 (DEN0018A_neon_programmers_guide.pdf)](https://developer.arm.com/documentation/den0018/a/)
 - 查询 armv7 所有汇编指令？
 - 查询 armv8 所有汇编指令？
 
