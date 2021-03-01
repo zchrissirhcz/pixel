@@ -9,11 +9,6 @@
 #include "common/pixel_log.h"
 #include "common/pixel_benchmark.h"
 
-using std::uniform_int_distribution;
-using std::default_random_engine;
-using std::random_device;
-using std::uniform_real_distribution;
-
 namespace int8 {
     void op_relu_c_naive(int8_t* buf, int len) {
         for (int i=0; i<len; i++) {
@@ -76,34 +71,6 @@ namespace int8 {
     }
 
 } // namespace int8
-
-int get_random_int(int a, int b) {
-    if (a>b) {
-        std::swap(a, b);
-    }
-    static random_device rd;
-    static default_random_engine engine(rd());
-    uniform_int_distribution<int> dist(a, b);
-    return dist(engine);
-}
-
-uint8_t get_random_uint8() {
-    return static_cast<uint8_t>(get_random_int(0, 255));
-}
-
-int8_t get_random_int8() {
-    return static_cast<int8_t>(get_random_int(-128, 127));
-}
-
-float get_random_float(float a, float b) {
-    if (a>b) {
-        std::swap(a, b);
-    }
-    static random_device rd;
-    static default_random_engine engine(rd());
-    uniform_real_distribution<float> dist(a, b);
-    return dist(engine);
-}
 
 void test_op_relu_int8() {
     fprintf(stdout, "--- %s ---\n", __FUNCTION__);
@@ -209,7 +176,9 @@ void test_op_relu_int8() {
 
 
 int main() {
-    test_op_relu_int8();
+    //test_op_relu_int8();
+    test_relu();
+    //test_relu_inplace();
 
     return 0;
 }
