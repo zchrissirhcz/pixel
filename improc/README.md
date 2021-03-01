@@ -10,15 +10,18 @@ image size: h=4032, w=3024
 android device: XiaoMI8(QCOM845)
 OpenCV 4.5.1
 
-| id | implementation | armv8 release | armv8 debug | armv7 release | armv7 debug |
-| ---| -------------- | ---------- | ----------- | ------------ | ------------ |
-| 1  | float       |  42 ms   |  157 ms  |  59 ms  |   152 ms |
-| 2  | fixed point[<sup>1</sup>](#refer-anchor-1) | 11 ms | 128 ms  |  30 ms | 119 ms |
-| 3  | fixed point + neon intrinsic[<sup>2</sup>](#refer-anchor-2) | 10~13 ms | 81 ms | 9.5 ms | 80 ms |
-| 4  | opencv 4.5.0 | 7-18 ms | 10-20 ms |  11 ms | 11 ms |
-| 5  | asm     | 9.4 ms |  9.4 ms   |     10 ms |  10 ms |
-| 6  | float + assembly[<sup>3</sup>](#refer-anchor-3) | 14 ms | - | - | - |
+| id | implementation            | PC Release    | armv8 release | armv8 debug | armv7 release | armv7 debug |
+| ---| ------------------------- | ------------- | ------------- | ----------- | ------------  | ----------- |
+| 1  | float加权                 |     25 ms     |     42 ms     |   157 ms    |    59 ms      |   152 ms    |
+| 2  | opencv                    |      2 ms     |   7-18 ms     | 10-20 ms    |    11 ms      |    11 ms    |
+| 3  | 定点加权                  |     20 ms     |     11 ms     |   128 ms    |    30 ms      |   119 ms    |
+| 4  | neon intrinsic(定点加权)  |     -         |  10~13 ms     |    81 ms    |   9.5 ms      |    80 ms    |
+| 5  | neon asm(定点加权)        |     -         |    9.4 ms     |   9.4 ms    |    10 ms      |    10 ms    |
+| 6  | float平均                 |      9 ms     |    9.4 ms     |    63 ms    |    66 ms      |    66 ms    |
+| 7  | neon intrinsic(float平均) |
+| 8  | neon asm(float平均)       |
 
+`gray = (r+g+b)/3`在armv8上加速明显。
 
 ### References
 
