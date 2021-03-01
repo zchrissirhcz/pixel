@@ -6,10 +6,17 @@
 #include "threshold.h"
 
 #include "common/pixel_benchmark.h"
+#include "simd/pixel_simd.h"
 
+#ifdef PIXEL_SIMD_NEON
 #include <arm_neon.h>
+#endif
 
-int main() {
+static int test_threshold_gray();
+static int test_threshold_rgb();
+
+
+int test_threshold_gray() {
 
     cv::Mat image = cv::imread("sky.png");
     cv::Mat gray;
@@ -61,6 +68,55 @@ int main() {
     return 0;
 }
 
+int test_threshold_rgb()
+{
+    cv::Mat image = cv::imread("sky.png");
+    cv::Size size = image.size();
+    cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
+    size_t height = size.height;
+    size_t width = size.width;
+
+    cv::Mat result_naive(size, CV_8UC1);
+    cv::Mat gray(size, CV_8UC1);
+    cv::Mat result_opencv(size, CV_8UC1);
+    cv::Mat result_asimd(size, CV_8UC1);
+    cv::Mat result_asm(size, CV_8UC1);
+
+    double t_start, t_cost;
+    unsigned char thresh = 120;
+    unsigned char minval = 0;
+    unsigned char maxval = 255;
+    unsigned char* rgb_input = NULL;
+    unsigned char* gray_output = NULL;
+
+    rgb_input = image.data;
+    gray_output = result_naive.data;
+    t_start = pixel_get_current_time();
+    threshold_rgb_naive(rgb_input, height, width, gray_output, thresh, minval, maxval);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("threshold_rgb, naive, time cost %.4lf ms\n", t_cost);
+
+    t_start = pixel_get_current_time();
+    cv::cvtColor(image, gray, cv::COLOR_RGB2GRAY);
+    cv::threshold(gray, result_opencv, thresh, maxval, 0);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("threshold_rgb, opencv, time cost %.4lf ms\n", t_cost);
+    
+    rgb_input = image.data;
+    gray_output = result_asimd.data;
+    t_start = pixel_get_current_time();
+    threshold_rgb_asimd(rgb_input, height, width, gray_output, thresh, minval, maxval);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("threshold_rgb, asimd, time cost %.4lf ms\n", t_cost);
+    
+    cv::imwrite("sky_thresh120_naive.png", result_naive);
+    cv::imwrite("sky_thresh120_opencv.png", result_opencv);
+    cv::imwrite("sky_thresh120_asimd.png", result_asimd);
+
+    return 0;
+}
+
+#ifdef PIXEL_SIMD_NEON
 static void test() {
     //------------------------------
     // prepare input
@@ -152,10 +208,13 @@ static void test() {
     }
     printf("\n");
 }
+#endif // PIXEL_SIMD_NEON
 
-int main2() {
+int main() {
 
-    test();
+    //test();
+    //test_threshold_gray();
+    test_threshold_rgb();
 
     return 0;
 }

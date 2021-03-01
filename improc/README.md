@@ -76,12 +76,32 @@ android=XiaoMI8(QCOM845),NDK-r21b
 PC=i5-8500, ubuntu20.04, clang11.0
 OpenCV 4.5.1
 
+**threshold_gray**
+
+input is gray, output is gray.
+
 | id | implementation | PC release | armv8 release | armv8 debug | armv7 release | armv7 debug |
 | -- | ------------   | ---------  | ------------  | ----------- | ------------  | ----------- |
 | 1  | naive          |  4 ms      |     6 ms      |    62 ms    |   19 ms       |     58 ms   |
 | 2  | opencv         |  1~2 ms    |     6 ms      |     6 ms    |   6 ms        |     6 ms    |
 | 3  | neon intrinsic |  -         |     6 ms      |    25 ms    |   6 ms        |     25 ms   |
 | 4  | neon asm       |  -         |     7 ms      |     7 ms    |   7 ms        |     7 ms    |
+
+**threshold_rgb**
+
+input is rgb, output is gray
+
+| id | implementation | PC release | armv8 release | armv8 debug | armv7 release | armv7 debug |
+| -- | ------------   | ---------  | ------------  | ----------- | ------------  | ----------- |
+| 1  | naive, 浮点    |  28 ms     |  50 ms        |   123 ms    |     42 ms     |  141 ms    |
+| 2  | opencv （两步）|  3~8 ms    |  23 ms        |    23 ms    |     25 ms     |   25  ms   |
+| 3  | naive, 取平均  |  15 ms     |  15 ms        |   107 ms    |    217 ms     |   102 ms   |
+| 4  | naive, 定点化  |  21 ms     |  18 ms        |   103 ms    |     24 ms     |   105 ms   |
+| 5  | neon intrinsic(定点) |  -   |  9.6 ms       |   113 ms    |     11 ms     |   110 ms   |
+| 6  | neon intrinsic(平均) |  -   |
+| 7  | neon asm (定点)      |  -   |
+| 8  | neon asm (平均)      |  -   |
+
 
 ## boxfilter
 

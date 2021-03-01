@@ -107,10 +107,84 @@ void threshold_gray_asm(unsigned char* input_gray, size_t height, size_t width, 
 
 // --------------------------------
 
-void threshold_rgb(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf, unsigned char thresh, unsigned char minval, unsigned char maxval)
+void threshold_rgb_naive(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf, unsigned char thresh, unsigned char minval, unsigned char maxval)
 {
+    size_t total_len = height * width;
+    unsigned char gray;
+    for (size_t i=0; i<total_len; i++) {
+#if 1
+        gray = (0.299*rgb_buf[0] + 0.587*rgb_buf[1] + 0.114*rgb_buf[2]);
+#elif 0
+        gray = (rgb_buf[0] + rgb_buf[1] + rgb_buf[2]) / 3;
+#else
+        gray = (77*rgb_buf[0] + 151*rgb_buf[1] + 28*rgb_buf[2]) >> 8;
+#endif
+        rgb_buf += 3;
+        *gray_buf = (gray>thresh) ? maxval : minval;
+        gray_buf ++;
+    }
+}
+
+void threshold_rgb_asimd(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf, unsigned char thresh, unsigned char minval, unsigned char maxval)
+{
+    size_t total_len = height * width;
+    size_t done = 0;
+    const unsigned char weight_r_u8 = 77;
+    const unsigned char weight_g_u8 = 151;
+    const unsigned char weight_b_u8 = 28;
+    const int weight_r = weight_r_u8;
+    const int weight_g = weight_g_u8;
+    const int weight_b = weight_b_u8;
+#ifdef PIXEL_SIMD_NEON
+    size_t step = 8;
+    size_t rgb_step = step * 3;
+    size_t vec_size = total_len - total_len % step;
+    uint8x8x3_t v1;
+    uint8x8_t vmask_gt;
+    uint8x8_t vthresh = vdup_n_u8(thresh);
+    uint8x8_t vmaxval = vdup_n_u8(maxval);
+    uint8x8_t vminval = vdup_n_u8(minval);
+    uint8x8_t v_weight_r = vdup_n_u8(weight_r_u8);
+    uint8x8_t v_weight_g = vdup_n_u8(weight_g_u8);
+    uint8x8_t v_weight_b = vdup_n_u8(weight_b_u8);
+    uint16x8_t v_tmp;
+    uint8x8_t v_gray;
+    for (size_t i=0; i<vec_size; i+=step) {
+        v1 = vld3_u8(rgb_buf);
+        rgb_buf += rgb_step;
+        
+#if 1
+        v_tmp = vmull_u8(v1.val[0], v_weight_r);
+        v_tmp = vmlal_u8(v_tmp, v1.val[1], v_weight_g);
+        v_tmp = vmlal_u8(v_tmp, v1.val[2], v_weight_b);
+        v_gray = vshrn_n_u16(v_tmp, 8);
+#else
+        v_tmp = vaddl_u8(v1.val[0], v1.val[1]);
+        v_tmp = vaddw_u8(v_tmp, v1.val[2]);
+        //TODO: try use (r+g+b)/3 for gray computation
+#endif
+
+        vmask_gt = vcgt_u8(v_gray, vthresh);
+        v_gray = vbsl_u8(vmask_gt, vmaxval, vminval);
+        vst1_u8(gray_buf, v_gray);
+        gray_buf += step;
+    }
+    done = vec_size;
+#endif // PIXEL_SIMD_NEON
+
+    unsigned char gray;
+    for (; done<total_len; done++) {
+        gray = (weight_r*rgb_buf[0] + weight_g*rgb_buf[1] + weight_b*rgb_buf[2]) >> 8;
+        rgb_buf += 3;
+        *gray_buf = (gray>thresh) ? maxval : minval;
+        gray_buf++;
+    }
+}
+
+void threshold_rgb_asm(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf, unsigned char thresh, unsigned char minval, unsigned char maxval){
     //TODO
 }
+
 
 void threshold_gray_inplace(unsigned char* gray_buf, size_t height, size_t width, unsigned char thresh, unsigned char minval, unsigned char maxval)
 {

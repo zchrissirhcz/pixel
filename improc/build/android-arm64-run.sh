@@ -19,7 +19,11 @@ adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
 # adb pull /data/pixel/sky_rgb_inplace_asm.bmp ./
 # adb pull /data/pixel/sky_rgb_inplace_opencv.bmp ./
 
-adb pull /data/pixel/sky_thresh60_naive.png ./
-adb pull /data/pixel/sky_thresh60_opencv.png ./
-adb pull /data/pixel/sky_thresh60_asimd.png ./
-adb pull /data/pixel/sky_thresh60_asm.png ./
+# adb pull /data/pixel/sky_thresh60_naive.png ./
+# adb pull /data/pixel/sky_thresh60_opencv.png ./
+# adb pull /data/pixel/sky_thresh60_asimd.png ./
+# adb pull /data/pixel/sky_thresh60_asm.png ./
+
+adb pull /data/pixel/sky_thresh120_naive.png ./
+adb pull /data/pixel/sky_thresh120_opencv.png ./
+adb pull /data/pixel/sky_thresh120_asimd.png ./
