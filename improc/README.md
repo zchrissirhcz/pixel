@@ -1,5 +1,7 @@
 # improc
 
+Image processing algorithm implementations.
+
 [TOC]
 
 ## rgb2gray
