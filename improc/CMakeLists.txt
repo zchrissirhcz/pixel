@@ -26,15 +26,11 @@ add_executable(testbed
     # threshold.c
     # threshold_test.cpp
 
-    #test.cpp
+    test.cpp
 
     #histogram.h
     #histogram.c
     #histogram_test.cpp
-
-    bright_contrast.h
-    bright_contrast.c
-    bright_contrast_test.cpp
 
     # boxfilter.h
     # boxfilter.c
