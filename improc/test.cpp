@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <algorithm>
 
 #include "common/pixel_benchmark.h"
 
@@ -19,19 +20,43 @@ void rgb2gray_mean(const unsigned char* rgb_buf, size_t height, size_t width, un
     }
 }
 
+void rgb2gray_ldp(const unsigned char *rgbImage,
+              const int            height,
+              const int            width,
+              unsigned char       *grayImage) {
+    int size = height * width;
+    const unsigned char *src = rgbImage;
+    
+    uint16_t rW = 77;
+    uint16_t gW = 151;
+    uint16_t bW = 28;
+
+    for (int i = 0; i < size; ++i ) {
+        uint16_t gray = (static_cast<uint16_t>(src[0]) * rW) + 
+                        (static_cast<uint16_t>(src[1]) * gW) + 
+                        (static_cast<uint16_t>(src[2]) * bW);
+
+        // undo the scale by 256 and write to memory
+        gray = gray >> 8;
+        gray = std::max(std::min(gray, (uint16_t)255), (uint16_t)0);
+        grayImage[i] = static_cast<unsigned char>(gray);
+        src += 3;
+    }
+}
+
 void rgb2gray_weighted(const unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf)
 {
-    size_t gray_len = height * width;
-    size_t rgb_len = gray_len * 3;
+    size_t total_len = height * width;
 
-    size_t i=0; // rgb_idx
-    size_t j=0; // gray_idx
-    for( ; j<gray_len; j++, i+=3) {
-        float r = rgb_buf[i];
-        float g = rgb_buf[i+1];
-        float b = rgb_buf[i+2];
-        float gray = (0.299*r + 0.587*g + 0.114*b);
-        gray_buf[j] = gray;
+    // uint16_t rW = 77;
+    // uint16_t gW = 151;
+    // uint16_t bW = 28;
+    int16_t gray;
+    for(size_t i=0; i<total_len; i++) {
+        //*gray_buf = (rW*rgb_buf[0] + gW*rgb_buf[1] + bW*rgb_buf[2]) >> 8;
+        *gray_buf = (77*rgb_buf[0] + 151*rgb_buf[1] + 28*rgb_buf[2]) >> 8;
+        gray_buf++;
+        rgb_buf += 3;
     }
 }
 
