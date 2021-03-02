@@ -108,6 +108,26 @@ input is rgb, output is gray
 | 8  | neon asm (平均)      |  -   |
 
 
+## histogram
+
+**histogram_gray**
+
+image size: h=4032, w=3024
+android=XiaoMI8(QCOM845),NDK-r21b
+PC=i5-8500, ubuntu20.04, clang11.0
+OpenCV 4.5.1
+
+| id | implementation | PC release | armv8 release | armv7 release |
+| -- | -------------- | ---------- | ------------- | ------------- |
+| 1  |  naive         |   5 ms     |    18 ms      |     21 ms     |
+
+**histogram_rgb**
+
+| id | implementation | PC release | armv8 release | armv7 release |
+| -- | -------------- | ---------- | ------------- | ------------- |
+| 1  |naive, gray(平均)|   11 ms   |   58 ms       |     62 ms     |
+| 2  |  naive, r/g/b  |   6  ms    |   18 ms       |     21 ms     |
+
 ## boxfilter
 
 TBD
@@ -128,7 +148,7 @@ TBD
 **Intrinscs**:
 
 - [Neon Intrinsics查询 - 官方在线版](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/intrinsics)
-
+ 
 - [Neon Intrinsics查询 - fengbingchun整理版，部分带sse等价解释](https://blog.csdn.net/fengbingchun/article/details/38085781)，部分intrinsics缺失
 
 - [Neon Intrinsics - 按类型整理 - EmSoftEn的博客](https://blog.csdn.net/emsoften/article/details/51718763)
