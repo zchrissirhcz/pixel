@@ -54,7 +54,7 @@ int main() {
     mC.cols = n;
     mC.data = (float*)malloc(mC.rows*mC.cols * sizeof(float));
 
-    matrix_multiply_matrix(mA.data, mB.data, mC.data, m, k, n);
+    matrix_multiply(mA.data, mB.data, mC.data, m, k, n);
 
     print_matrix(mA.data, mA.rows, mA.cols);
     print_matrix(mB.data, mB.rows, mB.cols);

@@ -1,7 +1,8 @@
 #include "matrix.h"
 
 // A(mxk), B(kxn), C（mxn）
-void matrix_multiply_matrix(float* mA, float* mB, float* mC, size_t M, size_t K, size_t N)
+// C = A B
+void matrix_multiply(float* mA, float* mB, float* mC, size_t M, size_t K, size_t N)
 {
     for (size_t i=0; i<M; i++) {
         for (size_t j=0; j<N; j++) {
@@ -14,5 +15,25 @@ void matrix_multiply_matrix(float* mA, float* mB, float* mC, size_t M, size_t K,
             size_t c_idx = i*N + j;
             mC[c_idx] = sum;
         }
+    }
+}
+
+// A(mxn), B(mxn), C(mxn)
+// C = A + B
+void matrix_add(float* mA, float* mB, float* mC, size_t M, size_t N)
+{
+    size_t total_len = mA * mB;
+    for (size_t i=0; i<total_len; i++) {
+        mC[i] = mA[i] + mB[i];
+    }
+}
+
+// A(mxn), B(mxn), C(mxn)
+// C = A - B
+void matrix_sub(float* mA, float* mB, float* mC, size_t M, size_t N)
+{
+    size_t total_len = mA * mB;
+    for (size_t i=0; i<total_len; i++) {
+        mC[i] = mA[i] - mB[i];
     }
 }
