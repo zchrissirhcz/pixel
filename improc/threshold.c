@@ -153,16 +153,10 @@ void threshold_rgb_asimd(unsigned char* rgb_buf, size_t height, size_t width, un
         v1 = vld3_u8(rgb_buf);
         rgb_buf += rgb_step;
         
-#if 1
         v_tmp = vmull_u8(v1.val[0], v_weight_r);
         v_tmp = vmlal_u8(v_tmp, v1.val[1], v_weight_g);
         v_tmp = vmlal_u8(v_tmp, v1.val[2], v_weight_b);
         v_gray = vshrn_n_u16(v_tmp, 8);
-#else
-        v_tmp = vaddl_u8(v1.val[0], v1.val[1]);
-        v_tmp = vaddw_u8(v_tmp, v1.val[2]);
-        //TODO: try use (r+g+b)/3 for gray computation
-#endif
 
         vmask_gt = vcgt_u8(v_gray, vthresh);
         v_gray = vbsl_u8(vmask_gt, vmaxval, vminval);
@@ -182,9 +176,66 @@ void threshold_rgb_asimd(unsigned char* rgb_buf, size_t height, size_t width, un
 }
 
 void threshold_rgb_asm(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf, unsigned char thresh, unsigned char minval, unsigned char maxval){
-    //TODO
-}
+    size_t total_len = height * width;
+    size_t done = 0;
+    const unsigned char weight_r_u8 = 77;
+    const unsigned char weight_g_u8 = 151;
+    const unsigned char weight_b_u8 = 28;
+    const int weight_r = weight_r_u8;
+    const int weight_g = weight_g_u8;
+    const int weight_b = weight_b_u8;
+#ifdef PIXEL_SIMD_NEON
+    size_t step = 8;
+    size_t vec_size = total_len - total_len % step;
+    size_t neon_len = vec_size / step;
+    #ifdef __aarch64__
 
+    #else
+    __asm__ volatile(
+        "vdup.u8 d0, %6 \n" //vthresh
+        "vdup.u8 d1, %7 \n" //vmaxval
+        "vdup.u8 d2, %8 \n" //vminval
+        "mov r3, #77 \n" //weight_r
+        "mov r4, #151 \n" //weight_g
+        "mov r5, #28 \n" //weight_b
+        "vdup.u8 d3, r3 \n"
+        "vdup.u8 d4, r4 \n"
+        "vdup.u8 d5, r5 \n"
+        "0: \n"
+        "vld3.u8 {d6-d8}, [%0]! \n"
+        "# do the weight average: \n"
+        "vmull.u8 q6, d6, d3 \n"
+        "vmlal.u8 q6, d7, d4 \n"
+        "vmlal.u8 q6, d8, d5 \n"
+        "# shift and store: \n"
+        "vshrn.u16 d9, q6, #8 \n" //gray value
+        "vcgt.u8 d10, d9, d0 \n"
+        "vbsl.u8 d10, d1, d2 \n"
+        "vst1.u8 {d10}, [%1]! \n"
+        "subs %2, #1 \n"
+        "bne  0b \n"
+        : "=r"(rgb_buf), //%0
+        "=r"(gray_buf), //%1
+        "=r"(neon_len) //%2
+        : "0"(rgb_buf),
+        "1"(gray_buf),
+        "2"(neon_len),
+        "r"(thresh), //%6
+        "r"(maxval), //%7
+        "r"(minval) //%8
+        : "cc", "memory", "r3", "r4", "r5", "q0", "q1", "q2", "q3", "q4", "q5", "q6"
+    );
+    #endif
+    done = vec_size;
+#endif // PIXEL_SIMD_NEON
+    unsigned char gray;
+    for (; done<total_len; done++) {
+        gray = (weight_r*rgb_buf[0] + weight_g*rgb_buf[1] + weight_b*rgb_buf[2]) >> 8;
+        rgb_buf += 3;
+        *gray_buf = (gray>thresh) ? maxval : minval;
+        gray_buf++;
+    }
+}
 
 void threshold_gray_inplace(unsigned char* gray_buf, size_t height, size_t width, unsigned char thresh, unsigned char minval, unsigned char maxval)
 {

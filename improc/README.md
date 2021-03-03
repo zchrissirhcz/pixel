@@ -102,10 +102,8 @@ input is rgb, output is gray
 | 2  | opencv （两步）|  3~8 ms    |  23 ms        |    23 ms    |     25 ms     |   25  ms   |
 | 3  | naive, 取平均  |  15 ms     |  15 ms        |   107 ms    |    217 ms     |   102 ms   |
 | 4  | naive, 定点化  |  21 ms     |  18 ms        |   103 ms    |     24 ms     |   105 ms   |
-| 5  | neon intrinsic(定点) |  -   |  9.6 ms       |   113 ms    |     11 ms     |   110 ms   |
-| 6  | neon intrinsic(平均) |  -   |
-| 7  | neon asm (定点)      |  -   |
-| 8  | neon asm (平均)      |  -   |
+| 5  | neon intrinsic(定点) |  -   |  10 ms        |   113 ms    |     11 ms     |   110 ms   |
+| 7  | neon asm (定点)      |  -   |               |             |     10 ms     |    10 ms   |
 
 
 ## histogram
@@ -267,3 +265,14 @@ typedef double float64_t;
     - VFP的个别指令，是NEON无法替代的
 
 10. NEON指令和浮点指令，使用的是相同的寄存器
+
+11. 一些指令的含义：
+
+- `asr`: arithmetic shift right, store the last bit shifted out in the carry flag(if instruction uses the S suffix)
+- `lsl`: logical shift left, store the last bit shifted out in the carry flag (if instruction uses the S suffix)
+- `lsr`: logical shift right, store the last bit shifted out in the carry flag(if instruction uses the S suffix)
+- `ror`: rotate right, place original bit n - 1 into the carry flag
+- `rrx`: rotate right exactly one bit (this operation does not accept a shift amount), treat the register as a 33-bit register with the carry flag acting as the LSB
+- `ldr`: 从内存读取到寄存器: `ldr <register> <memory address>`
+- `str`: 从寄存器写入到内存: `str <register> <memory address>`
+- 更多arm汇编基本指令，见《Embedded Systems - ARM Programming and Optimization》第一章最后一节(P50)。

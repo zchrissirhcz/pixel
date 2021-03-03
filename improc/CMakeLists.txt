@@ -22,11 +22,11 @@ add_executable(testbed
     # rgb2bgr.c
     # rgb2bgr_test.cpp
 
-    # threshold.h
-    # threshold.c
-    # threshold_test.cpp
+    threshold.h
+    threshold.c
+    threshold_test.cpp
 
-    test.cpp
+    #test.cpp
 
     #histogram.h
     #histogram.c

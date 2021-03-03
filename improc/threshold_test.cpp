@@ -102,16 +102,22 @@ int test_threshold_rgb()
     t_cost = pixel_get_current_time() - t_start;
     printf("threshold_rgb, opencv, time cost %.4lf ms\n", t_cost);
     
-    rgb_input = image.data;
     gray_output = result_asimd.data;
     t_start = pixel_get_current_time();
     threshold_rgb_asimd(rgb_input, height, width, gray_output, thresh, minval, maxval);
     t_cost = pixel_get_current_time() - t_start;
     printf("threshold_rgb, asimd, time cost %.4lf ms\n", t_cost);
     
+    gray_output = result_asm.data;
+    t_start = pixel_get_current_time();
+    threshold_rgb_asm(rgb_input, height, width, gray_output, thresh, minval, maxval);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("threshold_rgb, asm, time cost %.4lf ms\n", t_cost);
+
     cv::imwrite("sky_thresh120_naive.png", result_naive);
     cv::imwrite("sky_thresh120_opencv.png", result_opencv);
     cv::imwrite("sky_thresh120_asimd.png", result_asimd);
+    cv::imwrite("sky_thresh120_asm.png", result_asm);
 
     return 0;
 }
