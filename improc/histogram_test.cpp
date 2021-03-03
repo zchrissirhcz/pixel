@@ -13,7 +13,7 @@ int main() {
     size_t height = (size_t)size.height;
     size_t width  = (size_t)size.width;
 
-    unsigned char hist[256];
+    unsigned int hist[256];
     memset(hist, 0, sizeof(hist));
 
     unsigned char* gray_buf = NULL;
@@ -26,11 +26,17 @@ int main() {
     printf("histogram_gray, naive, time cost %.4lf ms\n", t_cost);
 
     memset(hist, 0, sizeof(hist));
+    t_start = pixel_get_current_time();
+    histogram_gray_asimd(gray_buf, height, width, hist);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("histogram_gray, asimd, time cost %.4lf ms\n", t_cost);
+
+    memset(hist, 0, sizeof(hist));
     unsigned char* rgb_buf = image.data;
     t_start = pixel_get_current_time();
     histogram_rgb_naive(rgb_buf, height, width, hist, 1);
     t_cost = pixel_get_current_time() - t_start;
-    printf("histogram_gray, naive, time cost %.4lf ms\n", t_cost);
+    printf("histogram_rgb, naive, time cost %.4lf ms\n", t_cost);
 
     return 0;
 }

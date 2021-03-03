@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 #add_definitions(-ffast-math)
 
-#add_definitions(-O3)
+add_definitions(-O3)
 #set(CMAKE_BUILD_TYPE Debug)
 message(STATUS "--- CMAKE_BUILD_TYPE is: ${CMAKE_BUILD_TYPE}")
 message(STATUS "--- CMAKE_C_FLAGS are: ${CMAKE_C_FLAGS}")
@@ -22,15 +22,15 @@ add_executable(testbed
     # rgb2bgr.c
     # rgb2bgr_test.cpp
 
-    threshold.h
-    threshold.c
-    threshold_test.cpp
+    # threshold.h
+    # threshold.c
+    # threshold_test.cpp
 
     #test.cpp
 
-    #histogram.h
-    #histogram.c
-    #histogram_test.cpp
+    histogram.h
+    histogram.c
+    histogram_test.cpp
 
     # boxfilter.h
     # boxfilter.c
