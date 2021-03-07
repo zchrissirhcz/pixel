@@ -18,8 +18,6 @@ OpenCV 4.5.1
 | 4  | neon intrinsic(定点加权)  |     -         |  10~13 ms     |    81 ms    |   9.5 ms      |    80 ms    |
 | 5  | neon asm(定点加权)        |     -         |    9.4 ms     |   9.4 ms    |    10 ms      |    10 ms    |
 | 6  | float平均                 |      9 ms     |    9.4 ms     |    63 ms    |    66 ms      |    66 ms    |
-| 7  | neon intrinsic(float平均) |
-| 8  | neon asm(float平均)       |
 
 `gray = (r+g+b)/3`在armv8上加速明显。
 
