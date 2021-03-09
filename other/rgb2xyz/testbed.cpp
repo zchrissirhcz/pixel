@@ -6,7 +6,7 @@
 #include <vector>
 #include <opencv2/opencv.hpp>
 
-#include "pixel_benchmark.h"
+#include "common/pixel_benchmark.h"
 
 typedef struct XYZ {
     float x, y, z;
@@ -27,13 +27,6 @@ XYZ rgb2xyz_naive(cv::Mat Ir, cv::Mat Ig, cv::Mat Ib)
 
     return xyz;
 }
-
-
-
-
-
-
-
 
 XYZ rgb2xyz_fused(cv::Mat Ir, cv::Mat Ig, cv::Mat Ib)
 {
@@ -81,7 +74,39 @@ XYZ rgb2xyz_fused_float(cv::Mat Ir, cv::Mat Ig, cv::Mat Ib)
     return xyz;
 }
 
-void test(std::string image_path){
+static float array_mean_naive(float* data, size_t len) {
+    float sum = 0;
+    for (size_t i=0; i<len; i++) {
+        sum += data[i];
+    }
+    sum /= len;
+    return sum;
+}
+
+XYZ rgb2xyz_fused_fastmean(cv::Mat Ir, cv::Mat Ig, cv::Mat Ib)
+{
+    cv::Mat Fr = 1.0 * Ir;
+    cv::Mat Fg = 1.0 * Ig;
+    cv::Mat Fb = 1.0 * Ib;
+
+    float r_mean = cv::mean(Fr).val[0];
+    float g_mean = cv::mean(Fg).val[0];
+    float b_mean = cv::mean(Fb).val[0];
+
+    float x_mean = 0.412453f * r_mean + 0.357580f * g_mean + 0.180423f * b_mean;
+    float y_mean = 0.212671f * r_mean + 0.715160f * g_mean + 0.072169f * b_mean;
+    float z_mean = 0.019334f * r_mean + 0.119193f * g_mean + 0.950227f * b_mean;
+
+    float Sxyz = x_mean + y_mean + z_mean;
+    XYZ xyz;
+    xyz.x = x_mean / Sxyz;
+    xyz.y = y_mean / Sxyz;
+    xyz.z = z_mean / Sxyz;
+
+    return xyz;
+}
+
+void test_rgb2xyz(std::string image_path){
 
     cv::Mat image = cv::imread(image_path);
     cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
@@ -113,10 +138,24 @@ void test(std::string image_path){
     printf("rgb2xyz, fused float,   time=%.4lf ms, x=%.4lf, y=%.4lf, z=%.4lf\n", t_cost, xyz.x, xyz.y, xyz.z);
 }
 
+void test_array_mean() {
+    cv::Mat image = cv::imread("sky.jpg");
+    cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
+    std::vector<cv::Mat> channels;
+    cv::split(image, channels);
+
+    cv::Mat Ir = channels[0];
+    cv::Mat Ig = channels[1];
+    cv::Mat Ib = channels[2];
+
+    
+}
+
 int main() {
 
-    test("colorhouse.jpg");
-    test("sky.jpg");
+    //test_rgb2xyz("colorhouse.jpg");
+    //test_rgb2xyz("sky.jpg");
+    test_array_mean();
 
     return 0;
 }
