@@ -87,6 +87,7 @@ static float array_mean_naive(unsigned char* data, size_t len) {
     return sum;
 }
 
+// u8转u16再转u32再转f32，然后算sum
 static float array_mean_asimd(unsigned char* data, size_t len) {
     float sum = 0;
     size_t done = 0;
@@ -196,6 +197,88 @@ static float array_mean_asimd2(unsigned char* data, size_t len) {
     return sum;
 }
 
+// <del>u8转u16，算sum，再转float</del>
+static float array_mean_asimd3(unsigned char* data, size_t len) {
+    int16x8_t result_level1 = vdupq_n_s16(0);
+    int32x4_t result_level2 = vdupq_n_s32(0);
+    int32x4_t result_vec = vdupq_n_s32(0);
+    
+    int8x8_t h_vec;
+
+    int8x8_t x_vec = vdup_n_s8(1);
+
+    int t0, t1;
+
+    bool flag;
+    for(int i=0; i<len/8; i++) {
+        h_vec = vld1_u8(&data[i*8]);
+        result_level1 = vmlal_u8(result_level1, h_vec, x_vec);
+        flag = false;
+
+        if( (i*8) % 256 == 0) {
+            //16x8 => 32x4
+            t0 = vgetq_lane_u16(result_level1, 0);
+            t1 = vgetq_lane_u16(result_level1, 1);
+            result_level2 = vsetq_lane_u32(t0+t1, result_level2, 0);
+
+            t0 = vgetq_lane_u16(result_level1, 2);
+            t1 = vgetq_lane_u16(result_level1, 3);
+            result_level2 = vsetq_lane_u32(t0+t1, result_level2, 1);
+
+            t0 = vgetq_lane_u16(result_level1, 4);
+            t1 = vgetq_lane_u16(result_level1, 5);
+            result_level2 = vsetq_lane_u32(t0+t1, result_level2, 2);
+
+            t0 = vgetq_lane_u16(result_level1, 6);
+            t1 = vgetq_lane_u16(result_level1, 7);
+            result_level2 = vsetq_lane_u32(t0+t1, result_level2, 3);
+
+            result_vec = vaddq_u32(result_level2, result_vec);
+
+            result_level1 = vdupq_n_u16(0);
+            flag = true;
+        }
+    }
+    if(!flag) {
+        //16x8 => 32x4
+        t0 = vgetq_lane_u16(result_level1, 0);
+        t1 = vgetq_lane_u16(result_level1, 1);
+        result_level2 = vsetq_lane_u32(t0+t1, result_level2, 0);
+
+        t0 = vgetq_lane_u16(result_level1, 2);
+        t1 = vgetq_lane_u16(result_level1, 3);
+        result_level2 = vsetq_lane_u32(t0+t1, result_level2, 1);
+
+        t0 = vgetq_lane_u16(result_level1, 4);
+        t1 = vgetq_lane_u16(result_level1, 5);
+        result_level2 = vsetq_lane_u32(t0+t1, result_level2, 2);
+
+        t0 = vgetq_lane_u16(result_level1, 6);
+        t1 = vgetq_lane_u16(result_level1, 7);
+        result_level2 = vsetq_lane_u32(t0+t1, result_level2, 3);
+
+        result_vec = vaddq_u32(result_level2, result_vec);
+
+        result_level1 = vdupq_n_u16(0);
+        flag = true;
+    }
+
+    float sum = 0;
+    sum += vgetq_lane_u32(result_vec, 0);
+    sum += vgetq_lane_u32(result_vec, 1);
+    sum += vgetq_lane_u32(result_vec, 2);
+    sum += vgetq_lane_u32(result_vec, 3);
+
+    if(len%8!=0) {
+        for(int k=len-(len%8); k<len; k++) {
+            sum += data[k];
+        }
+    }
+
+    float avg = sum / len;
+    return avg;
+}
+
 XYZ rgb2xyz_fused_asimd(cv::Mat Ir, cv::Mat Ig, cv::Mat Ib)
 {
     cv::Size size = Ir.size();
@@ -228,6 +311,30 @@ XYZ rgb2xyz_fused_asimd2(cv::Mat Ir, cv::Mat Ig, cv::Mat Ib)
     float r_mean = array_mean_asimd2(Ir.data, len);
     float g_mean = array_mean_asimd2(Ig.data, len);
     float b_mean = array_mean_asimd2(Ib.data, len);
+
+    float x_mean = 0.412453f * r_mean + 0.357580f * g_mean + 0.180423f * b_mean;
+    float y_mean = 0.212671f * r_mean + 0.715160f * g_mean + 0.072169f * b_mean;
+    float z_mean = 0.019334f * r_mean + 0.119193f * g_mean + 0.950227f * b_mean;
+
+    float Sxyz = x_mean + y_mean + z_mean;
+    XYZ xyz;
+    xyz.x = x_mean / Sxyz;
+    xyz.y = y_mean / Sxyz;
+    xyz.z = z_mean / Sxyz;
+
+    return xyz;
+}
+
+
+XYZ rgb2xyz_fused_asimd3(cv::Mat Ir, cv::Mat Ig, cv::Mat Ib)
+{
+    cv::Size size = Ir.size();
+    size_t height = size.height;
+    size_t width = size.width;
+    size_t len = height * width;
+    float r_mean = array_mean_asimd3(Ir.data, len);
+    float g_mean = array_mean_asimd3(Ig.data, len);
+    float b_mean = array_mean_asimd3(Ib.data, len);
 
     float x_mean = 0.412453f * r_mean + 0.357580f * g_mean + 0.180423f * b_mean;
     float y_mean = 0.212671f * r_mean + 0.715160f * g_mean + 0.072169f * b_mean;
@@ -282,6 +389,11 @@ void test_rgb2xyz(std::string image_path){
     xyz = rgb2xyz_fused_asimd2(channels[0], channels[1], channels[2]);
     t_cost = pixel_get_current_time() - t_start;
     printf("rgb2xyz, fused asimd2,  time=%.4lf ms, x=%.4lf, y=%.4lf, z=%.4lf\n", t_cost, xyz.x, xyz.y, xyz.z);
+
+    t_start = pixel_get_current_time();
+    xyz = rgb2xyz_fused_asimd3(channels[0], channels[1], channels[2]);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("rgb2xyz, fused asimd3,  time=%.4lf ms, x=%.4lf, y=%.4lf, z=%.4lf\n", t_cost, xyz.x, xyz.y, xyz.z);
 }
 
 void test_array_mean() {
