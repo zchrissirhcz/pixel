@@ -198,7 +198,13 @@ static float array_mean_asimd2(unsigned char* data, size_t len) {
 }
 
 // <del>u8转u16，算sum，再转float</del>
+// Note: this implementation requires len < 67372036
+// when len > 67372036 and each element is 255, it will cause overflow
+// ((2*2147483648-1)/255)*4 = 67372036 (=8000x8421 size gray image)
 static float array_mean_asimd3(unsigned char* data, size_t len) {
+    if (len >= 67372036) {
+        fprintf(stderr, "input len too long, may cause overflow\n");
+    }
     uint16x8_t result_level1 = vdupq_n_u16(0);
     uint32x4_t result_level2 = vdupq_n_u32(0);
     uint32x4_t result_vec = vdupq_n_u32(0);
