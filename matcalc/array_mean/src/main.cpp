@@ -8,7 +8,7 @@
 #include "common/pixel_log.h"
 
 #ifdef __ARM_NEON //will this macro be defined in T3's device?
-#include<arm_neon.h>
+#include <arm_neon.h>
 #endif
 
 float get_random_float(float s, float t){

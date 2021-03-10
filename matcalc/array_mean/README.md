@@ -22,3 +22,8 @@ pixel/Debug | main.cpp, line 242 | mean_neon  returns 0.001056
 
 old executable size: about 4.5 MB
 new executable size: 13KB
+
+
+## Refs
+
+https://stackoverflow.com/a/6932695/2999096
