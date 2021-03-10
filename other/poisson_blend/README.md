@@ -25,6 +25,8 @@
 
 - [The Top 19 Eigen Open Source Projects](https://awesomeopensource.com/projects/eigen) 这个页面搜集了好多..
 
+- [Poisson Image Editing](https://github.com/PPPW/poisson-image-editing) Python implementation
+
 ## 其他
 
 USTC的CG作业之一，是实现泊松融合。。
