@@ -199,18 +199,19 @@ static float array_mean_asimd2(unsigned char* data, size_t len) {
 
 // <del>u8转u16，算sum，再转float</del>
 static float array_mean_asimd3(unsigned char* data, size_t len) {
-    int16x8_t result_level1 = vdupq_n_s16(0);
-    int32x4_t result_level2 = vdupq_n_s32(0);
-    int32x4_t result_vec = vdupq_n_s32(0);
+    uint16x8_t result_level1 = vdupq_n_u16(0);
+    uint32x4_t result_level2 = vdupq_n_u32(0);
+    uint32x4_t result_vec = vdupq_n_u32(0);
     
-    int8x8_t h_vec;
+    uint8x8_t h_vec;
 
-    int8x8_t x_vec = vdup_n_s8(1);
+    uint8x8_t x_vec = vdup_n_u8(1);
 
-    int t0, t1;
+    uint32_t t0, t1;
 
     bool flag;
-    for(int i=0; i<len/8; i++) {
+    size_t vec_size = len / 8;
+    for(size_t i=0; i<vec_size; i++) {
         h_vec = vld1_u8(&data[i*8]);
         result_level1 = vmlal_u8(result_level1, h_vec, x_vec);
         flag = false;
