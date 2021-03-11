@@ -208,7 +208,7 @@ static float array_mean_asimd3(unsigned char* data, size_t len) {
     uint16x8_t result_level1 = vdupq_n_u16(0);
     uint32x4_t result_level2 = vdupq_n_u32(0);
     uint32x4_t result_vec = vdupq_n_u32(0);
-    
+
     uint8x8_t h_vec;
 
     uint8x8_t x_vec = vdup_n_u8(1);
@@ -439,13 +439,18 @@ void test_array_mean() {
     t_cost = pixel_get_current_time() - t_start;
     printf("array mean, asimd impl2, result=%.4f, time cost %.4lf\n", sum, t_cost);
 
+    t_start = pixel_get_current_time();
+    sum = array_mean_asimd3(data, len);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("array mean, asimd impl3, result=%.4f, time cost %.4lf\n", sum, t_cost);
+
 }
 
 int main() {
 
     test_rgb2xyz("colorhouse.jpg");
     test_rgb2xyz("sky.jpg");
-    
+
     //test_array_mean();
 
     return 0;

@@ -1,7 +1,8 @@
 #!/bin/bash
 
 BUILD_DIR=android-arm64
-DST_DIR=/data/pixel
+#DST_DIR=/data/pixel
+DST_DIR=/data/local/tmp/
 EXE_FILE=testbed
 
 adb shell "mkdir -p $DST_DIR"
@@ -24,6 +25,6 @@ adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
 # adb pull /data/pixel/sky_thresh60_asimd.png ./
 # adb pull /data/pixel/sky_thresh60_asm.png ./
 
-adb pull /data/pixel/sky_thresh120_naive.png ./
-adb pull /data/pixel/sky_thresh120_opencv.png ./
-adb pull /data/pixel/sky_thresh120_asimd.png ./
+#adb pull /data/pixel/sky_thresh120_naive.png ./
+#adb pull /data/pixel/sky_thresh120_opencv.png ./
+#adb pull /data/pixel/sky_thresh120_asimd.png ./
