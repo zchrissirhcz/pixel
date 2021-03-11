@@ -205,9 +205,14 @@ static float array_mean_asimd3(unsigned char* data, size_t len) {
     if (len >= 67372036) {
         fprintf(stderr, "input len too long, may cause overflow\n");
     }
+    float sum = 0;
+    size_t done = 0;
+
+#ifdef __ARM_NEON
+
     uint16x8_t result_level1 = vdupq_n_u16(0);
     uint32x4_t result_level2 = vdupq_n_u32(0);
-    uint32x4_t result_vec = vdupq_n_u32(0);
+    uint32x4_t vsum = vdupq_n_u32(0);
 
     uint8x8_t h_vec;
 
@@ -216,13 +221,15 @@ static float array_mean_asimd3(unsigned char* data, size_t len) {
     uint32_t t0, t1;
 
     bool flag;
-    size_t vec_size = len / 8;
-    for(size_t i=0; i<vec_size; i++) {
-        h_vec = vld1_u8(&data[i*8]);
+    size_t step = 8;
+    size_t vec_size = len - len % step;
+    for(size_t i=0; i<vec_size; i+=step) {
+        h_vec = vld1_u8(data);
+        data += step;
         result_level1 = vmlal_u8(result_level1, h_vec, x_vec);
         flag = false;
 
-        if( (i*8) % 256 == 0) {
+        if( i % 256 == 0) {
             //16x8 => 32x4
             t0 = vgetq_lane_u16(result_level1, 0);
             t1 = vgetq_lane_u16(result_level1, 1);
@@ -240,7 +247,7 @@ static float array_mean_asimd3(unsigned char* data, size_t len) {
             t1 = vgetq_lane_u16(result_level1, 7);
             result_level2 = vsetq_lane_u32(t0+t1, result_level2, 3);
 
-            result_vec = vaddq_u32(result_level2, result_vec);
+            vsum = vaddq_u32(result_level2, vsum);
 
             result_level1 = vdupq_n_u16(0);
             flag = true;
@@ -264,22 +271,25 @@ static float array_mean_asimd3(unsigned char* data, size_t len) {
         t1 = vgetq_lane_u16(result_level1, 7);
         result_level2 = vsetq_lane_u32(t0+t1, result_level2, 3);
 
-        result_vec = vaddq_u32(result_level2, result_vec);
+        vsum = vaddq_u32(result_level2, vsum);
 
         result_level1 = vdupq_n_u16(0);
         flag = true;
     }
 
-    float sum = 0;
-    sum += vgetq_lane_u32(result_vec, 0);
-    sum += vgetq_lane_u32(result_vec, 1);
-    sum += vgetq_lane_u32(result_vec, 2);
-    sum += vgetq_lane_u32(result_vec, 3);
+    uint32_t sum_lst[4];
+    vst1q_u32(sum_lst, vsum);
+    sum += sum_lst[0];
+    sum += sum_lst[1];
+    sum += sum_lst[2];
+    sum += sum_lst[3];
 
-    if(len%8!=0) {
-        for(int k=len-(len%8); k<len; k++) {
-            sum += data[k];
-        }
+    done = vec_size;
+#endif // __ARM_NEON
+
+    for (; done<len; done++) {
+        sum += *data;
+        data++;
     }
 
     float avg = sum / len;
@@ -318,7 +328,7 @@ static float array_mean_asimd4(unsigned char* data, size_t len) {
     sum += sum1;
     sum += sum2;
     sum += sum3;
-#else
+#else // 注意：armv7没有vaddv指令，下面的实现是从asimd1拷贝来的。。慢。
     size_t step = 8;
     size_t vec_size = len - len % step;
     float sum_lst[4] = {0.f, 0.f, 0.f, 0.f};
@@ -351,6 +361,47 @@ static float array_mean_asimd4(unsigned char* data, size_t len) {
     sum /= len;
     return sum;
 }
+
+static float array_mean_asimd5(unsigned char* data, size_t len) {
+    float sum = 0;
+    size_t done = 0;
+#ifdef __ARM_NEON
+
+    size_t step = 8*4;
+    size_t vec_size = len - len % step;
+
+    uint8x8x4_t vdata;
+    uint16x8x4_t vsum;
+    uint8x8_t ones = vdup_n_u8(1);
+    uint32_t sum_lst[4] = {0};
+    for (size_t i=0; i<vec_size; i+=step) {
+        vdata = vld4_u8(data);
+        data += step;
+
+        vsum.val[0] = vmlal_u8(vsum.val[0], vdata.val[0], ones);
+        vsum.val[1] = vmlal_u8(vsum.val[1], vdata.val[1], ones);
+        vsum.val[2] = vmlal_u8(vsum.val[2], vdata.val[2], ones);
+        vsum.val[3] = vmlal_u8(vsum.val[3], vdata.val[3], ones);
+
+        if (i%256==0) {
+            // TODO: convert u16 to u32, refer to asimd3
+        }
+    }
+    sum += sum0;
+    sum += sum1;
+    sum += sum2;
+    sum += sum3;
+
+    done = vec_size;
+#endif // __ARM_NEON
+    for (; done<len; done++) {
+        sum += *data;
+        data++;
+    }
+    sum /= len;
+    return sum;
+}
+
 
 
 XYZ rgb2xyz_fused_asimd(cv::Mat Ir, cv::Mat Ig, cv::Mat Ib)
