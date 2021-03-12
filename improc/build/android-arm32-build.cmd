@@ -20,6 +20,7 @@ cmake -G Ninja ^
     -DANDROID_ABI="armeabi-v7a" ^
     -DANDROID_ARM_NEON=ON ^
     -DANDROID_PLATFORM=android-24 ^
+    -DCMAKE_BUILD_TYPE=Release ^
     ../..
 
 ninja

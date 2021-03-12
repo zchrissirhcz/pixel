@@ -124,6 +124,31 @@ OpenCV 4.5.1
 | 1  |naive, gray(平均)|   11 ms   |   58 ms       |     62 ms     |
 | 2  |  naive, r/g/b  |   6  ms    |   18 ms       |     21 ms     |
 
+## flip
+
+**rgb flip horizontally**
+
+image info: height=4032, width=3024
+
+涉及指令为 vrev64_u8
+
+| id | name   | armv7 debug |  armv7 release | armv8 release |
+| ---| -----  |-----------  | -------------- | ------------- |
+| 1  | opencv |  42.5385 ms |  42.4799 ms    |  24.1896 ms   |
+| 2  | naive  | 157.2149 ms |  24.7365 ms    |  17.3522 ms   |
+| 3  | idxopt | 141.7304 ms |  26.1346 ms    |  26.0233 ms   |
+| 4  | asimd  |  50.3773 ms |  21.0564 ms    |  21.3476 ms   |
+
+尝试实现 rgb 图的水平翻转，比较naive的实现，发现armv8编译器O2, 速度比手写neon intrinsic快一点。
+
+**gray flip horizontally**
+
+| id | name   | armv8 release | armv7 release |
+| -- | ------ | ------------- | ------------- |
+| 1  | opencv | 10.4322 ms    |   7.4855 ms   |
+| 2  | naive  |  8.6991 ms    |  13.9475 ms   |
+| 3  | asimd  |  4.2636 ms    |   4.4192 ms   |
+
 
 ## boxfilter
 
