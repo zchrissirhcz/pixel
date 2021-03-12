@@ -149,6 +149,18 @@ image info: height=4032, width=3024
 | 2  | naive  |  8.6991 ms    |  13.9475 ms   |
 | 3  | asimd  |  4.2636 ms    |   4.4192 ms   |
 
+TODO: flip vertically; flip inplace
+
+## sobel
+
+**References**
+
+- [【AI PC端算法优化】四，一步步将Sobel边缘检测加速22倍](https://zhuanlan.zhihu.com/p/131319128)
+
+## magnitude
+
+TBD
+
 
 ## boxfilter
 
