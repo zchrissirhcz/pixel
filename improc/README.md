@@ -126,7 +126,7 @@ OpenCV 4.5.1
 
 ## flip
 
-**rgb flip horizontally**
+**flip horizontally, rgb**
 
 image info: height=4032, width=3024
 
@@ -141,7 +141,7 @@ image info: height=4032, width=3024
 
 尝试实现 rgb 图的水平翻转，比较naive的实现，发现armv8编译器O2, 速度比手写neon intrinsic快一点。
 
-**gray flip horizontally**
+**flip horizontally, gray**
 
 | id | name   | armv8 release | armv7 release |
 | -- | ------ | ------------- | ------------- |
@@ -149,7 +149,25 @@ image info: height=4032, width=3024
 | 2  | naive  |  8.6991 ms    |  13.9475 ms   |
 | 3  | asimd  |  4.2636 ms    |   4.4192 ms   |
 
-TODO: flip vertically; flip inplace
+
+**flip vertically, rgb**
+
+| id | name    | armv8 release | armv7 release |
+| -- | ------ | ------------- | ------------- |
+| 1 | opencv   | 11.5798 ms    | 11.6609 ms    |
+| 2 | naive    | 10.9293 ms    | 21.6688 ms    |
+| 3 | by lines | 11.1698 ms    | 11.0645 ms    |
+
+**flip vertically, gray**
+
+| id | name    | armv8 release | armv7 release |
+| -- | ------ | ------------- | ------------- |
+| 1 | opencv   | 3.9922 ms     | 4.0637 ms     |
+| 2 | naive    | 3.8403 ms     | 11.7752 ms    |
+| 3 | by lines | 3.8624 ms     | 3.5497 ms     |
+
+
+TODO: flip inplace
 
 ## sobel
 

@@ -158,8 +158,27 @@ void flip_vert_rgb_bylines(unsigned char* src, size_t height, size_t width, unsi
     }
 }
 
-void flip_vert_rgb_asimd(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+
+void flip_vert_gray_naive(unsigned char* src, size_t height, size_t width, unsigned char* dst)
 {
-    //TODO: consider arm neon optimize for memcpy
-    // https://www.jianshu.com/p/7b3bfc3aed12
+    size_t linebytes = width;
+    for (size_t i=0; i<height; i++) {
+        for (size_t j=0; j<width; j++) {
+            size_t src_idx = i*linebytes + j;
+            size_t dst_idx = (height-1-i)*linebytes + j;
+            dst[dst_idx] = src[src_idx];
+        }
+    }
+}
+
+void flip_vert_gray_bylines(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+{
+    size_t linebytes = width;
+    unsigned char* src_line = src;
+    unsigned char* dst_line = dst + (height-1)*linebytes;
+    for (size_t i=0; i<height; i++) {
+        memcpy(dst_line, src_line, linebytes);
+        dst_line -= linebytes;
+        src_line += linebytes;
+    }
 }

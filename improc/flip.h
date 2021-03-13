@@ -19,8 +19,12 @@ void flip_horiz_gray_asimd(unsigned char* src, size_t height, size_t width, unsi
 //----------------------------------------------------------------------
 
 void flip_vert_rgb_naive(unsigned char* src, size_t height, size_t width, unsigned char* dst);
-
 void flip_vert_rgb_bylines(unsigned char* src, size_t height, size_t width, unsigned char* dst);
+
+//----------------------------------------------------------------------
+
+void flip_vert_gray_naive(unsigned char* src, size_t height, size_t width, unsigned char* dst);
+void flip_vert_gray_bylines(unsigned char* src, size_t height, size_t width, unsigned char* dst);
 
 //----------------------------------------------------------------------//TODO
 
