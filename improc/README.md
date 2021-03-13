@@ -6,6 +6,7 @@ Image processing algorithm implementations.
 
 ## rgb2gray
 
+### Benchmark
 image size: h=4032, w=3024
 android device: XiaoMI8(QCOM845)
 OpenCV 4.5.1
@@ -37,6 +38,8 @@ OpenCV 4.5.1
 
 - [6] [A survery fast BGRA to grayscale conversion on iPhone](https://computer-vision-talks.com/2011-02-08-a-very-fast-bgra-to-grayscale-conversion-on-iphone/)
 ## rgb2bgr
+
+### Benchmark
 
 image size: h=4032, w=3024
 android device: XiaoMI8(QCOM845)
@@ -73,6 +76,7 @@ OpenCV 4.5.1
 
 
 ## threshold
+### Benchmark
 
 image size: h=4032, w=3024
 android=XiaoMI8(QCOM845),NDK-r21b
@@ -106,6 +110,8 @@ input is rgb, output is gray
 
 ## histogram
 
+### Benchmark
+
 **histogram_gray**
 
 image size: h=4032, w=3024
@@ -125,6 +131,8 @@ OpenCV 4.5.1
 | 2  |  naive, r/g/b  |   6  ms    |   18 ms       |     21 ms     |
 
 ## flip
+
+### Benchmark
 
 **flip horizontally, rgb**
 
@@ -169,6 +177,10 @@ image info: height=4032, width=3024
 
 TODO: flip inplace
 
+### References
+
+- [NEON加速之memcpy在ARM平台的优化](https://www.jianshu.com/p/7b3bfc3aed12), flip vert by lines的潜在优化方案
+
 ## sobel
 
 **References**
@@ -193,11 +205,11 @@ TBD
 
 ## Neon Links
 
-**examples**
+### Examples
 
 [rgba2gray - neon](https://github.com/carlj/NEON-ASM-BGRA-to-Grayscale-conversion/blob/master/Classes/NEON_ASMViewController.m)
 
-**Intrinscs**:
+### Intrinscs
 
 - [Neon Intrinsics查询 - 官方在线版](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/intrinsics)
  
@@ -209,7 +221,7 @@ TBD
 
 - [gcc-4.8.4 - ARM-NEON-Intrinsics](https://gcc.gnu.org/onlinedocs/gcc-4.8.4/gcc/ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics)，可访问
 
-**Assembler**:
+### Assembler
 
 - [arm汇编入门帖 - asm volatile形式 - Roland_Sun的博客](https://blog.csdn.net/Roland_Sun/article/details/42921131)
 
@@ -244,7 +256,7 @@ TBD
 - [Confusion about different clobber description for arm inline assembly - StackOverFlow](https://stackoverflow.com/questions/65056624/confusion-about-different-clobber-description-for-arm-inline-assembly)
 
 
-**全能系列**
+### 全能系列
 
 - [AI移动端优化 - 知乎 - 章小龙 & BBuf & 圈圈虫等](https://www.zhihu.com/people/zxloas/posts)
 
@@ -258,11 +270,11 @@ TBD
 
 - [NEON™ Programmer's Guide 1.0 (armv7 neon文档)](https://developer.arm.com/documentation/den0018/a/)
 
-**Cache系列**
+### Cache系列
 
 - [性能优化篇（4）：NEON优化案例——图像颜色转换之RGB到BGR（aarch64版）](https://blog.csdn.net/wohenfanjian/article/details/103407259)
 
-**TODO系列**
+### TODO系列
 
 - 查询 armv7 所有 neon intrinsic 对应的汇编指令语法，见 [Neon Programmer's Guide 1.0 (DEN0018A_neon_programmers_guide.pdf)](https://developer.arm.com/documentation/den0018/a/)
 - 查询 armv7 所有汇编指令？
