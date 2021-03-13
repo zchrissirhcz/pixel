@@ -4,8 +4,10 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
+#include <stdlib.h>
+#include <string.h>
 
-void flip_rgb_horiz_naive(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+void flip_horiz_rgb_naive(unsigned char* src, size_t height, size_t width, unsigned char* dst)
 {
     unsigned char* src_line = src;
     unsigned char* dst_line = dst;
@@ -23,7 +25,7 @@ void flip_rgb_horiz_naive(unsigned char* src, size_t height, size_t width, unsig
     }
 }
 
-void flip_rgb_horiz_idxopt(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+void flip_horiz_rgb_idxopt(unsigned char* src, size_t height, size_t width, unsigned char* dst)
 {
     size_t linebytes = width * 3;
     size_t double_linebytes = linebytes * 2;
@@ -45,7 +47,7 @@ void flip_rgb_horiz_idxopt(unsigned char* src, size_t height, size_t width, unsi
     }
 }
 
-void flip_rgb_horiz_asimd(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+void flip_horiz_rgb_asimd(unsigned char* src, size_t height, size_t width, unsigned char* dst)
 {
     size_t done = 0;
     size_t linebytes = width * 3;
@@ -82,7 +84,7 @@ void flip_rgb_horiz_asimd(unsigned char* src, size_t height, size_t width, unsig
 }
 
 
-void flip_gray_horiz_naive(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+void flip_horiz_gray_naive(unsigned char* src, size_t height, size_t width, unsigned char* dst)
 {
     unsigned char* dst_line = dst;
     unsigned char* src_line = src;
@@ -95,7 +97,7 @@ void flip_gray_horiz_naive(unsigned char* src, size_t height, size_t width, unsi
     }
 }
 
-void flip_gray_horiz_asimd(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+void flip_horiz_gray_asimd(unsigned char* src, size_t height, size_t width, unsigned char* dst)
 {
 #ifdef __ARM_NEON
     size_t done = 0;
@@ -124,4 +126,40 @@ void flip_gray_horiz_asimd(unsigned char* src, size_t height, size_t width, unsi
 #else
     printf("TODO: not implemented yet!\n");
 #endif // __ARM_NEON
+}
+
+
+
+//----------------------------------------------------------------------
+
+void flip_vert_rgb_naive(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+{
+    size_t linebytes = width * 3;
+    for (size_t i=0; i<height; i++) {
+        for (size_t j=0; j<width; j++) {
+            size_t src_idx = i*linebytes + j*3;
+            size_t dst_idx = (height-1-i)*linebytes + j*3;
+            dst[dst_idx  ] = src[src_idx];
+            dst[dst_idx+1] = src[src_idx+1];
+            dst[dst_idx+2] = src[src_idx+2];
+        }
+    }
+}
+
+void flip_vert_rgb_bylines(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+{
+    size_t linebytes = width * 3;
+    unsigned char* src_line = src;
+    unsigned char* dst_line = dst + (height-1)*linebytes;
+    for (size_t i=0; i<height; i++) {
+        memcpy(dst_line, src_line, linebytes);
+        dst_line -= linebytes;
+        src_line += linebytes;
+    }
+}
+
+void flip_vert_rgb_asimd(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+{
+    //TODO: consider arm neon optimize for memcpy
+    // https://www.jianshu.com/p/7b3bfc3aed12
 }

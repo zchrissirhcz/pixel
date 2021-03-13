@@ -9,7 +9,7 @@
 //mode=1，左右颠倒  horizontally
 //mode=-1, against center point
 
-void flip_rgb_test() {
+void flip_horiz_rgb_test() {
     
     //cv::Mat image = cv::imread("colorhouse.jpg");
     cv::Mat image = cv::imread("sky.jpg");
@@ -38,7 +38,7 @@ void flip_rgb_test() {
     src_buf = image.data;
     dst_buf = result_naive.data;
     t_start = pixel_get_current_time();
-    flip_rgb_horiz_naive(src_buf, height, width, dst_buf);
+    flip_horiz_rgb_naive(src_buf, height, width, dst_buf);
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("flip rgb horiz, naive,  time cost %.4lf ms\n", t_cost);
 
@@ -46,7 +46,7 @@ void flip_rgb_test() {
     src_buf = image.data;
     dst_buf = result_idxopt.data;
     t_start = pixel_get_current_time();
-    flip_rgb_horiz_idxopt(src_buf, height, width, dst_buf);
+    flip_horiz_rgb_idxopt(src_buf, height, width, dst_buf);
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("flip rgb horiz, idxopt, time cost %.4lf ms\n", t_cost);
 
@@ -54,7 +54,7 @@ void flip_rgb_test() {
     src_buf = image.data;
     dst_buf = result_asimd.data;
     t_start = pixel_get_current_time();
-    flip_rgb_horiz_asimd(src_buf, height, width, dst_buf);
+    flip_horiz_rgb_asimd(src_buf, height, width, dst_buf);
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("flip rgb horiz, asimd, time cost %.4lf ms\n", t_cost);
 
@@ -64,7 +64,7 @@ void flip_rgb_test() {
     cv::imwrite("sky_flip_asimd.png", result_asimd);
 }
 
-void flip_gray_test()
+void flip_horiz_gray_test()
 {
     cv::Mat image = cv::imread("sky.png");
     cv::Size size = image.size();
@@ -91,7 +91,7 @@ void flip_gray_test()
     src_buf = gray.data;
     dst_buf = result_naive.data;
     t_start = pixel_get_current_time();
-    flip_gray_horiz_naive(src_buf, height, width, dst_buf);
+    flip_horiz_gray_naive(src_buf, height, width, dst_buf);
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("flip gray horiz, naive,  time cost %.4lf ms\n", t_cost);
 
@@ -99,7 +99,7 @@ void flip_gray_test()
     src_buf = gray.data;
     dst_buf = result_naive.data;
     t_start = pixel_get_current_time();
-    flip_gray_horiz_asimd(src_buf, height, width, dst_buf);
+    flip_horiz_gray_asimd(src_buf, height, width, dst_buf);
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("flip gray horiz, asimd,  time cost %.4lf ms\n", t_cost);
 
@@ -108,10 +108,56 @@ void flip_gray_test()
     cv::imwrite("sky_gray_flip_asimd.png", result_asimd);
 }
 
+static void flip_vert_rgb_test()
+{
+    cv::Mat image = cv::imread("sky.png");
+    cv::Size size = image.size();
+    size_t height = size.height;
+    size_t width = size.width;
+
+    cv::Mat result_opencv(size, CV_8UC3);
+    cv::Mat result_naive(size, CV_8UC3);
+    cv::Mat result_bylines(size, CV_8UC3);
+    
+    double t_start, t_cost;
+    unsigned char* src_buf = NULL;
+    unsigned char* dst_buf = NULL;
+
+    // opencv
+    src_buf = image.data;
+    dst_buf = result_opencv.data;
+    t_start = pixel_get_current_time();
+    cv::flip(image, result_opencv, 0);
+    t_cost = pixel_get_current_time() - t_start;
+    PIXEL_LOGD("flip rgb vertically, opencv, time cost %.4lf ms\n", t_cost);
+
+    // naive
+    src_buf = image.data;
+    dst_buf = result_naive.data;
+    t_start = pixel_get_current_time();
+    flip_vert_rgb_naive(src_buf, height, width, dst_buf);
+    t_cost = pixel_get_current_time() - t_start;
+    PIXEL_LOGD("flip rgb vertically, naive, time cost %.4lf ms\n", t_cost);
+
+    //flip_vert_rgb_bylines
+    src_buf = image.data;
+    dst_buf = result_bylines.data;
+    t_start = pixel_get_current_time();
+    flip_vert_rgb_bylines(src_buf, height, width, dst_buf);
+    t_cost = pixel_get_current_time() - t_start;
+    PIXEL_LOGD("flip rgb vertically, by lines, time cost %.4lf ms\n", t_cost);
+
+    cv::imwrite("sky_flip_vert_rgb_opencv.png", result_opencv);
+    cv::imwrite("sky_flip_vert_rgb_naive.png", result_naive);
+    cv::imwrite("sky_flip_vert_rgb_bylines.png", result_bylines);
+}
+
 int main() {
 
-    //flip_rgb_test();
-    flip_gray_test();
+    //flip_horiz_rgb_test();
+    //flip_horiz_gray_test();
+
+    flip_vert_rgb_test();
 
     return 0;
 }
