@@ -115,25 +115,25 @@ static void matrix_column_max_and_idx_test()
     unsigned char* src_buf = NULL;
     unsigned char* dst_buf = NULL;
     size_t buf_size = width*sizeof(size_t);
-    size_t* max_indicies_naive = (size_t*)malloc(buf_size);
+    uint32_t* max_indicies_naive = (uint32_t*)malloc(buf_size);
     //memset(max_indicies_naive, 0, buf_size);
     for (size_t i = 0; i < width; i++) {
         max_indicies_naive[i] = 0;
     }
 
-    size_t* max_indicies_cacheline = (size_t*)malloc(buf_size);
+    uint32_t* max_indicies_cacheline = (uint32_t*)malloc(buf_size);
     //memset(max_indicies_cacheline, 0, buf_size);
     for (size_t i = 0; i < width; i++) {
         max_indicies_cacheline[i] = 0;
     }
 
-    size_t* max_indicies_cacheline_asimd = (size_t*)malloc(buf_size);
+    uint32_t* max_indicies_cacheline_asimd = (uint32_t*)malloc(buf_size);
     //memset(max_indicies_cacheline_asimd, 0, buf_size);
     for (size_t i = 0; i < width; i++) {
         max_indicies_cacheline_asimd[i] = 0;
     }
 
-    size_t* max_indicies_opencv = (size_t*)malloc(buf_size);
+    uint32_t* max_indicies_opencv = (uint32_t*)malloc(buf_size);
     //memset(max_indicies_opencv, 0, buf_size);
     for (size_t i = 0; i < width; i++) {
         max_indicies_opencv[i] = 0;
@@ -190,14 +190,17 @@ static void matrix_column_max_and_idx_test()
               (result_naive.data[i] != result_cacheline.data[i]) || 
               (result_naive.data[i] != result_cacheline_asimd.data[i])
             ) {
-            printf("mis@%zu(naive=%d, cache=%d) ", i, result_naive.data[i], result_cacheline.data[i]);
+            //printf("mis@%zu(naive=%d, cache=%d) ", i, result_naive.data[i], result_cacheline.data[i]);
             mis_count++;
         }
-        if ( (max_indicies_naive[i] != max_indicies_opencv[i]) ||
+        if ( 
+             (max_indicies_naive[i] != max_indicies_opencv[i]) ||
              (max_indicies_naive[i] != max_indicies_cacheline[i]) ||
              (max_indicies_naive[i] != max_indicies_cacheline_asimd[i])
+             //(max_indicies_cacheline[i] != max_indicies_cacheline_asimd[i])
             ) {
             mis_idx_count++;
+            //printf("mis idx@%zu, cacheline=%d, asimd=%d\n", i, max_indicies_cacheline[i], max_indicies_cacheline_asimd[i]);
         }
     }
     printf("mis_count=%zu, mis_idx_count=%zu\n", mis_count, mis_idx_count);
@@ -211,8 +214,8 @@ static void matrix_column_max_and_idx_test()
 
 
 int main() {
-    matrix_column_max_test();
-    //matrix_column_max_and_idx_test();
+    //matrix_column_max_test();
+    matrix_column_max_and_idx_test();
     //ld_test();
 
     return 0;
