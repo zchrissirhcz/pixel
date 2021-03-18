@@ -18,10 +18,10 @@ void matrix_column_max_u8_naive(unsigned char* src, size_t height, size_t width,
     }
 }
 
-void matrix_column_max_u8_neighborline(unsigned char* src, size_t height, size_t width, unsigned char* max_vals)
+void matrix_column_max_u8_cacheline(unsigned char* src, size_t height, size_t width, unsigned char* max_vals)
 {
     memcpy(max_vals, src, width*sizeof(unsigned char));
-    unsigned char* src_line = src;
+    unsigned char* src_line = src + width;
     for (size_t i = 1; i < height; i++) {
         for (size_t j = 0; j < width; j++) {
             if (src_line[j] > max_vals[j]) {
@@ -32,10 +32,10 @@ void matrix_column_max_u8_neighborline(unsigned char* src, size_t height, size_t
     }
 }
 
-void matrix_column_max_u8_neighborline_asimd(unsigned char* src, size_t height, size_t width, unsigned char* max_vals)
+void matrix_column_max_u8_cacheline_asimd(unsigned char* src, size_t height, size_t width, unsigned char* max_vals)
 {
     memcpy(max_vals, src, width*sizeof(unsigned char));
-    unsigned char* src_line = src;
+    unsigned char* src_line = src + width;
 
 #if __ARM_NEON
     size_t step = 16;
@@ -82,15 +82,11 @@ void matrix_column_max_and_idx_u8_naive(unsigned char* src, size_t height, size_
     }
 }
 
-void matrix_column_max_and_idx_u8_neighborline(unsigned char* src, size_t height, size_t width, unsigned char* max_vals, size_t* max_indices)
+void matrix_column_max_and_idx_u8_cacheline(unsigned char* src, size_t height, size_t width, unsigned char* max_vals, size_t* max_indices)
 {
     memcpy(max_vals, src, width*sizeof(unsigned char));
-    
-    for (size_t i=0; i<width; i++) {
-        max_indices[i] = 0;
-    }
-
-    unsigned char* src_line = src;
+    memset(max_indices, 0, width * sizeof(size_t));
+    unsigned char* src_line = src + width;
     for (size_t i = 1; i < height; i++) {
         for (size_t j = 0; j < width; j++) {
             if (src_line[j] > max_vals[j]) {
@@ -102,7 +98,7 @@ void matrix_column_max_and_idx_u8_neighborline(unsigned char* src, size_t height
     }
 }
 
-void matrix_column_max_and_idx_u8_neighborline_asimd(unsigned char* src, size_t height, size_t width, unsigned char* max_vals, size_t* max_indices)
+void matrix_column_max_and_idx_u8_cacheline_asimd(unsigned char* src, size_t height, size_t width, unsigned char* max_vals, size_t* max_indices)
 {
     memcpy(max_vals, src, width*sizeof(unsigned char));
     unsigned char* src_line = src;
