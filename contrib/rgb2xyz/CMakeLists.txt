@@ -10,6 +10,8 @@ include("cmake/dependencies.cmake")
 
 add_executable(testbed
     testbed.cpp
+    "${CMAKE_SOURCE_DIR}/../../matcalc/array_mean.h"
+    "${CMAKE_SOURCE_DIR}/../../matcalc/array_mean.c"
 )
 
 target_include_directories(testbed PUBLIC "${CMAKE_SOURCE_DIR}/../..")

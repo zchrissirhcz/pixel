@@ -25,8 +25,7 @@ rgb2xyz, fused asimd2,  time=12.8382 ms, x=0.2988, y=0.3162, z=0.3849
 rgb2xyz, fused asimd3,  time=7.2030 ms, x=0.2988, y=0.3162, z=0.3849
 ```
 
-Initial: 115 ms
-Current Best: 7 ms (fused asimd3)
+Initial: 115 ms, Current Best: 7 ms (fused asimd3), **16 times faster**
 
 **QCOM 888(XiaoMi11)**
 ```
@@ -47,3 +46,4 @@ rgb2xyz, fused asimd2,  time=4.7895 ms, x=0.2988, y=0.3162, z=0.3849
 rgb2xyz, fused asimd3,  time=3.2334 ms, x=0.2988, y=0.3162, z=0.3849
 rgb2xyz, fused asimd4,  time=3.1785 ms, x=0.2988, y=0.3162, z=0.3849
 ```
+Initial: 56 ms, Current Best: 3 ms (fused asimd3), **17 times faster**

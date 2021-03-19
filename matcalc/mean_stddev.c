@@ -44,3 +44,8 @@ void mean_stddev_u8_naive(unsigned char* src, size_t len, float* _mean, float* _
     *_mean = mean;
     *_stddev = stddev;
 }
+
+void mean_stddev_u8_asimd(unsigned char* src, size_t len, float* _mean, float* stddev)
+{
+    
+}

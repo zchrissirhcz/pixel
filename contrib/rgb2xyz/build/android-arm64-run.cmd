@@ -1,7 +1,7 @@
 @echo off
 
 set BUILD_DIR=android-arm64
-set DST_DIR=/data/pixel
+set DST_DIR=/data/local/tmp
 set EXE_FILE=testbed
 
 adb shell "mkdir -p %DST_DIR%"
