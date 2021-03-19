@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-float array_mean_naive(unsigned char* data, size_t len) {
+float array_mean_u8_naive(unsigned char* data, size_t len) {
     float sum = 0;
     for (size_t i=0; i<len; i++) {
         sum += data[i];
@@ -17,7 +17,7 @@ float array_mean_naive(unsigned char* data, size_t len) {
 }
 
 // u8转u16再转u32再转f32，然后算sum
-float array_mean_asimd(unsigned char* data, size_t len) {
+float array_mean_u8_asimd(unsigned char* data, size_t len) {
     float sum = 0;
     size_t done = 0;
 #ifdef __ARM_NEON
@@ -53,7 +53,7 @@ float array_mean_asimd(unsigned char* data, size_t len) {
     return sum;
 }
 
-float array_mean_asimd2(unsigned char* data, size_t len) {
+float array_mean_u8_asimd2(unsigned char* data, size_t len) {
     float sum = 0;
     size_t done = 0;
 #ifdef __ARM_NEON
@@ -130,7 +130,7 @@ float array_mean_asimd2(unsigned char* data, size_t len) {
 // Note: this implementation requires len < 67372036
 // when len > 67372036 and each element is 255, it will cause overflow
 // ((2*2147483648-1)/255)*4 = 67372036 (=8000x8421 size gray image)
-float array_mean_asimd3(unsigned char* data, size_t len) {
+float array_mean_u8_asimd3(unsigned char* data, size_t len) {
     if (len >= 67372036) {
         fprintf(stderr, "input len too long, may cause overflow\n");
     }
@@ -225,7 +225,7 @@ float array_mean_asimd3(unsigned char* data, size_t len) {
     return avg;
 }
 
-float array_mean_asimd4(unsigned char* data, size_t len) {
+float array_mean_u8_asimd4(unsigned char* data, size_t len) {
     float sum = 0;
     size_t done = 0;
 #ifdef __ARM_NEON
@@ -293,7 +293,7 @@ float array_mean_asimd4(unsigned char* data, size_t len) {
 
 /*
 //TODO
-float array_mean_asimd5(unsigned char* data, size_t len) {
+float array_mean_u8_asimd5(unsigned char* data, size_t len) {
     float sum = 0;
     size_t done = 0;
 #ifdef __ARM_NEON
@@ -333,3 +333,99 @@ float array_mean_asimd5(unsigned char* data, size_t len) {
     return sum;
 }
 */
+
+//-----
+float array_mean_s8_naive(int8_t* data, size_t len) {
+    float res = 0;
+    for(size_t i=0; i<len; i++) {
+        res += data[i];
+    }
+    res /= len;
+    return res;
+}
+
+float array_mean_s8_asimd(int8_t* data, size_t len)
+{
+#ifdef __ARM_NEON
+    int16x8_t result_level1 = vdupq_n_s16(0);
+    int32x4_t result_level2 = vdupq_n_s32(0);
+    int32x4_t result_vec = vdupq_n_s32(0);
+    
+    int8x8_t h_vec;
+
+    int8x8_t x_vec = vdup_n_s8(1);
+
+    int t0, t1;
+
+    bool flag;
+    for(int i=0; i<len/8; i++) {
+        h_vec = vld1_s8(&data[i*8]);
+        result_level1 = vmlal_s8(result_level1, h_vec, x_vec);
+        flag = false;
+
+        if( (i*8) % 256 == 0) {
+            //16x8 => 32x4
+            t0 = vgetq_lane_s16(result_level1, 0);
+            t1 = vgetq_lane_s16(result_level1, 1);
+            result_level2 = vsetq_lane_s32(t0+t1, result_level2, 0);
+
+            t0 = vgetq_lane_s16(result_level1, 2);
+            t1 = vgetq_lane_s16(result_level1, 3);
+            result_level2 = vsetq_lane_s32(t0+t1, result_level2, 1);
+
+            t0 = vgetq_lane_s16(result_level1, 4);
+            t1 = vgetq_lane_s16(result_level1, 5);
+            result_level2 = vsetq_lane_s32(t0+t1, result_level2, 2);
+
+            t0 = vgetq_lane_s16(result_level1, 6);
+            t1 = vgetq_lane_s16(result_level1, 7);
+            result_level2 = vsetq_lane_s32(t0+t1, result_level2, 3);
+
+            result_vec = vaddq_s32(result_level2, result_vec);
+
+            result_level1 = vdupq_n_s16(0);
+            flag = true;
+        }
+    }
+    if(!flag) {
+        //16x8 => 32x4
+        t0 = vgetq_lane_s16(result_level1, 0);
+        t1 = vgetq_lane_s16(result_level1, 1);
+        result_level2 = vsetq_lane_s32(t0+t1, result_level2, 0);
+
+        t0 = vgetq_lane_s16(result_level1, 2);
+        t1 = vgetq_lane_s16(result_level1, 3);
+        result_level2 = vsetq_lane_s32(t0+t1, result_level2, 1);
+
+        t0 = vgetq_lane_s16(result_level1, 4);
+        t1 = vgetq_lane_s16(result_level1, 5);
+        result_level2 = vsetq_lane_s32(t0+t1, result_level2, 2);
+
+        t0 = vgetq_lane_s16(result_level1, 6);
+        t1 = vgetq_lane_s16(result_level1, 7);
+        result_level2 = vsetq_lane_s32(t0+t1, result_level2, 3);
+
+        result_vec = vaddq_s32(result_level2, result_vec);
+
+        result_level1 = vdupq_n_s16(0);
+        flag = true;
+    }
+
+    float sum = 0;
+    sum += vgetq_lane_s32(result_vec, 0);
+    sum += vgetq_lane_s32(result_vec, 1);
+    sum += vgetq_lane_s32(result_vec, 2);
+    sum += vgetq_lane_s32(result_vec, 3);
+
+    if(len%8!=0) {
+        for(int k=len-(len%8); k<len; k++) {
+            sum += data[k];
+        }
+    }
+
+    float avg = sum / len;
+    return avg;
+#endif
+    //TODO
+    return 0;
+}

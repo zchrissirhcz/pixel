@@ -24,6 +24,7 @@ static void test_mean_stddev_u8()
 
     double t_start, t_cost;
     unsigned char* src_buf = gray.data;
+    size_t len = height * width;
 
     t_start = pixel_get_current_time();
     cv::meanStdDev(gray, mean_mat, stddev_mat);
@@ -39,12 +40,35 @@ static void test_mean_stddev_u8()
 
     float mean_naive = 0;
     float stddev_naive = 0;
-    size_t len = height * width;
     t_start = pixel_get_current_time();
     mean_stddev_u8_naive(src_buf, len, &mean_naive, &stddev_naive);
     t_cost = pixel_get_current_time() - t_start;
     printf("meanStdDev for u8 input, naive, mean: %.4f, stdDev: %.4f, time cost %.4lf ms\n",
         mean_naive, stddev_naive, t_cost);
+
+    float mean_asimd1 = 0;
+    float stddev_asimd1 = 0;
+    t_start = pixel_get_current_time();
+    mean_stddev_u8_asimd1(src_buf, len, &mean_asimd1, &stddev_asimd1);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("meanStdDev for u8 input, asimd1, mean: %.4f, stdDev: %.4f, time cost %.4lf ms\n",
+        mean_asimd1, stddev_asimd1, t_cost);
+
+    float mean_fast = 0;
+    float stddev_fast = 0;
+    t_start = pixel_get_current_time();
+    mean_stddev_u8_fast(src_buf, len, &mean_fast, &stddev_fast);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("meanStdDev for u8 input, fast,  mean: %.4f, stdDev: %.4f, time cost %.4lf ms\n",
+        mean_fast, stddev_fast, t_cost);
+
+    float mean_asimd2 = 0;
+    float stddev_asimd2 = 0;
+    t_start = pixel_get_current_time();
+    mean_stddev_u8_asimd2(src_buf, len, &mean_asimd2, &stddev_asimd2);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("meanStdDev for u8 input, asimd2, mean: %.4f, stdDev: %.4f, time cost %.4lf ms\n",
+        mean_asimd2, stddev_asimd2, t_cost);
 }
 
 int main(){
