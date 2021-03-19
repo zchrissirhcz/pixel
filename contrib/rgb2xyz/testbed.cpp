@@ -80,9 +80,9 @@ XYZ rgb2xyz_fused_asimd(cv::Mat Ir, cv::Mat Ig, cv::Mat Ib)
     size_t height = size.height;
     size_t width = size.width;
     size_t len = height * width;
-    float r_mean = array_mean_asimd4(Ir.data, len);
-    float g_mean = array_mean_asimd4(Ig.data, len);
-    float b_mean = array_mean_asimd4(Ib.data, len);
+    float r_mean = array_mean_u8_asimd4(Ir.data, len);
+    float g_mean = array_mean_u8_asimd4(Ig.data, len);
+    float b_mean = array_mean_u8_asimd4(Ib.data, len);
 
     float x_mean = 0.412453f * r_mean + 0.357580f * g_mean + 0.180423f * b_mean;
     float y_mean = 0.212671f * r_mean + 0.715160f * g_mean + 0.072169f * b_mean;

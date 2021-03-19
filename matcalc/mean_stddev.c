@@ -190,7 +190,8 @@ void mean_stddev_u8_asimd2(unsigned char* src, size_t len, float* _mean, float* 
     
     done = vec_size;
 #else
-
+    //TODO
+    printf("error! not implemented yet!\n");
 #endif // __aarch64__
 
 #endif // __ARM_NEON
