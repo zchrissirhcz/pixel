@@ -31,8 +31,8 @@ armv8a: XiaoMi 11 (QCOM888)
 | 1  | opencv      |  237 ms    |   88 ms  |
 | 2  | naive       |  167 ms    |   78 ms  |
 | 3  | 缓存行       |  10 ms    |  5.3 ms  |
-| 4  | 缓存行 asimd |  -         | 3.5 ms |
+| 4  | 缓存行 asimd |  -         | 1.46 ms |
 
-android-armv8加速比：time(opencv)/time(缓存行asimd)=**25倍**
+android-armv8加速比：time(opencv)/time(缓存行asimd)=**60倍**
 
 

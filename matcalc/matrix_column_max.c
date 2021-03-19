@@ -100,6 +100,7 @@ void matrix_column_max_and_idx_u8_cacheline(unsigned char* src, size_t height, s
 }
 
 #if 0
+//结果不对
 void matrix_column_max_and_idx_u8_cacheline_asimd(unsigned char* src, size_t height, size_t width, unsigned char* max_vals, uint32_t* max_indicies)
 {
     memcpy(max_vals, src, width*sizeof(unsigned char));
@@ -166,7 +167,8 @@ void matrix_column_max_and_idx_u8_cacheline_asimd(unsigned char* src, size_t hei
     }
 }
 
-#else
+#elif 0 
+// 3.5 ms
 void matrix_column_max_and_idx_u8_cacheline_asimd(unsigned char* src, size_t height, size_t width, unsigned char* max_vals, uint32_t* max_indicies)
 {
     memcpy(max_vals, src, width*sizeof(unsigned char));
@@ -261,5 +263,126 @@ void matrix_column_max_and_idx_u8_cacheline_asimd(unsigned char* src, size_t hei
         //break;
     }
 }
+#elif 0
+// 上一版的u8 mask转u32 mask有点丑，速度也不快。尝试优化
+// 2.9 ms
+void matrix_column_max_and_idx_u8_cacheline_asimd(unsigned char* src, size_t height, size_t width, unsigned char* max_vals, uint32_t* max_indicies)
+{
+    memcpy(max_vals, src, width*sizeof(unsigned char));
+    memset(max_indicies, 0, width*sizeof(uint32_t));
+    unsigned char* src_line = src + width;
 
+#if __ARM_NEON
+    size_t step = 8;
+    size_t vec_size = width - width % step;
+    uint32x4_t vcur_indicies;
+#endif // __ARM_NEON
+
+    for (size_t i=1; i<height; i++) {
+        size_t done = 0;
+#if __ARM_NEON
+        vcur_indicies = vdupq_n_u32(i);
+        for (size_t j=0; j<vec_size; j+=step) {
+            uint8x8_t vsrc = vld1_u8(src_line + j);
+            uint8x8_t vmax_vals = vld1_u8(max_vals + j);
+            uint8x8_t vmask_gt = vcgt_u8(vsrc, vmax_vals);
+            vmax_vals = vbsl_u8(vmask_gt, vsrc, vmax_vals);
+            vst1_u8(max_vals + j, vmax_vals);
+
+            uint16x8_t vm_s16 = vmovl_s8(vreinterpret_s8_u8(vmask_gt));
+            uint32x4_t vm_u32_low = vreinterpretq_u32_s32(vmovl_s16(vget_low_s16(vm_s16)));
+            uint32x4_t vm_u32_high = vreinterpretq_u32_s32(vmovl_s16(vget_high_s16(vm_s16)));
+
+            uint32x4_t vmax_indicies;
+
+            vmax_indicies = vld1q_u32(max_indicies+j);
+            vmax_indicies = vbslq_u32(vm_u32_low, vcur_indicies, vmax_indicies);
+            vst1q_u32(max_indicies+j, vmax_indicies);
+
+            vmax_indicies = vld1q_u32(max_indicies+j+4);
+            vmax_indicies = vbslq_u32(vm_u32_high, vcur_indicies, vmax_indicies);
+            vst1q_u32(max_indicies+j+4, vmax_indicies);
+        }
+        done = vec_size;
+#endif // __ARM_NEON
+        for (size_t j=done; j<width; j++) {
+            if (src_line[j] > max_vals[j]) {
+                max_vals[j] = src_line[j];
+                max_indicies[j] = i;
+            }
+        }
+        src_line += width;
+
+        //break;
+    }
+}
+#else
+// step从8增加到16
+//1.46 ms
+void matrix_column_max_and_idx_u8_cacheline_asimd(unsigned char* src, size_t height, size_t width, unsigned char* max_vals, uint32_t* max_indicies)
+{
+    memcpy(max_vals, src, width*sizeof(unsigned char));
+    memset(max_indicies, 0, width*sizeof(uint32_t));
+    unsigned char* src_line = src + width;
+
+#if __ARM_NEON
+    size_t step = 16;
+    size_t vec_size = width - width % step;
+    uint32x4_t vcur_indicies;
+    uint8x16_t vsrc;
+    uint8x16_t vmax_vals;
+    uint8x16_t vmask_gt;
+    uint32x4x4_t vmax_indicies;
+    
+#endif // __ARM_NEON
+
+    for (size_t i=1; i<height; i++) {
+        size_t done = 0;
+#if __ARM_NEON
+        vcur_indicies = vdupq_n_u32(i);
+        for (size_t j=0; j<vec_size; j+=step) {
+            vsrc = vld1q_u8(src_line + j);
+            vmax_vals = vld1q_u8(max_vals + j);
+            vmask_gt = vcgtq_u8(vsrc, vmax_vals);
+            vmax_vals = vbslq_u8(vmask_gt, vsrc, vmax_vals);
+            vst1q_u8(max_vals + j, vmax_vals);
+
+            uint16x8_t vm_s16_0 = vmovl_s8(vget_low_s8(vreinterpretq_s8_u8(vmask_gt)));
+            uint16x8_t vm_s16_1 = vmovl_s8(vget_high_s8(vreinterpretq_s8_u8(vmask_gt)));
+            uint32x4x4_t vm_u32;
+            
+            vm_u32.val[0] = vreinterpretq_u32_s32(vmovl_s16(vget_low_s16(vm_s16_0)));
+            vm_u32.val[1] = vreinterpretq_u32_s32(vmovl_s16(vget_high_s16(vm_s16_0)));
+            vm_u32.val[2] = vreinterpretq_u32_s32(vmovl_s16(vget_low_s16(vm_s16_1)));
+            vm_u32.val[3] = vreinterpretq_u32_s32(vmovl_s16(vget_high_s16(vm_s16_1)));
+
+            vmax_indicies.val[0] = vld1q_u32(max_indicies+j);
+            vmax_indicies.val[0] = vbslq_u32(vm_u32.val[0], vcur_indicies, vmax_indicies.val[0]);
+            vst1q_u32(max_indicies+j, vmax_indicies.val[0]);
+
+            vmax_indicies.val[1] = vld1q_u32(max_indicies+j+4);
+            vmax_indicies.val[1] = vbslq_u32(vm_u32.val[1], vcur_indicies, vmax_indicies.val[1]);
+            vst1q_u32(max_indicies+j+4, vmax_indicies.val[1]);
+
+            vmax_indicies.val[2] = vld1q_u32(max_indicies+j+8);
+            vmax_indicies.val[2] = vbslq_u32(vm_u32.val[2], vcur_indicies, vmax_indicies.val[2]);
+            vst1q_u32(max_indicies+j+8, vmax_indicies.val[2]);
+
+            vmax_indicies.val[3] = vld1q_u32(max_indicies+j+12);
+            vmax_indicies.val[3] = vbslq_u32(vm_u32.val[3], vcur_indicies, vmax_indicies.val[3]);
+            vst1q_u32(max_indicies+j+12, vmax_indicies.val[3]);
+        }
+        done = vec_size;
+#endif // __ARM_NEON
+        for (size_t j=done; j<width; j++) {
+            if (src_line[j] > max_vals[j]) {
+                max_vals[j] = src_line[j];
+                max_indicies[j] = i;
+            }
+        }
+        src_line += width;
+
+        //break;
+    }
+}
 #endif
