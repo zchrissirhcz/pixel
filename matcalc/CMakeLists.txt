@@ -7,9 +7,13 @@ add_executable(testbed
     # matrix.c
     # matrix_test.cpp
 
-    matrix_column_max.h
-    matrix_column_max.c
-    matrix_column_max_test.cpp
+    # matrix_column_max.h
+    # matrix_column_max.c
+    # matrix_column_max_test.cpp
+
+    mean_stddev.h
+    mean_stddev.c
+    mean_stddev_test.cpp
 )
 
 target_include_directories(testbed PRIVATE ${CMAKE_SOURCE_DIR}/..)

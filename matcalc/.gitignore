@@ -1,3 +1,4 @@
 build/*.bmp
 build/*.jpg
 build/*.png
+*.png

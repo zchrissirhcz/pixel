@@ -36,3 +36,15 @@ armv8a: XiaoMi 11 (QCOM888)
 android-armv8加速比：time(opencv)/time(缓存行asimd)=**60倍**
 
 
+## mean std dev, input u8 (uchar输入类型，算均值和方差)
+
+image info: name=river_bank2.png, height=3024, width=4032
+
+vs2019-x64: i7-4790
+armv8a: XiaoMi 11 (QCOM888)
+
+| id | method      | vs2019-x64 | armv8a   |
+| -- | ----------- | ---------- | -------- |
+| 1  | opencv      |  5.6 ms    |  2 ms    |
+| 2  | naive       |  11.2 ms   |  15 ms   |
+
