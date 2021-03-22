@@ -638,6 +638,148 @@ float array_mean_u8_asimd6(unsigned char* data, size_t len) {
     return sum * 1.0 / len;
 }
 
+// asimd3的重构
+float array_mean_u8_asimd70(unsigned char* data, size_t len) {
+    uint64_t sum = 0;
+    size_t done = 0;
+
+#ifdef __ARM_NEON
+    size_t step = 8;
+    size_t vec_size = len - len % step;
+
+    uint8x8_t v0;
+    uint16x8_t v2 = vdupq_n_u16(0);
+    uint8x8_t v_one = vdup_n_u8(1);
+    bool flag;
+
+    uint16_t v2_mem[8];
+    for(size_t i=0; i<vec_size; i+=step) {
+        v0 = vld1_u8(data);
+        data += step;
+        v2 = vmlal_u8(v2, v0, v_one);
+        flag = false;
+
+        if( i % 256 == 0) {
+            vst1q_u16(v2_mem, v2);
+            sum += v2_mem[0] + v2_mem[1] + v2_mem[2] + v2_mem[3] + v2_mem[4] + v2_mem[5] + v2_mem[6] + v2_mem[7];
+            v2 = vdupq_n_u16(0);
+            flag = true;
+        }
+    }
+    if(!flag) {
+        vst1q_u16(v2_mem, v2);
+        sum += v2_mem[0] + v2_mem[1] + v2_mem[2] + v2_mem[3] + v2_mem[4] + v2_mem[5] + v2_mem[6] + v2_mem[7];
+        v2 = vdupq_n_u16(0);
+        flag = true;
+    }
+
+    done = vec_size;
+#endif // __ARM_NEON
+
+    for (; done<len; done++) {
+        sum += *data;
+        data++;
+    }
+
+    return sum * 1.0 / len;
+}
+
+// 基于array_mean_u8_asimd70，vld1改为vld1q, 1.01ms->0.63ms @ armv8
+float array_mean_u8_asimd71(unsigned char* data, size_t len) {
+    uint64_t sum = 0;
+    size_t done = 0;
+
+#ifdef __ARM_NEON
+    size_t step = 16;
+    size_t vec_size = len - len % step;
+
+    uint8x16_t v0;
+    uint16x8_t v2 = vdupq_n_u16(0);
+    uint8x8_t v_one = vdup_n_u8(1);
+    bool flag;
+
+    uint16_t v2_mem[8];
+    for(size_t i=0; i<vec_size; i+=step) {
+        v0 = vld1q_u8(data);
+        data += step;
+        v2 = vmlal_u8(v2, vget_low_u8(v0), v_one);
+        v2 = vmlal_u8(v2, vget_high_u8(v0), v_one);
+        flag = false;
+
+        if( i % 256 == 0) {
+            vst1q_u16(v2_mem, v2);
+            sum += v2_mem[0] + v2_mem[1] + v2_mem[2] + v2_mem[3] + v2_mem[4] + v2_mem[5] + v2_mem[6] + v2_mem[7];
+            v2 = vdupq_n_u16(0);
+            flag = true;
+        }
+    }
+    if(!flag) {
+        vst1q_u16(v2_mem, v2);
+        sum += v2_mem[0] + v2_mem[1] + v2_mem[2] + v2_mem[3] + v2_mem[4] + v2_mem[5] + v2_mem[6] + v2_mem[7];
+        v2 = vdupq_n_u16(0);
+        flag = true;
+    }
+
+    done = vec_size;
+#endif // __ARM_NEON
+
+    for (; done<len; done++) {
+        sum += *data;
+        data++;
+    }
+
+    return sum * 1.0 / len;
+}
+
+// 有时候比array_mean_u8_asimd71快一点；和OpenCV在armv7速度基本一样，或更快
+float array_mean_u8_asimd7(unsigned char* data, size_t len) {
+    uint64_t sum = 0;
+    size_t done = 0;
+
+#ifdef __ARM_NEON
+    size_t step = 16*2;
+    size_t vec_size = len - len % step;
+
+    uint8x16x2_t v0;
+    uint16x8_t v2 = vdupq_n_u16(0);
+    bool flag;
+
+    uint16_t v2_mem[8];
+    for(size_t i=0; i<vec_size; i+=step) {
+        v0 = vld2q_u8(data);
+        data += step;
+        flag = false;
+
+        v2 = vaddq_u16(v2, vmovl_u8(vget_low_u8(v0.val[0])));
+        v2 = vaddq_u16(v2, vmovl_u8(vget_high_u8(v0.val[0])));
+        v2 = vaddq_u16(v2, vmovl_u8(vget_low_u8(v0.val[1])));
+        v2 = vaddq_u16(v2, vmovl_u8(vget_high_u8(v0.val[1])));
+
+        if( i % 256 == 0) {
+            vst1q_u16(v2_mem, v2);
+            sum += v2_mem[0] + v2_mem[1] + v2_mem[2] + v2_mem[3] + v2_mem[4] + v2_mem[5] + v2_mem[6] + v2_mem[7];
+            v2 = vdupq_n_u16(0);
+            flag = true;
+        }
+    }
+    if(!flag) {
+        vst1q_u16(v2_mem, v2);
+        sum += v2_mem[0] + v2_mem[1] + v2_mem[2] + v2_mem[3] + v2_mem[4] + v2_mem[5] + v2_mem[6] + v2_mem[7];
+        v2 = vdupq_n_u16(0);
+        flag = true;
+    }
+
+    done = vec_size;
+#endif // __ARM_NEON
+
+    for (; done<len; done++) {
+        sum += *data;
+        data++;
+    }
+
+    return sum * 1.0 / len;
+}
+
 /*
 //TODO
 float array_mean_u8_asimd5(unsigned char* data, size_t len) {

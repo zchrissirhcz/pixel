@@ -61,6 +61,11 @@ void test_array_mean() {
     mean = array_mean_u8_asimd6(data, len);
     t_cost = pixel_get_current_time() - t_start;
     printf("array mean, asimd6, result=%.4f, time cost %.4lf\n", mean, t_cost);
+
+    t_start = pixel_get_current_time();
+    mean = array_mean_u8_asimd7(data, len);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("array mean, asimd7, result=%.4f, time cost %.4lf\n", mean, t_cost);
 }
 
 int main() {
