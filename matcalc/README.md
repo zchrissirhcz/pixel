@@ -60,10 +60,12 @@ armv8a: XiaoMi 11 (QCOM888)
 
 | id | method      | vs2019-x64 | armv8a   | armv7a    |
 | -- | ----------- | ---------- | -------- | --------- |
-| 1  | opencv      |  4.21 ms   |  0.6 ms  |  0.94 ms  |
+| 1  | opencv      |  4.21 ms   |0.6/0.8 ms|  0.94 ms  |
 | 2  | naive       |  2.53 ms   |  3.5 ms  |  8.64 ms  |
 | 3  | asimd1      |  -         |  1.95 ms |  3.28 ms  |
 | 4  | asimd2      |  -         |  1.42 ms |  4.62 ms  |
 | 5  | asimd3      |  -         |  1.08 ms |  2.69 ms  |
-| 4  | asimd4      |  -         |  1.04 ms |  3.79 ms  |
+| 6  | asimd4      |  -         |  1.04 ms |  3.79 ms  |
+| 7  | asimd5      |  -         |  1.07 ms |  1.79 ms  |
+| 8  | asimd6      |  -         |  0.57 ms |  -        |
  
