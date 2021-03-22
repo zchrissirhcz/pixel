@@ -18,35 +18,39 @@ void test_array_mean() {
 
     size_t len = height * width;
 
-    float sum = 0;
+    float mean = 0;
     double t_start, t_cost;
-
     unsigned char* data = gray.data;
 
     t_start = pixel_get_current_time();
-    sum = array_mean_u8_naive(data, len);
+    mean = cv::mean(gray).val[0];
     t_cost = pixel_get_current_time() - t_start;
-    printf("array mean, naive,  result=%.4f, time cost %.4lf\n", sum, t_cost);
+    printf("array mean, opencv, result=%.4f, time cost %.4lf\n", mean, t_cost);
 
     t_start = pixel_get_current_time();
-    sum = array_mean_u8_asimd1(data, len);
+    mean = array_mean_u8_naive(data, len);
     t_cost = pixel_get_current_time() - t_start;
-    printf("array mean, asimd1, result=%.4f, time cost %.4lf\n", sum, t_cost);
+    printf("array mean, naive,  result=%.4f, time cost %.4lf\n", mean, t_cost);
 
     t_start = pixel_get_current_time();
-    sum = array_mean_u8_asimd2(data, len);
+    mean = array_mean_u8_asimd1(data, len);
     t_cost = pixel_get_current_time() - t_start;
-    printf("array mean, asimd2, result=%.4f, time cost %.4lf\n", sum, t_cost);
+    printf("array mean, asimd1, result=%.4f, time cost %.4lf\n", mean, t_cost);
 
     t_start = pixel_get_current_time();
-    sum = array_mean_u8_asimd3(data, len);
+    mean = array_mean_u8_asimd2(data, len);
     t_cost = pixel_get_current_time() - t_start;
-    printf("array mean, asimd3, result=%.4f, time cost %.4lf\n", sum, t_cost);
+    printf("array mean, asimd2, result=%.4f, time cost %.4lf\n", mean, t_cost);
 
     t_start = pixel_get_current_time();
-    sum = array_mean_u8_asimd4(data, len);
+    mean = array_mean_u8_asimd3(data, len);
     t_cost = pixel_get_current_time() - t_start;
-    printf("array mean, asimd4, result=%.4f, time cost %.4lf\n", sum, t_cost);
+    printf("array mean, asimd3, result=%.4f, time cost %.4lf\n", mean, t_cost);
+
+    t_start = pixel_get_current_time();
+    mean = array_mean_u8_asimd4(data, len);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("array mean, asimd4, result=%.4f, time cost %.4lf\n", mean, t_cost);
 }
 
 int main() {
