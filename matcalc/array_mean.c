@@ -173,7 +173,7 @@ float array_mean_u8_asimd3(unsigned char* data, size_t len) {
 
     uint16x8_t result_level1 = vdupq_n_u16(0);
     uint32x4_t result_level2 = vdupq_n_u32(0);
-    uint64x2_t vsum = vdupq_n_u32(0);
+    uint64x2_t vsum = vdupq_n_u64(0);
 
     uint8x8_t h_vec;
     uint8x8_t x_vec = vdup_n_u8(1);
@@ -366,36 +366,38 @@ float array_mean_u8_asimd5(unsigned char* data, size_t len) {
 }
 */
 
-//-----
 float array_mean_s8_naive(int8_t* data, size_t len) {
-    float res = 0;
-    for(size_t i=0; i<len; i++) {
-        res += data[i];
+    int64_t sum = 0; // note: if use float type for `sum`, when sum>=16777216 and as integer, sum would be incorrect
+    for (size_t i=0; i<len; i++) {
+        sum += data[i];
     }
-    res /= len;
-    return res;
+    return sum*1.0 / len;
 }
 
 float array_mean_s8_asimd(int8_t* data, size_t len)
 {
+    int64_t sum = 0;
+    size_t done = 0;
+
 #ifdef __ARM_NEON
+    size_t step = 8;
+    size_t vec_size = len - len % step;
+
     int16x8_t result_level1 = vdupq_n_s16(0);
     int32x4_t result_level2 = vdupq_n_s32(0);
-    int32x4_t result_vec = vdupq_n_s32(0);
+    int64x2_t vsum = vdupq_n_s64(0);
     
     int8x8_t h_vec;
-
     int8x8_t x_vec = vdup_n_s8(1);
-
     int t0, t1;
-
     bool flag;
-    for(int i=0; i<len/8; i++) {
-        h_vec = vld1_s8(&data[i*8]);
+    for(size_t i=0; i<vec_size; i++) {
+        h_vec = vld1_s8(data);
+        data += step;
         result_level1 = vmlal_s8(result_level1, h_vec, x_vec);
         flag = false;
 
-        if( (i*8) % 256 == 0) {
+        if( i % 256 == 0) {
             //16x8 => 32x4
             t0 = vgetq_lane_s16(result_level1, 0);
             t1 = vgetq_lane_s16(result_level1, 1);
@@ -413,7 +415,8 @@ float array_mean_s8_asimd(int8_t* data, size_t len)
             t1 = vgetq_lane_s16(result_level1, 7);
             result_level2 = vsetq_lane_s32(t0+t1, result_level2, 3);
 
-            result_vec = vaddq_s32(result_level2, result_vec);
+            vsum = vaddq_s64(vsum, vmovl_s32(vget_low_s32(result_level2)));
+            vsum = vaddq_s64(vsum, vmovl_s32(vget_high_s32(result_level2)));
 
             result_level1 = vdupq_n_s16(0);
             flag = true;
@@ -437,27 +440,23 @@ float array_mean_s8_asimd(int8_t* data, size_t len)
         t1 = vgetq_lane_s16(result_level1, 7);
         result_level2 = vsetq_lane_s32(t0+t1, result_level2, 3);
 
-        result_vec = vaddq_s32(result_level2, result_vec);
+        vsum = vaddq_s64(vsum, vmovl_s32(vget_low_s32(result_level2)));
+        vsum = vaddq_s64(vsum, vmovl_s32(vget_high_s32(result_level2)));
 
         result_level1 = vdupq_n_s16(0);
         flag = true;
     }
+    int64_t sum_lst[2];
+    vst1q_s64(sum_lst, vsum);
+    sum += sum_lst[0] + sum_lst[1];
 
-    float sum = 0;
-    sum += vgetq_lane_s32(result_vec, 0);
-    sum += vgetq_lane_s32(result_vec, 1);
-    sum += vgetq_lane_s32(result_vec, 2);
-    sum += vgetq_lane_s32(result_vec, 3);
+    done = vec_size;
+#endif // __ARM_NEON
 
-    if(len%8!=0) {
-        for(int k=len-(len%8); k<len; k++) {
-            sum += data[k];
-        }
+    for (; done<len; done++) {
+        sum += *data;
+        data++;
     }
 
-    float avg = sum / len;
-    return avg;
-#endif
-    //TODO
-    return 0;
+    return sum * 1.0 / len;
 }
