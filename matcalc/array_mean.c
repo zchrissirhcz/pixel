@@ -163,31 +163,22 @@ float array_mean_u8_asimd2(unsigned char* data, size_t len) {
     return sum * 1.0 / len;
 }
 
-// Note: this implementation requires len < 67372036
-// when len > 67372036 and each element is 255, it will cause overflow
-// ((2*2147483648-1)/255)*4 = 67372036 (=8000x8421 size gray image)
 float array_mean_u8_asimd3(unsigned char* data, size_t len) {
-    if (len >= 67372036) {
-        fprintf(stderr, "input len too long, may cause overflow\n");
-    }
-    float sum = 0;
+    uint64_t sum = 0;
     size_t done = 0;
 
 #ifdef __ARM_NEON
+    size_t step = 8;
+    size_t vec_size = len - len % step;
 
     uint16x8_t result_level1 = vdupq_n_u16(0);
     uint32x4_t result_level2 = vdupq_n_u32(0);
-    uint32x4_t vsum = vdupq_n_u32(0);
+    uint64x2_t vsum = vdupq_n_u32(0);
 
     uint8x8_t h_vec;
-
     uint8x8_t x_vec = vdup_n_u8(1);
-
     uint32_t t0, t1;
-
     bool flag;
-    size_t step = 8;
-    size_t vec_size = len - len % step;
     for(size_t i=0; i<vec_size; i+=step) {
         h_vec = vld1_u8(data);
         data += step;
@@ -212,7 +203,8 @@ float array_mean_u8_asimd3(unsigned char* data, size_t len) {
             t1 = vgetq_lane_u16(result_level1, 7);
             result_level2 = vsetq_lane_u32(t0+t1, result_level2, 3);
 
-            vsum = vaddq_u32(result_level2, vsum);
+            vsum = vaddq_u64(vsum, vmovl_u32(vget_low_u32(result_level2)));
+            vsum = vaddq_u64(vsum, vmovl_u32(vget_high_u32(result_level2)));
 
             result_level1 = vdupq_n_u16(0);
             flag = true;
@@ -236,18 +228,15 @@ float array_mean_u8_asimd3(unsigned char* data, size_t len) {
         t1 = vgetq_lane_u16(result_level1, 7);
         result_level2 = vsetq_lane_u32(t0+t1, result_level2, 3);
 
-        vsum = vaddq_u32(result_level2, vsum);
+        vsum = vaddq_u64(vsum, vmovl_u32(vget_low_u32(result_level2)));
+        vsum = vaddq_u64(vsum, vmovl_u32(vget_high_u32(result_level2)));
 
         result_level1 = vdupq_n_u16(0);
         flag = true;
     }
-
-    uint32_t sum_lst[4];
-    vst1q_u32(sum_lst, vsum);
-    sum += sum_lst[0];
-    sum += sum_lst[1];
-    sum += sum_lst[2];
-    sum += sum_lst[3];
+    uint64_t sum_lst[2];
+    vst1q_u64(sum_lst, vsum);
+    sum = sum_lst[0] + sum_lst[1];
 
     done = vec_size;
 #endif // __ARM_NEON
@@ -257,8 +246,7 @@ float array_mean_u8_asimd3(unsigned char* data, size_t len) {
         data++;
     }
 
-    float avg = sum / len;
-    return avg;
+    return sum * 1.0 / len;
 }
 
 float array_mean_u8_asimd4(unsigned char* data, size_t len) {
