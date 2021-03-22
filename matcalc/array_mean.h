@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 float array_mean_u8_naive(unsigned char* data, size_t len);
-float array_mean_u8_asimd(unsigned char* data, size_t len);
+float array_mean_u8_asimd1(unsigned char* data, size_t len);
 float array_mean_u8_asimd2(unsigned char* data, size_t len);
 float array_mean_u8_asimd3(unsigned char* data, size_t len);
 float array_mean_u8_asimd4(unsigned char* data, size_t len);

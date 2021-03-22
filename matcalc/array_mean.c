@@ -15,8 +15,8 @@ float array_mean_u8_naive(unsigned char* data, size_t len) {
     return sum*1.0 / len;
 }
 
-// u8转u16再转u32再转f32，然后算sum
-float array_mean_u8_asimd(unsigned char* data, size_t len) {
+// u8转u16再转u32再转u64，然后算sum
+float array_mean_u8_asimd1(unsigned char* data, size_t len) {
     uint64_t sum = 0;
     size_t done = 0;
 #ifdef __ARM_NEON
@@ -61,80 +61,108 @@ float array_mean_u8_asimd(unsigned char* data, size_t len) {
     return sum * 1.0 / len;
 }
 
+// asimd1的增强版，step从8变为8x4
 float array_mean_u8_asimd2(unsigned char* data, size_t len) {
-    float sum = 0;
+    uint64_t sum = 0;
     size_t done = 0;
 #ifdef __ARM_NEON
-    size_t step = 32;
+    size_t step = 8 * 4;
     size_t vec_size = len - len % step;
-    float sum_lst[4] = {0.f, 0.f, 0.f, 0.f};
-    uint8x8x4_t vdata;
-    uint16x8_t v21, v22, v23, v24;
-    uint32x4_t v31_low, v32_low, v33_low, v34_low;
-    uint32x4_t v31_high, v32_high, v33_high, v34_high;
-    float32x4_t v41_low, v42_low, v43_low, v44_low;
-    float32x4_t v41_high, v42_high, v43_high, v44_high;
-    float32x4_t v51, v52, v53, v54;
-    float32x4_t vsum1 = vdupq_n_f32(0.f);
-    float32x4_t vsum2 = vdupq_n_f32(0.f);
-    float32x4_t vsum3 = vdupq_n_f32(0.f);
-    float32x4_t vsum4 = vdupq_n_f32(0.f);
+
+    uint8x8x4_t v1;
+    uint16x8x4_t v2;
+    uint32x4x4_t v30, v31;
+
+    uint64x2x4_t v40, v41, v42, v43;
+    v40.val[0] = vdupq_n_u64(0);
+    v40.val[1] = vdupq_n_u64(0);
+    v40.val[2] = vdupq_n_u64(0);
+    v40.val[3] = vdupq_n_u64(0);
+
+    v41.val[0] = vdupq_n_u64(0);
+    v41.val[1] = vdupq_n_u64(0);
+    v41.val[2] = vdupq_n_u64(0);
+    v41.val[3] = vdupq_n_u64(0);
+
+    v42.val[0] = vdupq_n_u64(0);
+    v42.val[1] = vdupq_n_u64(0);
+    v42.val[2] = vdupq_n_u64(0);
+    v42.val[3] = vdupq_n_u64(0);
+
+    v43.val[0] = vdupq_n_u64(0);
+    v43.val[1] = vdupq_n_u64(0);
+    v43.val[2] = vdupq_n_u64(0);
+    v43.val[3] = vdupq_n_u64(0);
+
     for (size_t i=0; i<vec_size; i+=step) {
-        vdata = vld4_u8(data);
+        v1 = vld4_u8(data);
         data += step;
 
-        //vdata[0]
-        v21 = vmovl_u8(vdata.val[0]);
-        v31_low = vmovl_u16(vget_low_u16(v21));
-        v31_high = vmovl_u16(vget_high_u16(v21));
-        v41_low = vcvtq_f32_u32(v31_low);
-        v41_high = vcvtq_f32_u32(v31_high);
-        v51 = vaddq_f32(v41_low, v41_high);
-        vsum1 = vaddq_f32(v51, vsum1);
+        v2.val[0] = vmovl_u8(v1.val[0]);
+        v30.val[0] = vmovl_u16(vget_low_u16(v2.val[0]));
+        v31.val[0] = vmovl_u16(vget_high_u16(v2.val[0]));
+        v40.val[0] = vaddq_u64(v40.val[0], vmovl_u32(vget_low_u32(v30.val[0])));
+        v41.val[0] = vaddq_u64(v41.val[0], vmovl_u32(vget_high_u32(v30.val[0])));
+        v42.val[0] = vaddq_u64(v42.val[0], vmovl_u32(vget_low_u32(v31.val[0])));
+        v43.val[0] = vaddq_u64(v43.val[0], vmovl_u32(vget_high_u32(v31.val[0])));
 
-        //vdata[1]
-        v22 = vmovl_u8(vdata.val[1]);
-        v32_low = vmovl_u16(vget_low_u16(v22));
-        v32_high = vmovl_u16(vget_high_u16(v22));
-        v42_low = vcvtq_f32_u32(v32_low);
-        v42_high = vcvtq_f32_u32(v32_high);
-        v52 = vaddq_f32(v42_low, v42_high);
-        vsum2 = vaddq_f32(v52, vsum2);
+        v2.val[1] = vmovl_u8(v1.val[1]);
+        v30.val[1] = vmovl_u16(vget_low_u16(v2.val[1]));
+        v31.val[1] = vmovl_u16(vget_high_u16(v2.val[1]));
+        v40.val[1] = vaddq_u64(v40.val[1], vmovl_u32(vget_low_u32(v30.val[1])));
+        v41.val[1] = vaddq_u64(v41.val[1], vmovl_u32(vget_high_u32(v30.val[1])));
+        v42.val[1] = vaddq_u64(v42.val[1], vmovl_u32(vget_low_u32(v31.val[1])));
+        v43.val[1] = vaddq_u64(v43.val[1], vmovl_u32(vget_high_u32(v31.val[1])));
 
-        //vdata[2]
-        v23 = vmovl_u8(vdata.val[2]);
-        v33_low = vmovl_u16(vget_low_u16(v23));
-        v33_high = vmovl_u16(vget_high_u16(v23));
-        v43_low = vcvtq_f32_u32(v33_low);
-        v43_high = vcvtq_f32_u32(v33_high);
-        v53 = vaddq_f32(v43_low, v43_high);
-        vsum3 = vaddq_f32(v53, vsum3);
+        v2.val[2] = vmovl_u8(v1.val[2]);
+        v30.val[2] = vmovl_u16(vget_low_u16(v2.val[2]));
+        v31.val[2] = vmovl_u16(vget_high_u16(v2.val[2]));
+        v40.val[2] = vaddq_u64(v40.val[2], vmovl_u32(vget_low_u32(v30.val[2])));
+        v41.val[2] = vaddq_u64(v41.val[2], vmovl_u32(vget_high_u32(v30.val[2])));
+        v42.val[2] = vaddq_u64(v42.val[2], vmovl_u32(vget_low_u32(v31.val[2])));
+        v43.val[2] = vaddq_u64(v43.val[2], vmovl_u32(vget_high_u32(v31.val[2])));
 
-        //vdata[3]
-        v24 = vmovl_u8(vdata.val[3]);
-        v34_low = vmovl_u16(vget_low_u16(v24));
-        v34_high = vmovl_u16(vget_high_u16(v24));
-        v44_low = vcvtq_f32_u32(v34_low);
-        v44_high = vcvtq_f32_u32(v34_high);
-        v54 = vaddq_f32(v44_low, v44_high);
-        vsum4 = vaddq_f32(v54, vsum4);
+        v2.val[3] = vmovl_u8(v1.val[3]);
+        v30.val[3] = vmovl_u16(vget_low_u16(v2.val[3]));
+        v31.val[3] = vmovl_u16(vget_high_u16(v2.val[3]));
+        v40.val[3] = vaddq_u64(v40.val[3], vmovl_u32(vget_low_u32(v30.val[3])));
+        v41.val[3] = vaddq_u64(v41.val[3], vmovl_u32(vget_high_u32(v30.val[3])));
+        v42.val[3] = vaddq_u64(v42.val[3], vmovl_u32(vget_low_u32(v31.val[3])));
+        v43.val[3] = vaddq_u64(v43.val[3], vmovl_u32(vget_high_u32(v31.val[3])));
     }
-    vsum1 = vaddq_f32(vsum1, vsum2);
-    vsum1 = vaddq_f32(vsum1, vsum3);
-    vsum1 = vaddq_f32(vsum1, vsum4);
-    vst1q_f32(sum_lst, vsum1);
-    sum = sum_lst[0] + sum_lst[1] + sum_lst[2] + sum_lst[3];
+    v40.val[0] = vaddq_u64(v40.val[0], v41.val[0]);
+    v40.val[0] = vaddq_u64(v40.val[0], v42.val[0]);
+    v40.val[0] = vaddq_u64(v40.val[0], v43.val[0]);
+
+    v40.val[1] = vaddq_u64(v40.val[1], v41.val[1]);
+    v40.val[1] = vaddq_u64(v40.val[1], v42.val[1]);
+    v40.val[1] = vaddq_u64(v40.val[1], v43.val[1]);
+
+    v40.val[2] = vaddq_u64(v40.val[2], v41.val[2]);
+    v40.val[2] = vaddq_u64(v40.val[2], v42.val[2]);
+    v40.val[2] = vaddq_u64(v40.val[2], v43.val[2]);
+
+    v40.val[3] = vaddq_u64(v40.val[3], v41.val[3]);
+    v40.val[3] = vaddq_u64(v40.val[3], v42.val[3]);
+    v40.val[3] = vaddq_u64(v40.val[3], v43.val[3]);
+
+    v40.val[0] = vaddq_u64(v40.val[0], v40.val[1]);
+    v40.val[0] = vaddq_u64(v40.val[0], v40.val[2]);
+    v40.val[0] = vaddq_u64(v40.val[0], v40.val[3]);
+
+    uint64_t sum_lst[2];
+    vst1q_u64(sum_lst, v40.val[0]);
+    sum += sum_lst[0] + sum_lst[1];
+
     done = vec_size;
 #endif // __ARM_NEON
     for (; done<len; done++) {
         sum += *data;
         data++;
     }
-    sum /= len;
-    return sum;
+    return sum * 1.0 / len;
 }
 
-// <del>u8转u16，算sum，再转float</del>
 // Note: this implementation requires len < 67372036
 // when len > 67372036 and each element is 255, it will cause overflow
 // ((2*2147483648-1)/255)*4 = 67372036 (=8000x8421 size gray image)
@@ -234,7 +262,7 @@ float array_mean_u8_asimd3(unsigned char* data, size_t len) {
 }
 
 float array_mean_u8_asimd4(unsigned char* data, size_t len) {
-    float sum = 0;
+    uint64_t sum = 0;
     size_t done = 0;
 #ifdef __ARM_NEON
 
@@ -244,7 +272,7 @@ float array_mean_u8_asimd4(unsigned char* data, size_t len) {
 
     uint8x8x4_t vdata;
     uint16x8_t v20, v21, v22, v23;
-    uint32_t sum0=0, sum1=0, sum2=0, sum3=0;
+    uint64_t sum0=0, sum1=0, sum2=0, sum3=0;
     for (size_t i=0; i<vec_size; i+=step) {
         vdata = vld4_u8(data);
         data += step;
@@ -268,26 +296,35 @@ float array_mean_u8_asimd4(unsigned char* data, size_t len) {
 #else // 注意：armv7没有vaddv指令，下面的实现是从asimd1拷贝来的。。慢。
     size_t step = 8;
     size_t vec_size = len - len % step;
-    float sum_lst[4] = {0.f, 0.f, 0.f, 0.f};
+
     uint8x8_t v1;
     uint16x8_t v2;
-    uint32x4_t v3_low, v3_high;
-    float32x4_t v4_low, v4_high;
-    float32x4_t v5;
-    float32x4_t vsum = vdupq_n_f32(0.f);
+    uint32x4_t v30, v31;
+
+    uint64x2_t v40 = vdupq_n_u64(0);
+    uint64x2_t v41 = vdupq_n_u64(0);
+    uint64x2_t v42 = vdupq_n_u64(0);
+    uint64x2_t v43 = vdupq_n_u64(0);
+
     for (size_t i=0; i<vec_size; i+=step) {
         v1 = vld1_u8(data);
         data += step;
         v2 = vmovl_u8(v1);
-        v3_low = vmovl_u16(vget_low_u16(v2));
-        v3_high = vmovl_u16(vget_high_u16(v2));
-        v4_low = vcvtq_f32_u32(v3_low);
-        v4_high = vcvtq_f32_u32(v3_high);
-        v5 = vaddq_f32(v4_low, v4_high);
-        vsum = vaddq_f32(v5, vsum);
+        v30 = vmovl_u16(vget_low_u16(v2));
+        v31 = vmovl_u16(vget_high_u16(v2));
+
+        v40 = vaddq_u64(v40, vmovl_u32(vget_low_u32(v30)));
+        v41 = vaddq_u64(v41, vmovl_u32(vget_high_u32(v30)));
+        v42 = vaddq_u64(v42, vmovl_u32(vget_low_u32(v31)));
+        v43 = vaddq_u64(v43, vmovl_u32(vget_high_u32(v31)));
     }
-    vst1q_f32(sum_lst, vsum);
-    sum = sum_lst[0] + sum_lst[1] + sum_lst[2] + sum_lst[3];
+    v40 = vaddq_u64(v40, v41);
+    v40 = vaddq_u64(v40, v42);
+    v40 = vaddq_u64(v40, v43);
+
+    uint64_t sum_lst[2];
+    vst1q_u64(sum_lst, v40);
+    sum += sum_lst[0] + sum_lst[1];
 #endif // __aarch64__
     done = vec_size;
 #endif // __ARM_NEON
@@ -295,8 +332,7 @@ float array_mean_u8_asimd4(unsigned char* data, size_t len) {
         sum += *data;
         data++;
     }
-    sum /= len;
-    return sum;
+    return sum * 1.0 / len;
 }
 
 /*

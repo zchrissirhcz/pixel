@@ -26,27 +26,27 @@ void test_array_mean() {
     t_start = pixel_get_current_time();
     sum = array_mean_u8_naive(data, len);
     t_cost = pixel_get_current_time() - t_start;
-    printf("array mean, naive impl, result=%.4f, time cost %.4lf\n", sum, t_cost);
+    printf("array mean, naive,  result=%.4f, time cost %.4lf\n", sum, t_cost);
 
     t_start = pixel_get_current_time();
-    sum = array_mean_u8_asimd(data, len);
+    sum = array_mean_u8_asimd1(data, len);
     t_cost = pixel_get_current_time() - t_start;
-    printf("array mean, asimd impl, result=%.4f, time cost %.4lf\n", sum, t_cost);
+    printf("array mean, asimd1, result=%.4f, time cost %.4lf\n", sum, t_cost);
 
     t_start = pixel_get_current_time();
     sum = array_mean_u8_asimd2(data, len);
     t_cost = pixel_get_current_time() - t_start;
-    printf("array mean, asimd impl2, result=%.4f, time cost %.4lf\n", sum, t_cost);
+    printf("array mean, asimd2, result=%.4f, time cost %.4lf\n", sum, t_cost);
 
     t_start = pixel_get_current_time();
     sum = array_mean_u8_asimd3(data, len);
     t_cost = pixel_get_current_time() - t_start;
-    printf("array mean, asimd impl3, result=%.4f, time cost %.4lf\n", sum, t_cost);
+    printf("array mean, asimd3, result=%.4f, time cost %.4lf\n", sum, t_cost);
 
     t_start = pixel_get_current_time();
     sum = array_mean_u8_asimd4(data, len);
     t_cost = pixel_get_current_time() - t_start;
-    printf("array mean, asimd impl4, result=%.4f, time cost %.4lf\n", sum, t_cost);
+    printf("array mean, asimd4, result=%.4f, time cost %.4lf\n", sum, t_cost);
 }
 
 int main() {
