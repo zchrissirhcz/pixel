@@ -8,49 +8,57 @@
 #include <stdbool.h>
 
 float array_mean_u8_naive(unsigned char* data, size_t len) {
-    float sum = 0;
+    uint64_t sum = 0; // note: if use float type for `sum`, when sum>=16777216 and as integer, sum would be incorrect
     for (size_t i=0; i<len; i++) {
         sum += data[i];
     }
-    sum /= len;
-    return sum;
+    return sum*1.0 / len;
 }
 
 // u8转u16再转u32再转f32，然后算sum
 float array_mean_u8_asimd(unsigned char* data, size_t len) {
-    float sum = 0;
+    uint64_t sum = 0;
     size_t done = 0;
 #ifdef __ARM_NEON
     size_t step = 8;
     size_t vec_size = len - len % step;
-    float sum_lst[4] = {0.f, 0.f, 0.f, 0.f};
+
     uint8x8_t v1;
     uint16x8_t v2;
-    uint32x4_t v3_low, v3_high;
-    float32x4_t v4_low, v4_high;
-    float32x4_t v5;
-    float32x4_t vsum = vdupq_n_f32(0.f);
+    uint32x4_t v30, v31;
+
+    uint64x2_t v40 = vdupq_n_u64(0);
+    uint64x2_t v41 = vdupq_n_u64(0);
+    uint64x2_t v42 = vdupq_n_u64(0);
+    uint64x2_t v43 = vdupq_n_u64(0);
+
     for (size_t i=0; i<vec_size; i+=step) {
         v1 = vld1_u8(data);
         data += step;
         v2 = vmovl_u8(v1);
-        v3_low = vmovl_u16(vget_low_u16(v2));
-        v3_high = vmovl_u16(vget_high_u16(v2));
-        v4_low = vcvtq_f32_u32(v3_low);
-        v4_high = vcvtq_f32_u32(v3_high);
-        v5 = vaddq_f32(v4_low, v4_high);
-        vsum = vaddq_f32(v5, vsum);
+        v30 = vmovl_u16(vget_low_u16(v2));
+        v31 = vmovl_u16(vget_high_u16(v2));
+
+        v40 = vaddq_u64(v40, vmovl_u32(vget_low_u32(v30)));
+        v41 = vaddq_u64(v41, vmovl_u32(vget_high_u32(v30)));
+        v42 = vaddq_u64(v42, vmovl_u32(vget_low_u32(v31)));
+        v43 = vaddq_u64(v43, vmovl_u32(vget_high_u32(v31)));
     }
-    vst1q_f32(sum_lst, vsum);
-    sum = sum_lst[0] + sum_lst[1] + sum_lst[2] + sum_lst[3];
+    v40 = vaddq_u64(v40, v41);
+    v40 = vaddq_u64(v40, v42);
+    v40 = vaddq_u64(v40, v43);
+
+    uint64_t sum_lst[2];
+    vst1q_u64(sum_lst, v40);
+    sum += sum_lst[0] + sum_lst[1];
+
     done = vec_size;
 #endif // __ARM_NEON
     for (; done<len; done++) {
         sum += *data;
         data++;
     }
-    sum /= len;
-    return sum;
+    return sum * 1.0 / len;
 }
 
 float array_mean_u8_asimd2(unsigned char* data, size_t len) {
