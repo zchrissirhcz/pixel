@@ -258,6 +258,8 @@ TBD
 
 ### 全能系列
 
+- [ARM Neon Intrinsics 学习指北：从入门、进阶到学个通透](https://zhuanlan.zhihu.com/p/358603760)
+
 - [AI移动端优化 - 知乎 - 章小龙 & BBuf & 圈圈虫等](https://www.zhihu.com/people/zxloas/posts)
 
 - [arm官方文档 armv8-a 系列教程](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/neon-programmers-guide-for-armv8-a)
@@ -299,14 +301,7 @@ TBD
     } float32x4x4_t;
     ```
 
-4. arm32不支持double，arm64才支持，从`${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/9.0.8/include/arm_neon.h`知道：
-```c++
-typedef float float32_t;
-typedef __fp16 float16_t;
-#ifdef __aarch64__
-typedef double float64_t;                                                                                                          
-#endif
-```
+4. <del>arm32不支持double，arm64才支持</del> arm32/64都支持double；但float保存>=16777216的整数时可能不准确，考虑用double或int64/uint64。
 
 5. `poly8_t`和`poly16_t`这样的类型，常规计算用不到，它们是[为加密算法和CRC哈希校验准备的](https://stackoverflow.com/questions/22224282/arm-neon-and-poly8-t-and-poly16-t)。
 
