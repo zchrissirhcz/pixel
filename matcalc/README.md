@@ -69,3 +69,7 @@ armv8a: XiaoMi 11 (QCOM888)
 | 7  | asimd5      |  -         |  1.07 ms |  1.79 ms  |
 | 8  | asimd6      |  -         |  0.57 ms |  -        |
 | 8  | asimd7      |  -         |  0.65 ms |  1.28 ms  |
+
+**References**
+
+https://zhuanlan.zhihu.com/p/128640600
