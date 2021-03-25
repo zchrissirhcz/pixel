@@ -1,5 +1,8 @@
 # GFLOPS table
 
+XiaoMI8:  `2.8GHz * 4 + 1.8GHz * 4`
+XiaoMI11: `2.84GHz X1*1 + 2.4GHz A78*3 + 1.8GHz A55*4`
+
 ## TEST1
 (`FMLA Vd.4S,Vn.4S,Vm.4S`)
 
