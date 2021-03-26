@@ -9,6 +9,9 @@ enable_language(ASM)
 #set_source_files_properties(test.S PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
 
 add_executable(testbed
-    testbed.cpp
+    
     #qqc.cpp
+    cpu_affinity.h
+    cpu_affinity.cpp
+    get_gflops.cpp
 )

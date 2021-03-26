@@ -1,14 +1,15 @@
 #include <time.h>
 #include <stdio.h>
+#include "cpu_affinity.h"
+#include <vector>
 
-//#define LOOP (1e9)
-#define LOOP (0x40000000ll)
+#define LOOP (1e9)
+//#define LOOP (0x40000000ll)
 //#define OP_FLOATS (80) //一次fmla是并行4组mul+add，所以`fmla v0.4s, v0.4s, v0.4s`这条指令是8 ops。一共10条指令，因此是80 ops。
-#define OP_FLOATS (8*16ll) //ll是long long；
 
 // float32x4_t vfmaq_f32 (float32x4_t __a, float32x4_t __b, float32x4_t __c);
 // FMLA Vd.4S,Vn.4S,Vm.4S
-static void TEST1(int loop_count)
+static void TEST1(int loop_count, int* op_floats)
 {
 #if __aarch64__
     asm volatile(
@@ -29,30 +30,31 @@ static void TEST1(int loop_count)
         "fmla v13.4s, v13.4s, v13.4s \n"
         "fmla v14.4s, v14.4s, v14.4s \n"
         "fmla v15.4s, v15.4s, v15.4s \n"
-        // "fmla v16.4s, v16.4s, v16.4s \n"
-        // "fmla v17.4s, v17.4s, v17.4s \n"
-        // "fmla v18.4s, v18.4s, v18.4s \n"
-        // "fmla v19.4s, v19.4s, v19.4s \n"
-        // "fmla v20.4s, v20.4s, v20.4s \n"
-        // "fmla v21.4s, v21.4s, v21.4s \n"
-        // "fmla v22.4s, v22.4s, v22.4s \n"
-        // "fmla v23.4s, v23.4s, v23.4s \n"
-        // "fmla v24.4s, v24.4s, v24.4s \n"
-        // "fmla v25.4s, v25.4s, v25.4s \n"
-        // "fmla v26.4s, v26.4s, v26.4s \n"
-        // "fmla v27.4s, v27.4s, v27.4s \n"
-        // "fmla v28.4s, v28.4s, v28.4s \n"
-        // "fmla v29.4s, v29.4s, v29.4s \n"
-        // "fmla v30.4s, v30.4s, v30.4s \n"
-        // "fmla v31.4s, v31.4s, v31.4s \n"
+        "fmla v16.4s, v16.4s, v16.4s \n"
+        "fmla v17.4s, v17.4s, v17.4s \n"
+        "fmla v18.4s, v18.4s, v18.4s \n"
+        "fmla v19.4s, v19.4s, v19.4s \n"
+        "fmla v20.4s, v20.4s, v20.4s \n"
+        "fmla v21.4s, v21.4s, v21.4s \n"
+        "fmla v22.4s, v22.4s, v22.4s \n"
+        "fmla v23.4s, v23.4s, v23.4s \n"
+        "fmla v24.4s, v24.4s, v24.4s \n"
+        "fmla v25.4s, v25.4s, v25.4s \n"
+        "fmla v26.4s, v26.4s, v26.4s \n"
+        "fmla v27.4s, v27.4s, v27.4s \n"
+        "fmla v28.4s, v28.4s, v28.4s \n"
+        "fmla v29.4s, v29.4s, v29.4s \n"
+        "fmla v30.4s, v30.4s, v30.4s \n"
+        "fmla v31.4s, v31.4s, v31.4s \n"
         "subs %w0, %w0,    #1 \n"
         "bne 0b \n"
         : "=r"(loop_count) //%0
         : "0"(loop_count)
         : "cc", "memory", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15"
-            // , 
-            // "v16", "v17", "v18", "v19", "v20", "v21", "v22", "v23", "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31"
+            , 
+            "v16", "v17", "v18", "v19", "v20", "v21", "v22", "v23", "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31"
     );
+    *op_floats = 8 * 32; // 8 ops * 32条指令
 #else
     asm volatile(
         "0: \n"
@@ -78,13 +80,14 @@ static void TEST1(int loop_count)
         : "0"(loop_count)
         : "cc", "memory", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15"
     );
+    *op_floats = 8 * 16;
 #endif
 }
 
 // float32x4_t vfmaq_n_f32 (float32x4_t a, float32x4_t b, float32_t n)
 // FMLA Vd.4S,Vn.4S,Vm.S[0]
 // 经尝试，armv7用11条指令得到的GFLOPS最大
-static void TEST2(int loop_count)
+static void TEST2(int loop_count, int* op_floats)
 {
 #if __aarch64__
     asm volatile(
@@ -111,6 +114,7 @@ static void TEST2(int loop_count)
         : "0"(loop_count)
         : "cc", "memory", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15"
     );
+    *op_floats = 8*16;
 #else
     //For vector-scalar multiplications, the 32bit scalar container must be d0 - d15 by definition.
     //因此只能用d0-d15
@@ -138,6 +142,7 @@ static void TEST2(int loop_count)
         : "0"(loop_count)
         : "cc", "memory", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15"
     );
+    *op_floats = 8*16;
 #endif
 }
 
@@ -146,15 +151,146 @@ static double get_time(struct timespec* start, struct timespec* end)
     return end->tv_sec - start->tv_sec + (end->tv_nsec - start->tv_nsec) * 1e-9;
 }
 
-int main() {
+static int measure_gflops() {
     struct timespec start, end;
     double time_used = 0.0;
-
+    int op_floats = 0;
     clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-    TEST2(LOOP);
+    TEST1(LOOP, &op_floats);
     clock_gettime(CLOCK_MONOTONIC_RAW, &end);
     time_used = get_time(&start, &end);
-    printf("perf: %.6lf \n", LOOP*OP_FLOATS*1.0 * 1e-9 / time_used);
+    printf("perf: %.6lf \n", LOOP*op_floats*1.0 * 1e-9 / time_used);
+
+    return 0;
+}
+
+
+
+
+static void swapSort(std::vector<int> &arr, std::vector<int> &idx, bool reverse = true) {
+  if (reverse) {
+    for (int i = 0; i < arr.size() - 1; ++i) {
+      int maxVal = arr[i];
+      int maxIdx = i;
+      for (int j = i + 1; j < arr.size(); ++j) {
+        if (arr[j] > maxVal) {
+          maxVal = arr[j];
+          maxIdx = j;
+        }
+      }
+      // swap val
+      int tmp = arr[maxIdx];
+      arr[maxIdx] = arr[i];
+      arr[i] = tmp;
+      // swap idx
+      tmp = idx[maxIdx];
+      idx[maxIdx] = idx[i];
+      idx[i] = tmp;
+    }
+  } else {
+    for (int i = 0; i < arr.size() - 1; ++i) {
+      int minVal = arr[i];
+      int minIdx = i;
+      for (int j = i + 1; j < arr.size(); ++j) {
+        if (arr[j] < minVal) {
+          minVal = arr[j];
+          minIdx = j;
+        }
+      }
+      // swap val
+      int tmp = arr[minIdx];
+      arr[minIdx] = arr[i];
+      arr[i] = tmp;
+      // swap idx
+      tmp = idx[minIdx];
+      idx[minIdx] = idx[i];
+      idx[i] = tmp;
+    }
+  }
+}
+
+
+// naive boxfilter implementation
+static void Boxfilter(int radius, int height, int width) {
+  float *input = new float[height * width];
+  float *output = new float[height * width];
+  for (int h = 0; h < height; ++h) {
+    int height_sift = h * width;
+    for (int w = 0; w < width; ++w) {
+      int start_h = std::max(0, h - radius);
+      int end_h = std::min(height - 1, h + radius);
+      int start_w = std::max(0, w - radius);
+      int end_w = std::min(width - 1, w + radius);
+      float tmp = 0;
+      for (int sh = start_h; sh <= end_h; ++sh) {
+        for (int sw = start_w; sw <= end_w; ++ sw) {
+          tmp += input[sh * width + sw];
+        }
+      }
+      output[height_sift + w] = tmp;
+    }
+  }
+  delete[] input;
+  delete[] output;
+}
+
+
+
+int main() {
+    int cpu_count = get_cpucount();
+    printf("cpu numbers %d\n", cpu_count);
+
+    std::vector<int> cpu_max_freq_khz(cpu_count);
+    std::vector<int> cpu_idx(cpu_count);
+    for (int i=0; i<cpu_count; i++)
+    {
+        cpu_max_freq_khz[i] = get_max_freq_khz(i);
+        cpu_idx[i] = i;
+    }
+    
+    printf("before sort\n");
+    for (int i = 0; i < cpu_count; ++i) {
+        printf("cpu_%d:%d, ", cpu_idx[i], cpu_max_freq_khz[i]);
+    }
+    printf("\n");
+
+    swapSort(cpu_max_freq_khz, cpu_idx);
+
+    printf("after sort\n");
+    for (int i = 0; i < cpu_count; ++i) {
+      printf("cpu_%d:%d, ", cpu_idx[i], cpu_max_freq_khz[i]);
+    }
+    printf("\n\n");
+
+    // distinguish big & little cores with ncnn strategy 
+    int max_freq_khz_max = 0;
+    int max_freq_cpu_idx = 0;
+    for (int i = 0; i < cpu_count; i++) {
+        if (cpu_max_freq_khz[i] > max_freq_khz_max) {
+            max_freq_khz_max = cpu_max_freq_khz[i];
+            max_freq_cpu_idx = i;
+        }
+    }
+    
+    // warm up
+    for (int i = 0; i < 5; ++i) {
+        Boxfilter(7, 500, 500);
+    }
+
+    // bind big cores
+    printf("bind big cores ex:\n");
+    size_t mask = 0;
+    for (int i = 0; i < cpu_count; ++i) {
+      if (cpu_max_freq_khz[i] == max_freq_khz_max) {
+        mask |= (1 << cpu_idx[i]);
+        printf("bind cpu: %d, ", cpu_idx[i]);
+      }
+    }
+    printf("\n");
+    int ret = set_sched_affinity(mask);
+
+    // measure GFLOPS
+    measure_gflops();
 
     return 0;
 }
