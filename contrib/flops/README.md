@@ -56,3 +56,7 @@ ARM NEON乘加指令，向量乘标量形式，对应的arm64汇编是`FMLA Vd.4
 - https://github.com/BBuf/how-to-optimize-gemm/blob/master/armv8a/armv8afp/test.S
 - [移动端arm cpu优化学习笔记第3弹--绑定cpu(cpu affinity)](https://zhuanlan.zhihu.com/p/138905432)
 - [手机处理器寿命多长，为什么一般手机不允许超频工作？](https://www.zhihu.com/question/335518974) 关于手机CPU睿频的讨论
+
+## Notes
+- 查找某款ARM CPU的手册（例如确定是几发射），搜索`Arm Cortex-X1 Core Software optimization guide`关键字，对应X1；搜索`Arm Cortex-A55 Core Software optimization guide`对应A55文档
+- 寄存器re-naming机制
