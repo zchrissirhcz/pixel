@@ -9,7 +9,7 @@
 
 // float32x4_t vfmaq_f32 (float32x4_t __a, float32x4_t __b, float32x4_t __c);
 // FMLA Vd.4S,Vn.4S,Vm.4S
-static void TEST1(int loop_count, int* op_floats)
+static void perf_fmla_vec_vec(int loop_count, int* op_floats)
 {
 #if __aarch64__
     asm volatile(
@@ -87,7 +87,7 @@ static void TEST1(int loop_count, int* op_floats)
 // float32x4_t vfmaq_n_f32 (float32x4_t a, float32x4_t b, float32_t n)
 // FMLA Vd.4S,Vn.4S,Vm.S[0]
 // 经尝试，armv7用11条指令得到的GFLOPS最大
-static void TEST2(int loop_count, int* op_floats)
+static void perf_fmla_vec_scalar(int loop_count, int* op_floats)
 {
 #if __aarch64__
     asm volatile(
@@ -174,11 +174,18 @@ static int measure_gflops() {
     struct timespec start, end;
     double time_used = 0.0;
     int op_floats = 0;
+    
     clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-    TEST1(LOOP, &op_floats);
+    perf_fmla_vec_vec(LOOP, &op_floats);
     clock_gettime(CLOCK_MONOTONIC_RAW, &end);
     time_used = get_time(&start, &end);
-    printf("perf: %.6lf \n", LOOP*op_floats*1.0 * 1e-9 / time_used);
+    printf("perf_fmla_vec_vec: %.2lf \n", LOOP*op_floats*1.0 * 1e-9 / time_used);
+
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+    perf_fmla_vec_scalar(LOOP, &op_floats);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    time_used = get_time(&start, &end);
+    printf("perf_fmla_vec_scalar: %.2lf GFLOPS\n", LOOP*op_floats*1.0 * 1e-9 / time_used);
 
     return 0;
 }
