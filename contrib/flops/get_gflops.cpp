@@ -108,13 +108,32 @@ static void TEST2(int loop_count, int* op_floats)
         "fmla v13.4s, v13.4s, v13.s[0] \n"
         "fmla v14.4s, v14.4s, v14.s[0] \n"
         "fmla v15.4s, v15.4s, v15.s[0] \n"
+        "fmla v16.4s, v16.4s, v16.s[0] \n"
+        "fmla v17.4s, v17.4s, v17.s[0] \n"
+        "fmla v18.4s, v18.4s, v18.s[0] \n"
+        "fmla v19.4s, v19.4s, v19.s[0] \n"
+        "fmla v20.4s, v20.4s, v20.s[0] \n"
+        "fmla v21.4s, v21.4s, v21.s[0] \n"
+        "fmla v22.4s, v22.4s, v22.s[0] \n"
+        "fmla v23.4s, v23.4s, v23.s[0] \n"
+        "fmla v24.4s, v24.4s, v24.s[0] \n"
+        "fmla v25.4s, v25.4s, v25.s[0] \n"
+        "fmla v26.4s, v26.4s, v26.s[0] \n"
+        "fmla v27.4s, v27.4s, v27.s[0] \n"
+        "fmla v28.4s, v28.4s, v28.s[0] \n"
+        "fmla v29.4s, v29.4s, v29.s[0] \n"
+        "fmla v30.4s, v30.4s, v30.s[0] \n"
+        "fmla v31.4s, v31.4s, v31.s[0] \n"
         "subs %w0, %w0,    #1 \n"
         "bne 0b \n"
         : "=r"(loop_count) //%0
         : "0"(loop_count)
-        : "cc", "memory", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15"
+        : "cc", "memory", 
+          "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15"
+          ,
+          "v16", "v17", "v18", "v19", "v20", "v21", "v22", "v23", "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31"
     );
-    *op_floats = 8*16;
+    *op_floats = 8*32;
 #else
     //For vector-scalar multiplications, the 32bit scalar container must be d0 - d15 by definition.
     //因此只能用d0-d15
@@ -238,7 +257,7 @@ static void Boxfilter(int radius, int height, int width) {
 
 int main() {
     int cpu_count = get_cpucount();
-    printf("cpu numbers %d\n", cpu_count);
+    fprintf(stderr, "cpu numbers %d\n", cpu_count);
 
     std::vector<int> cpu_max_freq_khz(cpu_count);
     std::vector<int> cpu_idx(cpu_count);
@@ -247,46 +266,12 @@ int main() {
         cpu_max_freq_khz[i] = get_max_freq_khz(i);
         cpu_idx[i] = i;
     }
-    
-    printf("before sort\n");
-    for (int i = 0; i < cpu_count; ++i) {
-        printf("cpu_%d:%d, ", cpu_idx[i], cpu_max_freq_khz[i]);
-    }
-    printf("\n");
 
-    swapSort(cpu_max_freq_khz, cpu_idx);
-
-    printf("after sort\n");
-    for (int i = 0; i < cpu_count; ++i) {
-      printf("cpu_%d:%d, ", cpu_idx[i], cpu_max_freq_khz[i]);
-    }
-    printf("\n\n");
-
-    // distinguish big & little cores with ncnn strategy 
-    int max_freq_khz_max = 0;
-    int max_freq_cpu_idx = 0;
-    for (int i = 0; i < cpu_count; i++) {
-        if (cpu_max_freq_khz[i] > max_freq_khz_max) {
-            max_freq_khz_max = cpu_max_freq_khz[i];
-            max_freq_cpu_idx = i;
-        }
-    }
-    
-    // warm up
-    for (int i = 0; i < 5; ++i) {
-        Boxfilter(7, 500, 500);
-    }
-
+    int the_cpu_id = 7;
     // bind big cores
-    printf("bind big cores ex:\n");
+    fprintf(stderr, "bind big core %d, whose max freq khz is %d:\n", the_cpu_id, cpu_max_freq_khz[the_cpu_id]);
     size_t mask = 0;
-    for (int i = 0; i < cpu_count; ++i) {
-      if (cpu_max_freq_khz[i] == max_freq_khz_max) {
-        mask |= (1 << cpu_idx[i]);
-        printf("bind cpu: %d, ", cpu_idx[i]);
-      }
-    }
-    printf("\n");
+    mask |= (1<<the_cpu_id);
     int ret = set_sched_affinity(mask);
 
     // measure GFLOPS

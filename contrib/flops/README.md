@@ -2,57 +2,47 @@
 
 ## 设备
 
-XiaoMI8:  `2.8GHz * 4 + 1.8GHz * 4`
-
 XiaoMI11: `2.84GHz X1*1 + 2.4GHz A78*3 + 1.8GHz A55*4`
 
-假设只考虑性能最好的 X1 core，理论单精度浮点峰值应该是： `4*4*2*2.84=90.88`，解释：
+## 理论峰值
+
+**X1**
+
+理论单精度浮点峰值： `4*4*2*2.84=90.88`，解释：
 - 第一个因子，4：可以发射4条fma ("Cortex-X1 是 SIMD 4发射" by 虫叔)
 - 第二个因子，4：128bit/(8bit*sizeof(float))=128/32=4，每条向量指令有4个float
 - 第三个因子，2：每个fma指令，有一次乘法，一次加法；每个lane上，加起来是两次浮点计算
 - 第四个因子，2.84：这个是X1 core的最大频率
 
-**TODO：绑核再测量**
-## 绑核
-```
-before sort
-cpu_0:1804800, cpu_1:1804800, cpu_2:1804800, cpu_3:1804800, cpu_4:2419200, cpu_5:2419200, cpu_6:2419200, cpu_7:2841600,
-after sort
-cpu_7:2841600, cpu_4:2419200, cpu_5:2419200, cpu_6:2419200, cpu_1:1804800, cpu_2:1804800, cpu_3:1804800, cpu_0:1804800,
-```
-cpu_7是x1;
-cpu_4, cpu_5, cpu_6是A78;
-cpu_0, cpu_1, cpu_2, cpu_3是A55
+**A78**
 
-## TEST1
-(`FMLA Vd.4S,Vn.4S,Vm.4S`)
+理论单精度浮点峰值： `2*4*2*2.4=38.4`，解释：
+- 第一个因子，2：可以发射2条fma ("Cortex-A78 是 SIMD 2发射" by 虫叔)
+- 第二个因子，4：128bit/(8bit*sizeof(float))=128/32=4，每条向量指令有4个float
+- 第三个因子，2：每个fma指令，有一次乘法，一次加法；每个lane上，加起来是两次浮点计算
+- 第四个因子，2.4：这个是A78 core的最大频率
 
-| id  | device   | SoC     | armv8 GFLOPS | armv7 GFLOPS |
-| --- | -------- | ------- | ------------ | ----------- |
-| 1   | XiaoMI8  | QCOM845 |     |    |
-| 2   | XiaoMI11 | QCOM888 | 71.489574    | 44.649627  |
+## 实测峰值
 
-```
-android-arm64/testbed: 1 file pushed, 0 skipped. 118.7 MB/s (1258608 bytes in 0.010s)
-syscall error -1
-cpu numbers 8
-before sort
-cpu_0:1804800, cpu_1:1804800, cpu_2:1804800, cpu_3:1804800, cpu_4:2419200, cpu_5:2419200, cpu_6:2419200, cpu_7:2841600,
-after sort
-cpu_7:2841600, cpu_4:2419200, cpu_5:2419200, cpu_6:2419200, cpu_1:1804800, cpu_2:1804800, cpu_3:1804800, cpu_0:1804800,
 
-bind big cores ex:
-bind cpu: 7,
-perf: 71.065572
-```
+**向量乘向量形式**
 
-## TEST2
-(`FMLA Vd.4S,Vn.4S,Vm.S[0]`)
+ARM NEON乘加指令，向量乘向量形式，对应的arm64汇编是`FMLA Vd.4S,Vn.4S,Vm.4S`，对应的函数实现是`TEST1`，实测得到GFLOPS如下:
 
-| id  | device   | SoC     | armv8 GFLOPS | armv7 GFLOPS |
-| --- | -------- | ------- | ------------ | ----------- |
-| 1   | XiaoMI8  | QCOM845 |     |   |
-| 2   | XiaoMI11 | QCOM888 |  69.079704    |   37.253853  |
+| id  | core | armv8 GFLOPS | armv7 GFLOPS |
+| --- | ---- | ------------ | ------------ |
+| 1   | A78  | 71.489574    | 44.649627    |
+| 2   | X1   | 71.231474    | 44.697178    |
+
+
+**向量乘标量形式**
+
+ARM NEON乘加指令，向量乘标量形式，对应的arm64汇编是`FMLA Vd.4S,Vn.4S,Vm.S[0]`，对应的函数实现是`TEST2`，实测得到GFLOPS如下:
+
+| id  | core | armv8 GFLOPS | armv7 GFLOPS |
+| --- | ---- | ------------ | ------------ |
+| 1   | A78  | 38.252554    | 37.063867    |
+| 2   | X1   | 71.026283    | 42.628718    |
 
 ## Refs
 

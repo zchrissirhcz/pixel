@@ -14,15 +14,20 @@
 
 int set_sched_affinity(size_t thread_affinity_mask)
 {
-#ifdef __GLIBC__
+    // set affinity for thread
+#if defined(__GLIBC__) || defined(__OHOS__)
     pid_t pid = syscall(SYS_gettid);
+    printf("case 1\n");
 #else
-#ifdef PI3
+#if defined(PI3) || (defined(__MUSL__) && __MUSL_MINOR__ <= 14)
     pid_t pid = getpid();
+    printf("case 2\n");
 #else
     pid_t pid = gettid();
+    printf("case 3\n");
 #endif
 #endif
+
     int syscallret = syscall(__NR_sched_setaffinity, pid, sizeof(thread_affinity_mask), &thread_affinity_mask);
     if (syscallret)
     {
