@@ -106,7 +106,7 @@ int main() {
     double time_used = 0.0;
 
     clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-    TEST2(LOOP);
+    TEST1(LOOP);
     clock_gettime(CLOCK_MONOTONIC_RAW, &end);
     time_used = get_time(&start, &end);
     printf("perf: %.6lf \n", LOOP*OP_FLOATS*1.0 * 1e-9 / time_used);
