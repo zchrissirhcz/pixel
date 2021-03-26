@@ -10,5 +10,5 @@ enable_language(ASM)
 
 add_executable(testbed
     testbed.cpp
-    #hack.cpp
+    #qqc.cpp
 )

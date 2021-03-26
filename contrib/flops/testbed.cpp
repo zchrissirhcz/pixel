@@ -1,8 +1,10 @@
 #include <time.h>
 #include <stdio.h>
 
-#define LOOP (1e9)
-#define OP_FLOATS (80)
+//#define LOOP (1e9)
+#define LOOP (0x40000000ll)
+//#define OP_FLOATS (80) //一次fmla是并行4组mul+add，所以`fmla v0.4s, v0.4s, v0.4s`这条指令是8 ops。一共10条指令，因此是80 ops。
+#define OP_FLOATS (8*16ll) //ll是long long；
 
 // float32x4_t vfmaq_f32 (float32x4_t __a, float32x4_t __b, float32x4_t __c);
 // FMLA Vd.4S,Vn.4S,Vm.4S
@@ -21,11 +23,35 @@ static void TEST1(int loop_count)
         "fmla v7.4s, v7.4s, v7.4s \n"
         "fmla v8.4s, v8.4s, v8.4s \n"
         "fmla v9.4s, v9.4s, v9.4s \n"
+        "fmla v10.4s, v10.4s, v10.4s \n"
+        "fmla v11.4s, v11.4s, v11.4s \n"
+        "fmla v12.4s, v12.4s, v12.4s \n"
+        "fmla v13.4s, v13.4s, v13.4s \n"
+        "fmla v14.4s, v14.4s, v14.4s \n"
+        "fmla v15.4s, v15.4s, v15.4s \n"
+        // "fmla v16.4s, v16.4s, v16.4s \n"
+        // "fmla v17.4s, v17.4s, v17.4s \n"
+        // "fmla v18.4s, v18.4s, v18.4s \n"
+        // "fmla v19.4s, v19.4s, v19.4s \n"
+        // "fmla v20.4s, v20.4s, v20.4s \n"
+        // "fmla v21.4s, v21.4s, v21.4s \n"
+        // "fmla v22.4s, v22.4s, v22.4s \n"
+        // "fmla v23.4s, v23.4s, v23.4s \n"
+        // "fmla v24.4s, v24.4s, v24.4s \n"
+        // "fmla v25.4s, v25.4s, v25.4s \n"
+        // "fmla v26.4s, v26.4s, v26.4s \n"
+        // "fmla v27.4s, v27.4s, v27.4s \n"
+        // "fmla v28.4s, v28.4s, v28.4s \n"
+        // "fmla v29.4s, v29.4s, v29.4s \n"
+        // "fmla v30.4s, v30.4s, v30.4s \n"
+        // "fmla v31.4s, v31.4s, v31.4s \n"
         "subs %w0, %w0,    #1 \n"
         "bne 0b \n"
         : "=r"(loop_count) //%0
         : "0"(loop_count)
-        : "cc", "memory", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9"
+        : "cc", "memory", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15"
+            // , 
+            // "v16", "v17", "v18", "v19", "v20", "v21", "v22", "v23", "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31"
     );
 #else
     asm volatile(
@@ -40,11 +66,17 @@ static void TEST1(int loop_count)
         "vmla.f32 q7, q7, q7 \n"
         "vmla.f32 q8, q8, q8 \n"
         "vmla.f32 q9, q9, q9 \n"
+        "vmla.f32 q10, q10, q10 \n"
+        "vmla.f32 q11, q11, q11 \n"
+        "vmla.f32 q12, q12, q12 \n"
+        "vmla.f32 q13, q13, q13 \n"
+        "vmla.f32 q14, q14, q14 \n"
+        "vmla.f32 q15, q15, q15 \n"
         "subs %0, %0,    #1 \n"
         "bne 0b \n"
         : "=r"(loop_count) //%0
         : "0"(loop_count)
-        : "cc", "memory", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9"
+        : "cc", "memory", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15"
     );
 #endif
 }
@@ -67,13 +99,21 @@ static void TEST2(int loop_count)
         "fmla v7.4s, v7.4s, v7.s[0] \n"
         "fmla v8.4s, v8.4s, v8.s[0] \n"
         "fmla v9.4s, v9.4s, v9.s[0] \n"
+        "fmla v10.4s, v10.4s, v10.s[0] \n"
+        "fmla v11.4s, v11.4s, v11.s[0] \n"
+        "fmla v12.4s, v12.4s, v12.s[0] \n"
+        "fmla v13.4s, v13.4s, v13.s[0] \n"
+        "fmla v14.4s, v14.4s, v14.s[0] \n"
+        "fmla v15.4s, v15.4s, v15.s[0] \n"
         "subs %w0, %w0,    #1 \n"
         "bne 0b \n"
         : "=r"(loop_count) //%0
         : "0"(loop_count)
-        : "cc", "memory", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9"
+        : "cc", "memory", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15"
     );
 #else
+    //For vector-scalar multiplications, the 32bit scalar container must be d0 - d15 by definition.
+    //因此只能用d0-d15
     asm volatile(
         "0: \n"
         "vmla.f32 q0, q0, d0[0] \n"
@@ -84,14 +124,19 @@ static void TEST2(int loop_count)
         "vmla.f32 q5, q5, d10[0] \n"
         "vmla.f32 q6, q6, d12[0] \n"
         "vmla.f32 q7, q7, d14[0] \n"
-        "vmla.f32 q8, q8, d0[0] \n"
-        "vmla.f32 q9, q9, d2[0] \n"
-        "vmla.f32 q10, q10, d4[0] \n"
+        "vmla.f32 q8, q8, d1[0] \n"
+        "vmla.f32 q9, q9, d3[0] \n"
+        "vmla.f32 q10, q10, d5[0] \n"
+        "vmla.f32 q11, q11, d7[0] \n"
+        "vmla.f32 q12, q12, d9[0] \n"
+        "vmla.f32 q13, q13, d11[0] \n"
+        "vmla.f32 q14, q14, d13[0] \n"
+        "vmla.f32 q15, q15, d15[0] \n"
         "subs %0, %0,    #1 \n"
         "bne 0b \n"
         : "=r"(loop_count) //%0
         : "0"(loop_count)
-        : "cc", "memory", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10"
+        : "cc", "memory", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15"
     );
 #endif
 }
@@ -106,7 +151,7 @@ int main() {
     double time_used = 0.0;
 
     clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-    TEST1(LOOP);
+    TEST2(LOOP);
     clock_gettime(CLOCK_MONOTONIC_RAW, &end);
     time_used = get_time(&start, &end);
     printf("perf: %.6lf \n", LOOP*OP_FLOATS*1.0 * 1e-9 / time_used);
