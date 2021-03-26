@@ -15,13 +15,19 @@ add_executable(testbed
     # mean_stddev.c
     # mean_stddev_test.cpp
 
-    array_mean.h
-    array_mean.c
-    array_mean_test.cpp
+    # array_mean.h
+    # array_mean.c
+    # array_mean_test.cpp
+
+    matrix_add_sub.h
+    matrix_add_sub.c
+    matrix_add_sub_test.cpp
 )
 
-target_include_directories(testbed PRIVATE ${CMAKE_SOURCE_DIR}/..)
-
+target_include_directories(testbed PRIVATE
+    ${CMAKE_SOURCE_DIR}/..
+    ${CMAKE_SOURCE_DIR}/eigen
+)
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
     if (CMAKE_SYSTEM_NAME MATCHES "Linux")

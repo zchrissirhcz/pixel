@@ -17,15 +17,9 @@ extern "C" {
 // C = A B
 void matrix_multiply(float* mA, float* mB, float* mC, size_t M, size_t K, size_t N);
 
-// A(mxn), B(mxn), C(mxn)
-// C = A + B
-void matrix_add(float* mA, float* mB, float* mC, size_t M, size_t N);
-
-// A(mxn), B(mxn), C(mxn)
-// C = A - B
-void matrix_sub(float* mA, float* mB, float* mC, size_t M, size_t N);
 
 // TODO: matrix inverse
+// TODO: matrix decomposition
 
 #ifdef __cplusplus
 }

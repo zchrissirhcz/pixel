@@ -17,23 +17,3 @@ void matrix_multiply(float* mA, float* mB, float* mC, size_t M, size_t K, size_t
         }
     }
 }
-
-// A(mxn), B(mxn), C(mxn)
-// C = A + B
-void matrix_add(float* mA, float* mB, float* mC, size_t M, size_t N)
-{
-    size_t total_len = mA * mB;
-    for (size_t i=0; i<total_len; i++) {
-        mC[i] = mA[i] + mB[i];
-    }
-}
-
-// A(mxn), B(mxn), C(mxn)
-// C = A - B
-void matrix_sub(float* mA, float* mB, float* mC, size_t M, size_t N)
-{
-    size_t total_len = mA * mB;
-    for (size_t i=0; i<total_len; i++) {
-        mC[i] = mA[i] - mB[i];
-    }
-}
