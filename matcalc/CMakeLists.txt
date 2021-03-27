@@ -23,9 +23,9 @@ add_executable(testbed
 
     #eigen_test.cpp
 
-    matrix_add_sub.h
-    matrix_add_sub.c
-    matrix_add_sub_test.cpp
+    matrix_add_subtract.h
+    matrix_add_subtract.c
+    matrix_add_subtract_test.cpp
 )
 
 target_include_directories(testbed PRIVATE

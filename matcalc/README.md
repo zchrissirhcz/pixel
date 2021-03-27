@@ -74,6 +74,17 @@ armv8a: XiaoMi 11 (QCOM888)
 
 https://zhuanlan.zhihu.com/p/128640600
 
+## f32 matrix add / subtract
+
+| id | method     | armv8      | armv7      |
+| -- | ---------- | ---------- | ---------- |
+| 1  | eigen      | 14.68 ms   | 18.84 ms   |
+| 2  | opencv     | 14.35 ms   | 17.21 ms   |
+| 3  | naive      | 14.08 ms   | 21.44 ms   |
+| 4  | asimd      | 14.03 ms   | 14.83 ms   |
+
+neon优化在armv7时有明显提升，armv8时几乎没提升。
+
 ## Eigen Notes
 
 ### 1. 快速入门
