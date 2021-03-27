@@ -37,6 +37,7 @@ void matrix_add_f32_asimd(float* mA, float* mB, float* mC, size_t M, size_t N)
         vst1q_f32(mC, vC);
         mC += step;
     }
+    done = vec_size;
 #endif // __ARM_NEON
 
     for (size_t i=done; i<total_len; i++) {

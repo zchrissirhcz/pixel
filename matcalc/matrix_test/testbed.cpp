@@ -3,8 +3,8 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
-#include "pixel_benchmark.h"
-#include "pixel_log.h"
+#include "common/pixel_benchmark.h"
+#include "common/pixel_log.h"
 
 #include <Eigen/Dense>
 
@@ -14,10 +14,16 @@ using std::endl;
 int main(int argc, char **argv)
 {
     int dim = 1000;
+    cv::Scalar s_min(-5);
+    cv::Scalar s_max(5);
 
-    cv::Mat m1 = (cv::Mat_<float>(dim, dim) << 1., 0., 3., 0., 5., 6., 7., 8., 0.);
-    cv::Mat m2 = (cv::Mat_<float>(dim, dim) << 0., 2., 1., 4., 5., 6., 7., 1., 0.);
+    cv::Mat m1(dim, dim, CV_32FC1);
+    cv::Mat m2(dim, dim, CV_32FC1);
     cv::Mat m3 = cv::Mat::zeros(dim, dim, CV_32F);
+
+    cv::randu(m1, s_min, s_max);
+    cv::randu(m2, s_min, s_max);
+
     const int times = 10;
 
     // opencv multiple
@@ -41,10 +47,14 @@ int main(int argc, char **argv)
     printf("Opencv Add %d cost %lf ms.\n", times, t_cost);
     //cout<<"Result: "<<endl<<m3<<endl;
 
-    Eigen::Matrix3f eM1, eM2, eM3;
-    eM1 << 1., 0., 3., 0., 5., 6., 7., 8., 0.;
-    eM2 << 0., 2., 1., 4., 5., 6., 7., 1., 0.;
-    eM3 = Eigen::Matrix3f::Zero();
+    // Eigen::Matrix3f eM1, eM2, eM3;
+    // eM1 << 1., 0., 3., 0., 5., 6., 7., 8., 0.;
+    // eM2 << 0., 2., 1., 4., 5., 6., 7., 1., 0.;
+    // eM3 = Eigen::Matrix3f::Zero();
+
+    Eigen::MatrixXf eM1 = Eigen::MatrixXd::Random(dim, dim);
+    Eigen::MatrixXd eM2 = Eigen::MatrixXd::Random(dim, dim);
+    Eigen::MatrixXd eM3 = Eigen::MatrixXd::Zero();
 
     // eigen multiple
     t_start = pixel_get_current_time();

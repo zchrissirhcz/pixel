@@ -18,10 +18,15 @@ static void matrix_add_f32_opencv(float* mA, float* mB, float* mC, size_t M, siz
 
 static void matrix_add_f32_eigen(float* mA, float* mB, float* mC, size_t M, size_t N)
 {
-    size_t len = M * N;
-    Eigen::Map<Eigen::Matrix<float, 1, Eigen::Dynamic, Eigen::RowMajor>> eA(mA, len);
-    Eigen::Map<Eigen::Matrix<float, 1, Eigen::Dynamic, Eigen::RowMajor>> eB(mB, len);
-    Eigen::Map<Eigen::Matrix<float, 1, Eigen::Dynamic, Eigen::RowMajor>> eC(mA, len);
+    // size_t len = M * N;
+    // Eigen::Map<Eigen::Matrix<float, 1, Eigen::Dynamic, Eigen::RowMajor>> eA(mA, len);
+    // Eigen::Map<Eigen::Matrix<float, 1, Eigen::Dynamic, Eigen::RowMajor>> eB(mB, len);
+    // Eigen::Map<Eigen::Matrix<float, 1, Eigen::Dynamic, Eigen::RowMajor>> eC(mA, len);
+    // eC = eA + eB;
+
+    Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> eA(mA, M, N);
+    Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> eB(mB, M, N);
+    Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> eC(mC, M, N);
     eC = eA + eB;
 }
 
@@ -54,14 +59,14 @@ static void matrix_add_float_test()
     double t_start, t_cost;
 
     t_start = pixel_get_current_time();
-    matrix_add_f32_opencv(mA, mB, mC_opencv, height, width);
-    t_cost = pixel_get_current_time() - t_start;
-    printf("matrix_add_f32, opencv, time cost %.2lf ms\n", t_cost);
-
-    t_start = pixel_get_current_time();
     matrix_add_f32_eigen(mA, mB, mC_eigen, height, width);
     t_cost = pixel_get_current_time() - t_start;
     printf("matrix_add_f32, eigen, time cost %.2lf ms\n", t_cost);
+
+    t_start = pixel_get_current_time();
+    matrix_add_f32_opencv(mA, mB, mC_opencv, height, width);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("matrix_add_f32, opencv, time cost %.2lf ms\n", t_cost);
 
     t_start = pixel_get_current_time();
     matrix_add_f32_naive(mA, mB, mC_naive, height, width);

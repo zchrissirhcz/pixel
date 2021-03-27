@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.15)
 
 project(matcalc)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_executable(testbed
     # matrix.h
     # matrix.c
@@ -18,6 +20,8 @@ add_executable(testbed
     # array_mean.h
     # array_mean.c
     # array_mean_test.cpp
+
+    #eigen_test.cpp
 
     matrix_add_sub.h
     matrix_add_sub.c
