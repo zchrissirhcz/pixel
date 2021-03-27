@@ -336,3 +336,23 @@ TBD
 - `ldr`: 从内存读取到寄存器: `ldr <register> <memory address>`
 - `str`: 从寄存器写入到内存: `str <register> <memory address>`
 - 更多arm汇编基本指令，见《Embedded Systems - ARM Programming and Optimization》第一章最后一节(P50)。
+
+12. 用来区分arm neon, armv7, armv8, armv8.2的宏
+
+>2020年开始，新手机 CPU 几乎都是 armv8.2 架构，这个架构引入了新的 fp16 运算和 int8 dot 指令，优化得当就能大幅加速深度学习框架的推理效率。类似于 x86 CPU 的 AVX，不是全部 CPU 都支持，得考虑兼容性，做到老CPU上用老指令，新CPU用新指令。
+
+```
+#if __ARM_NEON
+    #if __aarch64__
+        #if __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+            printf("armv8.2\n");
+        #else
+            printf("armv8\n");
+        #endif
+    #else
+        printf("armv7\n");
+    #endif
+#endif // __ARM_NEON
+```
+
+Ref: [ncnn avx2/armv8.2 基础架构](https://zhuanlan.zhihu.com/p/149702006)
