@@ -186,8 +186,8 @@ Matrix<typename Scalar,
        int MaxRowsAtCompileTime = RowsAtCompileTime,
        int MaxColsAtCompileTime = ColsAtCompileTime>
 ```
-Options表示“是否用RowMajor"，为0表示ColumnMajor，为1表示RowMajor。
-实际上`RowMajor=1, ColumnMajor=0`是定义好了的量（枚举？）。
+Options表示“是否用RowMajor"，为0表示ColMajor，为1表示RowMajor。
+实际上`RowMajor=1, ColMajor=0`是定义好了的量（枚举？）。
 `MaxRowsAtCompileTime`和`MaxColsAtCompileTime`表示编译时候能确定的维度最大值，在`RowsAtCompileTime`或`ColsAtCompileTime`为Daynamic时，指定了它们两个，可以避免动态内存分配。例如：
 ```c++
 Matrix<float, Dynamic, Dynamic, 0, 3, 4>
@@ -222,6 +222,6 @@ Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>
 
 
 ### 疑问
-1. 为什么Eigen默认用Column-major存储？感觉会慢，而且和其他C/C++库会不一致。
+1. 为什么Eigen默认用ColMajor存储？感觉会慢，而且和其他C/C++库会不一致。
 
 2. 为什么`cols()`和`rows()`方法，返回值类型是`long`这个不友好的类型？
