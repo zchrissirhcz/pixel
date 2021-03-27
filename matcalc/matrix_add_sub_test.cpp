@@ -74,24 +74,24 @@ static void matrix_add_float_test()
     printf("matrix_add_f32, asimd,  time cost %.2lf ms\n", t_cost);
 
     // validate result, check if they are match
-    int mis1 = 0;
-    int mis2 = 0;
-    int mis3 = 0;
+    int mis_opencv = 0;
+    int mis_eigen = 0;
+    int mis_asimd = 0;
     size_t len = height * width;
     for (size_t i=0; i<len; i++) {
         if (mC_naive[i]!=mC_opencv[i]) {
-            mis1 ++;
+            mis_opencv ++;
         }
 
         if (mC_naive[i]!=mC_eigen[i]) {
-            mis2 ++;
+            mis_eigen ++;
         }
 
         if (mC_naive[i]!=mC_asimd[i]) {
-            mis3 ++;
+            mis_asimd ++;
         }
     }
-    printf("mis1=%d, mis2=%d, mis3=%d\n", mis1, mis2, mis3);
+    printf("mis_opencv=%d, mis_eigen=%d, mis_asimd=%d\n", mis_opencv, mis_eigen, mis_asimd);
 
 }
 
