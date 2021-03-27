@@ -1,5 +1,4 @@
 #include "matrix_add_subtract.h"
-#include "matrix.h"
 #include "common/pixel_benchmark.h"
 
 #include <opencv2/opencv.hpp>

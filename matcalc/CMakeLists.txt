@@ -23,9 +23,13 @@ add_executable(testbed
 
     #eigen_test.cpp
 
-    matrix_add_subtract.h
-    matrix_add_subtract.c
-    matrix_add_subtract_test.cpp
+    # matrix_add_subtract.h
+    # matrix_add_subtract.c
+    # matrix_add_subtract_test.cpp
+
+    matrix_gemm.h
+    matrix_gemm.c
+    matrix_gemm_test.cpp
 )
 
 target_include_directories(testbed PRIVATE

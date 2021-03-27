@@ -76,6 +76,8 @@ https://zhuanlan.zhihu.com/p/128640600
 
 ## f32 matrix add / subtract
 
+image info: name=river_bank2.png, height=3024, width=4032
+
 | id | method     | armv8      | armv7      |
 | -- | ---------- | ---------- | ---------- |
 | 1  | eigen      | 14.68 ms   | 18.84 ms   |
@@ -84,6 +86,22 @@ https://zhuanlan.zhihu.com/p/128640600
 | 4  | asimd      | 14.03 ms   | 14.83 ms   |
 
 neon优化在armv7时有明显提升，armv8时几乎没提升。
+
+## f32 GEMM
+
+image info: name=colorhouse.png, height=512, width=512
+
+
+| id | method     | armv8      | armv7      |
+| -- | ---------- | ---------- | ---------- |
+| 1  | eigen      | 6.22 ms    | 26.92 ms   |
+| 2  | opencv     | 32.14 ms   | 78.93 ms   |
+| 3  | naive      | 202.98 ms  | 204.07 ms  |
+| 4  | order opt  | 16.77 ms   | 137.21 ms  |
+| 5  | order opt2 | 17.21 ms   | 157.08 ms  |
+| 6  | asimd      | 24.30 ms   | 107.93 ms  |
+
+neon优化在armv7时有明显提升，armv8时反而最慢。（TODO继续优化）
 
 ## Eigen Notes
 
