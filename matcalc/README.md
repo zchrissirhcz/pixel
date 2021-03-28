@@ -104,7 +104,7 @@ image info: name=colorhouse.png, height=512, width=512
 neon优化在armv7时有明显提升，armv8时反而最慢。（TODO继续优化）
 
 
-## array fill f32
+## array fill f32（float数组填充相同元素)
 
 float类型数组，1000000个元素；测试手机是小米11，搭载了QCOM 888芯片；Android NDK-r21编译，时间开销如下：
 
@@ -113,6 +113,30 @@ float类型数组，1000000个元素；测试手机是小米11，搭载了QCOM 8
 | 1  |  逐元素赋值    |  1.28 ms     | 4.29 ms     |  1.51 ms      | 3.33 ms     |
 | 2  |  std::fill_n   |  0.12 ms     | 2.34 ms     |  0.35 ms      | 1.74 ms     |
 | 3  |  asimd(neon)   |  0.12 ms     | 0.68 ms     |  0.13 ms      | 0.62 ms     |
+
+## transpose u8 (uchar矩阵转置)
+
+| id | method         | armv8 release| armv7 release |
+| -- | -------------- | ------------ | ------------- |
+| 1  | naive          | 47.09 ms     |  47.11 ms     |
+| 2  | order_opt      | 66.95 ms     |  66.19 ms     |
+| 3  | opencv         | 19.38 ms     |  19.27 ms     |
+| 4  | eigen          | 67.27 ms     |  69.13 ms     |
+| 5  | partition(8x8分块)| 13.82 ms  |  15.17 ms     |
+| 6  | 8x8分块+asimd  |  9.79 ms     |  10.55 ms     |
+
+矩阵分块用于求矩阵转置：首先且分为方块（例如4x4，或8x8)，然后对分块做转置，接着是每个分块内部转置，最后处理leftover（包括两个方向的）。
+
+uchar类型的8x8分块+asimd的思路：基于分块实现的矩阵转置做法，在求8x8方块的转置时，有三个phase：
+- phase1：`vtrn_u8`
+- phase2: u8转u16再`vtrn_u16`
+- phase3: u16转u32再`vtrn_u32`，再转回u8
+
+目前用了15个向量寄存器，看起来在armv8上可以考虑16x16分块，用更多的寄存器，希望能更多的提速。
+
+**Reference**
+
+- [NEON 指令集并行技术优化矩阵转置【Android】](https://blog.csdn.net/panda1234lee/article/details/85222973)
 
 ## Eigen Notes
 

@@ -27,9 +27,13 @@ add_executable(testbed
     # matrix_add_subtract.c
     # matrix_add_subtract_test.cpp
 
-    array_fill.h
-    array_fill.c
-    array_fill_test.cpp
+    # array_fill.h
+    # array_fill.c
+    # array_fill_test.cpp
+
+    matrix_transpose.h
+    matrix_transpose.c
+    matrix_transpose_test.cpp
 
     # matrix_gemm.h
     # matrix_gemm.c
