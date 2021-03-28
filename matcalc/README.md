@@ -103,6 +103,17 @@ image info: name=colorhouse.png, height=512, width=512
 
 neon优化在armv7时有明显提升，armv8时反而最慢。（TODO继续优化）
 
+
+## array fill f32
+
+float类型数组，1000000个元素；测试手机是小米11，搭载了QCOM 888芯片；Android NDK-r21编译，时间开销如下：
+
+| id |  method        | armv8 release| armv8 debug | armv7 release | armv7 debug |
+| -- | -------------- | ------------ | ------------| ------------- | ----------- |
+| 1  |  逐元素赋值    |  1.28 ms     | 4.29 ms     |  1.51 ms      | 3.33 ms     |
+| 2  |  std::fill_n   |  0.12 ms     | 2.34 ms     |  0.35 ms      | 1.74 ms     |
+| 3  |  asimd(neon)   |  0.12 ms     | 0.68 ms     |  0.13 ms      | 0.62 ms     |
+
 ## Eigen Notes
 
 ### 1. 快速入门
