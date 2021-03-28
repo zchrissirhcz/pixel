@@ -194,6 +194,8 @@ Matrix<float, Dynamic, Dynamic, 0, 3, 4>
 ```
 表示的类型，内部用的是12个float元素的数组。
 
+注意：Options还可以设定 AutoAlign 、 DontAlign。
+
 7. typedef说明
 
 - `MatrixNt`是`Matrix<type, N, N>`，也就是系数类型为type的NxN方阵
@@ -203,6 +205,11 @@ Matrix<float, Dynamic, Dynamic, 0, 3, 4>
 - N可以是2, 3, 4或X（表示动态尺寸）
 - t可以是`i`(int), `f`(float), `d`(double), `cf`(`complex<float>`)或`cd`(`complex<double>`)之一（也就是说，Eigen的typedef定义的类型中，t只有i,f,d,cf,cd这5种取值）
 - 对于没有被提到的其他类型，仍然可作为Scalar参数，例如uchar, short等。
+
+8. Eigen还提供了 half 类型 （fp16？）
+
+Eigen不直接支持gpu。但有half之类的类型，可以用于cuda
+
 
 ### 3. map函数
 
@@ -224,4 +231,20 @@ Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>
 ### 疑问
 1. 为什么Eigen默认用ColMajor存储？感觉会慢，而且和其他C/C++库会不一致。
 
+>StarEngine使用列主序的矩阵，列向量，矩阵左乘运算，右手坐标系。列主序矩阵与direct3d、opengl保持一致，左乘与列向量符合线性代数的惯用法。Unity、Unreal使用左手坐标系，这其实不是特别方便。绝大多数物理定律、建模软件都是右手系，采用左手系会对算法开发与集成提出巨大挑战。我们为了简化物理体系的构建与DCC的流程，采用右手系。
+
+作者：Star.E
+链接：https://zhuanlan.zhihu.com/p/87598519
+
 2. 为什么`cols()`和`rows()`方法，返回值类型是`long`这个不友好的类型？
+
+
+### 为什么Eigen快？
+- SIMD
+- expression templates（编译阶段优化）
+    - 不产生不必要的临时变量
+    - lazy evaluation，避免内存搬运
+- 小尺寸矩阵静态内存
+### 参考
+- [Eigen: C++开源矩阵计算工具](https://zhuanlan.zhihu.com/p/31111908) 小鱼干（EasyCNN作者）整理的中文入门博客
+- [游戏引擎开发新感觉！(2) 数学库Eigen](https://zhuanlan.zhihu.com/p/87598519)
