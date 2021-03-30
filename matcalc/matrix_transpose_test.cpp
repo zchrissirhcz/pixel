@@ -102,17 +102,17 @@ static void matrix_transpose_u8_test()
     t_cost = pixel_get_current_time() - t_start;
     printf("matrix transpose u8, eigen,         time cost %.2lf ms\n", t_cost);
 
-    // partition4x4
+    // partition8x8
     t_start = pixel_get_current_time();
-    matrix_transpose_u8_partition(src, height, width, dst_partition4x4);
+    matrix_transpose_u8_partition8x8(src, height, width, dst_partition4x4);
     t_cost = pixel_get_current_time() - t_start;
-    printf("matrix transpose u8, partition,     time cost %.2lf ms\n", t_cost);
+    printf("matrix transpose u8, partition8x8,  time cost %.2lf ms\n", t_cost);
 
-    // asimd
+    // partition8x8, asimd
     t_start = pixel_get_current_time();
-    matrix_transpose_u8_asimd(src, height, width, dst_asimd);
+    matrix_transpose_u8_partition8x8_asimd(src, height, width, dst_asimd);
     t_cost = pixel_get_current_time() - t_start;
-    printf("matrix transpose u8, asimd,         time cost %.2lf ms\n", t_cost);
+    printf("matrix transpose u8, partition8x8 asimd, time cost %.2lf ms\n", t_cost);
 
     int mis_order_opt = 0;
     int mis_opencv = 0;

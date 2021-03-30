@@ -37,7 +37,7 @@ void matrix_transpose_u8_order_opt(unsigned char* src, uint32_t height, uint32_t
     }
 }
 
-void matrix_transpose_u8_partition(unsigned char* src, uint32_t height, uint32_t width, unsigned char* dst)
+void matrix_transpose_u8_partition8x8(unsigned char* src, uint32_t height, uint32_t width, unsigned char* dst)
 {
     // 转置所有分块
     const uint32_t block_size = 8;
@@ -226,8 +226,8 @@ void transpose_u8_8x8(unsigned char* data0, unsigned char* data1, unsigned char*
 
 #endif
 
-// 基于 matrix_transpose_u8_partition，把里面的分块内转置，改为neon intrinsic
-void matrix_transpose_u8_asimd(unsigned char* src, uint32_t height, uint32_t width, unsigned char* dst)
+// 基于 matrix_transpose_u8_partition8x8，把里面的分块内转置，改为neon intrinsic
+void matrix_transpose_u8_partition8x8_asimd(unsigned char* src, uint32_t height, uint32_t width, unsigned char* dst)
 {
     // 转置所有分块
     const uint32_t block_size = 8;
