@@ -51,7 +51,7 @@ void matrix_transpose_u8_partition(unsigned char* src, uint32_t height, uint32_t
         for (uint32_t j=0; j<w_block; j+=block_size) {
             unsigned char* block_src = src + (i*width + j);
             unsigned char* block_dst = dst + (j*height + i);
-            
+
             for (size_t k=0; k<block_size; k++) {
                 memcpy(block_dst, block_src, block_line_size);
                 block_src += src_linebytes;
@@ -74,7 +74,7 @@ void matrix_transpose_u8_partition(unsigned char* src, uint32_t height, uint32_t
             t = block_ptr1[0]; block_ptr1[0] = block_ptr0[1]; block_ptr0[1] = t; // 0,1 <=> 1,0
             t = block_ptr2[0]; block_ptr2[0] = block_ptr0[2]; block_ptr0[2] = t; // 0,2 <=> 2,0
             t = block_ptr3[0]; block_ptr3[0] = block_ptr0[3]; block_ptr0[3] = t; // 0,3 <=> 3,0
-            
+
             t = block_ptr1[2]; block_ptr1[2] = block_ptr2[1]; block_ptr2[1] = t; // 1,2 <=> 2,1
             t = block_ptr1[3]; block_ptr1[3] = block_ptr3[1]; block_ptr3[1] = t; // 1,3 <=> 3,1
 
@@ -113,7 +113,7 @@ void matrix_transpose_u8_partition(unsigned char* src, uint32_t height, uint32_t
 }
 
 #if __ARM_NEON
-void transpose_f32_4x4(float* data0, float* data1, float* data2, float* data3) {
+void transpose_f32_4x4_asimd(float* data0, float* data1, float* data2, float* data3) {
     float32x4_t q0 = vld1q_f32(data0);
     float32x4_t q1 = vld1q_f32(data1);
     float32x4_t q2 = vld1q_f32(data2);
@@ -122,23 +122,23 @@ void transpose_f32_4x4(float* data0, float* data1, float* data2, float* data3) {
     // ----------------------------------------------
     float32x4x2_t q01 = vtrnq_f32(q0, q1);
     float32x4x2_t q23 = vtrnq_f32(q2, q3);
- 
+
     float32x4_t qq0 = q01.val[0];
     float32x2_t d00 = vget_low_f32(qq0);
     float32x2_t d01 = vget_high_f32(qq0);
- 
+
     float32x4_t qq1 = q01.val[1];
     float32x2_t d10 = vget_low_f32(qq1);
     float32x2_t d11 = vget_high_f32(qq1);
- 
+
     float32x4_t qq2 = q23.val[0];
     float32x2_t d20 = vget_low_f32(qq2);
     float32x2_t d21 = vget_high_f32(qq2);
- 
+
     float32x4_t qq3 = q23.val[1];
     float32x2_t d30 = vget_low_f32(qq3);
     float32x2_t d31 = vget_high_f32(qq3);
- 
+
     q0 = vcombine_f32(d00, d20);
     q1 = vcombine_f32(d10, d30);
     q2 = vcombine_f32(d01, d21);
@@ -151,9 +151,97 @@ void transpose_f32_4x4(float* data0, float* data1, float* data2, float* data3) {
     vst1q_f32(data3, q3);
 }
 
+void transpose_f32_8x8_asimd(float* data0, float* data1, float* data2, float* data3, float* data4, float* data5, float* data6, float* data7)
+{
+    // ----------------------------------------------
+    // phase1
+    float32x4_t q00 = vld1q_f32(data0);
+    float32x4_t q10 = vld1q_f32(data1);
+    float32x4x2_t r01_left = vtrnq_f32(q00, q10);
+
+    float32x4_t q01 = vld1q_f32(data0+4);
+    float32x4_t q11 = vld1q_f32(data1+4);
+    float32x4x2_t r01_right = vtrnq_f32(q01, q11);
+
+    float32x4_t q20 = vld1q_f32(data2);
+    float32x4_t q30 = vld1q_f32(data3);
+    float32x4x2_t r23_left = vtrnq_f32(q20, q30);
+
+    float32x4_t q21 = vld1q_f32(data2+4);
+    float32x4_t q31 = vld1q_f32(data3+4);
+    float32x4x2_t r23_right = vtrnq_f32(q21, q31);
+
+    float32x4_t q40 = vld1q_f32(data4);
+    float32x4_t q50 = vld1q_f32(data5);
+    float32x4x2_t r45_left = vtrnq_f32(q40, q50);
+
+    float32x4_t q41 = vld1q_f32(data4+4);
+    float32x4_t q51 = vld1q_f32(data5+4);
+    float32x4x2_t r45_right = vtrnq_f32(q41, q51);
+
+    float32x4_t q60 = vld1q_f32(data6);
+    float32x4_t q70 = vld1q_f32(data7);
+    float32x4x2_t r67_left = vtrnq_f32(q60, q70);
+
+    float32x4_t q61 = vld1q_f32(data6+4);
+    float32x4_t q71 = vld1q_f32(data7+4);
+    float32x4x2_t r67_right = vtrnq_f32(q61, q71);
+
+    q00 = vcombine_f32(vget_low_f32(r01_left.val[0]), vget_low_f32(r23_left.val[0])); //0, 10, 20, 30
+    vst1q_f32(data0, q00);
+
+    q01 = vcombine_f32(vget_low_f32(r45_left.val[0]), vget_low_f32(r67_left.val[0])); //40, 50, 60, 70
+    vst1q_f32(data0+4, q01);
+
+    q10 = vcombine_f32(vget_low_f32(r01_left.val[1]), vget_low_f32(r23_left.val[1])); //1, 11, 21, 31
+    vst1q_f32(data1, q10);
+
+    q11 = vcombine_f32(vget_low_f32(r45_left.val[1]), vget_low_f32(r67_left.val[1])); //41, 51, 61, 71
+    vst1q_f32(data1+4, q11);
+
+    q20 = vcombine_f32(vget_high_f32(r01_left.val[0]), vget_high_f32(r23_left.val[0])); //2, 12, 22, 32
+    vst1q_f32(data2, q20);
+
+    q21 = vcombine_f32(vget_high_f32(r45_left.val[0]), vget_high_f32(r67_left.val[0])); //42, 52, 62, 72
+    vst1q_f32(data2+4, q21);
+
+    q30 = vcombine_f32(vget_high_f32(r01_left.val[1]), vget_high_f32(r23_left.val[1])); //3, 13, 23, 33
+    vst1q_f32(data3, q30);
+
+    q31 = vcombine_f32(vget_high_f32(r45_left.val[1]), vget_high_f32(r67_left.val[1])); //43, 53, 63, 73
+    vst1q_f32(data3+4, q31);
+
+    q40 = vcombine_f32(vget_low_f32(r01_right.val[0]), vget_low_f32(r23_right.val[0])); //4, 14, 24, 34
+    vst1q_f32(data4, q40);
+
+    q41 = vcombine_f32(vget_low_f32(r45_right.val[0]), vget_low_f32(r67_right.val[0])); //44, 54, 64, 74
+    vst1q_f32(data4+4, q41);
+
+    q50 = vcombine_f32(vget_low_f32(r01_right.val[1]), vget_low_f32(r23_right.val[1])); //5, 15, 25, 35
+    vst1q_f32(data5, q50);
+
+    q51 = vcombine_f32(vget_low_f32(r45_right.val[1]), vget_low_f32(r67_right.val[1])); //45, 55, 65, 75
+    vst1q_f32(data5+4, q51);
+
+    q60 = vcombine_f32(vget_high_f32(r01_right.val[0]), vget_high_f32(r23_right.val[0])); //6, 16, 26, 36
+    vst1q_f32(data6, q60);
+
+    q61 = vcombine_f32(vget_high_f32(r45_right.val[0]), vget_high_f32(r67_right.val[0])); //46, 56, 66, 76
+    vst1q_f32(data6+4, q61);
+
+    q70 = vcombine_f32(vget_high_f32(r01_right.val[1]), vget_high_f32(r23_right.val[1])); //7, 17, 27, 37
+    vst1q_f32(data7, q70);
+
+    q71 = vcombine_f32(vget_high_f32(r45_right.val[1]), vget_high_f32(r67_right.val[1])); //47, 57, 67, 77
+    vst1q_f32(data7+4, q71);
 
 
-void transpose_u8_8x8_asimd(unsigned char* data0, unsigned char* data1, unsigned char* data2, unsigned char* data3, 
+    // ----------------------------------------------
+}
+
+
+
+void transpose_u8_8x8_asimd(unsigned char* data0, unsigned char* data1, unsigned char* data2, unsigned char* data3,
     unsigned char* data4, unsigned char* data5, unsigned char* data6, unsigned char* data7)
 {
     uint8x8_t d0 = vld1_u8(data0);
@@ -223,8 +311,7 @@ void transpose_u8_8x8_asimd(unsigned char* data0, unsigned char* data1, unsigned
     vst1_u8(data7, d7);
 }
 
-
-void transpose_u8_16x16_asimd(unsigned char* data0, unsigned char* data1, unsigned char* data2, unsigned char* data3, 
+void transpose_u8_16x16_asimd(unsigned char* data0, unsigned char* data1, unsigned char* data2, unsigned char* data3,
     unsigned char* data4, unsigned char* data5, unsigned char* data6, unsigned char* data7,
     unsigned char* data8, unsigned char* data9, unsigned char* data10, unsigned char* data11,
     unsigned char* data12, unsigned char* data13, unsigned char* data14, unsigned char* data15)
@@ -363,17 +450,17 @@ void matrix_transpose_u8_partition_asimd(unsigned char* src, uint32_t height, ui
     uint32_t h_block = height - height % block_size;
     uint32_t w_block = width - width % block_size;
     uint32_t block_line_size = block_size * sizeof(unsigned char);
-    uint32_t src_linebytes = width * sizeof(unsigned char);
-    uint32_t dst_linebytes = height * sizeof(unsigned char);
+    uint32_t src_elem = width;
+    uint32_t dst_elem = height;
     for (uint32_t i=0; i<h_block; i+=block_size) {
         for (uint32_t j=0; j<w_block; j+=block_size) {
             unsigned char* block_src = src + (i*width + j);
             unsigned char* block_dst = dst + (j*height + i);
-            
+
             for (size_t k=0; k<block_size; k++) {
                 memcpy(block_dst, block_src, block_line_size);
-                block_src += src_linebytes;
-                block_dst += dst_linebytes;
+                block_src += src_elem;
+                block_dst += dst_elem;
             }
         }
     }
@@ -385,34 +472,45 @@ void matrix_transpose_u8_partition_asimd(unsigned char* src, uint32_t height, ui
             if (block_size==8) {
                 unsigned char* block_ptr = dst + i*height + j;
                 unsigned char* data0 = block_ptr;
-                unsigned char* data1 = data0 + dst_linebytes;
-                unsigned char* data2 = data1 + dst_linebytes;
-                unsigned char* data3 = data2 + dst_linebytes;
-                unsigned char* data4 = data3 + dst_linebytes;
-                unsigned char* data5 = data4 + dst_linebytes;
-                unsigned char* data6 = data5 + dst_linebytes;
-                unsigned char* data7 = data6 + dst_linebytes;
+                unsigned char* data1 = data0 + dst_elem;
+                unsigned char* data2 = data1 + dst_elem;
+                unsigned char* data3 = data2 + dst_elem;
+                unsigned char* data4 = data3 + dst_elem;
+                unsigned char* data5 = data4 + dst_elem;
+                unsigned char* data6 = data5 + dst_elem;
+                unsigned char* data7 = data6 + dst_elem;
                 transpose_u8_8x8_asimd(data0, data1, data2, data3, data4, data5, data6, data7);
             }
             else if (block_size==16) {
                 unsigned char* block_ptr = dst + i*height + j;
                 unsigned char* data0 = block_ptr;
-                unsigned char* data1 = data0 + dst_linebytes;
-                unsigned char* data2 = data1 + dst_linebytes;
-                unsigned char* data3 = data2 + dst_linebytes;
-                unsigned char* data4 = data3 + dst_linebytes;
-                unsigned char* data5 = data4 + dst_linebytes;
-                unsigned char* data6 = data5 + dst_linebytes;
-                unsigned char* data7 = data6 + dst_linebytes;
-                unsigned char* data8 = data7 + dst_linebytes;
-                unsigned char* data9 = data8 + dst_linebytes;
-                unsigned char* data10 = data9 + dst_linebytes;
-                unsigned char* data11 = data10 + dst_linebytes;
-                unsigned char* data12 = data11 + dst_linebytes;
-                unsigned char* data13 = data12 + dst_linebytes;
-                unsigned char* data14 = data13 + dst_linebytes;
-                unsigned char* data15 = data14 + dst_linebytes;
+                unsigned char* data1 = data0 + dst_elem;
+                unsigned char* data2 = data1 + dst_elem;
+                unsigned char* data3 = data2 + dst_elem;
+                unsigned char* data4 = data3 + dst_elem;
+                unsigned char* data5 = data4 + dst_elem;
+                unsigned char* data6 = data5 + dst_elem;
+                unsigned char* data7 = data6 + dst_elem;
+                unsigned char* data8 = data7 + dst_elem;
+                unsigned char* data9 = data8 + dst_elem;
+                unsigned char* data10 = data9 + dst_elem;
+                unsigned char* data11 = data10 + dst_elem;
+                unsigned char* data12 = data11 + dst_elem;
+                unsigned char* data13 = data12 + dst_elem;
+                unsigned char* data14 = data13 + dst_elem;
+                unsigned char* data15 = data14 + dst_elem;
                 transpose_u8_16x16_asimd(data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12, data13, data14, data15);
+            }
+            else {
+                for (uint32_t bi=0; bi<block_size; bi++) {
+                    for (uint32_t bj=0; bj<bi; bj++) {
+                        uint32_t src_idx = (i+bi)*height + (j+bj);
+                        uint32_t dst_idx = (i+bj)*height + (j+bi);
+                        unsigned char t = dst[dst_idx];
+                        dst[dst_idx] = dst[src_idx];
+                        dst[src_idx] = t;
+                    }
+                }
             }
 #else
             for (uint32_t bi=0; bi<block_size; bi++) {
@@ -420,6 +518,201 @@ void matrix_transpose_u8_partition_asimd(unsigned char* src, uint32_t height, ui
                     uint32_t src_idx = (i+bi)*height + (j+bj);
                     uint32_t dst_idx = (i+bj)*height + (j+bi);
                     unsigned char t = dst[dst_idx];
+                    dst[dst_idx] = dst[src_idx];
+                    dst[src_idx] = t;
+                }
+            }
+#endif // __ARM_NEON
+        }
+    }
+
+    // 处理 leftover 元素，包括行尾和列尾
+    // 行尾
+    for (uint32_t i=0; i<h_block; i++) {
+        for (uint32_t j=w_block; j<width; j++) {
+            uint32_t src_idx = i*width + j;
+            uint32_t dst_idx = j*height + i;
+            dst[dst_idx] = src[src_idx];
+        }
+    }
+    // 列尾
+    for (uint32_t i=h_block; i<height; i++) {
+        for (uint32_t j=0; j<width; j++) {
+            uint32_t src_idx = i*width + j;
+            uint32_t dst_idx = j*height + i;
+            dst[dst_idx] = src[src_idx];
+        }
+    }
+}
+
+//----------------------------------------------------------------------
+
+void matrix_transpose_f32_naive(float* src, uint32_t height, uint32_t width, float* dst)
+{
+    // src: height x width
+    // dst: width x height
+    for (uint32_t i=0; i<height; i++) {
+        uint32_t src_idx_base = i*width;
+        for (uint32_t j=0; j<width; j++) {
+            uint32_t dst_idx = j*height + i;
+            uint32_t src_idx = src_idx_base + j;
+            dst[dst_idx] = src[src_idx];
+        }
+    }
+}
+
+void matrix_transpose_f32_order_opt(float* src, uint32_t height, uint32_t width, float* dst)
+{
+    for (uint32_t j=0; j<width; j++) {
+        uint32_t dst_idx_base = j*height;
+        for (uint32_t i=0; i<height; i++) {
+            uint32_t dst_idx = dst_idx_base + i;
+            uint32_t src_idx = i*width + j;
+            dst[dst_idx] = src[src_idx];
+        }
+    }
+}
+
+void matrix_transpose_f32_partition(float* src, uint32_t height, uint32_t width, float* dst, const uint32_t block_size)
+{
+    // 转置所有分块
+    //const uint32_t block_size = 8;
+
+    uint32_t h_block = height - height % block_size;
+    uint32_t w_block = width - width % block_size;
+    uint32_t block_line_size = block_size * sizeof(float);
+    uint32_t src_elem = width;
+    uint32_t dst_elem = height;
+    for (uint32_t i=0; i<h_block; i+=block_size) {
+        for (uint32_t j=0; j<w_block; j+=block_size) {
+            float* block_src = src + (i*width + j);
+            float* block_dst = dst + (j*height + i);
+
+            for (size_t k=0; k<block_size; k++) {
+                memcpy(block_dst, block_src, block_line_size);
+                block_src += src_elem;
+                block_dst += dst_elem;
+            }
+        }
+    }
+
+    // 每个分块内部做转置
+    for (uint32_t i=0; i<w_block; i+=block_size) {
+        for (uint32_t j=0; j<h_block; j+=block_size) {
+#if 0 // 用于调试，当block_size=4时，直接写出来每一个swap
+            float* block_ptr0 = dst + (i*height + j);
+            float* block_ptr1 = block_ptr0 + dst_elem;
+            float* block_ptr2 = block_ptr1 + dst_elem;
+            float* block_ptr3 = block_ptr2 + dst_elem;
+
+            float t;
+
+            t = block_ptr1[0]; block_ptr1[0] = block_ptr0[1]; block_ptr0[1] = t; // 0,1 <=> 1,0
+            t = block_ptr2[0]; block_ptr2[0] = block_ptr0[2]; block_ptr0[2] = t; // 0,2 <=> 2,0
+            t = block_ptr3[0]; block_ptr3[0] = block_ptr0[3]; block_ptr0[3] = t; // 0,3 <=> 3,0
+
+            t = block_ptr1[2]; block_ptr1[2] = block_ptr2[1]; block_ptr2[1] = t; // 1,2 <=> 2,1
+            t = block_ptr1[3]; block_ptr1[3] = block_ptr3[1]; block_ptr3[1] = t; // 1,3 <=> 3,1
+
+            t = block_ptr2[3]; block_ptr2[3] = block_ptr3[2]; block_ptr3[2] = t; // 2,3 <=> 3,2
+#else
+            for (uint32_t bi=0; bi<block_size; bi++) {
+                for (uint32_t bj=0; bj<bi; bj++) {
+                    uint32_t src_idx = (i+bi)*height + (j+bj);
+                    uint32_t dst_idx = (i+bj)*height + (j+bi);
+                    float t = dst[dst_idx];
+                    dst[dst_idx] = dst[src_idx];
+                    dst[src_idx] = t;
+                }
+            }
+#endif
+        }
+    }
+
+    // 处理 leftover 元素，包括行尾和列尾
+    // 行尾
+    for (uint32_t i=0; i<h_block; i++) {
+        for (uint32_t j=w_block; j<width; j++) {
+            uint32_t src_idx = i*width + j;
+            uint32_t dst_idx = j*height + i;
+            dst[dst_idx] = src[src_idx];
+        }
+    }
+    // 列尾
+    for (uint32_t i=h_block; i<height; i++) {
+        for (uint32_t j=0; j<width; j++) {
+            uint32_t src_idx = i*width + j;
+            uint32_t dst_idx = j*height + i;
+            dst[dst_idx] = src[src_idx];
+        }
+    }
+}
+
+// 基于 matrix_transpose_f32_partition8x8，把里面的分块内转置，改为neon intrinsic
+void matrix_transpose_f32_partition_asimd(float* src, uint32_t height, uint32_t width, float* dst, const uint32_t block_size)
+{
+    // 转置所有分块
+    //const uint32_t block_size = 8;
+
+    uint32_t h_block = height - height % block_size;
+    uint32_t w_block = width - width % block_size;
+    uint32_t block_line_size = block_size * sizeof(float);
+    uint32_t src_elem = width;
+    uint32_t dst_elem = height;
+    for (uint32_t i=0; i<h_block; i+=block_size) {
+        for (uint32_t j=0; j<w_block; j+=block_size) {
+            float* block_src = src + (i*width + j);
+            float* block_dst = dst + (j*height + i);
+
+            for (size_t k=0; k<block_size; k++) {
+                memcpy(block_dst, block_src, block_line_size);
+                block_src += src_elem;
+                block_dst += dst_elem;
+            }
+        }
+    }
+
+    // 每个分块内部做转置
+    for (uint32_t i=0; i<w_block; i+=block_size) {
+        for (uint32_t j=0; j<h_block; j+=block_size) {
+#if __ARM_NEON
+            if (block_size==4) {
+                float* block_ptr = dst + i*height + j;
+                float* data0 = block_ptr;
+                float* data1 = data0 + dst_elem;
+                float* data2 = data1 + dst_elem;
+                float* data3 = data2 + dst_elem;
+                transpose_f32_4x4_asimd(data0, data1, data2, data3);
+            }
+            else if (block_size==8) {
+                float* block_ptr = dst + i*height + j;
+                float* data0 = block_ptr;
+                float* data1 = data0 + dst_elem;
+                float* data2 = data1 + dst_elem;
+                float* data3 = data2 + dst_elem;
+                float* data4 = data3 + dst_elem;
+                float* data5 = data4 + dst_elem;
+                float* data6 = data5 + dst_elem;
+                float* data7 = data6 + dst_elem;
+                transpose_f32_8x8_asimd(data0, data1, data2, data3, data4, data5, data6, data7);
+            }
+            else {
+                for (uint32_t bi=0; bi<block_size; bi++) {
+                    for (uint32_t bj=0; bj<bi; bj++) {
+                        uint32_t src_idx = (i+bi)*height + (j+bj);
+                        uint32_t dst_idx = (i+bj)*height + (j+bi);
+                        float t = dst[dst_idx];
+                        dst[dst_idx] = dst[src_idx];
+                        dst[src_idx] = t;
+                    }
+                }
+            }
+#else
+            for (uint32_t bi=0; bi<block_size; bi++) {
+                for (uint32_t bj=0; bj<bi; bj++) {
+                    uint32_t src_idx = (i+bi)*height + (j+bj);
+                    uint32_t dst_idx = (i+bj)*height + (j+bi);
+                    float t = dst[dst_idx];
                     dst[dst_idx] = dst[src_idx];
                     dst[src_idx] = t;
                 }

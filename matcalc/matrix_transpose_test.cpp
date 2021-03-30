@@ -28,6 +28,24 @@ static void matrix_transpose_u8_eigen(unsigned char* src, uint32_t height, uint3
     // cout << "eDst:" << endl << eDst << endl;
 }
 
+
+static void matrix_transpose_f32_opencv(float* src, uint32_t height, uint32_t width, float* dst)
+{
+    cv::Mat src_mat(height, width, CV_32FC1, src);
+    cv::Mat dst_mat(width, height, CV_32FC1, dst);
+    dst_mat = src_mat.t();
+}
+
+static void matrix_transpose_f32_eigen(float* src, uint32_t height, uint32_t width, float* dst)
+{
+    Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> eSrc(src, height, width);
+    Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> eDst(dst, width, height);
+    eDst = eSrc.transpose();
+
+    // cout << "eSrc:" << endl << eSrc << endl;
+    // cout << "eDst:" << endl << eDst << endl;
+}
+
 static void prepare_big(uint32_t& height, uint32_t& width, cv::Mat& gray)
 {
     cv::Mat image = cv::imread("river_bank2.png");
@@ -36,6 +54,11 @@ static void prepare_big(uint32_t& height, uint32_t& width, cv::Mat& gray)
     // cv::Size dsize;
     // dsize.height = image.rows - 1;
     // dsize.width = image.cols - 1;
+    // cv::resize(image, image, dsize);
+
+    // cv::Size dsize;
+    // dsize.height = 1024;
+    // dsize.width = 1024;
     // cv::resize(image, image, dsize);
 
     cv::Size size = image.size();
@@ -58,6 +81,115 @@ static void prepare_small(uint32_t& height, uint32_t& width, cv::Mat& gray)
     for (uint32_t i=0; i<height*width; i++) {
         data[i] = i%256;
     }
+}
+
+static void matrix_transpose_f32_test()
+{
+    uint32_t height;
+    uint32_t width;
+    cv::Mat gray;
+    prepare_big(height, width, gray);
+    //prepare_small(height, width, gray);
+
+    // u8 to float
+    gray.convertTo(gray, CV_32FC1);
+
+    float* src = (float*)gray.data;
+    double t_start, t_cost;
+    uint32_t len = height * width;
+    float* dst_naive = (float*)malloc(sizeof(float)*len);
+    float* dst_order_opt = (float*)malloc(sizeof(float)*len);
+    float* dst_opencv = (float*)malloc(sizeof(float)*len);
+    float* dst_eigen = (float*)malloc(sizeof(float)*len);
+    float* dst_partition4x4 = (float*)malloc(sizeof(float)*len);
+    float* dst_partition4x4_asimd = (float*)malloc(sizeof(float)*len);
+    float* dst_partition8x8 = (float*)malloc(sizeof(float)*len);
+    float* dst_partition8x8_asimd = (float*)malloc(sizeof(float)*len);
+
+    // naive
+    t_start = pixel_get_current_time();
+    matrix_transpose_f32_naive(src, height, width, dst_naive);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("matrix transpose f32, naive,         time cost %.2lf ms\n", t_cost);
+
+    // order_opt
+    t_start = pixel_get_current_time();
+    matrix_transpose_f32_order_opt(src, height, width, dst_order_opt);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("matrix transpose f32, order_opt,     time cost %.2lf ms\n", t_cost);
+
+    // opencv
+    t_start = pixel_get_current_time();
+    matrix_transpose_f32_opencv(src, height, width, dst_opencv);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("matrix transpose f32, opencv,        time cost %.2lf ms\n", t_cost);
+
+    // eigen
+    t_start = pixel_get_current_time();
+    matrix_transpose_f32_eigen(src, height, width, dst_eigen);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("matrix transpose f32, eigen,         time cost %.2lf ms\n", t_cost);
+
+    // partition, 4x4
+    t_start = pixel_get_current_time();
+    matrix_transpose_f32_partition(src, height, width, dst_partition4x4, 4);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("matrix transpose f32, partition4x4,  time cost %.2lf ms\n", t_cost);
+
+    // partition, 4x4, asimd
+    t_start = pixel_get_current_time();
+    matrix_transpose_f32_partition_asimd(src, height, width, dst_partition4x4_asimd, 4);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("matrix transpose f32, partition4x4 asimd, time cost %.2lf ms\n", t_cost);
+
+    // partition, 8x8
+    t_start = pixel_get_current_time();
+    matrix_transpose_f32_partition(src, height, width, dst_partition8x8, 8);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("matrix transpose f32, partition8x8,  time cost %.2lf ms\n", t_cost);
+
+    // partition, 8x8, asimd
+    t_start = pixel_get_current_time();
+    matrix_transpose_f32_partition_asimd(src, height, width, dst_partition8x8_asimd, 8);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("matrix transpose f32, partition8x8 asimd, time cost %.2lf ms\n", t_cost);
+
+    int mis_order_opt = 0;
+    int mis_opencv = 0;
+    int mis_eigen = 0;
+    int mis_partition4x4 = 0;
+    int mis_partition4x4_asimd = 0;
+    int mis_partition8x8 = 0;
+    int mis_partition8x8_asimd = 0;
+
+    for (uint32_t i=0; i<len; i++) {
+        if (dst_naive[i]!=dst_order_opt[i]) {
+            mis_order_opt++;
+        }
+        if (dst_naive[i]!=dst_opencv[i]) {
+            mis_opencv++;
+        }
+        if (dst_naive[i]!=dst_eigen[i]) {
+            mis_eigen++;
+        }
+        if (dst_naive[i]!=dst_partition4x4[i]) {
+            mis_partition4x4++;
+            printf("dst_naive[%d]=%f, dst_partition4x4[%d]=%f\n", i, dst_naive[i], i, dst_partition4x4[i]);
+        }
+        if (dst_naive[i]!=dst_partition4x4_asimd[i]) {
+            mis_partition4x4_asimd++;
+        }
+        if (dst_naive[i]!=dst_partition8x8[i]) {
+            mis_partition8x8++;
+            printf("dst_naive[%d]=%f, dst_partition4x4[%d]=%f\n", i, dst_naive[i], i, dst_partition8x8[i]);
+        }
+        if (dst_naive[i]!=dst_partition8x8_asimd[i]) {
+            mis_partition8x8_asimd++;
+        }
+    }
+
+    printf("mis_order_opt=%d, mis_opencv=%d, mis_eigen=%d, \nmis_partition4x4=%d, mis_partition4x4_asimd=%d, mis_partition8x8=%d, mis_partition8x8_asimd=%d\n",
+        mis_order_opt, mis_opencv, mis_eigen, mis_partition4x4, mis_partition4x4_asimd, mis_partition8x8, mis_partition8x8_asimd);
 }
 
 static void matrix_transpose_u8_test()
@@ -202,7 +334,7 @@ static void vtrn_f32_test()
     printf("data2: %f %f %f %f\n", data2[0], data2[1], data2[2], data2[3]);
     printf("data3: %f %f %f %f\n", data3[0], data3[1], data3[2], data3[3]);
 
-    transpose_f32_4x4(data0, data1, data2, data3);
+    transpose_f32_4x4_asimd(data0, data1, data2, data3);
 
 
     printf("--------------------------------------------------\n");
@@ -261,6 +393,7 @@ static void vtrn_u8_test()
 int main() {
 
     matrix_transpose_u8_test();
+    matrix_transpose_f32_test();
     //eigen_test();
     //vtrn_f32_test();
     //vtrn_u8_test();

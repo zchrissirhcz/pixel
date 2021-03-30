@@ -114,7 +114,9 @@ float类型数组，1000000个元素；测试手机是小米11，搭载了QCOM 8
 | 2  |  std::fill_n   |  0.12 ms     | 2.34 ms     |  0.35 ms      | 1.74 ms     |
 | 3  |  asimd(neon)   |  0.12 ms     | 0.68 ms     |  0.13 ms      | 0.62 ms     |
 
-## transpose u8 (uchar矩阵转置)
+## transpose 矩阵转置
+
+**u8矩阵转置**
 
 image info: height=3024, width=4032
 
@@ -138,6 +140,24 @@ uchar类型的8x8分块+asimd的思路：基于分块实现的矩阵转置做法
 
 8x8分块+asimd，用了15个向量寄存器。
 16x16分块+asimd，由于没有`vtrnq_u64`指令，写法稍有不同。
+
+**f32矩阵转置**
+
+image info: height=3024, width=4032
+
+| id | method         | armv8 release| armv7 release |
+| -- | -------------- | ------------ | ------------- |
+| 1  | naive          | 72.58 ms     |  75.12 ms    |
+| 2  | order_opt      | 77.58 ms     |  78.57 ms    |
+| 3  | opencv         | 32.82 ms     |  32.83 ms    |
+| 4  | eigen          | 77.31 ms     |  86.45 ms    |
+| 5  | 8x8分块        | 36.26 ms     |  45.44 ms    |
+| 6  | 8x8分块+asimd  | 35.60 ms     |  42.71 ms    |
+| 7  | 16x16分块      | 30.94 ms     |  40.46 ms    |
+| 8  | 16x16分块+asimd| 26.70 ms     |  33.55 ms    |
+
+f32情况下，16x16的分块，也只是用了一次vtrnq指令，效率提升不多。
+
 
 **Reference**
 
