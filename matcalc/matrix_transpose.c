@@ -37,10 +37,10 @@ void matrix_transpose_u8_order_opt(unsigned char* src, uint32_t height, uint32_t
     }
 }
 
-void matrix_transpose_u8_partition8x8(unsigned char* src, uint32_t height, uint32_t width, unsigned char* dst)
+void matrix_transpose_u8_partition(unsigned char* src, uint32_t height, uint32_t width, unsigned char* dst, const uint32_t block_size)
 {
     // 转置所有分块
-    const uint32_t block_size = 8;
+    //const uint32_t block_size = 8;
 
     uint32_t h_block = height - height % block_size;
     uint32_t w_block = width - width % block_size;
@@ -153,7 +153,7 @@ void transpose_f32_4x4(float* data0, float* data1, float* data2, float* data3) {
 
 
 
-void transpose_u8_8x8(unsigned char* data0, unsigned char* data1, unsigned char* data2, unsigned char* data3, 
+void transpose_u8_8x8_asimd(unsigned char* data0, unsigned char* data1, unsigned char* data2, unsigned char* data3, 
     unsigned char* data4, unsigned char* data5, unsigned char* data6, unsigned char* data7)
 {
     uint8x8_t d0 = vld1_u8(data0);
@@ -224,13 +224,141 @@ void transpose_u8_8x8(unsigned char* data0, unsigned char* data1, unsigned char*
 }
 
 
+void transpose_u8_16x16_asimd(unsigned char* data0, unsigned char* data1, unsigned char* data2, unsigned char* data3, 
+    unsigned char* data4, unsigned char* data5, unsigned char* data6, unsigned char* data7,
+    unsigned char* data8, unsigned char* data9, unsigned char* data10, unsigned char* data11,
+    unsigned char* data12, unsigned char* data13, unsigned char* data14, unsigned char* data15)
+{
+    uint8x16_t q0 = vld1q_u8(data0);
+    uint8x16_t q1 = vld1q_u8(data1);
+    uint8x16_t q2 = vld1q_u8(data2);
+    uint8x16_t q3 = vld1q_u8(data3);
+    uint8x16_t q4 = vld1q_u8(data4);
+    uint8x16_t q5 = vld1q_u8(data5);
+    uint8x16_t q6 = vld1q_u8(data6);
+    uint8x16_t q7 = vld1q_u8(data7);
+    uint8x16_t q8 = vld1q_u8(data8);
+    uint8x16_t q9 = vld1q_u8(data9);
+    uint8x16_t q10 = vld1q_u8(data10);
+    uint8x16_t q11 = vld1q_u8(data11);
+    uint8x16_t q12 = vld1q_u8(data12);
+    uint8x16_t q13 = vld1q_u8(data13);
+    uint8x16_t q14 = vld1q_u8(data14);
+    uint8x16_t q15 = vld1q_u8(data15);
+    // ----------------------------------------------
+    // phase1
+    uint8x16x2_t q01 = vtrnq_u8(q0, q1);
+    uint8x16x2_t q23 = vtrnq_u8(q2, q3);
+    uint8x16x2_t q45 = vtrnq_u8(q4, q5);
+    uint8x16x2_t q67 = vtrnq_u8(q6, q7);
+    uint8x16x2_t q89 = vtrnq_u8(q8, q9);
+    uint8x16x2_t q1011 = vtrnq_u8(q10, q11);
+    uint8x16x2_t q1213 = vtrnq_u8(q12, q13);
+    uint8x16x2_t q1415 = vtrnq_u8(q14, q15);
+
+    // phase2
+    uint16x8_t v0 = vreinterpretq_u16_u8(q01.val[0]);
+    uint16x8_t v1 = vreinterpretq_u16_u8(q01.val[1]);
+    uint16x8_t v2 = vreinterpretq_u16_u8(q23.val[0]);
+    uint16x8_t v3 = vreinterpretq_u16_u8(q23.val[1]);
+    uint16x8_t v4 = vreinterpretq_u16_u8(q45.val[0]);
+    uint16x8_t v5 = vreinterpretq_u16_u8(q45.val[1]);
+    uint16x8_t v6 = vreinterpretq_u16_u8(q67.val[0]);
+    uint16x8_t v7 = vreinterpretq_u16_u8(q67.val[1]);
+    uint16x8_t v8 = vreinterpretq_u16_u8(q89.val[0]);
+    uint16x8_t v9 = vreinterpretq_u16_u8(q89.val[1]);
+    uint16x8_t v10 = vreinterpretq_u16_u8(q1011.val[0]);
+    uint16x8_t v11 = vreinterpretq_u16_u8(q1011.val[1]);
+    uint16x8_t v12 = vreinterpretq_u16_u8(q1213.val[0]);
+    uint16x8_t v13 = vreinterpretq_u16_u8(q1213.val[1]);
+    uint16x8_t v14 = vreinterpretq_u16_u8(q1415.val[0]);
+    uint16x8_t v15 = vreinterpretq_u16_u8(q1415.val[1]);
+
+    uint16x8x2_t v_tmp;
+    v_tmp = vtrnq_u16(v0, v2); v0 = v_tmp.val[0]; v2 = v_tmp.val[1];
+    v_tmp = vtrnq_u16(v1, v3); v1 = v_tmp.val[0]; v3 = v_tmp.val[1];
+    v_tmp = vtrnq_u16(v4, v6); v4 = v_tmp.val[0]; v6 = v_tmp.val[1];
+    v_tmp = vtrnq_u16(v5, v7); v5 = v_tmp.val[0]; v7 = v_tmp.val[1];
+    v_tmp = vtrnq_u16(v8, v10); v8 = v_tmp.val[0]; v10 = v_tmp.val[1];
+    v_tmp = vtrnq_u16(v9, v11); v9 = v_tmp.val[0]; v11 = v_tmp.val[1];
+    v_tmp = vtrnq_u16(v12, v14); v12 = v_tmp.val[0]; v14 = v_tmp.val[1];
+    v_tmp = vtrnq_u16(v13, v15); v13 = v_tmp.val[0]; v15 = v_tmp.val[1];
+
+    // phase3
+    uint32x4_t w0 = vreinterpretq_u32_u16(v0);
+    uint32x4_t w1 = vreinterpretq_u32_u16(v1);
+    uint32x4_t w2 = vreinterpretq_u32_u16(v2);
+    uint32x4_t w3 = vreinterpretq_u32_u16(v3);
+    uint32x4_t w4 = vreinterpretq_u32_u16(v4);
+    uint32x4_t w5 = vreinterpretq_u32_u16(v5);
+    uint32x4_t w6 = vreinterpretq_u32_u16(v6);
+    uint32x4_t w7 = vreinterpretq_u32_u16(v7);
+    uint32x4_t w8 = vreinterpretq_u32_u16(v8);
+    uint32x4_t w9 = vreinterpretq_u32_u16(v9);
+    uint32x4_t w10 = vreinterpretq_u32_u16(v10);
+    uint32x4_t w11 = vreinterpretq_u32_u16(v11);
+    uint32x4_t w12 = vreinterpretq_u32_u16(v12);
+    uint32x4_t w13 = vreinterpretq_u32_u16(v13);
+    uint32x4_t w14 = vreinterpretq_u32_u16(v14);
+    uint32x4_t w15 = vreinterpretq_u32_u16(v15);
+
+    uint32x4x2_t w_tmp;
+    w_tmp = vtrnq_u32(w0, w4); w0=w_tmp.val[0]; w4=w_tmp.val[1];
+    w_tmp = vtrnq_u32(w1, w5); w1=w_tmp.val[0]; w5=w_tmp.val[1];
+    w_tmp = vtrnq_u32(w2, w6); w2=w_tmp.val[0]; w6=w_tmp.val[1];
+    w_tmp = vtrnq_u32(w3, w7); w3=w_tmp.val[0]; w7=w_tmp.val[1];
+    w_tmp = vtrnq_u32(w8, w12); w8=w_tmp.val[0]; w12=w_tmp.val[1];
+    w_tmp = vtrnq_u32(w9, w13); w9=w_tmp.val[0]; w13=w_tmp.val[1];
+    w_tmp = vtrnq_u32(w10, w14); w10=w_tmp.val[0]; w14=w_tmp.val[1];
+    w_tmp = vtrnq_u32(w11, w15); w11=w_tmp.val[0]; w15=w_tmp.val[1];
+
+    // phase 4
+    uint64x2_t x_tmp;
+    x_tmp = vcombine_u32(vget_low_u32(w0), vget_low_u32(w8)); q0 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_low_u32(w1), vget_low_u32(w9)); q1 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_low_u32(w2), vget_low_u32(w10)); q2 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_low_u32(w3), vget_low_u32(w11)); q3 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_low_u32(w4), vget_low_u32(w12)); q4 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_low_u32(w5), vget_low_u32(w13)); q5 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_low_u32(w6), vget_low_u32(w14)); q6 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_low_u32(w7), vget_low_u32(w15)); q7 = vreinterpretq_u8_u64(x_tmp);
+
+    x_tmp = vcombine_u32(vget_high_u32(w0), vget_high_u32(w8)); q8 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_high_u32(w1), vget_high_u32(w9)); q9 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_high_u32(w2), vget_high_u32(w10)); q10 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_high_u32(w3), vget_high_u32(w11)); q11 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_high_u32(w4), vget_high_u32(w12)); q12 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_high_u32(w5), vget_high_u32(w13)); q13 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_high_u32(w6), vget_high_u32(w14)); q14 = vreinterpretq_u8_u64(x_tmp);
+    x_tmp = vcombine_u32(vget_high_u32(w7), vget_high_u32(w15)); q15 = vreinterpretq_u8_u64(x_tmp);
+
+    // ----------------------------------------------
+    vst1q_u8(data0, q0);
+    vst1q_u8(data1, q1);
+    vst1q_u8(data2, q2);
+    vst1q_u8(data3, q3);
+    vst1q_u8(data4, q4);
+    vst1q_u8(data5, q5);
+    vst1q_u8(data6, q6);
+    vst1q_u8(data7, q7);
+    vst1q_u8(data8, q8);
+    vst1q_u8(data9, q9);
+    vst1q_u8(data10, q10);
+    vst1q_u8(data11, q11);
+    vst1q_u8(data12, q12);
+    vst1q_u8(data13, q13);
+    vst1q_u8(data14, q14);
+    vst1q_u8(data15, q15);
+}
+
+
 #endif
 
 // 基于 matrix_transpose_u8_partition8x8，把里面的分块内转置，改为neon intrinsic
-void matrix_transpose_u8_partition8x8_asimd(unsigned char* src, uint32_t height, uint32_t width, unsigned char* dst)
+void matrix_transpose_u8_partition_asimd(unsigned char* src, uint32_t height, uint32_t width, unsigned char* dst, const uint32_t block_size)
 {
     // 转置所有分块
-    const uint32_t block_size = 8;
+    //const uint32_t block_size = 8;
 
     uint32_t h_block = height - height % block_size;
     uint32_t w_block = width - width % block_size;
@@ -254,16 +382,38 @@ void matrix_transpose_u8_partition8x8_asimd(unsigned char* src, uint32_t height,
     for (uint32_t i=0; i<w_block; i+=block_size) {
         for (uint32_t j=0; j<h_block; j+=block_size) {
 #if __ARM_NEON
-            unsigned char* block_ptr = dst + i*height + j;
-            unsigned char* data0 = block_ptr;
-            unsigned char* data1 = data0 + dst_linebytes;
-            unsigned char* data2 = data1 + dst_linebytes;
-            unsigned char* data3 = data2 + dst_linebytes;
-            unsigned char* data4 = data3 + dst_linebytes;
-            unsigned char* data5 = data4 + dst_linebytes;
-            unsigned char* data6 = data5 + dst_linebytes;
-            unsigned char* data7 = data6 + dst_linebytes;
-            transpose_u8_8x8(data0, data1, data2, data3, data4, data5, data6, data7);
+            if (block_size==8) {
+                unsigned char* block_ptr = dst + i*height + j;
+                unsigned char* data0 = block_ptr;
+                unsigned char* data1 = data0 + dst_linebytes;
+                unsigned char* data2 = data1 + dst_linebytes;
+                unsigned char* data3 = data2 + dst_linebytes;
+                unsigned char* data4 = data3 + dst_linebytes;
+                unsigned char* data5 = data4 + dst_linebytes;
+                unsigned char* data6 = data5 + dst_linebytes;
+                unsigned char* data7 = data6 + dst_linebytes;
+                transpose_u8_8x8_asimd(data0, data1, data2, data3, data4, data5, data6, data7);
+            }
+            else if (block_size==16) {
+                unsigned char* block_ptr = dst + i*height + j;
+                unsigned char* data0 = block_ptr;
+                unsigned char* data1 = data0 + dst_linebytes;
+                unsigned char* data2 = data1 + dst_linebytes;
+                unsigned char* data3 = data2 + dst_linebytes;
+                unsigned char* data4 = data3 + dst_linebytes;
+                unsigned char* data5 = data4 + dst_linebytes;
+                unsigned char* data6 = data5 + dst_linebytes;
+                unsigned char* data7 = data6 + dst_linebytes;
+                unsigned char* data8 = data7 + dst_linebytes;
+                unsigned char* data9 = data8 + dst_linebytes;
+                unsigned char* data10 = data9 + dst_linebytes;
+                unsigned char* data11 = data10 + dst_linebytes;
+                unsigned char* data12 = data11 + dst_linebytes;
+                unsigned char* data13 = data12 + dst_linebytes;
+                unsigned char* data14 = data13 + dst_linebytes;
+                unsigned char* data15 = data14 + dst_linebytes;
+                transpose_u8_16x16_asimd(data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12, data13, data14, data15);
+            }
 #else
             for (uint32_t bi=0; bi<block_size; bi++) {
                 for (uint32_t bj=0; bj<bi; bj++) {

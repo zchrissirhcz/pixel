@@ -75,8 +75,10 @@ static void matrix_transpose_u8_test()
     unsigned char* dst_order_opt = (unsigned char*)malloc(sizeof(unsigned char)*len);
     unsigned char* dst_opencv = (unsigned char*)malloc(sizeof(unsigned char)*len);
     unsigned char* dst_eigen = (unsigned char*)malloc(sizeof(unsigned char)*len);
-    unsigned char* dst_partition4x4 = (unsigned char*)malloc(sizeof(unsigned char)*len);
-    unsigned char* dst_asimd = (unsigned char*)malloc(sizeof(unsigned char)*len);
+    unsigned char* dst_partition8x8 = (unsigned char*)malloc(sizeof(unsigned char)*len);
+    unsigned char* dst_partition8x8_asimd = (unsigned char*)malloc(sizeof(unsigned char)*len);
+    unsigned char* dst_partition16x16 = (unsigned char*)malloc(sizeof(unsigned char)*len);
+    unsigned char* dst_partition16x16_asimd = (unsigned char*)malloc(sizeof(unsigned char)*len);
     
     // naive
     t_start = pixel_get_current_time();
@@ -102,23 +104,37 @@ static void matrix_transpose_u8_test()
     t_cost = pixel_get_current_time() - t_start;
     printf("matrix transpose u8, eigen,         time cost %.2lf ms\n", t_cost);
 
-    // partition8x8
+    // partition, 8x8
     t_start = pixel_get_current_time();
-    matrix_transpose_u8_partition8x8(src, height, width, dst_partition4x4);
+    matrix_transpose_u8_partition(src, height, width, dst_partition8x8, 8);
     t_cost = pixel_get_current_time() - t_start;
     printf("matrix transpose u8, partition8x8,  time cost %.2lf ms\n", t_cost);
 
-    // partition8x8, asimd
+    // partition, 8x8, asimd
     t_start = pixel_get_current_time();
-    matrix_transpose_u8_partition8x8_asimd(src, height, width, dst_asimd);
+    matrix_transpose_u8_partition_asimd(src, height, width, dst_partition8x8_asimd, 8);
     t_cost = pixel_get_current_time() - t_start;
     printf("matrix transpose u8, partition8x8 asimd, time cost %.2lf ms\n", t_cost);
+
+    // partition, 16x16
+    t_start = pixel_get_current_time();
+    matrix_transpose_u8_partition(src, height, width, dst_partition16x16, 16);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("matrix transpose u8, partition16x16,  time cost %.2lf ms\n", t_cost);
+
+    // partition, 16x16, asimd
+    t_start = pixel_get_current_time();
+    matrix_transpose_u8_partition_asimd(src, height, width, dst_partition16x16_asimd, 16);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("matrix transpose u8, partition16x16 asimd, time cost %.2lf ms\n", t_cost);
 
     int mis_order_opt = 0;
     int mis_opencv = 0;
     int mis_eigen = 0;
-    int mis_partition4x4 = 0;
-    int mis_asimd = 0;
+    int mis_partition8x8 = 0;
+    int mis_partition8x8_asimd = 0;
+    int mis_partition16x16 = 0;
+    int mis_partition16x16_asimd = 0;
 
     for (uint32_t i=0; i<len; i++) {
         if (dst_naive[i]!=dst_order_opt[i]) {
@@ -130,16 +146,22 @@ static void matrix_transpose_u8_test()
         if (dst_naive[i]!=dst_eigen[i]) {
             mis_eigen++;
         }
-        if (dst_naive[i]!=dst_partition4x4[i]) {
-            mis_partition4x4++;
+        if (dst_naive[i]!=dst_partition8x8[i]) {
+            mis_partition8x8++;
         }
-        if (dst_naive[i]!=dst_asimd[i]) {
-            mis_asimd++;
+        if (dst_naive[i]!=dst_partition8x8_asimd[i]) {
+            mis_partition8x8_asimd++;
+        }
+        if (dst_naive[i]!=dst_partition16x16[i]) {
+            mis_partition16x16++;
+        }
+        if (dst_naive[i]!=dst_partition16x16_asimd[i]) {
+            mis_partition16x16_asimd++;
         }
     }
 
-    printf("mis_order_opt=%d, mis_opencv=%d, mis_eigen=%d, mis_partition4x4=%d, mis_asimd=%d\n",
-        mis_order_opt, mis_opencv, mis_eigen, mis_partition4x4, mis_asimd);
+    printf("mis_order_opt=%d, mis_opencv=%d, mis_eigen=%d, \nmis_partition8x8=%d, mis_partition8x8_asimd=%d, mis_partition16x16=%d, mis_partition16x16_asimd=%d\n",
+        mis_order_opt, mis_opencv, mis_eigen, mis_partition8x8, mis_partition8x8_asimd, mis_partition16x16, mis_partition16x16_asimd);
 }
 
 static void eigen_test()
@@ -220,7 +242,7 @@ static void vtrn_u8_test()
     printf("data6:"); print_u8_array(data6, 8);
     printf("data7:"); print_u8_array(data7, 8);
     
-    transpose_u8_8x8(data0, data1, data2, data3, data4, data5, data6, data7);
+    transpose_u8_8x8_asimd(data0, data1, data2, data3, data4, data5, data6, data7);
 
     printf("--------------------------------------------------\n");
 
