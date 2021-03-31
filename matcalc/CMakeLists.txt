@@ -6,6 +6,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(PIXEL_ARMV8_2_FEATURE_FP16 "Enable armv8.2-a+fp16 support" ON)
 option(PIXEL_ARMV8_2_FEATURE_DOTPROD "enable armv8.2-a+dotprod support" ON)
 
+set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+
 add_executable(testbed
     # matrix.h
     # matrix.c
@@ -33,13 +38,17 @@ add_executable(testbed
     # array_fill.c
     # array_fill_test.cpp
 
-    # matrix_transpose.h
-    # matrix_transpose.c
-    # matrix_transpose_test.cpp
+    #matrix_transpose.h
+    #matrix_transpose.c
+    #matrix_transpose_test.cpp
 
-    dotproduct.h
-    dotproduct.c
-    dotproduct_test.cpp
+    #dotproduct.h
+    #dotproduct.c
+    #dotproduct_test.cpp
+
+    #square_matrix_inverse.h
+    #square_matrix_inverse.c
+    square_matrix_inverse_test.cpp
 
     # matrix_gemm.h
     # matrix_gemm.c
