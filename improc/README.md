@@ -258,6 +258,8 @@ TBD
 
 ### 全能系列
 
+- [移动端arm cpu优化学习笔记第4弹--内联汇编入门](https://zhuanlan.zhihu.com/p/143328317)
+
 - [ARM Neon Intrinsics 学习指北：从入门、进阶到学个通透](https://zhuanlan.zhihu.com/p/358603760)
 
 - [AI移动端优化 - 知乎 - 章小龙 & BBuf & 圈圈虫等](https://www.zhihu.com/people/zxloas/posts)
@@ -272,7 +274,11 @@ TBD
 
 - [NEON™ Programmer's Guide 1.0 (armv7 neon文档)](https://developer.arm.com/documentation/den0018/a/)
 
-### Cache系列
+### 优化的上限在哪里？
+
+- [浮点峰值那些事儿](https://zhuanlan.zhihu.com/p/28226956)
+
+- [如何判断算法是否有可优化空间？](https://mp.weixin.qq.com/s?__biz=MzA4MjY4NTk0NQ==&mid=2247490615&idx=1&sn=4fca4b963adcba01553371c6d566a597&scene=21)
 
 - [性能优化篇（4）：NEON优化案例——图像颜色转换之RGB到BGR（aarch64版）](https://blog.csdn.net/wohenfanjian/article/details/103407259)
 
