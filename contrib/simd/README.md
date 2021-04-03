@@ -174,5 +174,5 @@ float32x4x4_t v = vld4d(data); //512 bit
 ![](mla_fma_asm_diff.png)
 
 
-如果以指令数量越少越好为标准，那么应该用 `vqfma` 系列。
+如果以指令数量越少越好为标准，那么应该用 `vfmaq` 系列。
 

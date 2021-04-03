@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.15)
 project(matcalc)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+option(PIXEL_ARMV8_2_FEATURE_FP16 "Enable armv8.2-a+fp16 support" ON)
+option(PIXEL_ARMV8_2_FEATURE_DOTPROD "enable armv8.2-a+dotprod support" ON)
 
 add_executable(testbed
     # matrix.h
@@ -31,9 +33,13 @@ add_executable(testbed
     # array_fill.c
     # array_fill_test.cpp
 
-    matrix_transpose.h
-    matrix_transpose.c
-    matrix_transpose_test.cpp
+    # matrix_transpose.h
+    # matrix_transpose.c
+    # matrix_transpose_test.cpp
+
+    dotproduct.h
+    dotproduct.c
+    dotproduct_test.cpp
 
     # matrix_gemm.h
     # matrix_gemm.c
@@ -68,6 +74,21 @@ elseif (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
 endif()
 find_package(OpenCV REQUIRED)
 target_link_libraries(testbed ${OpenCV_LIBS})
+
+# arm8.2, fp16 and dotprod(sdot)
+if(((IOS AND CMAKE_OSX_ARCHITECTURES MATCHES "arm64") OR (APPLE AND CMAKE_OSX_ARCHITECTURES MATCHES "arm64") OR (CMAKE_SYSTEM_PROCESSOR           MATCHES "^(arm64|aarch64)")))
+    if (PIXEL_ARMV8_2_FEATURE_FP16)                                                                                                  
+        set(PIXEL_MARCH "-march=armv8.2-a+fp16")
+    endif()
+    if (PIXEL_ARMV8_2_FEATURE_DOTPROD)
+        if(PIXEL_ARMV8_2_FEATURE_FP16)
+            set(PIXEL_MARCH "-march=armv8.2-a+fp16+dotprod")
+        else()
+            set(PIXEL_MARCH "-march=armv8.2-a+dotprod")
+        endif()
+    endif()
+    target_compile_options(testbed PRIVATE ${PIXEL_MARCH})
+endif()
 
 
 message(STATUS "--------------------------------------------")
