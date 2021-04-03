@@ -2,6 +2,13 @@
 
 matrix calculation related stuffs, including basic blas-like operations.
 
+矩阵计算相关的函数实现、优化和评测。包括：
+- 源码（.h和.c，不带C++）
+- 测评代码（`_test.cpp`结尾，naive和优化方法测时、正确性验证）
+- 评测结果表格（耗时记录和比对）
+
+以`u8 matrix column max`为例，对应的源码文件是 matrix_column_max.h 和 matrix_column_max.c，测试代码为 matrix_column_max_test.cpp。
+
 ## u8 matrix column max (u8 矩阵逐列求最大值)
 
 image info: height=4032, width=3024 (river_bank2.png)
