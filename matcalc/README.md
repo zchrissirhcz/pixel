@@ -114,6 +114,38 @@ float类型数组，1000000个元素；测试手机是小米11，搭载了QCOM 8
 | 2  |  std::fill_n   |  0.12 ms     | 2.34 ms     |  0.35 ms      | 1.74 ms     |
 | 3  |  asimd(neon)   |  0.12 ms     | 0.68 ms     |  0.13 ms      | 0.62 ms     |
 
+## dotproduct
+
+**f32 dotproduct**
+
+向量长度：200000000
+
+| id | method          | armv8 release | armv7 release | 备注     |
+| -- | --------------- | ------------- | ------------- | -------- |
+| 1  | naive           | 143.5664 ms   | 249.1197 ms   |          |
+| 2  | opencv method1  | 57.2177 ms    | 71.7495 ms    |          |
+| 3  | opencv method2  | 56.8396 ms    | 76.3699 ms    | universal wide simd |
+| 4  | eigen           | 57.0176 ms    | 57.1433 ms    |          |
+| 5  | asimd           | 57.0256 ms    | 71.6731 ms    | 循环内一次fma  |
+| 6  | asimd2          | 57.2449 ms    | 59.0293 ms    | 循环内多次fma；一共用12个寄存器 |
+| 7  | asimd3          | 57.0860 ms    | 56.5627 ms    | 用15个寄存器 |
+
+结论：对于armv8，多用寄存器并没有带来提升，但armv7是有提升的。
+
+**u8 dotproduct**
+
+向量长度：200000000
+
+| id | method          | armv8 release | armv7 release | 备注     |
+| -- | --------------- | ------------- | ------------- | -------- |
+| 1  | naive           |  71.0257 ms   |  160.9071 ms  |          |
+| 2  | opencv          |  35.6169 ms   |  101.0333 ms  |          |
+| 3  | eigen           |  1108.2458 ms |  2099.6768 ms | 封装实现的很不优雅也很慢 |
+| 4  | asimd           |  35.5924 ms   |  35.5438 ms   | armv7下比opencv快3倍 |
+| 5  | asimd2          |  13.9695 ms   |  35.5438 ms   | armv8下vaddlvq_u16加速近3倍 |
+| 6  | asimd3          |  13.7971 ms   | -             | armv8.2 vdotq指令；没加速效果 |
+| 7  | asimd4          |  13.6398 ms   | -             | 多条armv8.2 vdotq；还是没有加速效果 |
+
 ## transpose 矩阵转置
 
 **u8矩阵转置**
