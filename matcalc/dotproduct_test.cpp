@@ -23,6 +23,7 @@ static void dotproduct_u8_test();
 static uint64_t dotproduct_u8_opencv1(uint8_t* a, uint8_t* b, uint32_t len);
 static uint64_t dotproduct_u8_opencv2(uint8_t* a, uint8_t* b, uint32_t len);
 static uint64_t dotproduct_u8_eigen(uint8_t* a, uint8_t* b, uint32_t len);
+static uint64_t dotproduct_u8_eigen2(uint8_t* a, uint8_t* b, uint32_t len);
 
 static void arm_marco_determine();
 
@@ -93,6 +94,15 @@ uint64_t dotproduct_u8_eigen(uint8_t* a, uint8_t* b, uint32_t len)
     return fa.dot(fb);
 }
 
+uint64_t dotproduct_u8_eigen2(uint8_t* a, uint8_t* b, uint32_t len)
+{
+    // 这里的实现有问题：如果是u8的Eigen::Matrix做dotproduct，结果不对
+    // 如果转为u64或float的Eigen::Matrix，结果对，但是比naive实现慢好多倍
+    Eigen::Map<Eigen::Matrix<uint8_t, 1, Eigen::Dynamic, Eigen::RowMajor>> va(a, len);
+    Eigen::Map<Eigen::Matrix<uint8_t, 1, Eigen::Dynamic, Eigen::RowMajor>> vb(b, len);
+    uint64_t res = va.cast<uint64_t>().dot(vb.cast<uint64_t>());
+    return res;
+}
 
 void dotproduct_f32_test()
 {
@@ -238,6 +248,12 @@ void dotproduct_u8_test()
     res_eigen = dotproduct_u8_eigen(a, b, len);
     t_cost = pixel_get_current_time() - t_start;
     printf("dotproduct_u8, eigen, time cost %.4lf ms\n", t_cost);
+
+    // eigen2
+    t_start = pixel_get_current_time();
+    res_eigen = dotproduct_u8_eigen2(a, b, len);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("dotproduct_u8, eigen2, time cost %.4lf ms\n", t_cost);
 
     // asimd
     t_start = pixel_get_current_time();

@@ -148,10 +148,11 @@ float类型数组，1000000个元素；测试手机是小米11，搭载了QCOM 8
 | 1  | naive           |  71.0257 ms   |  160.9071 ms  |          |
 | 2  | opencv          |  35.6169 ms   |  101.0333 ms  |          |
 | 3  | eigen           |  1108.2458 ms |  2099.6768 ms | 封装实现的很不优雅也很慢 |
-| 4  | asimd           |  35.5924 ms   |  35.5438 ms   | armv7下比opencv快3倍 |
-| 5  | asimd2          |  13.9695 ms   |  35.5438 ms   | armv8下vaddlvq_u16加速近3倍 |
-| 6  | asimd3          |  13.7971 ms   | -             | armv8.2 vdotq指令；没加速效果 |
-| 7  | asimd4          |  13.6398 ms   | -             | 多条armv8.2 vdotq；还是没有加速效果 |
+| 4  | eigen2          |  71.2119 ms   |  -            | 修改后的基于eigen的实现  |
+| 5  | asimd           |  35.5924 ms   |  35.5438 ms   | armv7下比opencv快3倍 |
+| 6  | asimd2          |  13.9695 ms   |  35.5438 ms   | armv8下vaddlvq_u16加速近3倍 |
+| 7  | asimd3          |  13.7971 ms   | -             | armv8.2 vdotq指令；没加速效果 |
+| 8  | asimd4          |  13.6398 ms   | -             | 多条armv8.2 vdotq；还是没有加速效果 |
 
 ## transpose 矩阵转置
 
