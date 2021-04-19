@@ -266,6 +266,8 @@ uint64_t dotproduct_u8_asimd2(uint8_t* a, uint8_t* b, uint32_t len)
 #endif // __ARM_NEON
     for(uint32_t i=done; i<len; i++) {
         res += (*a) * (*b);
+        a++;
+        b++;
     }
     return res;
 }
@@ -348,6 +350,8 @@ uint64_t dotproduct_u8_asimd3(uint8_t* a, uint8_t* b, uint32_t len)
 #endif // __ARM_NEON
     for(uint32_t i=done; i<len; i++) {
         res += (*a) * (*b);
+        a++;
+        b++;
     }
     return res;
 }
@@ -469,6 +473,8 @@ uint64_t dotproduct_u8_asimd4(uint8_t* a, uint8_t* b, uint32_t len)
 #endif // __ARM_NEON
     for(uint32_t i=done; i<len; i++) {
         res += (*a) * (*b);
+        a++;
+        b++;
     }
     return res;
 }
