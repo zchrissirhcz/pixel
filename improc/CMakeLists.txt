@@ -4,6 +4,7 @@ project(improc)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 11)
+include("../overlook.cmake")
 
 #add_definitions(-ffast-math)
 
@@ -32,13 +33,13 @@ add_executable(testbed
     #histogram.c
     #histogram_test.cpp
 
-    flip.h
-    flip.c
-    flip_test.cpp
+    # flip.h
+    # flip.c
+    # flip_test.cpp
 
-    # boxfilter.h
-    # boxfilter.c
-    # boxfilter_test.cpp
+    boxfilter.h
+    boxfilter.c
+    boxfilter_test.cpp
 )
 target_include_directories(testbed
     PUBLIC
@@ -50,13 +51,13 @@ if (CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
         #set(OpenCV_DIR "/home/zz/soft/opencv-4.5.1/lib/cmake/opencv4" CACHE PATH "") # shared
         set(OpenCV_DIR "/home/zz/soft/opencv-4.5.1-static/lib/cmake/opencv4" CACHE PATH "") # static
     elseif (ANDROID)
-        set(OpenCV_DIR "/home/zz/soft/opencv-4.5.1-android/sdk/native/jni" CACHE PATH "")
+        set(OpenCV_DIR "/home/zz/soft/opencv-4.5.2-android-sdk/sdk/native/jni" CACHE PATH "")
     endif()
 elseif (CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
     if (CMAKE_SYSTEM_NAME MATCHES "Windows")
-        set(OpenCV_DIR "E:/lib/opencv/4.5.0" CACHE PATH "")
+        set(OpenCV_DIR "E:/lib/opencv/4.5.2" CACHE PATH "")
     elseif (ANDROID)
-        set(OpenCV_DIR "E:/soft/Android/opencv-4.5.0-android-sdk/sdk/native/jni" CACHE PATH "")
+        set(OpenCV_DIR "E:/soft/Android/opencv-4.5.2-android-sdk/sdk/native/jni" CACHE PATH "")
     endif()
 elseif (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
     if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
