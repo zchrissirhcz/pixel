@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <opencv2/opencv.hpp>
+#include "border_clip.h"
 
 void blur_1d(float* src, float* dst, int src_size, int kernel_len)
 {
@@ -27,87 +28,6 @@ void blur_1d(float* src, float* dst, int src_size, int kernel_len)
     }
 }
 
-int reflect101_clip(int ti, int size) {
-    if (ti<0) {
-        return -ti;
-    }
-    else if (ti>size-1) {
-        return 2*size - 2 - ti; // size-1 - (ti-(size-1))  =>  size - 1 - (ti - size + 1) => size - 1 - ti + size - 1 => 2*size - 2 - ti
-    }
-    else {
-        return ti;
-    }
-}
-
-void my_boxfilter()
-{
-    cv::Mat image = cv::imread("sky.png");
-    cv::Size size = image.size();
-    int height = size.height;
-    int width = size.width;
-
-    unsigned char* src = image.data;
-    cv::Mat result = image.clone();
-    unsigned char* dst = result.data;
-
-    std::vector<int> kernel = {
-        1, 1, 1,
-        1, 1, 1,
-        1, 1, 1
-    };
-
-    int denominator = 9;
-
-    for (int i=0; i<height; i++) {
-        for (int j=0; j<width; j++) {
-            int blue = 0;
-            int green = 0;
-            int red = 0;
-            for(int ki=0; ki<3; ki++) {
-                for (int kj=0; kj<3; kj++) {
-                    int ti = (i+ki-1);
-                    int tj = (j+kj-1);
-                    ti = reflect101_clip(ti, height);
-                    tj = reflect101_clip(tj, width);
-                    blue += src[ti*width*3+tj*3];
-                    green += src[ti*width*3+tj*3+1];
-                    red += src[ti*width*3+tj*3+2];
-                }
-            }
-            blue = blue / denominator;
-            green = green / denominator;
-            red = red / denominator;
-            if (blue>255) blue = 255;
-            if (green>255) green = 255;
-            if (red>255) red = 255;
-
-            dst[i*width*3+j*3] = blue;
-            dst[i*width*3+j*3+1] = green;
-            dst[i*width*3+j*3+2] = red;
-        }
-    }
-
-    cv::imwrite("sky_myboxfilter.png", result);
-}
-
-int main2() {
-
-    cv::Mat image = cv::imread("sky.png");
-    cv::Size size = image.size();
-    printf("image: h=%d, w=%d\n", size.height, size.width);
-
-    cv::Mat result;
-    cv::Size kernel_size(3, 3);
-    cv::boxFilter(image, result, 8, kernel_size);
-    size = result.size();
-    printf("result: h=%d, w=%d\n", size.height, size.width);
-
-    cv::imwrite("sky_boxfilter.png", result);
-
-    my_boxfilter();
-
-    return 0;
-}
 
 int main3() {
 
@@ -122,10 +42,6 @@ int main3() {
 
     return 0;
 }
-
-
-
-
 
 
 
@@ -234,6 +150,65 @@ int main4() {
     return 0;
 }
 
+
+void naive_boxfilter(unsigned char* src, unsigned char* dst, int height, int width, int channels, int kernel_size, int anchor_y, int anchor_x, bool norm, BorderType border_type)
+{
+    // param checking
+    assert(border_type==kBorderReplicate || 
+           border_type==kBorderReflect ||
+           border_type==kBorderReflect101);
+
+    int* kernel = (int*)malloc(sizeof(int)*kernel_size);
+    for (int i=0; i<kernel_size; i++) {
+        kernel[i] = 1;
+    }
+
+    int denominator = 1;
+    if (norm) {
+        denominator = kernel_size;
+    }
+    int radius = kernel_size / 2;
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            int pixel[3] = { 0 };
+            for (int ki = 0; ki < 3; ki++) {
+                for (int kj = 0; kj < 3; kj++) {
+                    int ti = (i + ki - anchor_y);
+                    int tj = (j + kj - anchor_x);
+                    ti = border_clip(border_type, ti, height, 0);
+                    tj = border_clip(border_type, tj, width, 0);
+                    if (channels==3) {
+                        pixel[0] += src[ti * width * 3 + tj * 3];
+                        pixel[1] += src[ti * width * 3 + tj * 3 + 1];
+                        pixel[2] += src[ti * width * 3 + tj * 3 + 2];
+                    }
+                    else if (channels == 1) {
+                        pixel[0] += src[ti * width + tj];
+                    }
+                }
+            }
+            if (channels == 3) {
+                pixel[0] = (pixel[0]+radius) / denominator;
+                pixel[1] = (pixel[1]+radius) / denominator;
+                pixel[2] = (pixel[2]+radius) / denominator;
+                if (pixel[0] > 255) pixel[0] = 255;
+                if (pixel[1] > 255) pixel[1] = 255;
+                if (pixel[2] > 255) pixel[2] = 255;
+                dst[i * width * 3 + j * 3] = pixel[0];
+                dst[i * width * 3 + j * 3 + 1] = pixel[1];
+                dst[i * width * 3 + j * 3 + 2] = pixel[2];
+            }
+            else if (channels == 1) {
+                pixel[0] = (pixel[0] + radius) / denominator;
+                if (pixel[0] > 255) pixel[0] = 255;
+                dst[i * width + j] = pixel[0];
+            }
+        }
+    }
+}
+
+
 int main()
 {
     bool print_mat = false;
@@ -271,7 +246,7 @@ int main()
     cv::Mat dst_opencv = input.clone();
     cv::Size kernel_size(3, 3);
     cv::Point anchor(2, 0);
-    cv::boxFilter(input, dst_opencv, 8, kernel_size, anchor, norm);
+    cv::boxFilter(input, dst_opencv, 8, kernel_size, anchor, norm, BORDER_DEFAULT);
 
     if (print_mat) {
         std::cout << "--- input is " << std::endl;
@@ -291,59 +266,10 @@ int main()
     unsigned char* src = input.data;
     cv::Mat dst_zz = input.clone();
     unsigned char* dst = dst_zz.data;
-
-    std::vector<int> kernel = {
-        1, 1, 1,
-        1, 1, 1,
-        1, 1, 1
-    };
-
-    int denominator = 1;
-    if (norm) {
-        denominator = 9;
-    }
-    int radius = kernel.size() / 2;
+    
+    int kernel_len = kernel_size.height * kernel_size.width;
     int channels = input.channels();
-
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            int pixel[3] = { 0 };
-            for (int ki = 0; ki < 3; ki++) {
-                for (int kj = 0; kj < 3; kj++) {
-                    //int ti = (i + ki - 1);
-                    //int tj = (j + kj - 1);
-                    int ti = (i + ki - anchor.y);
-                    int tj = (j + kj - anchor.x);
-                    ti = reflect101_clip(ti, height);
-                    tj = reflect101_clip(tj, width);
-                    if (channels==3) {
-                        pixel[0] += src[ti * width * 3 + tj * 3];
-                        pixel[1] += src[ti * width * 3 + tj * 3 + 1];
-                        pixel[2] += src[ti * width * 3 + tj * 3 + 2];
-                    }
-                    else if (channels == 1) {
-                        pixel[0] += src[ti * width + tj];
-                    }
-                }
-            }
-            if (channels == 3) {
-                pixel[0] = (pixel[0]+radius) / denominator;
-                pixel[1] = (pixel[1]+radius) / denominator;
-                pixel[2] = (pixel[2]+radius) / denominator;
-                if (pixel[0] > 255) pixel[0] = 255;
-                if (pixel[1] > 255) pixel[1] = 255;
-                if (pixel[2] > 255) pixel[2] = 255;
-                dst[i * width * 3 + j * 3] = pixel[0];
-                dst[i * width * 3 + j * 3 + 1] = pixel[1];
-                dst[i * width * 3 + j * 3 + 2] = pixel[2];
-            }
-            else if (channels == 1) {
-                pixel[0] = (pixel[0] + radius) / denominator;
-                if (pixel[0] > 255) pixel[0] = 255;
-                dst[i * width + j] = pixel[0];
-            }
-        }
-    }
+    naive_boxfilter(src, dst, height, width, channels, kernel_len, anchor.y, anchor.x, norm, kBorderDefault);
 
     if (print_mat) {
         std::cout << "--- dst_zz is " << std::endl;
