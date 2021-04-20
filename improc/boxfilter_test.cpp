@@ -28,35 +28,10 @@ void blur_1d(float* src, float* dst, int src_size, int kernel_len)
     }
 }
 
+#include <iostream>
+#include <algorithm>
 
-int main3() {
-
-    cv::Mat image = cv::imread("sky.png");
-    cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
-
-    cv::Mat result;
-    cv::Size kernel_size(3, 3);
-    cv::boxFilter(image, result, 8, kernel_size);
-
-    cv::imwrite("sky_boxfilter_opencv4.png", result);
-
-    return 0;
-}
-
-
-
-
-
-
-#include "opencv2/opencv.hpp"
-#include "iostream"
-#include "algorithm"
-#include "vector"
-#include "stdio.h"
-using namespace std;
-using namespace cv;
-
-void BoxFilter(const Mat& src, Mat& dst, int ksize) {
+void BoxFilter(const cv::Mat& src, cv::Mat& dst, int ksize) {
     CV_Assert(src.channels() == 1 || src.channels() == 3); //只处理单通道或者三通道图像
     //生成一维的
     double* matrix = new double[ksize];
@@ -69,7 +44,7 @@ void BoxFilter(const Mat& src, Mat& dst, int ksize) {
     }
     for (int i = 0; i < ksize; i++) matrix[i] /= norm;
     int border = ksize / 2;
-    copyMakeBorder(src, dst, border, border, border, border, BORDER_CONSTANT);
+    copyMakeBorder(src, dst, border, border, border, border, cv::BORDER_CONSTANT);
     int channels = dst.channels();
     int rows = dst.rows - border;
     int cols = dst.cols - border;
@@ -82,7 +57,7 @@ void BoxFilter(const Mat& src, Mat& dst, int ksize) {
                     sum[0] += matrix[border + k] * dst.at<uchar>(i, j + k);
                 }
                 else if (channels == 3) {
-                    Vec3b rgb = dst.at<Vec3b>(i, j + k);
+                    cv::Vec3b rgb = dst.at<cv::Vec3b>(i, j + k);
                     sum[0] += matrix[border + k] * rgb[0];
                     sum[1] += matrix[border + k] * rgb[1];
                     sum[2] += matrix[border + k] * rgb[2];
@@ -93,10 +68,10 @@ void BoxFilter(const Mat& src, Mat& dst, int ksize) {
                 else if (sum[k] > 255) sum[k] = 255;
             }
             if (channels == 1)
-                dst.at<Vec3b>(i, j) = static_cast<uchar>(sum[0]);
+                dst.at<cv::Vec3b>(i, j) = static_cast<uchar>(sum[0]);
             else if (channels == 3) {
-                Vec3b rgb = { static_cast<uchar>(sum[0]), static_cast<uchar>(sum[1]), static_cast<uchar>(sum[2]) };
-                dst.at<Vec3b>(i, j) = rgb;
+                cv::Vec3b rgb = { static_cast<uchar>(sum[0]), static_cast<uchar>(sum[1]), static_cast<uchar>(sum[2]) };
+                dst.at<cv::Vec3b>(i, j) = rgb;
             }
         }
     }
@@ -109,7 +84,7 @@ void BoxFilter(const Mat& src, Mat& dst, int ksize) {
                     sum[0] += matrix[border + k] * dst.at<uchar>(i + k, j);
                 }
                 else if (channels == 3) {
-                    Vec3b rgb = dst.at<Vec3b>(i + k, j);
+                    cv::Vec3b rgb = dst.at<cv::Vec3b>(i + k, j);
                     sum[0] += matrix[border + k] * rgb[0];
                     sum[1] += matrix[border + k] * rgb[1];
                     sum[2] += matrix[border + k] * rgb[2];
@@ -120,10 +95,10 @@ void BoxFilter(const Mat& src, Mat& dst, int ksize) {
                 else if (sum[k] > 255) sum[k] = 255;
             }
             if (channels == 1)
-                dst.at<Vec3b>(i, j) = static_cast<uchar>(sum[0]);
+                dst.at<cv::Vec3b>(i, j) = static_cast<uchar>(sum[0]);
             else if (channels == 3) {
-                Vec3b rgb = { static_cast<uchar>(sum[0]), static_cast<uchar>(sum[1]), static_cast<uchar>(sum[2]) };
-                dst.at<Vec3b>(i, j) = rgb;
+                cv::Vec3b rgb = { static_cast<uchar>(sum[0]), static_cast<uchar>(sum[1]), static_cast<uchar>(sum[2]) };
+                dst.at<cv::Vec3b>(i, j) = rgb;
             }
         }
     }
@@ -131,10 +106,10 @@ void BoxFilter(const Mat& src, Mat& dst, int ksize) {
 }
 
 int main4() {
-    Mat src = imread("sky.png");
-    Mat dst(src.rows, src.cols, CV_8UC3);
+    cv::Mat src = cv::imread("sky.png");
+    cv::Mat dst(src.rows, src.cols, CV_8UC3);
     BoxFilter(src, dst, 3);
-    imwrite("sky_boxfilter_bbuf.png", dst);
+    cv::imwrite("sky_boxfilter_bbuf.png", dst);
 
 
 
@@ -151,6 +126,7 @@ int main4() {
 }
 
 
+// TODO: 要支持非方形kernel，需要在x、y两个维度上分别做boxfilter
 void naive_boxfilter(unsigned char* src, unsigned char* dst, int height, int width, int channels, int kernel_size, int anchor_y, int anchor_x, bool norm, BorderType border_type)
 {
     // param checking
@@ -206,6 +182,7 @@ void naive_boxfilter(unsigned char* src, unsigned char* dst, int height, int wid
             }
         }
     }
+    free(kernel);
 }
 
 
@@ -246,7 +223,7 @@ int main()
     cv::Mat dst_opencv = input.clone();
     cv::Size kernel_size(3, 3);
     cv::Point anchor(2, 0);
-    cv::boxFilter(input, dst_opencv, 8, kernel_size, anchor, norm, BORDER_DEFAULT);
+    cv::boxFilter(input, dst_opencv, 8, kernel_size, anchor, norm, cv::BORDER_DEFAULT);
 
     if (print_mat) {
         std::cout << "--- input is " << std::endl;
