@@ -144,14 +144,14 @@ void BoxFilter(const Mat& src, Mat& dst, int ksize) {
     CV_Assert(src.channels() == 1 || src.channels() == 3); //只处理单通道或者三通道图像
     //生成一维的
     double* matrix = new double[ksize];
-    double sum = 0;
+    double norm = 0;
     int origin = ksize / 2;
     for (int i = 0; i < ksize; i++) {
         double g = 1.0;
-        sum += g;
+        norm += g;
         matrix[i] = g;
     }
-    for (int i = 0; i < ksize; i++) matrix[i] /= sum;
+    for (int i = 0; i < ksize; i++) matrix[i] /= norm;
     int border = ksize / 2;
     copyMakeBorder(src, dst, border, border, border, border, BORDER_CONSTANT);
     int channels = dst.channels();
@@ -270,7 +270,8 @@ int main()
 
     cv::Mat dst_opencv = input.clone();
     cv::Size kernel_size(3, 3);
-    cv::boxFilter(input, dst_opencv, 8, kernel_size, cv::Point(-1, -1), norm);
+    cv::Point anchor(2, 0);
+    cv::boxFilter(input, dst_opencv, 8, kernel_size, anchor, norm);
 
     if (print_mat) {
         std::cout << "--- input is " << std::endl;
@@ -309,8 +310,10 @@ int main()
             int pixel[3] = { 0 };
             for (int ki = 0; ki < 3; ki++) {
                 for (int kj = 0; kj < 3; kj++) {
-                    int ti = (i + ki - 1);
-                    int tj = (j + kj - 1);
+                    //int ti = (i + ki - 1);
+                    //int tj = (j + kj - 1);
+                    int ti = (i + ki - anchor.y);
+                    int tj = (j + kj - anchor.x);
                     ti = reflect101_clip(ti, height);
                     tj = reflect101_clip(tj, width);
                     if (channels==3) {
