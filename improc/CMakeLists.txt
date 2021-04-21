@@ -37,9 +37,13 @@ add_executable(testbed
     # flip.c
     # flip_test.cpp
 
-    boxfilter.h
-    boxfilter.c
-    boxfilter_test.cpp
+    # boxfilter.h
+    # boxfilter.c
+    # boxfilter_test.cpp
+
+    copy_make_border.h
+    copy_make_border.c
+    copy_make_border_test.cpp
 )
 target_include_directories(testbed
     PUBLIC
@@ -49,7 +53,7 @@ target_include_directories(testbed
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
     if (CMAKE_SYSTEM_NAME MATCHES "Linux")
         #set(OpenCV_DIR "/home/zz/soft/opencv-4.5.1/lib/cmake/opencv4" CACHE PATH "") # shared
-        set(OpenCV_DIR "/home/zz/soft/opencv-4.5.1-static/lib/cmake/opencv4" CACHE PATH "") # static
+        set(OpenCV_DIR "/home/zz/lib/opencv/4.5.2/lib/cmake/opencv4" CACHE PATH "") # static
     elseif (ANDROID)
         set(OpenCV_DIR "/home/zz/soft/opencv-4.5.2-android-sdk/sdk/native/jni" CACHE PATH "")
     endif()

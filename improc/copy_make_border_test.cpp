@@ -5,18 +5,22 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 
+#include "copy_make_border.h"
 
 using namespace cv;
 
-// Declare the variables
-Mat src, dst;
-int top, bottom, left, right;
-int borderType = BORDER_CONSTANT;
-const char* window_name = "copyMakeBorder Demo";
-RNG rng(12345);
-int main( int argc, char** argv )
+
+int main2( int argc, char** argv )
 {
-    const char* imageName = argc >=2 ? argv[1] : "sky.png";
+    // Declare the variables
+    Mat src, dst;
+    int top, bottom, left, right;
+    int borderType = BORDER_CONSTANT;
+    const char* window_name = "copyMakeBorder Demo";
+    RNG rng(12345);
+
+
+    const char* imageName = argc >=2 ? argv[1] : "IU.bmp";
     // Loads an image
     src = imread( samples::findFile( imageName ), IMREAD_COLOR ); // Load an image
     // Check if image is loaded fine
@@ -48,5 +52,47 @@ int main( int argc, char** argv )
         else if( c == 'r' )
         { borderType = BORDER_REPLICATE; }
     }
+    return 0;
+}
+
+// CV_EXPORTS_W void copyMakeBorder(InputArray src, OutputArray dst,
+//                                  int top, int bottom, int left, int right,
+//                                  int borderType, const Scalar& value = Scalar() );
+
+int main()
+{
+    cv::Mat src_image = cv::imread("IU.bmp");
+    cv::Size src_size = src_image.size();
+
+    int border = 10;
+
+    int top = border;
+    int bottom = border;
+    int left = border;
+    int right = border;
+
+    int src_height = src_size.height;
+    int src_width = src_size.width;
+
+    cv::Size dst_size;
+    dst_size.height = src_size.height + top + bottom;
+    dst_size.width = src_size.width + left + right;
+
+    cv::Mat dst_image_opencv(dst_size, src_image.type());
+    cv::Mat dst_image_naive(dst_size, src_image.type());
+
+    cv::copyMakeBorder(src_image, dst_image_opencv, top, bottom, left, right, cv::BORDER_CONSTANT);
+
+    //-----------------------------
+
+    int channels = src_image.channels();
+    unsigned char* dst = dst_image_naive.data;
+    unsigned char* src = src_image.data;
+
+    copy_make_border_naive(src, src_height, src_width, channels, dst, top, bottom, left, right);
+
+    cv::imwrite("IU_withborder_opencv.png", dst_image_opencv);
+    cv::imwrite("IU_withborder_naive.png", dst_image_naive);
+
     return 0;
 }
