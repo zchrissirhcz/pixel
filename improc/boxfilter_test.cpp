@@ -5,6 +5,10 @@
 #include <opencv2/opencv.hpp>
 #include "boxfilter.h"
 
+#include "common/pixel_benchmark.h"
+
+#include "matcalc/matrix_transpose.h"
+
 void blur_1d(float* src, float* dst, int src_size, int kernel_len)
 {
     assert(kernel_len>0);
@@ -44,11 +48,14 @@ void BoxFilter(const cv::Mat& src, cv::Mat& dst, int ksize) {
     }
     for (int i = 0; i < ksize; i++) matrix[i] /= norm;
     int border = ksize / 2;
+
+    // step1 拷贝src到dst并且补边
     copyMakeBorder(src, dst, border, border, border, border, cv::BORDER_CONSTANT);
     int channels = dst.channels();
     int rows = dst.rows - border;
     int cols = dst.cols - border;
-    //水平方向
+
+    // step2 水平方向boxfilter
     for (int i = border; i < rows; i++) {
         for (int j = border; j < cols; j++) {
             double sum[3] = { 0 };
@@ -75,7 +82,8 @@ void BoxFilter(const cv::Mat& src, cv::Mat& dst, int ksize) {
             }
         }
     }
-    //竖直方向
+
+    // step3 竖直方向boxfilter
     for (int i = border; i < rows; i++) {
         for (int j = border; j < cols; j++) {
             double sum[3] = { 0 };
@@ -105,30 +113,72 @@ void BoxFilter(const cv::Mat& src, cv::Mat& dst, int ksize) {
     delete[] matrix;
 }
 
-int main4() {
-    cv::Mat src = cv::imread("sky.png");
-    cv::Mat dst(src.rows, src.cols, CV_8UC3);
-    BoxFilter(src, dst, 3);
-    cv::imwrite("sky_boxfilter_bbuf.png", dst);
+void boxfilter_xydir(unsigned char* src, unsigned char* dst, int height, int width, int channels, int kernel_h, int kernel_w, int anchor_y, int anchor_x, bool norm, BorderType border_type)
+{
+    int* pixel = (int*)malloc(sizeof(int)*channels);
+    int linebytes = channels * width * sizeof(unsigned char);
+    int line_elem = channels * width;
 
+    int* bufmat = (int*)malloc(line_elem*height*sizeof(float));
 
+    // 按行做boxfilter;
+    // 仍然有计算冗余，相邻窗口位置重复计算了。。
+    for (int i=0; i<height; i++) {
+        for (int j=0; j<width; j++) {
+            memset(pixel, 0, sizeof(int)*channels);
+            for (int kj=0; kj<kernel_w; kj++) {
+                int tj = (j + kj - anchor_x);
+                tj = border_clip(border_type, tj, width);
+                for (int kc=0; kc<channels; kc++) {
+                    pixel[kc] += src[i*line_elem + tj*channels + kc];
+                }
+            }
+            for (int kc=0; kc<channels; kc++) {
+                bufmat[i*line_elem+j*channels+kc] = pixel[kc];
+            }
+        }
+    }
 
-    cv::Mat image = cv::imread("sky.png");
+    // TODO: 这里有一个优化的思路，是把bufmat转置得到bufmat_t，然后从butmat_t算出dst
+    // 但是，bufmat类型是int32，而int32类型的转置，还没有写过NEON优化
+    // (bufmat用int32类型的原因：pixel存储的值可能超过255,防止溢出；最根本原因，还是希望能准确计算，确保和OpenCV结果相同)
 
-    cv::Mat result;
-    cv::Size kernel_size(3, 3);
-    cv::boxFilter(image, result, 8, kernel_size);
+    // 另一个优化思路：不用转置倒腾；利用缓存行来累加（存储）按列做boxfilter的结果
+    // 单行缓存行做不到；缓存行的行数应该等于 kernel_h
 
-    cv::imwrite("sky_boxfilter_opencv4.png", result);
+    // 再另一个优化思路：用栈存储（其实是ring buffer）
 
+    // 目前还是 naive 实现
+    int kernel_size = kernel_h * kernel_w;
+    int radius = kernel_size / 2;
+    int denominator = kernel_size;
+    for (int j=0; j<line_elem; j++) {
+        for (int i=0; i<height; i++) {
+            int sum = 0;
+            for (int ki=0; ki<kernel_h; ki++) {
+                int ti = i + ki - anchor_y;
+                ti = border_clip(border_type, ti, height);
+                sum += bufmat[ti*line_elem + j];
+            }
+            sum = (sum + radius) / denominator;
+            dst[i*line_elem + j] = sum;
+        }
+    }
 
-    return 0;
+    free(bufmat);
 }
 
+/*
+time cost
+     naive     xydir      opencv
+Mac  2700ms    1553ms     12 ms
 
+*/
 
 int main()
 {
+    double t_start, t_cost;
+
     bool print_mat = false;
 
     bool norm = true;
@@ -164,7 +214,11 @@ int main()
     cv::Mat dst_opencv = input.clone();
     cv::Size kernel_size(5, 10);
     cv::Point anchor(2, 0);
+
+    t_start = pixel_get_current_time();
     cv::boxFilter(input, dst_opencv, 8, kernel_size, anchor, norm, cv::BORDER_DEFAULT);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("cv::boxFilter time cost %.4lf ms\n", t_cost);
 
     if (print_mat) {
         std::cout << "--- input is " << std::endl;
@@ -181,7 +235,16 @@ int main()
     unsigned char* dst = dst_zz.data;
 
     int channels = input.channels();
-    boxfilter_naive(src, dst, height, width, channels, kernel_size.height, kernel_size.width, anchor.y, anchor.x, norm, kBorderDefault);
+
+    t_start = pixel_get_current_time();
+
+    //boxfilter_naive(src, dst, height, width, channels, kernel_size.height, kernel_size.width, anchor.y, anchor.x, norm, kBorderDefault);
+    //t_cost = pixel_get_current_time() - t_start;
+    //printf("boxfilter_naive() time cost %.4lf ms\n", t_cost);
+
+    boxfilter_xydir(src, dst, height, width, channels, kernel_size.height, kernel_size.width, anchor.y, anchor.x, norm, kBorderDefault);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("boxfilter_xydir() time cost %.4lf ms\n", t_cost);
 
     if (print_mat) {
         std::cout << "--- dst_zz is " << std::endl;

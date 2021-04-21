@@ -37,20 +37,23 @@ add_executable(testbed
     # flip.c
     # flip_test.cpp
 
-    # boxfilter.h
-    # boxfilter.c
-    # boxfilter_test.cpp
+    boxfilter.h
+    boxfilter.c
+    boxfilter_test.cpp
+
+    ${CMAKE_SOURCE_DIR}/../matcalc/matrix_transpose.h
+    ${CMAKE_SOURCE_DIR}/../matcalc/matrix_transpose.c
 
     # copy_make_border.h
     # copy_make_border.c
     # copy_make_border_test.cpp
 
-    copy_cut_border.h
-    copy_cut_border.c
-    copy_cut_border_test.cpp
+    # copy_cut_border.h
+    # copy_cut_border.c
+    # copy_cut_border_test.cpp
 
-    improc_zcx.h
-    improc_zcx.cpp
+    # improc_zcx.h
+    # improc_zcx.cpp
 )
 target_include_directories(testbed
     PUBLIC
