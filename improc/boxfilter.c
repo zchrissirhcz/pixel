@@ -30,8 +30,8 @@ void boxfilter_naive(unsigned char* src, unsigned char* dst, int height, int wid
                 for (int kj = 0; kj < kernel_w; kj++) {
                     int ti = (i + ki - anchor_y);
                     int tj = (j + kj - anchor_x);
-                    ti = border_clip(border_type, ti, height, 0);
-                    tj = border_clip(border_type, tj, width, 0);
+                    ti = border_clip(border_type, ti, height);
+                    tj = border_clip(border_type, tj, width);
                     if (channels==3) {
                         pixel[0] += src[ti * width * 3 + tj * 3];
                         pixel[1] += src[ti * width * 3 + tj * 3 + 1];

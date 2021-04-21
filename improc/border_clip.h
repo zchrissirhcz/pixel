@@ -25,7 +25,7 @@ static int border_clip_reflect(int x, int size);
 static int border_clip_wrap(int x, int size);
 static int border_clip_reflect101(int x, int size);
 
-static int border_clip(BorderType border_type, int x, int size, int i);
+static int border_clip(BorderType border_type, int x, int size);
 
 #ifdef __cplusplus
 }
@@ -58,11 +58,11 @@ int border_clip_replicate(int x, int size)
 int border_clip_reflect(int x, int size)
 {
     if (x<0) {
-        return -x-1;
+        return border_clip_reflect(-x-1, size);
     }
     if (x>size-1) {
         //return size-(x-size) - 1 => size - x + size - 1 => 2*size - x - 1
-        return 2*size - x - 1;
+        return border_clip_reflect(2*size - x - 1, size);
     }
     return x;
 }
@@ -71,10 +71,10 @@ int border_clip_reflect(int x, int size)
 int border_clip_wrap(int x, int size)
 {
     if (x<0) {
-        return size+x;
+        return border_clip_wrap(size+x, size);
     }
     if (x>size-1) {
-        return x-size;
+        return border_clip_wrap(x-size, size);
     }
     return x;
 }
@@ -82,10 +82,11 @@ int border_clip_wrap(int x, int size)
 // gfedcb|abcdefgh|gfedcba
 int border_clip_reflect101(int x, int size) {
     if (x<0) {
-        return -x;
+        return border_clip_reflect101(-x, size);
     }
     else if (x>size-1) {
-        return 2*size - 2 - x; // size-1 - (x-(size-1))  =>  size - 1 - (x - size + 1) => size - 1 - x + size - 1 => 2*size - 2 - x
+        //return 2*size - 2 - x; // size-1 - (x-(size-1))  =>  size - 1 - (x - size + 1) => size - 1 - x + size - 1 => 2*size - 2 - x
+        return border_clip_reflect101(2*size - 2 - x, size);
     }
     else {
         return x;
@@ -97,12 +98,11 @@ int border_clip_reflect101(int x, int size) {
 // int border_clip_transparent(){
 // }
 
-// if border_type!=kBorderConstant, assign parameter `i` with any value is OK
-int border_clip(BorderType border_type, int x, int size, int i)
+int border_clip(BorderType border_type, int x, int size)
 {
     switch(border_type) {
         case kBorderConstant:
-            return border_clip_constant(x, size, i);
+            return border_clip_constant(x, size, 0);
         case kBorderReplicate:
             return border_clip_replicate(x, size);
         case kBorderReflect:
