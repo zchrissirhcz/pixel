@@ -2,6 +2,8 @@
 #include <string.h>
 #include <assert.h>
 
+// copy_make_border_naive( ) 仅支持单通道图像的补边、且只补0；用来形象的说明补边的基本原理
+// 对于多通道图像、多种类型补边策略的支持，请用 copy_make_border2_naive( )
 void copy_make_border_naive(unsigned char* src, int src_height, int src_width, int channels, unsigned char* dst, int top, int bottom, int left, int right)
 {
     int dst_height = src_height + top + bottom;

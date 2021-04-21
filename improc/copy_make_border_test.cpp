@@ -1,66 +1,13 @@
 
-//#include <opencv2/opencv.hpp>
-
-#include <opencv2/imgproc.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
+#include <opencv2/opencv.hpp>
 #include <iostream>
 
 #include "copy_make_border.h"
+#include "improc_zcx.h"
 
-using namespace cv;
+#include "common/pixel_benchmark.h"
 
-
-int main2( int argc, char** argv )
-{
-    // Declare the variables
-    Mat src, dst;
-    int top, bottom, left, right;
-    int borderType = BORDER_CONSTANT;
-    const char* window_name = "copyMakeBorder Demo";
-    RNG rng(12345);
-
-
-    const char* imageName = argc >=2 ? argv[1] : "IU.bmp";
-    // Loads an image
-    src = imread( samples::findFile( imageName ), IMREAD_COLOR ); // Load an image
-    // Check if image is loaded fine
-    if( src.empty()) {
-        printf(" Error opening image\n");
-        printf(" Program Arguments: [image_name -- default lena.jpg] \n");
-        return -1;
-    }
-    // Brief how-to for this program
-    printf( "\n \t copyMakeBorder Demo: \n" );
-    printf( "\t -------------------- \n" );
-    printf( " ** Press 'c' to set the border to a random constant value \n");
-    printf( " ** Press 'r' to set the border to be replicated \n");
-    printf( " ** Press 'ESC' to exit the program \n");
-    namedWindow( window_name );
-    // Initialize arguments for the filter
-    top = (int) (0.05*src.rows); bottom = top;
-    left = (int) (0.05*src.cols); right = left;
-    for(;;)
-    {
-        Scalar value( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
-        copyMakeBorder( src, dst, top, bottom, left, right, borderType, value );
-        imshow( window_name, dst );
-        char c = (char)waitKey(500);
-        if( c == 27 )
-        { break; }
-        else if( c == 'c' )
-        { borderType = BORDER_CONSTANT; }
-        else if( c == 'r' )
-        { borderType = BORDER_REPLICATE; }
-    }
-    return 0;
-}
-
-// CV_EXPORTS_W void copyMakeBorder(InputArray src, OutputArray dst,
-//                                  int top, int bottom, int left, int right,
-//                                  int borderType, const Scalar& value = Scalar() );
-
-int main()
+int main_old()
 {
     bool print_mat = false;
 
@@ -151,9 +98,51 @@ int main()
         }
     }
 
-
     cv::imwrite("IU_withborder_opencv.png", dst_image_opencv);
     cv::imwrite("IU_withborder_naive.png", dst_image_naive);
+
+    return 0;
+}
+
+int main()
+{
+    cv::Mat src_image = cv::imread("IU.bmp");
+    
+    cv::Size size = src_image.size();
+    int src_height = size.height;
+    int src_width = size.width;
+    
+    int pad_top = 2;
+    int pad_bottom = 2;
+    int pad_left = 2;
+    int pad_right = 2;
+    int pad[4] = {
+        pad_left, pad_top, pad_right, pad_bottom
+    };
+
+    int dst_height = src_height + pad_top + pad_bottom;
+    int dst_width = src_width + pad_left + pad_right;
+
+    cv::Size dst_size;
+    dst_size.height = dst_height;
+    dst_size.width = dst_width;
+    cv::Mat dst_zcx(dst_size, src_image.type());
+    cv::Mat dst_opencv(dst_size, src_image.type());
+
+    double t_start, t_cost;
+    
+    t_start = pixel_get_current_time();
+    cv_image_padding(src_image.data, src_height, src_width, pad, dst_zcx.data);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("cv_image_padding cost %.4lf ms\n", t_cost);
+
+    t_start = pixel_get_current_time();
+    cv::copyMakeBorder(src_image, dst_opencv, pad_top, pad_bottom, pad_left, pad_right, cv::BORDER_REFLECT101);
+    t_cost = pixel_get_current_time() - t_start;
+    printf("cv_image_padding cost %.4lf ms\n", t_cost);
+
+    cv::imwrite("result_zcx.png", dst_zcx);
+    cv::imwrite("result_opencv.png", dst_opencv);
 
     return 0;
 }

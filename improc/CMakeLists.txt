@@ -41,9 +41,16 @@ add_executable(testbed
     # boxfilter.c
     # boxfilter_test.cpp
 
-    copy_make_border.h
-    copy_make_border.c
-    copy_make_border_test.cpp
+    # copy_make_border.h
+    # copy_make_border.c
+    # copy_make_border_test.cpp
+
+    copy_cut_border.h
+    copy_cut_border.c
+    copy_cut_border_test.cpp
+
+    improc_zcx.h
+    improc_zcx.cpp
 )
 target_include_directories(testbed
     PUBLIC
