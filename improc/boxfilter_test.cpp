@@ -9,7 +9,7 @@ void blur_1d(float* src, float* dst, int src_size, int kernel_len)
 {
     assert(kernel_len>0);
     assert(src!=dst);
-    
+
     int offset = kernel_len / 2;
     int norm = kernel_len * kernel_len;
     for (int i=0; i<src_size; i++) {
@@ -127,13 +127,15 @@ int main4() {
 
 
 // TODO: 要支持非方形kernel，需要在x、y两个维度上分别做boxfilter
-void naive_boxfilter(unsigned char* src, unsigned char* dst, int height, int width, int channels, int kernel_size, int anchor_y, int anchor_x, bool norm, BorderType border_type)
+void naive_boxfilter(unsigned char* src, unsigned char* dst, int height, int width, int channels, int kernel_h, int kernel_w, int anchor_y, int anchor_x, bool norm, BorderType border_type)
 {
     // param checking
-    assert(border_type==kBorderReplicate || 
+    assert(border_type==kBorderReplicate ||
            border_type==kBorderReflect ||
            border_type==kBorderReflect101);
+    assert(kernel_h>0 && kernel_w>0);
 
+    int kernel_size = kernel_h * kernel_w;
     int* kernel = (int*)malloc(sizeof(int)*kernel_size);
     for (int i=0; i<kernel_size; i++) {
         kernel[i] = 1;
@@ -148,8 +150,8 @@ void naive_boxfilter(unsigned char* src, unsigned char* dst, int height, int wid
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             int pixel[3] = { 0 };
-            for (int ki = 0; ki < 3; ki++) {
-                for (int kj = 0; kj < 3; kj++) {
+            for (int ki = 0; ki < kernel_h; ki++) {
+                for (int kj = 0; kj < kernel_w; kj++) {
                     int ti = (i + ki - anchor_y);
                     int tj = (j + kj - anchor_x);
                     ti = border_clip(border_type, ti, height, 0);
@@ -221,7 +223,7 @@ int main()
 #endif
 
     cv::Mat dst_opencv = input.clone();
-    cv::Size kernel_size(3, 3);
+    cv::Size kernel_size(5, 10);
     cv::Point anchor(2, 0);
     cv::boxFilter(input, dst_opencv, 8, kernel_size, anchor, norm, cv::BORDER_DEFAULT);
 
@@ -243,10 +245,9 @@ int main()
     unsigned char* src = input.data;
     cv::Mat dst_zz = input.clone();
     unsigned char* dst = dst_zz.data;
-    
-    int kernel_len = kernel_size.height * kernel_size.width;
+
     int channels = input.channels();
-    naive_boxfilter(src, dst, height, width, channels, kernel_len, anchor.y, anchor.x, norm, kBorderDefault);
+    naive_boxfilter(src, dst, height, width, channels, kernel_size.height, kernel_size.width, anchor.y, anchor.x, norm, kBorderDefault);
 
     if (print_mat) {
         std::cout << "--- dst_zz is " << std::endl;
@@ -255,7 +256,7 @@ int main()
 
     cv::Mat diff;
     cv::absdiff(dst_opencv, dst_zz, diff);
-    
+
     cv::Scalar diff_scalar = cv::sum(diff);
     int total_diff = diff_scalar[0] + diff_scalar[1] + diff_scalar[2] + diff_scalar[3];
     std::cout << "-----------------------" << std::endl;
