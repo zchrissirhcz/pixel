@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include <opencv2/opencv.hpp>
-#include "border_clip.h"
+#include "boxfilter.h"
 
 void blur_1d(float* src, float* dst, int src_size, int kernel_len)
 {
@@ -126,67 +126,6 @@ int main4() {
 }
 
 
-// TODO: 要支持非方形kernel，需要在x、y两个维度上分别做boxfilter
-void naive_boxfilter(unsigned char* src, unsigned char* dst, int height, int width, int channels, int kernel_h, int kernel_w, int anchor_y, int anchor_x, bool norm, BorderType border_type)
-{
-    // param checking
-    assert(border_type==kBorderReplicate ||
-           border_type==kBorderReflect ||
-           border_type==kBorderReflect101);
-    assert(kernel_h>0 && kernel_w>0);
-
-    int kernel_size = kernel_h * kernel_w;
-    int* kernel = (int*)malloc(sizeof(int)*kernel_size);
-    for (int i=0; i<kernel_size; i++) {
-        kernel[i] = 1;
-    }
-
-    int denominator = 1;
-    if (norm) {
-        denominator = kernel_size;
-    }
-    int radius = kernel_size / 2;
-
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            int pixel[3] = { 0 };
-            for (int ki = 0; ki < kernel_h; ki++) {
-                for (int kj = 0; kj < kernel_w; kj++) {
-                    int ti = (i + ki - anchor_y);
-                    int tj = (j + kj - anchor_x);
-                    ti = border_clip(border_type, ti, height, 0);
-                    tj = border_clip(border_type, tj, width, 0);
-                    if (channels==3) {
-                        pixel[0] += src[ti * width * 3 + tj * 3];
-                        pixel[1] += src[ti * width * 3 + tj * 3 + 1];
-                        pixel[2] += src[ti * width * 3 + tj * 3 + 2];
-                    }
-                    else if (channels == 1) {
-                        pixel[0] += src[ti * width + tj];
-                    }
-                }
-            }
-            if (channels == 3) {
-                pixel[0] = (pixel[0]+radius) / denominator;
-                pixel[1] = (pixel[1]+radius) / denominator;
-                pixel[2] = (pixel[2]+radius) / denominator;
-                if (pixel[0] > 255) pixel[0] = 255;
-                if (pixel[1] > 255) pixel[1] = 255;
-                if (pixel[2] > 255) pixel[2] = 255;
-                dst[i * width * 3 + j * 3] = pixel[0];
-                dst[i * width * 3 + j * 3 + 1] = pixel[1];
-                dst[i * width * 3 + j * 3 + 2] = pixel[2];
-            }
-            else if (channels == 1) {
-                pixel[0] = (pixel[0] + radius) / denominator;
-                if (pixel[0] > 255) pixel[0] = 255;
-                dst[i * width + j] = pixel[0];
-            }
-        }
-    }
-    free(kernel);
-}
-
 
 int main()
 {
@@ -235,19 +174,14 @@ int main()
         std::cout << dst_opencv << std::endl;
     }
 
-
     //---------------------------------------
-
-    //cv::Size size = input.size();
-    //int height = size.height;
-    //int width = size.width;
 
     unsigned char* src = input.data;
     cv::Mat dst_zz = input.clone();
     unsigned char* dst = dst_zz.data;
 
     int channels = input.channels();
-    naive_boxfilter(src, dst, height, width, channels, kernel_size.height, kernel_size.width, anchor.y, anchor.x, norm, kBorderDefault);
+    boxfilter_naive(src, dst, height, width, channels, kernel_size.height, kernel_size.width, anchor.y, anchor.x, norm, kBorderDefault);
 
     if (print_mat) {
         std::cout << "--- dst_zz is " << std::endl;
