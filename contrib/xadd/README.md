@@ -1061,6 +1061,7 @@ static int MY_XADD(int* addr, int delta) {
 **基于std::atomic的操作**
 
 完整代码在 array_v9_std_atomic.cpp， 关键代码如下：
+(注：经测试，只能MSVC下编译运行，Linux下编译不过；目测 std::atomic 的用法有问题。。）
 
 ```c++
 class Array{

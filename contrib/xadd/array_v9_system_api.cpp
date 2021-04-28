@@ -1,4 +1,6 @@
+#ifdef _MSC_VER
 #include <vld.h> // 用于内存泄露检查。仅在MSVC Debug模式下测试用。
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -24,7 +26,7 @@ public:
 
 private:
     int* refcount; // 引用计数器。使用 volatile 修饰，希望能解决多线程访问冲突
-    
+
     void addref();
     void release();
 };
@@ -36,7 +38,7 @@ std::mutex g_mutex;
 //
 //    int tmp = *addr;
 //    *addr += delta;
-//    
+//
 //    g_mutex.unlock();
 //    return tmp;
 //}
