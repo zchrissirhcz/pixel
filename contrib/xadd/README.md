@@ -1161,35 +1161,8 @@ Windows 下测量得到：
 
 
 
-
-
-
-```
-无锁大部分时间不如整一个高性能spin lock 来的快速且逻辑自洽不埋坑……比如atomic 的int要赋值或者拷贝给正常的int 就要格外小心……但不是所有队友都会小心……
-```
-
-```
-不应将atomic和lock free混淆。atomic只是一个声明，表示“对此数据的访问是原子性的”，但是c++标准并不指定atomic的实现，atomic可能是由lock free实现，也可能由锁来实现。参考http://http://15418.courses.cs.cmu.edu/fall2017/lecture/lockfree/slide_006
-```
-
-
-还有一些不太了解、似乎也可以用的方法：
-- spin lock
-- 
-
-
-
-
-我们用 C++11 中提供的 std::mutex 来做加锁解锁操作。
-
-
-
 ## 0xx References
 
 [C++性能榨汁机之无锁编程](https://zhuanlan.zhihu.com/p/38664758)
 
-`float* data`共享数据，内存问题：
-- 内存泄露
-- 内存重复释放
-
-基于 RAII 
+ 
