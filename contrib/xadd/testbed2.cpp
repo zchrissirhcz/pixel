@@ -39,6 +39,13 @@ namespace ThreadSafePrint
 #define CV_INLINE inline
 CV_INLINE int CV_XADD(int* addr, int delta) { int tmp = *addr; *addr += delta; return tmp; }
 
+#elif 0
+
+#define CV_INLINE inline
+CV_INLINE int CV_XADD(volatile int* addr, int delta) {
+    int tmp = *addr; *addr += delta; return tmp;
+}
+
 #else
 
 
@@ -86,7 +93,7 @@ void do_work2()
 {
     
 
-    //printf("thread_id is %d, *refcount is %d\n", std::this_thread::get_id(), *refcount);
+    printf("thread_id is %d, *refcount is %d\n", std::this_thread::get_id(), *refcount);
     //fprintf(stderr, "thread_id is %d, *refcount is %d\n", std::this_thread::get_id(), *refcount);
     //std::cout << "thead_id is " << std::this_thread::get_id() << ", *refcount is " << *refcount << std::endl;
     //ThreadSafePrint::cout() << "thead_id is " << std::this_thread::get_id() << ", *refcount is " << *refcount << std::endl;
@@ -131,19 +138,78 @@ void test2()
     std::thread th3(do_work2);
     std::thread th4(do_work2);
     std::thread th5(do_work2);
+    std::thread th6(do_work2);
+    std::thread th7(do_work2);
+    std::thread th8(do_work2);
+    std::thread th9(do_work2);
+    std::thread th10(do_work2);
 
     th1.join();
     th2.join();
     th3.join();
     th4.join();
     th5.join();
+    th6.join();
+    th7.join();
+    th8.join();
+    th9.join();
+    th10.join();
 
     std::cout << "Result:" << *refcount << '\n';
 }
 
+//int  i = 0;
+//std::atomic<int> i = 0;
+volatile int i = 0;
+std::mutex mut;
+
+void iplusplus() {
+    
+    //int c = 10000000;  //循环次数
+    //while (c--) {
+    //    i++;
+    //}
+
+    //int c = 10000000;  //循环次数
+    //int c = 10;  //循环次数
+    int c = 10000000;  //循环次数
+    while (c--) {
+        // mutex for lock.  0.95 ms
+        //mut.lock();
+        //i++;
+        //mut.unlock();
+
+        CV_XADD(&i, 1);  //0.25~0.34 ms
+
+        //atomic
+        //i++; // 0.34 ms
+    }
+}
+int test3()
+{
+    std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();//开始时间
+
+    std::thread thread1(iplusplus);  //建立并运行线程1
+    std::thread thread2(iplusplus);  //建立并运行线程2
+    thread1.join();  // 等待线程1运行完毕
+    thread2.join();  // 等待线程2运行完毕
+    std::cout << "i = " << i << std::endl;
+
+    std::chrono::steady_clock::time_point stop_time = std::chrono::steady_clock::now();//结束时间
+    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::microseconds>(stop_time - start_time);
+    std::cout << "共耗时：" << time_span.count() << " ms" << std::endl; // 耗时
+
+    return 0;
+}
+
+
 int main() {
     //test1();
-    test2();
+    //test2();
+
+    
+
+    test3();
 
     return 0;
 }

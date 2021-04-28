@@ -4,6 +4,6 @@ project(xadd)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(testbed2
-    testbed2.cpp
+add_executable(testbed3
+    testbed3.cpp
 )
