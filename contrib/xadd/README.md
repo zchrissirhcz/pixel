@@ -1159,10 +1159,28 @@ Windows 下测量得到：
 | _InterlockedExchangeAdd | 0.713134 s |
 
 
+## 0x10 第十版 基于 Template 的 RefCount 类
 
+如果 Array, Matrix, Tensor 每个类都重新写一遍 `addref()/release()`，还是有点麻烦。
+
+通过实现模板类 RefCount，然后其他类... 应该会简单许多。
+
+```
+// TODO：
+```
 
 ## 0xx References
 
-[C++性能榨汁机之无锁编程](https://zhuanlan.zhihu.com/p/38664758)
+本文目前主要参考：
 
- 
+- [C++性能榨汁机之无锁编程](https://zhuanlan.zhihu.com/p/38664758)
+
+引用计数方面还有很多资料和开源代码，暂未研究:
+
+- 基于C的引用计数
+    - [Generic C Reference Counting](https://nullprogram.com/blog/2015/02/17/)
+    - [Reference counting in c](https://github.com/jeraymond/refcount)
+
+- 基于C++的引用计数
+    - [Programming in C and C++ - Lecture 7: Reference Counting and Garbage Collection](https://www.cl.cam.ac.uk/~nk480/C1819/lecture7.pdf)
+    - [Building a Quick and Handy Reference Counting Class](https://www.codeproject.com/Articles/64111/Building-a-Quick-and-Handy-Reference-Counting-Clas)
