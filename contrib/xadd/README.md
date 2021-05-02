@@ -1066,25 +1066,24 @@ static int MY_XADD(int* addr, int delta) {
 ```c++
 class Array{
     ...
-    std::atomic<int*>refcount;
+    std::atomic<int>* refcount;
     ...
 }
 
 static int MY_XADD(std::atomic<int>* addr, int delta) {
-    int tmp = *addr;
+    int tmp(addr->load());
     *addr += delta;
 
     return tmp;
 }
 
 // 拷贝构造函数
-Array::Array(const Array& arr) :
-    refcount(arr.refcount.load()) // 用 arr.refcount赋值给refcount
+Array::Array(const Array& arr):
+    len(arr.len),
+    data(arr.data),
+    refcount(arr.refcount) // 用 arr.refcount赋值给refcount
 {
     addref();
-
-    len = arr.len;
-    data = arr.data;
 }
 
 // 复制赋值函数
@@ -1096,7 +1095,7 @@ Array& Array::operator=(const Array& arr)
     if (this != &arr)
     {
         release();
-        refcount = arr.refcount.load();
+        refcount = arr.refcount;
         addref();
 
         data = arr.data;
@@ -1150,16 +1149,58 @@ CV_INLINE MY_XADD(int* addr, int delta) { int tmp = *addr; *addr += delta; retur
 
 分别基于上述方案实现的 MY_XADD，在 `do_work()` 函数中设定循环次数为 `int loop_counter = 2000000;`，分别测量三种方案的时间开销。
 
-Windows 下测量得到：
+编译时，先开 asan 查是否有越界或泄露，debug 模式运行；确保没问题后，再到 release 模式下测耗时：
+```c++
+# asan
+clang++ array_v9_std_atomic.cpp -pthread -fomit-frame-pointer -fsanitize=address -g
 
-| 方案                    | 耗时        |
-| ----------------------- | --------   |
-| std::mutex              | 4.39776 s  |
-| std::atomic             | 7.4746 s   |
-| _InterlockedExchangeAdd | 0.713134 s |
+# release
+clang++ array_v9_std_atomic.cpp -pthread -O3
+```
+
+测量耗时结果：
+
+| 方案                    | Windows耗时       | Linux 耗时        | Android armv8耗时 | Android armv7耗时 |
+| ----------------------- | ----------------  | ----------------- | ----------------- | ----------------- |
+| std::mutex              | 4.39776 s         |    2.63056  s     |   4.42047 s       | 3.23817 s         |
+| std::atomic             | -                 |    0.861335 s     |   1.22934 s       | 2.27211 s         |
+| 系统api                 | <b>0.713134 s</b> | <b>0.797501 s</b> |  <b>1.04305 s</b> | <b>2.12695 s</b>  |
+
+平台api： window 下是 `_InterlockedExchangeAdd`
 
 
-## 0x10 第十版 基于 Template 的 RefCount 类
+## 0x10 第十版 基于 std::shared_ptr 的 Array 类
+
+`std::shared_ptr` 天生就是为了解决引用计数问题的。关于 std::shared_ptr 的线程安全的讨论，有个误区是说它不是线程安全的因此不要使用；实际上对于计数器的操作，也就是构造、拷贝赋值函数、析构函数中，都是可以确保原子性的；而如果是访问共享的数据本身做读写操作，或者两个线程中同时读写同一个 shared_ptr 对象，那肯定不保证线程安全；那需要你自己加锁。
+
+有网友提问为什么不用 std::shared_ptr 而要搞 第九版 自行 mutex/atomic 操作呢？具体到 Array 这个类，在 `array_v10_shared_ptr.cpp` 中尝试实现，关键代码如下：
+```c++
+class Array {
+public:
+    Array();
+    explicit Array(uint32_t _len);
+    Array(uint32_t _len, float* data);
+    Array(const Array& arr); // 拷贝构造函数
+    Array& operator=(const Array& arr); // 复制赋值构造函数
+    ~Array();
+
+public:
+    std::shared_ptr<float> data; //!! 这里，新增
+    int len;
+};
+```
+
+由于 Array 类既可以自行申请一块新的内存然后管理，也可以使用外部传入的一块内存（这种情况下，谁申请谁释放，Array类不负责管理），后者的实现就出现了问题：
+```c++
+Array::Array(uint32_t _len, float* _data) :
+    len(_len), data(_data) // 用外部内存 _data 给 data 赋值，bad!
+{
+    // 外部的内存应该外部申请和释放，不应该交给 shared_ptr 来管理
+}
+```
+直接后果是，析构函数和外部都对 `_data` 做释放，二次释放造成 crash。这样的表达能力就很弱了啊。本着性能测试的想法，不考虑传入外部内存的那个构造函数的情况下，linux 下耗时为 0.760177 s，和直接调用平台 API 是几乎一样（略快，why？）的开销。
+
+## 0x11 第十一版 基于 Template 的 RefCount 类
 
 如果 Array, Matrix, Tensor 每个类都重新写一遍 `addref()/release()`，还是有点麻烦。
 

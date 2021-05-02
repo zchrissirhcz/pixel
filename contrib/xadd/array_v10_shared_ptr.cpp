@@ -7,10 +7,8 @@
 #include <stdlib.h>
 
 #include <iostream>
-
-#include <thread> // 用于验证多线程 MY_XADD 是否安全的 test 代码编写
-#include <mutex> // 用于验证锁操作对 MY_XADD 是否有效的尝试
-#include <atomic>
+#include <memory>
+#include <thread>
 
 class Array {
 public:
@@ -22,49 +20,12 @@ public:
     ~Array();
 
 public:
-    float* data;
+    std::shared_ptr<float> data;
     int len;
-
-private:
-    //int* refcount; // 引用计数器。使用 volatile 修饰，希望能解决多线程访问冲突
-    std::atomic<int>* refcount;
-    void addref();
-    void release();
 };
 
-static int MY_XADD(std::atomic<int>* addr, int delta) {
-    int tmp(addr->load());
-    *addr += delta;
-
-    return tmp;
-}
-
-// 引用计数器增加1次
-void Array::addref() {
-    if (refcount) {
-        MY_XADD(refcount, 1);
-    }
-}
-
-// 引用计数器减少1次
-// 如果计数器等于0，则释放data和refcount并且置NULL
-void Array::release() {
-    // 如果 refcount 不为 NULL，那么：
-    //    更新计数器： *refcount = *refcount - 1
-    //    判断如果原来的计数器值为1，那么现在计数器的值为0，应当释放相关内存
-    if (refcount && MY_XADD(refcount, -1) == 1) {
-        // end for refcount
-        delete(refcount);
-        refcount = NULL;
-
-        // end for Array object's shared heap memory variable(s)
-        free(data);
-        data = NULL;
-    }
-}
-
 Array::Array() :
-    len(0), data(NULL), refcount(NULL) // 构造函数，不分配内存，refcount初始化为NULL
+    len(0), data(NULL)
 {
 
 }
@@ -73,52 +34,37 @@ Array::Array(uint32_t _len) :
     len(_len)
 {
     if (len>0) {
-        refcount = new std::atomic<int>();
-        std::atomic_init(refcount, 0);
-        data = (float*)malloc(sizeof(float) * len);
-        addref(); // 构造函数，分配内存，refcount 分配内存，然后+1
+        data.reset(new float[len], [](float* p) {
+            delete[] p;
+        });
     }
 }
 
-Array::Array(uint32_t _len, float* data) :
-    len(_len), data(data), refcount(NULL) // 构造函数，不分配内存，refcount初始化为NULL
+Array::Array(uint32_t _len, float* _data) :
+    len(_len), data(_data) // 用外部内存 _data 给 data 赋值，bad!
 {
-
+    // 外部的内存应该外部申请和释放，不应该交给 shared_ptr 来管理
 }
 
 // 拷贝构造函数
 Array::Array(const Array& arr):
     len(arr.len),
-    data(arr.data),
-    refcount(arr.refcount) // 用 arr.refcount赋值给refcount
+    data(arr.data)
 {
-    addref();
 }
 
-// 复制赋值函数
 Array& Array::operator=(const Array& arr)
 {
-    // 当前array对象有两种状态：refcount不为空，或为空
-    // 传入的参数对象arr也有两种状态：refcount不为空，或为空
-    // 因此一共有4种状态
     if (this != &arr)
     {
-        release();
-        refcount = arr.refcount;
-        addref();
-
         data = arr.data;
         len = arr.len;
     }
-
-    // 如果传入的arr就是自己，那什么都不应该做
-    // 如果前面的refcount和其他成员的赋值弄好了，也在这里返回
     return *this;
 }
 
 Array::~Array()
 {
-    release();
 }
 
 
@@ -306,31 +252,7 @@ void test_multithread()
     std::cout << "共耗时：" << time_span.count() << " s" << std::endl; // 耗时
 }
 
-// 通过这个例子说明，std::atomic<int>类型作为引用计数，不合适
-// 无法保证引用同一内存的所有对象的计数器相同
-// (但 std::atomic<int>* 之间，可以相互赋值)
-// void atomic_test()
-// {
-//     std::atomic<int> a;
 
-//     a = 3;
-
-//     std::atomic<int> b;
-//     std::atomic_init(&b, a);
-
-//     a = 4;
-
-//     std::cout << a << std::endl; // 输出4
-//     std::cout << b << std::endl; // 输出3
-// }
-
-// void atomic_test2()
-// {
-//     std::atomic<int> a(3);
-//     int b = atomic_fetch_add(&a, 1);
-//     std::cout << a << std::endl;
-//     std::cout << b << std::endl;
-// }
 
 int main()
 {
@@ -343,8 +265,11 @@ int main()
 
     g_arr = Array(10);
     test_multithread();
-    //atomic_test();
-    //atomic_test2();
+
+    // float* data = (float*)malloc(10*sizeof(float));
+    // Array some(10, data);
+    // free(data); // 第一次释放
+    // 第二次释放是 some 的析构函数释放
 
     //test_thread_safe();
 
