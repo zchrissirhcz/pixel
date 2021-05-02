@@ -1206,11 +1206,36 @@ Array::Array(uint32_t _len, float* _data) :
 
 通过实现模板类 RefCount，然后其他类... 应该会简单许多。
 
-```
-// TODO：
-```
+[《C语言-C++学习指南》（新）29-3 类模板](https://www.bilibili.com/video/BV1px411k7Lo) 实现 Array 的类模板，看起来是大一课程；槽点多多，没有拷贝构造函数、复制复制函数、析构函数，更没有引用计数。
 
-## 0xx References
+[Ｃ++类模板](https://www.bilibili.com/video/BV1CE411i7s5) 从头实现了 max 函数，基本上完备正确。C++ 代码风格也好。
+练习代码放在 `max_template.cpp` 中。
+
+[C++新特性之四：标准库中的智能指针和引用计数](https://zhuanlan.zhihu.com/p/137495997) 这篇文章给出了 std::shared_ptr 依然会造成内存泄露的情况的示例代码。
+
+尝试基于 `array_v9_system_api.cpp` 的代码，把引用计数相关的代码剥离出来，放在 Refcount 模板类中，然后 Array 类继承 Refcount 类即可实现 Array 类的引用计数。
+
+代码实现在 `array_v11_template.cpp`
+
+## 0xx 一些不靠谱的资料
+
+### 不靠谱1: codeproject 上的一个项目
+https://www.codeproject.com/Articles/64111/Building-a-Quick-and-Handy-Reference-Counting-Clas
+
+实现了 `RCBase` 和 `RCPtr` 两个类，里面只有计数器，没有类似于 `float* data` 这样的在不同对象之间共享的数据，这两个类也就完全没有意义了。`RCBase`完全是 C 风格的调用，那为什么不用纯 C 实现呢？ `RCPtr` 管理的是外部传入的指针，这很奇怪，应该谁申请谁释放，轮不到 RCPtr 对象来 delete；更不用说 计数器的增减 线程不安全了。
+
+### 不靠谱2: bilibili上 “shellmad-15_C++新特性 引用计数” 视频
+
+https://www.bilibili.com/video/BV1AT4y1E7a1?from=search&seid=1795823596962243070
+
+视频标题有误导嫌疑，视频里的实现方式并没有新花样，反倒是比较朴素。
+
+视频里的讲解，涉及到3份代码，第1份是刻意示范错误写法，不过里面 `delete[]` 写成 `delete` 也过于粗心；
+第2份代码是实现引用计数来避免内存泄露和释放，虽然看起来 VS 下能运行，但只要开了 address sanitizer 立即看到泄露和越界，至少有8处槽点代码。代码运行不报错并不意味着没有bug，起码应该找方法验证说没有泄露和越界对吧？
+（具体代码对应到 bili_refcount.cpp 和 bili_refcount2.cpp）
+
+## 0xy 总结
+## 0xz References
 
 本文目前主要参考：
 
