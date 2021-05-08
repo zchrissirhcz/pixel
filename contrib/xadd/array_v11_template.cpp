@@ -47,12 +47,12 @@ class Refcount
 public:
     Refcount();
     explicit Refcount(uint32_t _len);
-    Refcount(uint32_t _len, void* _data);
-    Refcount(uint32_t _len, void* _data, int* _refcount);
+    Refcount(uint32_t _len, T* _data);
+    Refcount(uint32_t _len, T* _data, int* _refcount);
     virtual ~Refcount();
 
 public:
-    void* data;
+    T* data;
     uint32_t len;
     int* refcount;
 
@@ -91,14 +91,14 @@ Refcount<T>::Refcount(uint32_t _len):
 }
 
 template<class T>
-Refcount<T>::Refcount(uint32_t _len, void* _data):
+Refcount<T>::Refcount(uint32_t _len, T* _data):
     len(_len), data(_data), refcount(NULL)
 {
 
 }
 
 template<class T>
-Refcount<T>::Refcount(uint32_t _len, void* _data, int* _refcount):
+Refcount<T>::Refcount(uint32_t _len, T* _data, int* _refcount):
     len(_len), data(_data), refcount(_refcount)
 {
     addref();
