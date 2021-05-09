@@ -1,5 +1,5 @@
 #include "rgb2gray.h"
-#include "simd/pixel_simd.h"
+#include <stdint.h>
 
 static void HYW_rgb2gray(unsigned char* rgb_buf, size_t height, size_t width, unsigned char* gray_buf, int mode);
 

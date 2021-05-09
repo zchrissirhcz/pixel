@@ -47,22 +47,160 @@ OpenCV 4.5.1
 
 **rgb2bgr**
 
-| id | implementation | armv8 release | armv8 debug | armv7 release | armv7 debug |
-| --- | -------------- | --------- | -------------| --------------- | ----------- |
-| 1   | naive          |  25 ms  |  26 ms  |  27 ms  |  117 ms  |
-| 2   | index optimized|  19 ms  |  18 ms  |  25 ms  |  92 ms   |
-| 3   | neon intrinsic |  19 ms  |  19 ms  |  19 ms  |  41 ms   |
-| 4   | asm            |  19 ms  |  18 ms  |  20 ms  |  22 ms   |
-| 5   | opencv         |  15 ms  |  14 ms  |  15 ms  |  29 ms   |
+| id | implementation | armv8 release | armv8 debug  | armv7 release | armv7 debug |
+| --- | -------------- | ------------ | -------------| ------------- | ----------- |
+| 1   | naive          |  25 ms       |  26 ms       |  27 ms        |  117 ms     |
+| 2   | index optimized|  19 ms       |  18 ms       |  25 ms        |  92 ms      |
+| 3   | neon intrinsic |  19 ms       |  19 ms       |  19 ms        |  41 ms      |
+| 4   | asm            |  19 ms       |  18 ms       |  20 ms        |  22 ms      |
+| 5   | opencv         |  15 ms       |  14 ms       |  15 ms        |  29 ms      |
 
 **rgb2bgr_inplace**
 
 | id | implementation | armv8 release | armv8 debug | armv7 release | armv7 debug | 备注    |
-| --- | -------------- | ----------- | ------------ | ------------- | ----------- | ------- |
-| 1   | naive          | 12 ms    |   12 ms |  14 ms  |  88 ms   |  |
-| 2   | naive2         | 12 ms    |   12 ms |  18 ms  |  40 ms   |  |
-| 3   | asm            | 6 ms     |   6 ms  |  6 ms   |  6 ms    |  **比OpenCV快4~5倍** |
-| 4   | opencv         | 26 ms    |   24 ms |  30 ms  |  33 ms   |      |
+| --- | --------------| ------------- | ----------- | ------------- | ----------- | ------- |
+| 1   | naive         | 12 ms         |   12 ms     |  14 ms        |  88 ms      |         |
+| 2   | naive2        | 12 ms         |   12 ms     |  18 ms        |  40 ms      |         |
+| 3   | asm           | 6 ms          |   6 ms      |  6 ms         |  6 ms       |  **比OpenCV快4~5倍** |
+| 4   | opencv        | 26 ms         |   24 ms     |  30 ms        |  33 ms      |         |
+
+为什么 OpenCV 的**原地** rgb2bgr 比 naive 实现都要慢 5 倍？它的实现在 `3rdparty/carotene/hal/tegra_hal.hpp`：
+
+```c++
+#define TEGRA_CVTBGRTOBGR(src_data, src_step, dst_data, dst_step, width, height, depth, scn, dcn, swapBlue) \
+( \
+    depth == CV_8U && CAROTENE_NS::isSupportedConfiguration() ? \
+        scn == 3 ? \
+            dcn == 3 ? \
+                swapBlue ? \
+                    parallel_for_(Range(0, height), \
+                    TegraCvtColor_rgb2bgr_Invoker(src_data, src_step, dst_data, dst_step, width, height), \
+                    (width * height) / static_cast<double>(1<<16)), \
+                    CV_HAL_ERROR_OK : \
+                    CV_HAL_ERROR_NOT_IMPLEMENTED : \
+            dcn == 4 ? \
+                (swapBlue ? \
+                    parallel_for_(Range(0, height), \
+                    TegraCvtColor_rgb2bgrx_Invoker(src_data, src_step, dst_data, dst_step, width, height), \
+                    (width * height) / static_cast<double>(1<<16)) : \
+                    parallel_for_(Range(0, height), \
+                    TegraCvtColor_rgb2rgbx_Invoker(src_data, src_step, dst_data, dst_step, width, height), \
+                    (width * height) / static_cast<double>(1<<16)) ), \
+                CV_HAL_ERROR_OK : \
+            CV_HAL_ERROR_NOT_IMPLEMENTED : \
+        scn == 4 ? \
+            dcn == 3 ? \
+                (swapBlue ? \
+                    parallel_for_(Range(0, height), \
+                    TegraCvtColor_rgbx2bgr_Invoker(src_data, src_step, dst_data, dst_step, width, height), \
+                    (width * height) / static_cast<double>(1<<16)) : \
+                    parallel_for_(Range(0, height), \
+                    TegraCvtColor_rgbx2rgb_Invoker(src_data, src_step, dst_data, dst_step, width, height), \
+                    (width * height) / static_cast<double>(1<<16)) ), \
+                CV_HAL_ERROR_OK : \
+            dcn == 4 ? \
+                swapBlue ? \
+                    parallel_for_(Range(0, height), \
+                    TegraCvtColor_rgbx2bgrx_Invoker(src_data, src_step, dst_data, dst_step, width, height), \
+                    (width * height) / static_cast<double>(1<<16)), \
+                    CV_HAL_ERROR_OK : \
+                    CV_HAL_ERROR_NOT_IMPLEMENTED : \
+            CV_HAL_ERROR_NOT_IMPLEMENTED : \
+        CV_HAL_ERROR_NOT_IMPLEMENTED \
+    : CV_HAL_ERROR_NOT_IMPLEMENTED \
+)
+```
+进而会调用`CAROTENE_NS::rgb2bgr`，它的实现在 `3rdparty/carotene/src/colorconvert.cpp`:
+```c++
+void rgb2bgr(const Size2D &size,
+             const u8 * srcBase, ptrdiff_t srcStride,
+             u8 * dstBase, ptrdiff_t dstStride)
+{
+    internal::assertSupportedConfiguration();
+#ifdef CAROTENE_NEON
+#if !(!defined(__aarch64__) && defined(__GNUC__) && defined(__arm__))
+    size_t roiw16 = size.width >= 15 ? size.width - 15 : 0;
+#endif
+    size_t roiw8 = size.width >= 7 ? size.width - 7 : 0;
+
+    for (size_t i = 0u; i < size.height; ++i)
+    {
+        const u8 * src = internal::getRowPtr(srcBase, srcStride, i);
+        u8 * dst = internal::getRowPtr(dstBase, dstStride, i);
+        size_t sj = 0u, dj = 0u, j = 0u;
+
+
+#if !defined(__aarch64__) && defined(__GNUC__) && defined(__arm__)
+        for (; j < roiw8; sj += 24, dj += 24, j += 8)
+        {
+            internal::prefetch(src + sj);
+            __asm__ (
+                "vld3.8 {d0, d1, d2}, [%[in0]]             \n\t"
+                "vswp d0, d2                               \n\t"
+                "vst3.8 {d0, d1, d2}, [%[out0]]            \n\t"
+                : /*no output*/
+                : [out0] "r" (dst + dj),
+                  [in0]  "r" (src + sj)
+                : "d0","d1","d2"
+            );
+        }
+#else
+        for (; j < roiw16; sj += 48, dj += 48, j += 16)
+        {
+            internal::prefetch(src + sj);
+            uint8x16x3_t vals0 = vld3q_u8(src + sj);
+
+            std::swap(vals0.val[0], vals0.val[2]);
+
+            vst3q_u8(dst + dj, vals0);
+        }
+
+        if (j < roiw8)
+        {
+            uint8x8x3_t vals = vld3_u8(src + sj);
+            std::swap(vals.val[0], vals.val[2]);
+            vst3_u8(dst + dj, vals);
+            sj += 24; dj += 24; j += 8;
+        }
+#endif
+
+        for (; j < size.width; ++j, sj += 3, dj += 3)
+        {
+            u8 b = src[sj + 2];//Handle src == dst case
+            dst[dj + 2] = src[sj    ];
+            dst[dj + 1] = src[sj + 1];
+            dst[dj    ] = b;
+        }
+    }
+#else
+    (void)size;
+    (void)srcBase;
+    (void)srcStride;
+    (void)dstBase;
+    (void)dstStride;
+#endif
+}
+```
+经打印验证，确实定义了`CAROTENE_NEON`宏，NEON相关代码也很直白不会导致降速。注释掉整个函数，最终耗时从14ms降低为12ms，看起来还是外部的调用导致的。。。在哪里呢？？
+
+排除了“switch里case太多导致慢”的可能，只调用`cvtColorBGR2BGR(_src, _dst, dcn, swapBlue(code));`仍然慢；
+
+modules/imgproc/src/color.simd_helpers.hpp
+```c++
+        if (_src.getObj() == _dst.getObj()) {
+            dst = _dst.getMat();
+            printf("--- helper case 1\n");
+        }
+        else {
+            _dst.create(dstSz, CV_MAKETYPE(depth, dcn));
+            dst = _dst.getMat();
+            printf("--- helper case 2\n");
+        }
+```
+
+https://github.com/opencv/opencv/pull/6760
+
+原因找到了，做了 copyTo 导致的。需要研究一下 copyTo 的源码，为啥这么慢？
 
 ### References
 

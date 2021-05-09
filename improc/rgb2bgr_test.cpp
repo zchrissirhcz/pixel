@@ -77,7 +77,15 @@ int main() {
 
     t_start = pixel_get_current_time();
     src_buf = image_shadow6.data;
+#if 0
     rgb2bgr_inplace_naive(src_buf, height, width);
+#else
+    unsigned char* src_buf_line = src_buf;
+    for (int hi=0; hi<height; hi++) {
+        rgb2bgr_inplace_naive(src_buf_line, 1, width);
+        src_buf_line += width * 3;
+    }
+#endif
     t_cost6 = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2bgr_inplace, naive impl cost %.4lf ms", t_cost6);
 

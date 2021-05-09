@@ -19,9 +19,9 @@ add_executable(testbed
     # rgb2gray.c
     # rgb2gray_test.cpp
 
-    # rgb2bgr.h
-    # rgb2bgr.c
-    # rgb2bgr_test.cpp
+    rgb2bgr.h
+    rgb2bgr.c
+    rgb2bgr_test.cpp
 
     # threshold.h
     # threshold.c
@@ -37,12 +37,12 @@ add_executable(testbed
     # flip.c
     # flip_test.cpp
 
-    boxfilter.h
-    boxfilter.c
-    boxfilter_test.cpp
+    # boxfilter.h
+    # boxfilter.c
+    # boxfilter_test.cpp
 
-    ${CMAKE_SOURCE_DIR}/../matcalc/matrix_transpose.h
-    ${CMAKE_SOURCE_DIR}/../matcalc/matrix_transpose.c
+    # ${CMAKE_SOURCE_DIR}/../matcalc/matrix_transpose.h
+    # ${CMAKE_SOURCE_DIR}/../matcalc/matrix_transpose.c
 
     # copy_make_border.h
     # copy_make_border.c
@@ -65,7 +65,7 @@ if (CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
         #set(OpenCV_DIR "/home/zz/soft/opencv-4.5.1/lib/cmake/opencv4" CACHE PATH "") # shared
         set(OpenCV_DIR "/home/zz/lib/opencv/4.5.2/lib/cmake/opencv4" CACHE PATH "") # static
     elseif (ANDROID)
-        set(OpenCV_DIR "/home/zz/soft/opencv-4.5.2-android-sdk/sdk/native/jni" CACHE PATH "")
+        set(OpenCV_DIR "/home/zz/soft/opencv-4.5.2-dev-android/sdk/native/jni" CACHE PATH "")
     endif()
 elseif (CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
     if (CMAKE_SYSTEM_NAME MATCHES "Windows")
