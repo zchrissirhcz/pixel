@@ -200,7 +200,17 @@ modules/imgproc/src/color.simd_helpers.hpp
 
 https://github.com/opencv/opencv/pull/6760
 
-原因找到了，做了 copyTo 导致的。需要研究一下 copyTo 的源码，为啥这么慢？
+原因找到了，做了 copyTo 导致的。需要研究一下 copyTo 的源码，为啥这么慢？alalek 说是为了避免编译器优化，我表示没有理解：到底要检查 InputArray/OutputArray 的 obj 是否相等（判断的是两个Mat是否相等），还是应该判断两个 Mat 的 data 是否相等？
+
+https://github.com/opencv/opencv/pull/7819
+
+反正，如果只是为了 cpu 上跑 rgb2bgr 的 inplace 操作，假设不会遇到编译优化问题，那么可以这样写：
+```c++
+cv::Mat image = cv::read("rgb.png");
+cv::Mat image_copy = image;
+cv::cvtColor(image_copy, image, cv::COLOR_BGR2RGB);
+```
+则**耗时从 14ms 减少到 不到 3ms。**
 
 ### References
 
@@ -299,10 +309,11 @@ image info: height=4032, width=3024
 **flip vertically, rgb**
 
 | id | name    | armv8 release | armv7 release |
-| -- | ------ | ------------- | ------------- |
+| -- | ------  | ------------- | ------------- |
 | 1 | opencv   | 11.5798 ms    | 11.6609 ms    |
 | 2 | naive    | 10.9293 ms    | 21.6688 ms    |
 | 3 | by lines | 11.1698 ms    | 11.0645 ms    |
+| 4 | opencv inplace |  3.8 ms | -             |
 
 **flip vertically, gray**
 

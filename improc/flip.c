@@ -4,6 +4,7 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -35,7 +36,7 @@ void flip_horiz_rgb_idxopt(unsigned char* src, size_t height, size_t width, unsi
         for (size_t j=0; j<width; j++) {
             *dst = src[-3];
             dst++;
-            
+
             *dst = src[-2];
             dst++;
 
@@ -68,7 +69,7 @@ void flip_horiz_rgb_asimd(unsigned char* src, size_t height, size_t width, unsig
             vst3_u8(dst, vdst);
             dst += step;
         }
-        size_t done = vec_size;
+        done = vec_size;
         for (; done<linebytes; done+=3) {
             dst[0] = src[0];
             dst[1] = src[1];
@@ -115,7 +116,7 @@ void flip_horiz_gray_asimd(unsigned char* src, size_t height, size_t width, unsi
             vst1_u8(dst, vdst);
             dst += step;
         }
-        size_t done = vec_size;
+        done = vec_size;
         for (; done<width; done++) {
             *dst = *src;
             dst++;

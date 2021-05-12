@@ -10,13 +10,13 @@
 //mode=-1, against center point
 
 void flip_horiz_rgb_test() {
-    
+
     //cv::Mat image = cv::imread("colorhouse.jpg");
     cv::Mat image = cv::imread("sky.jpg");
     cv::Size size = image.size();
     size_t height = (size_t)size.height;
     size_t width = (size_t)size.width;
-    
+
     cv::Mat result_opencv(size, CV_8UC3);
     cv::Mat result_naive(size, CV_8UC3);
     cv::Mat result_idxopt(size, CV_8UC3);
@@ -25,7 +25,7 @@ void flip_horiz_rgb_test() {
     double t_start, t_cost;
     unsigned char* src_buf = NULL;
     unsigned char* dst_buf = NULL;
-    
+
     PIXEL_LOGD("image info: height=%zu, width=%zu\n", height, width);
 
     // opencv
@@ -86,7 +86,7 @@ void flip_horiz_gray_test()
     cv::flip(gray, result_opencv, 1);
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("flip gray horiz, opencv, time cost %.4lf ms\n", t_cost);
-    
+
     // naive
     src_buf = gray.data;
     dst_buf = result_naive.data;
@@ -118,18 +118,31 @@ static void flip_vert_rgb_test()
     cv::Mat result_opencv(size, CV_8UC3);
     cv::Mat result_naive(size, CV_8UC3);
     cv::Mat result_bylines(size, CV_8UC3);
-    
+
     double t_start, t_cost;
     unsigned char* src_buf = NULL;
     unsigned char* dst_buf = NULL;
 
     // opencv
-    src_buf = image.data;
-    dst_buf = result_opencv.data;
     t_start = pixel_get_current_time();
     cv::flip(image, result_opencv, 0);
     t_cost = pixel_get_current_time() - t_start;
     PIXEL_LOGD("flip rgb vertically, opencv, time cost %.4lf ms\n", t_cost);
+
+    // opencv inplace
+    cv::Mat result_opencv_inplace = image.clone();
+    t_start = pixel_get_current_time();
+    cv::flip(result_opencv_inplace, result_opencv_inplace, 0);
+    t_cost = pixel_get_current_time() - t_start;
+    PIXEL_LOGD("flip rgb vertically, opencv inplace, time cost %.4lf ms\n", t_cost);
+
+    // opencv inplace trick
+    cv::Mat shadow1 = image.clone();
+    cv::Mat result_opencv_inplace_trick = shadow1;
+    t_start = pixel_get_current_time();
+    cv::flip(shadow1, result_opencv_inplace_trick, 0);
+    t_cost = pixel_get_current_time() - t_start;
+    PIXEL_LOGD("flip rgb vertically, opencv inplace trick, time cost %.4lf ms\n", t_cost);
 
     // naive
     src_buf = image.data;
@@ -164,7 +177,7 @@ static void flip_vert_gray_test()
     cv::Mat result_opencv(size, CV_8UC1);
     cv::Mat result_naive(size, CV_8UC1);
     cv::Mat result_bylines(size, CV_8UC1);
-    
+
     double t_start, t_cost;
     unsigned char* src_buf = NULL;
     unsigned char* dst_buf = NULL;

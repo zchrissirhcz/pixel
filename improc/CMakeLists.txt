@@ -19,9 +19,9 @@ add_executable(testbed
     # rgb2gray.c
     # rgb2gray_test.cpp
 
-    rgb2bgr.h
-    rgb2bgr.c
-    rgb2bgr_test.cpp
+    #rgb2bgr.h
+    #rgb2bgr.c
+    #rgb2bgr_test.cpp
 
     # threshold.h
     # threshold.c
@@ -33,9 +33,9 @@ add_executable(testbed
     #histogram.c
     #histogram_test.cpp
 
-    # flip.h
-    # flip.c
-    # flip_test.cpp
+    flip.h
+    flip.c
+    flip_test.cpp
 
     # boxfilter.h
     # boxfilter.c

@@ -19,6 +19,7 @@ adb pull $DST_DIR/sky_rgb_inplace_naive.bmp ./
 adb pull $DST_DIR/sky_rgb_inpalce_naive2.bmp ./
 adb pull $DST_DIR/sky_rgb_inplace_asm.bmp ./
 adb pull $DST_DIR/sky_rgb_inplace_opencv.bmp ./
+adb pull $DST_DIR/sky_rgb_inplace_opencv_trick.bmp ./
 
 # adb pull /data/pixel/sky_thresh60_naive.png ./
 # adb pull /data/pixel/sky_thresh60_opencv.png ./

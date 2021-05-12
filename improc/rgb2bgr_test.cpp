@@ -1,14 +1,17 @@
 #include <stdio.h>
+
+#ifdef __ARM_NEON
 #include "common/pixel_cpu_affinity.h"
+#endif
 #include "common/pixel_benchmark.h"
 #include "common/pixel_log.h"
-#include "common/pixel_cpu_affinity.h"
 
 #include <opencv2/opencv.hpp>
 
 #include "rgb2bgr.h"
 
 int main() {
+#ifdef __ARM_NEON
     size_t mask = 0;
     for (int i = 0; i < 8; ++i) {
       if (i >= 5) {
@@ -16,6 +19,7 @@ int main() {
       }
     }
     int ret = set_sched_affinity(mask);
+#endif
 
     cv::Mat image = cv::imread("sky.jpg");
     cv::Size size = image.size();
@@ -69,7 +73,7 @@ int main() {
     cv::imwrite("sky_rgb_opencv.bmp", mat_opencv);
 
     // ---------
-    double t_cost6, t_cost7, t_cost8, t_cost9;
+    double t_cost6, t_cost7, t_cost8, t_cost9, t_cost10;
     cv::Mat image_shadow6 = image.clone();
     cv::Mat image_shadow7 = image.clone();
     cv::Mat image_shadow8 = image.clone();
@@ -106,15 +110,24 @@ int main() {
     t_cost9 = pixel_get_current_time() - t_start;
     PIXEL_LOGD("rgb2bgr_inplace, opencv cost %.4lf ms", t_cost9);
 
+    t_start = pixel_get_current_time();
+    cv::Mat image_shadow10 = image_shadow9;
+    cv::cvtColor(image_shadow9, image_shadow10, cv::COLOR_BGR2RGB);
+    t_cost10 = pixel_get_current_time() - t_start;
+    PIXEL_LOGD("rgb2bgr_inplace, opencv trick cost %.4lf ms", t_cost10);
+
     cv::imwrite("sky_rgb_inplace_naive.bmp", image_shadow6);
     cv::imwrite("sky_rgb_inpalce_naive2.bmp", image_shadow7);
     cv::imwrite("sky_rgb_inplace_asm.bmp", image_shadow8);
     cv::imwrite("sky_rgb_inplace_opencv.bmp", image_shadow9);
+    cv::imwrite("sky_rgb_inplace_opencv_trick.bmp", image_shadow10);
 
     return 0;
 }
 
 
+// 最初用来探索着写 arm neon 汇编代码的 snippet
+#ifdef __ARM_NEON
 
 #include <arm_neon.h>
 #include <stdio.h>
@@ -179,3 +192,5 @@ void swap_u8() {
     free(src);
     free(dst);
 }
+
+#endif
