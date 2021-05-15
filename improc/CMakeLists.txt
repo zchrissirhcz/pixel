@@ -15,6 +15,9 @@ message(STATUS "--- CMAKE_C_FLAGS are: ${CMAKE_C_FLAGS}")
 message(STATUS "--- CMAKE_CXX_FLAGS are: ${CMAKE_CXX_FLAGS}")
 
 add_executable(testbed
+    ${CMAKE_SOURCE_DIR}/../common/autotimer.h
+    ${CMAKE_SOURCE_DIR}/../common/autotimer.cpp
+
     # rgb2gray.h
     # rgb2gray.c
     # rgb2gray_test.cpp
