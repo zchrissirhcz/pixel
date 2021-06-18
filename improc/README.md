@@ -212,6 +212,8 @@ cv::cvtColor(image_copy, image, cv::COLOR_BGR2RGB);
 ```
 则**耗时从 14ms 减少到 不到 3ms。**
 
+Note: 在 OpenCL 编程中， `image2d_t` 和 `image3d_t` 类型，需要有 `__read_only` 和 `__write_only` 修饰（但不能全都有），这导致 `cvtColor()` 需要检查冲突。
+
 ### References
 
 - [性能优化篇（4）：NEON优化案例——图像颜色转换之RGB到BGR（aarch64版）](https://blog.csdn.net/wohenfanjian/article/details/103407259)
