@@ -498,7 +498,7 @@ TBD
 
 >2020年开始，新手机 CPU 几乎都是 armv8.2 架构，这个架构引入了新的 fp16 运算和 int8 dot 指令，优化得当就能大幅加速深度学习框架的推理效率。类似于 x86 CPU 的 AVX，不是全部 CPU 都支持，得考虑兼容性，做到老CPU上用老指令，新CPU用新指令。
 
-```
+```c++
 #if __ARM_NEON
     #if __aarch64__
         #if __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
