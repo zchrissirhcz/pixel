@@ -1,5 +1,5 @@
 #include "autotimer.h"
-#include <iostream>
+//#include <iostream>
 #if _WIN32
 #include <windows.h>
 #else
@@ -44,8 +44,9 @@ AutoTimer::AutoTimer(const std::string& name):
 
 AutoTimer::~AutoTimer()
 {
-    std::cout << mImpl->mName << ": took " << mImpl->GetElapsed()
-        << " secs" << std::endl;
+    // std::cout << mImpl->mName << ": took " << 
+    //     << " secs" << std::endl;
+    fprintf(stderr, "%s: took %lf secs\n", mImpl->GetElapsed());
     delete mImpl;
     mImpl = NULL;
 }
@@ -89,8 +90,9 @@ AutoTimer::AutoTimer(const std::string& name):
 
 AutoTimer::~AutoTimer()
 {
-    std::cout << mImpl->mName << ": took " << mImpl->GetElapsed()
-        << " ms" << std::endl;
+    // std::cout << mImpl->mName << ": took " << mImpl->GetElapsed()
+    //     << " ms" << std::endl;
+    fprintf(stderr, "%s: took %lf ms\n", mImpl->GetElapsed());
     delete mImpl;
     mImpl = NULL;
 }
