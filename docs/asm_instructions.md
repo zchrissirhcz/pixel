@@ -26,4 +26,5 @@ at&t: （x86，power，VAX等）
 
 更基础内容，需要看：
 -《ARM Developer Suite Assembler Guide》
+- 《ARM Assembly Language Fundamentals and Techniques》
 - https://developer.arm.com/documentation/dui0473/c/writing-arm-assembly-language
