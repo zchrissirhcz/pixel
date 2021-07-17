@@ -43,7 +43,26 @@ https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html：
 
 ### Condition Codes
 
-TODO: 确定有哪些汇编语句，会影响 Condition Codes
+所有的数据处理指令(data processing instruction)，如果带了“S”后缀，就会根据执行结果，更新CPSR中的ALU状态标志。
+
+CMP, CMN, TST, TEQ 这些指令不需要带后缀S，它们本身就是会更新flags的。
+
+CPSR寄存器包含了如下的ALU状态标志位：
+N    当操作的结果是Negative的时候，设置这一位
+Z    当操作的结果是Zero的时候，设置这一位
+C    当操作的结果有Carry的时候，设置这一位
+V    当操作的结果有oVerflow（溢出）的时候，设置这一位
+
+Carry位在这些时候才会设置：
+- 加法操作，结果超过 2^32
+- 减法操作，结果是正的
+- 作为移动或逻辑操作中，barrel shifter操作的结果
+
+Overflow位在这些时候才会设置：
+- 加法、减法、比较操作的结果，大于等于 2^31， 或小于 -2^31
+
+
+
 
 Condition Codes table:
 
