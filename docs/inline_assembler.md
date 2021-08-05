@@ -43,7 +43,31 @@ https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html：
 
 ### Condition Codes
 
-TODO: 确定有哪些汇编语句，会影响 Condition Codes
+CPSR (Current Program Status Register)
+>ARM v6/v7 maintains a status register called the CPSR (current program status register) that holds four status bits, negative (N), zero (Z), carry (C), and overflow (O). These bits can be used for conditional execution of subsequent instructions.
+
+(https://www.sciencedirect.com/topics/computer-science/current-program-status-register)
+
+所有的数据处理指令(data processing instruction)，如果带了“S”后缀，就会根据执行结果，更新CPSR中的ALU状态标志。
+
+CMP, CMN, TST, TEQ 这些指令不需要带后缀S，它们本身就是会更新flags的。
+
+CPSR寄存器包含了如下的ALU状态标志位：
+N    当操作的结果是Negative的时候，设置这一位
+Z    当操作的结果是Zero的时候，设置这一位
+C    当操作的结果有Carry的时候，设置这一位
+V    当操作的结果有oVerflow（溢出）的时候，设置这一位
+
+Carry位在这些时候才会设置：
+- 加法操作，结果超过 2^32
+- 减法操作，结果是正的
+- 作为移动或逻辑操作中，barrel shifter操作的结果
+
+Overflow位在这些时候才会设置：
+- 加法、减法、比较操作的结果，大于等于 2^31， 或小于 -2^31
+
+
+
 
 Condition Codes table:
 
@@ -65,3 +89,16 @@ Condition Codes table:
 | le      | z set, or n and v different  | Signed <=        |
 
 (Table 1.1 from "Embedded Systems - ARM Programming and Optimization")
+
+
+问题探讨：如果一个汇编指令修改了 CPSR， 但是 clobber 里没有写明 cc ， 并且 asm volatile 中的汇编指令也不依赖于 CPSR， 是否 OK？
+
+个人认为有影响，原因：
+- 上下文切换（进程线程切换）时，其他进程线程可能依赖于 CPSR
+- 中断
+（参考了 http://www.cxyzjd.com/article/xiaojsj111/14648233 ，但不完全认同）
+
+
+TODO: 如何检查 CPSR 中的 oVerflow 位？
+
+TODO：如果计算结果确实溢出了，能否影响到下一条指令？
