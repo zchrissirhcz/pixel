@@ -11,7 +11,7 @@
 
 ## Relu f32
 
-优化方法参考 MNN 作者姜小棠的博客 [SIMD优化之ARM纯汇编开发](https://blog.csdn.net/jxt1234and2010/article/details/104012746)，armv8汇编为自行实现。
+优化方法参考 MNN 作者姜霄棠的博客 [SIMD优化之ARM纯汇编开发](https://blog.csdn.net/jxt1234and2010/article/details/104012746)，armv8汇编为自行实现。
 
 核心实现代码实现在 [relu_layer.c](relu_layer.c)，性能测试代码在 [relu_layer_test.cpp](relu_layer_test.cpp)。
 
