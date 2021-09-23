@@ -33,3 +33,7 @@ __pycache__/
 #un-published file
 **/utils.cmake
 **/overlook.cmake
+
+# unittest build
+!tests/build/android-arm64-build.sh
+!tests/build/android-arm64-run.sh

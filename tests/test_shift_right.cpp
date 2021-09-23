@@ -28,8 +28,6 @@ TEST(shift_right, round_or_not)
 
     // unsigned char dump = std::round(255.5);
     // fprintf(stderr, "dump = %d\n", output); // 255
-
-    return 0;
 }
 
 
