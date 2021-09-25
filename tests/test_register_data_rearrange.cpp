@@ -158,6 +158,87 @@ TEST(register_data_rearrange, vtrn)
 TEST(register_data_rearrange, vzip)
 {
     // vzip_type: 将两个输入 vector 的元素通过交叉生成一个有两个 vector 的矩阵
+    int8x8_t v1 = { 1,  2,  3,  4,  5,  6,  7,  8};
+    int8x8_t v2 = {11, 12, 13, 14, 15, 16, 17, 18};
+    int8x8x2_t v_out = vzip_s8(v1, v2);
+    int8_t expected_out[2][8] = {
+        {1, 11, 2, 12, 3, 13, 4, 14},
+        {5, 15, 6, 16, 7, 17, 8, 18}
+    };
+
+    int8_t out[2][8];
+    vst1_s8(out[0], v_out.val[0]);
+    vst1_s8(out[1], v_out.val[1]);
+    for (int i=0; i<2; i++)
+    {
+        for (int j=0; j<8; j++)
+        {
+            ASSERT_EQ(expected_out[i][j], out[i][j]);
+        }
+    }
+}
+
+TEST(register_data_rearrange, vuzp)
+{
+    // 将两个输入 vector 的元素通过反交叉生成一个有两个 vector 的矩阵
+    // (通过这个可以实现 n-way 交织)
+    int8x8_t v1 = { 1,  2,  3,  4,  5,  6,  7,  8};
+    int8x8_t v2 = {11, 12, 13, 14, 15, 16, 17, 18};
+    int8x8x2_t v_out = vuzp_s8(v1, v2);
+    
+    int8_t expected_out[2][8] = {
+        {1, 3, 5, 7, 11, 13, 15, 17},
+        {2, 4, 6, 8, 12, 14, 16, 18}
+    };
+
+    int8_t out[2][8];
+    vst1_s8(out[0], v_out.val[0]);
+    vst1_s8(out[1], v_out.val[1]);
+
+    for (int i=0; i<2; i++)
+    {
+        for (int j=0; j<8; j++)
+        {
+            ASSERT_EQ(expected_out[i][j], out[i][j]);
+        }
+    }
+}
+
+TEST(register_data_rearrange, vcombine)
+{
+    int8x8_t v1 = { 1,  2,  3,  4,  5,  6,  7,  8};
+    int8x8_t v2 = {11, 12, 13, 14, 15, 16, 17, 18};
+    int8x16_t v_out = vcombine_s8(v1, v2);
+    int8_t expected_out[16] = {1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18};
+
+    int8_t out[16];
+    vst1q_s8(out, v_out);
+    for (int i=0; i<16; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+    }
+}
+
+TEST(register_data_rearrange, vbsl)
+{
+    // vbsl_type: 按位选择，参数为(mask, src1, src2).
+    // mask 的某个 bit 为 1， 则选择 src1 中对应的 bit; 为 0， 则选择 src2 中对应的 bit
+    // **注意** 是按 bit 取的， 而不是按照 一个byte 为1或0而取的
+    // 也就是说， mask里的一个元素，是有若干bits的，根据这些bits，是1则从src1取bit，是0则从src2取bit
+    // 也就是说很有可能分别从src1和src2的不同bit位取bit才得到结果，例如下面例子中最后一个maks元素
+    int8x8_t v1 = { 1,  2,  3,  4,  5,  6,  7,  8}; // 8的二进制: 00001000
+    int8x8_t v2 = {11, 12, 13, 14, 15, 16, 17, 18}; //18的二进制: 00010010
+    uint8x8_t v_mask = {0xFF, 0, 0xFF, 0, 0, 0, 0xFF, 0x0F}; //   00001111  => 00011000 => 24
+    int8x8_t v_out = vbsl_s8(v_mask, v1, v2);
+    
+    int8_t expected_out[8] = {1, 12, 3, 14, 15, 16, 7, 24};
+    int8_t out[8];
+    vst1_s8(out, v_out);
+    for (int i=0; i<8; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
 }
 
 int main(int argc, char* argv[])
