@@ -56,9 +56,19 @@ test_conditionals()
     adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
 }
 
-test_shift_right
-test_arithmetic
-test_load_store
-test_arrays
-test_max_and_min
-test_conditionals
+test_register_data_rearrange()
+{
+    DST_DIR=/data/local/tmp
+    EXE_FILE=test_register_data_rearrange
+
+    adb push $BUILD_DIR/$EXE_FILE $DST_DIR
+    adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
+}
+
+# test_shift_right
+# test_arithmetic
+# test_load_store
+# test_arrays
+# test_max_and_min
+# test_conditionals
+test_register_data_rearrange

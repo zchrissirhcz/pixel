@@ -5,7 +5,8 @@
 // add: vaddq_f32 or vaddq_f64
 TEST(neon, add)
 {
-    float32x4_t v1 = { 1.0, 2.0, 3.0, 4.0 }, v2 = { 1.0, 1.0, 1.0, 1.0 };
+    float32x4_t v1 = { 1.0, 2.0, 3.0, 4.0 };
+    float32x4_t v2 = { 1.0, 1.0, 1.0, 1.0 };
     float32x4_t v_sum = vaddq_f32(v1, v2);
     float expected_sum[4] = { 2.0, 3.0, 4.0, 5.0 };
 
@@ -20,7 +21,8 @@ TEST(neon, add)
 // multiply: vmulq_f32 or vmulq_f64
 TEST(neon, multiply)
 {
-    float32x4_t v1 = { 1.0, 2.0, 3.0, 4.0 }, v2 = { 1.0, 1.0, 1.0, 1.0 };
+    float32x4_t v1 = { 1.0, 2.0, 3.0, 4.0 };
+    float32x4_t v2 = { 1.0, 1.0, 1.0, 1.0 };
     float32x4_t v_prod = vmulq_f32(v1, v2);
     float expected_prod[4] = { 1.0, 2.0, 3.0, 4.0 };
 
@@ -35,7 +37,9 @@ TEST(neon, multiply)
 // multiply and accumulate: vmlaq_f32
 TEST(neon, multiply_and_accumulate)
 {
-    float32x4_t v1 = { 1.0, 2.0, 3.0, 4.0 }, v2 = { 2.0, 2.0, 2.0, 2.0 }, v3 = { 3.0, 3.0, 3.0, 3.0 };
+    float32x4_t v1 = { 1.0, 2.0, 3.0, 4.0 };
+    float32x4_t v2 = { 2.0, 2.0, 2.0, 2.0 };
+    float32x4_t v3 = { 3.0, 3.0, 3.0, 3.0 };
     float32x4_t v_acc = vmlaq_f32(v3, v1, v2);  // acc = v3 + v1 * v2
     float expected_acc[4] = { 5.0, 7.0, 9.0, 11.0 };
 
@@ -66,7 +70,8 @@ TEST(neon, multipy_by_scalar)
 // multiply by a scalar and accumulate: vmlaq_n_f32 or vmlaq_n_f64
 TEST(neon, multiply_by_scalar_and_accumulate)
 {
-    float32x4_t v1 = { 1.0, 2.0, 3.0, 4.0 }, v2 = { 1.0, 1.0, 1.0, 1.0 };
+    float32x4_t v1 = { 1.0, 2.0, 3.0, 4.0 };
+    float32x4_t v2 = { 1.0, 1.0, 1.0, 1.0 };
     float32_t s = 3.0;
     float32x4_t v_acc = vmlaq_n_f32(v1, v2, s);
     float expected_acc[4] = { 4.0, 5.0, 6.0, 7.0 };
