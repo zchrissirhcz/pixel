@@ -37,3 +37,6 @@ __pycache__/
 # unittest build
 !tests/build/android-arm64-build.sh
 !tests/build/android-arm64-run.sh
+
+# 2.4MB, too big
+tests/arm_neon.h 

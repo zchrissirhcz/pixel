@@ -65,10 +65,20 @@ test_register_data_rearrange()
     adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
 }
 
+test_add()
+{
+    DST_DIR=/data/local/tmp
+    EXE_FILE=test_add
+
+    adb push $BUILD_DIR/$EXE_FILE $DST_DIR
+    adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
+}
+
 # test_shift_right
 # test_arithmetic
 # test_load_store
 # test_arrays
 # test_max_and_min
 # test_conditionals
-test_register_data_rearrange
+# test_register_data_rearrange
+test_add
