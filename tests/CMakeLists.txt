@@ -35,5 +35,8 @@ pixel_add_test(load_store)
 pixel_add_test(arrays)
 pixel_add_test(max_and_min)
 pixel_add_test(conditionals)
+
+# based on https://github.com/rogerou/Arm-neon-intrinsics
 pixel_add_test(register_data_rearrange)
 pixel_add_test(add)
+pixel_add_test(sub)
