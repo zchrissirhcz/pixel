@@ -81,4 +81,5 @@ test_add()
 # test_max_and_min
 # test_conditionals
 # test_register_data_rearrange
-test_add
+#test_add
+test_shift_right
