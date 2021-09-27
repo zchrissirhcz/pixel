@@ -102,12 +102,32 @@ TEST(sub, vqsub)
 
 TEST(sub, vhsub)
 {
-    //TODO
+    int8x8_t v1 = vdup_n_u8(120);
+    int8x8_t v2 = {1, 2, 3, 4, 120, 121, 122, 123};
+    int8x8_t v_out = vhsub_s8(v1, v2);
+    int8_t expected_out[8] = {59, 59, 58, 58, 0, 0, -1, -1};
+
+    int8_t out[8];
+    vst1_s8(out, v_out);
+    for (int i=0; i<8; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+    }
 }
 
 TEST(sub, vrsubhn)
 {
-    //TODO
+    int16x8_t v1 = vdupq_n_u16(850);
+    int16x8_t v2 = {200, 400, 600, 800, 1000, 1200, 1400, 1600};
+    int8x8_t v_out = vrsubhn_s16(v1, v2);
+    int8_t expected_out[8] = {3, 2, 1, 0, -1, -1, -2, -3};
+
+    int8_t out[8];
+    vst1_s8(out, v_out);
+    for (int i=0; i<8; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+    }
 }
 
 int main(int argc, char* argv[])
