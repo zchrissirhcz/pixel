@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 
-project(neon_test)
+project(pixel_neon)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -20,12 +20,27 @@ elseif (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
   endif()
 endif()
 
+add_library(pixel_neon
+  pixel_neon.hpp
+  vadd.hpp
+  vadd.cpp
+
+  vaddl.hpp
+  vaddl.cpp
+
+  vaddw.hpp
+  vaddw.cpp
+
+  vdup_n.hpp
+  vdup_n.cpp
+)
+
 find_package(GTest REQUIRED)
 
 enable_testing() # `ctest` or `make test` or `ctest -VV` or `ctest --output-on-failure`
 macro(pixel_add_test name)
     add_executable(test_${name} test_${name}.cpp)
-    target_link_libraries(test_${name} PRIVATE ${ARGN} GTest::gtest)
+    target_link_libraries(test_${name} PRIVATE pixel_neon ${ARGN} GTest::gtest)
     gtest_add_tests(TARGET test_${name})
 endmacro()
 

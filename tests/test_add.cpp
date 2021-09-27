@@ -2,22 +2,34 @@
 
 #include <arm_neon.h>
 
+#include "pixel_neon.hpp"
+#include "vadd.hpp"
+#include "vaddl.hpp"
+#include "vaddw.hpp"
+#include "vdup_n.hpp"
+
 // vadd_type
 // vaddq_type
 TEST(add, vadd_s8)
 {
     // 对应位元素相加: ri = ai + bi
     // 对于 signed 类型， 例如s8, 超过127后， 要减去256 从而得到正确结果
+    int8_t input1[8] = {1, 2, 3, 4, 5, 6, 7, 8};
     int8x8_t v1 = {1, 2, 3, 4, 5, 6, 7, 8};
     int8x8_t v2 = {10, 20, 30, 40, 50, 60, 70, 127};
     int8x8_t v_out = vadd_s8(v1, v2);
     int8_t expected_out[8] = {11, 22, 33, 44, 55, 66, 77, -121};
+
+    pxl::int8x8_t pv1 = {1, 2, 3, 4, 5, 6, 7, 8};
+    pxl::int8x8_t pv2 = {10, 20, 30, 40, 50, 60, 70, 127};
+    pxl::int8x8_t pv_out = pxl::vadd_s8(pv1, pv2);
 
     int8_t out[8];
     vst1_s8(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
     }
 }
 
@@ -29,11 +41,16 @@ TEST(add, vaddl_u8)
     uint16x8_t v_out = vaddl_u8(v1, v2);
     uint16_t expected_out[8] = {250, 251, 252, 253, 254, 255, 256, 257};
 
+    pxl::uint8x8_t pv1 = {200, 200, 200, 200, 200, 200, 200, 200};
+    pxl::uint8x8_t pv2 = { 50,  51,  52,  53,  54,  55,  56,  57};
+    pxl::uint16x8_t pv_out = pxl::vaddl_u8(pv1, pv2);
+
     uint16_t out[8];
     vst1q_u16(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
     }
 }
 
@@ -46,11 +63,16 @@ TEST(add, vaddw_s8)
     int16x8_t v_out = vaddw_s8(v1, v2);
     int16_t expected_out[8] = {301, 302, 303, 304, 305, 306, 307, 308};
 
+    pxl::int16x8_t pv1 = pxl::vdupq_n_s16(300);
+    pxl::int8x8_t pv2 = {1, 2, 3, 4, 5, 6, 7, 8};
+    pxl::int16x8_t pv_out = pxl::vaddw_s8(pv1, pv2);
+
     int16_t out[8];
     vst1q_s16(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
     }
 }
 
