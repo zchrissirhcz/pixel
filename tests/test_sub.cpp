@@ -2,6 +2,8 @@
 
 #include <arm_neon.h>
 
+#include "pixel_neon.hpp"
+
 TEST(sub, vsub)
 {
     // vsub_type: ri = ai - bi
@@ -9,6 +11,8 @@ TEST(sub, vsub)
     uint8x8_t v2 = vdup_n_u8(10);
     uint8x8_t v_out = vsub_u8(v1, v2);
     uint8_t expected_out[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+
+    
     
     uint8_t out[8];
     vst1_u8(out, v_out);

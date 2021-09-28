@@ -3,10 +3,10 @@
 #include <arm_neon.h>
 
 #include "pixel_neon.hpp"
-#include "vadd.hpp"
-#include "vaddl.hpp"
-#include "vaddw.hpp"
-#include "vdup_n.hpp"
+
+//----------------------------------------------------------------------
+// add
+//----------------------------------------------------------------------
 
 // vadd_type
 // vaddq_type
@@ -114,12 +114,17 @@ TEST(add, vaddhn_u16)
     uint8x8_t v_out = vaddhn_u16(v1, v2);
     uint8_t expected_out[8] = {0, 0, 0, 0, 0, 1, 1, 2};
 
+    pxl::uint16x8_t pv1 = pxl::vdupq_n_u16(250);
+    pxl::uint16x8_t pv2 = {1, 2, 3, 4, 5, 6, 7, 264};
+    pxl::uint8x8_t pv_out = pxl::vaddhn_u16(pv1, pv2);
+
     uint8_t out[8];
     vst1_u8(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
         //fprintf(stderr, "%d, ", out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
     }
     //fprintf(stderr, "\n");
 }
@@ -133,11 +138,16 @@ TEST(add, vqadd)
     uint8x8_t v_out = vqadd_u8(v1, v2);
     uint8_t expected_out[8] = {251, 252, 253, 254, 255, 255, 255, 255};
 
+    pxl::uint8x8_t pv1 = pxl::vdup_n_u8(250);
+    pxl::uint8x8_t pv2 = {1, 2, 3, 4, 5, 6, 7, 8};
+    pxl::uint8x8_t pv_out = pxl::vqadd_u8(pv1, pv2);
+
     uint8_t out[8];
     vst1_u8(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
     }
 }
 
@@ -151,81 +161,47 @@ TEST(add, vhadd)
     int8x8_t v_out = vhadd_s8(v1, v2);
     int8_t expected_out[8] = {1, 2, 4, 5, 7, 8, 10, -4};
 
+    pxl::int8x8_t pv1 =  {1, 2, 3, 4, 5,  6,  7,   8};
+    pxl::int8x8_t pv2 = {1, 3, 5, 7, 9, 11, 13, -15};
+    pxl::int8x8_t pv_out = pxl::vhadd_s8(pv1, pv2);
+
     int8_t out[8];
     vst1_s8(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, ">>> %d, ", pv_out[i]);
     }
+    //fprintf(stderr, "\n");
+    int a = -7;
+    // fprintf(stderr, "-7/2=%d\n", -7/2); // -3
+    // fprintf(stderr, "-7>>1=%d\n", (-7>>1)); // -3
+    // fprintf(stderr, "(8-15)>>1=%d\n", ( (-7)>>1)); // -4
 }
 
 TEST(add, vrhadd)
 {
     // vrhadd_type: 相加结果再除2(四舍五入)。ri = (ai + bi + 1) >> 1
     // 结果也是向下取整。
-    int8x8_t v1 = {1, 2, 3, 4, 5,  6,  7,   1};
-    int8x8_t v2 = {1, 3, 5, 7, 9, 11, 13, -15};
+    int8x8_t v1 = {120, 2, 3, 4, 5,  6,  7,   1};
+    int8x8_t v2 = {121, 3, 5, 7, 9, 11, 13, -15};
     int8x8_t v_out = vrhadd_s8(v1, v2);
-    int8_t expected_out[8] = {1, 3, 4, 6, 7, 9, 10, -7};
+    int8_t expected_out[8] = {121, 3, 4, 6, 7, 9, 10, -7};
+
+    pxl::int8x8_t pv1 =  {120, 2, 3, 4, 5,  6,  7,   1};
+    pxl::int8x8_t pv2 = {121, 3, 5, 7, 9, 11, 13, -15};
+    pxl::int8x8_t pv_out = pxl::vrhadd_s8(pv1, pv2);
 
     int8_t out[8];
     vst1_s8(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
     }
 }
 
-// r = vpadd(a, b)
-TEST(add, vpadd)
-{
-    // vpadd_type: 两个输入向量拼接后，拼接向量里每两个相邻元素作为pair，每个pair相加作为结果向量的元素
-    int8x8_t v1 = {1, 2, 3, 4, 5, 6, 7, 8};
-    int8x8_t v2 = {11, 12, 13, 14, 15, 16, 17, 18};
-    int8x8_t v_out = vpadd_s8(v1, v2);
-    int8_t expected_out[8] = {3, 7, 11, 15, 23, 27, 31, 35};
-
-    int8_t out[8];
-    vst1_s8(out, v_out);
-    for (int i=0; i<8; i++)
-    {
-        //fprintf(stderr, "%d, ", out[i]);
-        ASSERT_EQ(expected_out[i], out[i]);
-    }
-}
-
-// r = vadd(a)
-TEST(add, vpaddl)
-{
-    // vadd_type: 输入向量a的每两个相邻（不重叠）元素作为pair，每个pair相加作为结果元素，并且类型拓宽 。
-    uint8x8_t v1 = {255, 1, 255, 2, 255, 3, 255, 4};
-    uint16x4_t v_out = vpaddl_u8(v1);
-    uint16_t expected_out[4] = {256, 257, 258, 259};
-
-    uint16_t out[4];
-    vst1_u16(out, v_out);
-    for (int i=0; i<4; i++)
-    {
-        ASSERT_EQ(expected_out[i], out[i]);
-    }
-}
-
-TEST(add, vpadal)
-{
-    // vpadal: Signed Add and Accumulate Long Pairwise
-    // r0 = a0 + (b0 + b1), ..., r3 = a3 + (b6 + b7);
-    uint16x4_t v1 = {100, 200, 300, 400};
-    uint8x8_t v2 = {1, 2, 3, 4, 5, 6, 7, 8};
-    uint16x4_t v_out = vpadal_u8(v1, v2);
-    uint16_t expected_out[4] = {103, 207, 311, 415};
-    
-    uint16_t out[4];
-    vst1_u16(out, v_out);
-    for (int i=0; i<4; i++)
-    {
-        ASSERT_EQ(expected_out[i], out[i]);
-    }
-}
 
 int main(int argc, char* argv[])
 {

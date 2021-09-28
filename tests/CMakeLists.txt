@@ -31,6 +31,18 @@ add_library(pixel_neon
   vaddw.hpp
   vaddw.cpp
 
+  vaddhn.hpp
+  vaddhn.cpp
+
+  vqadd.hpp
+  vqadd.cpp
+
+  vhadd.hpp
+  vhadd.cpp
+
+  vrhadd.hpp
+  vrhadd.cpp
+
   vdup_n.hpp
   vdup_n.cpp
 )
@@ -44,14 +56,16 @@ macro(pixel_add_test name)
     gtest_add_tests(TARGET test_${name})
 endmacro()
 
-pixel_add_test(shift_right)
-pixel_add_test(arithmetic)
-pixel_add_test(load_store)
-pixel_add_test(arrays)
-pixel_add_test(max_and_min)
-pixel_add_test(conditionals)
+
+# pixel_add_test(arithmetic)
+# pixel_add_test(load_store)
+# pixel_add_test(arrays)
+# pixel_add_test(max_and_min)
+# pixel_add_test(conditionals)
 
 # based on https://github.com/rogerou/Arm-neon-intrinsics
 pixel_add_test(register_data_rearrange)
 pixel_add_test(add)
 pixel_add_test(sub)
+
+pixel_add_test(shift_right)
