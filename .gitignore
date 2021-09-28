@@ -39,4 +39,4 @@ __pycache__/
 !tests/build/android-arm64-run.sh
 
 # 2.4MB, too big
-tests/arm_neon.h 
+neon_ref/arm_neon.h 

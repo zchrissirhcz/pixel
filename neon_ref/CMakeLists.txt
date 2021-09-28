@@ -21,37 +21,46 @@ elseif (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
 endif()
 
 add_library(pixel_neon
+  pixel_neon_base.hpp
   pixel_neon.hpp
-  vadd.hpp
-  vadd.cpp
 
-  vaddl.hpp
-  vaddl.cpp
+  arithmetic/vadd.hpp
+  arithmetic/vadd.cpp
 
-  vaddw.hpp
-  vaddw.cpp
+  arithmetic/vaddl.hpp
+  arithmetic/vaddl.cpp
 
-  vaddhn.hpp
-  vaddhn.cpp
+  arithmetic/vaddw.hpp
+  arithmetic/vaddw.cpp
 
-  vqadd.hpp
-  vqadd.cpp
+  arithmetic/vaddhn.hpp
+  arithmetic/vaddhn.cpp
 
-  vhadd.hpp
-  vhadd.cpp
+  arithmetic/vqadd.hpp
+  arithmetic/vqadd.cpp
 
-  vrhadd.hpp
-  vrhadd.cpp
+  arithmetic/vhadd.hpp
+  arithmetic/vhadd.cpp
 
-  vdup_n.hpp
-  vdup_n.cpp
+  arithmetic/vrhadd.hpp
+  arithmetic/vrhadd.cpp
+
+  misc/vdup_n.hpp
+  misc/vdup_n.cpp
+)
+
+target_include_directories(pixel_neon PUBLIC
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/arithmetic
+  ${CMAKE_SOURCE_DIR}/data_processing
+  ${CMAKE_SOURCE_DIR}/misc
 )
 
 find_package(GTest REQUIRED)
 
 enable_testing() # `ctest` or `make test` or `ctest -VV` or `ctest --output-on-failure`
 macro(pixel_add_test name)
-    add_executable(test_${name} test_${name}.cpp)
+    add_executable(test_${name} tests/test_${name}.cpp)
     target_link_libraries(test_${name} PRIVATE pixel_neon ${ARGN} GTest::gtest)
     gtest_add_tests(TARGET test_${name})
 endmacro()
