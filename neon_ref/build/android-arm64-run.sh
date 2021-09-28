@@ -74,6 +74,24 @@ test_add()
     adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
 }
 
+test_add()
+{
+    DST_DIR=/data/local/tmp
+    EXE_FILE=test_sub
+
+    adb push $BUILD_DIR/$EXE_FILE $DST_DIR
+    adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
+}
+
+test_sub()
+{
+    DST_DIR=/data/local/tmp
+    EXE_FILE=test_sub
+
+    adb push $BUILD_DIR/$EXE_FILE $DST_DIR
+    adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
+}
+
 # test_shift_right
 # test_arithmetic
 # test_load_store
@@ -81,5 +99,8 @@ test_add()
 # test_max_and_min
 # test_conditionals
 # test_register_data_rearrange
-test_add
+
 #test_shift_right
+
+#test_add
+test_sub

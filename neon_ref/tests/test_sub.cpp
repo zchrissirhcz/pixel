@@ -12,13 +12,16 @@ TEST(sub, vsub)
     uint8x8_t v_out = vsub_u8(v1, v2);
     uint8_t expected_out[8] = {1, 2, 3, 4, 5, 6, 7, 8};
 
-    
+    pxl::uint8x8_t pv1 = {11, 12, 13, 14, 15, 16, 17, 18};
+    pxl::uint8x8_t pv2 = pxl::vdup_n_u8(10);
+    pxl::uint8x8_t pv_out = pxl::vsub_u8(pv1, pv2);
     
     uint8_t out[8];
     vst1_u8(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
     }
 }
 
@@ -29,12 +32,17 @@ TEST(sub, vsubl)
     int8x8_t v2 = {0, 1, 2, 3, -1, -2, -3, -4};
     int16x8_t v_out = vsubl_s8(v1, v2);
     int16_t expected_out[8] = {127, 126, 125, 124, 128, 129, 130, 131};
-    
+
+    pxl::int8x8_t pv1 = pxl::vdup_n_s8(127);
+    pxl::int8x8_t pv2 = {0, 1, 2, 3, -1, -2, -3, -4};
+    pxl::int16x8_t pv_out = pxl::vsubl_s8(pv1, pv2);
+
     int16_t out[8];
     vst1q_s16(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
     }
 }
 

@@ -8,4 +8,7 @@
 #include "arithmetic/vhadd.hpp"
 #include "arithmetic/vrhadd.hpp"
 
+#include "arithmetic/vsub.hpp"
+#include "arithmetic/vsubl.hpp"
+
 #include "misc/vdup_n.hpp"

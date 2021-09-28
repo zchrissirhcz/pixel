@@ -45,6 +45,12 @@ add_library(pixel_neon
   arithmetic/vrhadd.hpp
   arithmetic/vrhadd.cpp
 
+  arithmetic/vsub.hpp
+  arithmetic/vsub.cpp
+
+  arithmetic/vsubl.hpp
+  arithmetic/vsubl.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
