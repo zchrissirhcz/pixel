@@ -14,5 +14,6 @@
 #include "arithmetic/vsubhn.hpp"
 #include "arithmetic/vqsub.hpp"
 #include "arithmetic/vhsub.hpp"
+#include "arithmetic/vrsubhn.hpp"
 
 #include "misc/vdup_n.hpp"

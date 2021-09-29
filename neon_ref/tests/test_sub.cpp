@@ -165,17 +165,25 @@ TEST(sub, vhsub)
 
 TEST(sub, vrsubhn)
 {
-    int16x8_t v1 = vdupq_n_u16(850);
+    int16x8_t v1 = vdupq_n_s16(850);
     int16x8_t v2 = {200, 400, 600, 800, 1000, 1200, 1400, 1600};
     int8x8_t v_out = vrsubhn_s16(v1, v2);
     int8_t expected_out[8] = {3, 2, 1, 0, -1, -1, -2, -3};
+
+    pxl::int16x8_t pv1 = pxl::vdupq_n_s16(850);
+    pxl::int16x8_t pv2 = {200, 400, 600, 800, 1000, 1200, 1400, 1600};
+    pxl::int8x8_t pv_out = pxl::vrsubhn_s16(pv1, pv2);
 
     int8_t out[8];
     vst1_s8(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
+        // fprintf(stderr, "[%d, ", out[i]);
+        // fprintf(stderr, "%d, ]", pv_out[i]);
     }
+    //fprintf(stderr, "\n");
 }
 
 int main(int argc, char* argv[])
