@@ -10,5 +10,9 @@
 
 #include "arithmetic/vsub.hpp"
 #include "arithmetic/vsubl.hpp"
+#include "arithmetic/vsubw.hpp"
+#include "arithmetic/vsubhn.hpp"
+#include "arithmetic/vqsub.hpp"
+#include "arithmetic/vhsub.hpp"
 
 #include "misc/vdup_n.hpp"

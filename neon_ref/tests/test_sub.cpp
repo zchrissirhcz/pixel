@@ -54,11 +54,16 @@ TEST(sub, vsubw)
     int16x8_t v_out = vsubw_s8(v1, v2);
     int16_t expected_out[8] = {100, 100, 100, 100, 100, 100, 100, 100};
 
+    pxl::int16x8_t pv1 = {101, 102, 103, 104, 105, 106, 107, 108};
+    pxl::int8x8_t pv2 = {1, 2, 3, 4, 5, 6, 7, 8};
+    pxl::int16x8_t pv_out = vsubw_s8(pv1, pv2);
+
     int16_t out[8];
     vst1q_s16(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
     }
 }
 
@@ -66,17 +71,24 @@ TEST(sub, vsubhn)
 {
     // vsubhn_type: sub, half narrow
     // r = vsubhn_type(a, b), a和b是宽类型，r是(a-b)右移n/2位后的结果（高n/2位）
-    int16x8_t v1 = {131, 131, 103, 104, 105, 106, 107, 108};
+    int16x8_t v1 = {100, 200, 300, 400, 500, 600, 700, 800};
     int16x8_t v2 = {1, 2, 3, 4, 5, 6, 7, 8};
     int8x8_t v_out = vsubhn_s16(v1, v2);
-    int8_t expected_out[8] = {3, 2, 0, 0, 0, 0, 0, 0};
+    int8_t expected_out[8] = {0, 0, 1, 1, 1, 2, 2, 3};
+
+    pxl::int16x8_t pv1 = {100, 200, 300, 400, 500, 600, 700, 800};
+    pxl::int16x8_t pv2 = {1, 2, 3, 4, 5, 6, 7, 8};
+    pxl::int8x8_t pv_out = pxl::vsubhn_s16(pv1, pv2);
 
     int8_t out[8];
     vst1_s8(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
     }
+    //fprintf(stderr, "\n");
 }
 
 TEST(sub, vqsub)
@@ -89,42 +101,66 @@ TEST(sub, vqsub)
         uint8x8_t v_out = vqsub_u8(v1, v2);
         uint8_t expected_out[8] = {249, 248, 247, 246, 0, 0, 0, 0};
 
+        pxl::uint8x8_t pv1 = pxl::vdup_n_u8(250);
+        pxl::uint8x8_t pv2 = {1, 2, 3, 4, 251, 252, 253, 254};
+        pxl::uint8x8_t pv_out = pxl::vqsub_u8(pv1, pv2);
+
         uint8_t out[8];
         vst1_u8(out, v_out);
         for (int i=0; i<8; i++)
         {
             ASSERT_EQ(expected_out[i], out[i]);
+            ASSERT_EQ(pv_out[i], out[i]);
+            // fprintf(stderr, "[%d, ", out[i]);
+            // fprintf(stderr, "%d, ]", pv_out[i]);
         }
+        //fprintf(stderr, "\n");
     }
 
     {
-        int8x8_t v1 = vdup_n_u8(120);
+        int8x8_t v1 = vdup_n_s8(120);
         int8x8_t v2 = {-11, 2, 3, 4, 121, 122, 123, 124};
-        int8x8_t v_out = vqsub_u8(v1, v2);
-        int8_t expected_out[8] = {127, 118, 117, 116, 0, 0, 0, 0};
+        int8x8_t v_out = vqsub_s8(v1, v2);
+        int8_t expected_out[8] = {127, 118, 117, 116, -1, -2, -3, -4};
+
+        pxl::int8x8_t pv1 = pxl::vdup_n_s8(120);
+        pxl::int8x8_t pv2 = {-11, 2, 3, 4, 121, 122, 123, 124};
+        pxl::int8x8_t pv_out = pxl::vqsub_s8(pv1, pv2);
 
         int8_t out[8];
         vst1_s8(out, v_out);
         for (int i=0; i<8; i++)
         {
             ASSERT_EQ(expected_out[i], out[i]);
+            ASSERT_EQ(pv_out[i], out[i]);
+            // fprintf(stderr, "[%d, ", out[i]);
+            // fprintf(stderr, "%d, ]", pv_out[i]);
         }
+        //fprintf(stderr, "\n");
     }
 }
 
 TEST(sub, vhsub)
 {
-    int8x8_t v1 = vdup_n_u8(120);
+    int8x8_t v1 = vdup_n_s8(120);
     int8x8_t v2 = {1, 2, 3, 4, 120, 121, 122, 123};
     int8x8_t v_out = vhsub_s8(v1, v2);
-    int8_t expected_out[8] = {59, 59, 58, 58, 0, 0, -1, -1};
+    int8_t expected_out[8] = {59, 59, 58, 58, 0, -1, -1, -2};
+
+    pxl::int8x8_t pv1 = pxl::vdup_n_s8(120);
+    pxl::int8x8_t pv2 = {1, 2, 3, 4, 120, 121, 122, 123};
+    pxl::int8x8_t pv_out = pxl::vhsub_s8(pv1, pv2);
 
     int8_t out[8];
     vst1_s8(out, v_out);
     for (int i=0; i<8; i++)
     {
         ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
+        // fprintf(stderr, "[%d, ", out[i]);
+        // fprintf(stderr, "%d, ]", pv_out[i]);
     }
+    //fprintf(stderr, "\n");
 }
 
 TEST(sub, vrsubhn)
