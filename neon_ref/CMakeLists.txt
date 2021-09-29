@@ -68,6 +68,12 @@ add_library(pixel_neon
   arithmetic/vrsubhn.hpp
   arithmetic/vrsubhn.cpp
 
+  multiply/vmul.hpp
+  multiply/vmul.cpp
+
+  multiply/vmul_n.hpp
+  multiply/vmul_n.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
@@ -99,5 +105,6 @@ endmacro()
 pixel_add_test(register_data_rearrange)
 pixel_add_test(add)
 pixel_add_test(sub)
+pixel_add_test(mul)
 
 pixel_add_test(shift_right)

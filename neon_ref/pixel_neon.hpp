@@ -16,4 +16,7 @@
 #include "arithmetic/vhsub.hpp"
 #include "arithmetic/vrsubhn.hpp"
 
+#include "multiply/vmul.hpp"
+#include "multiply/vmul_n.hpp"
+
 #include "misc/vdup_n.hpp"

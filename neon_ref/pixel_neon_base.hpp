@@ -4,6 +4,9 @@
 #include <array>
 #include <stdint.h>
 
+typedef float float32_t;
+typedef double float64_t;
+
 namespace pxl {
 
 template<class T, size_t N>
