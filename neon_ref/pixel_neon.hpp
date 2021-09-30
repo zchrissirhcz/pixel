@@ -21,5 +21,6 @@
 #include "multiply/vmul_lane.hpp"
 #include "multiply/vmull.hpp"
 #include "multiply/vmull_n.hpp"
+#include "multiply/vmull_lane.hpp"
 
 #include "misc/vdup_n.hpp"

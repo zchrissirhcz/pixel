@@ -109,6 +109,31 @@ TEST(mul, vmull_n)
     }
 }
 
+TEST(mul, vmull_lane)
+{
+    const int lane = 2;
+#if __ARM_NEON
+    int16x4_t v1 = {1, 3, 5, 7};
+    int16x4_t v2 = {10000, 20000, 20500, 30000};
+    int32x4_t v_out = vmull_lane_s16(v1, v2, lane);
+#else
+    pxl::int16x4_t v1 = {1, 3, 5, 7};
+    pxl::int16x4_t v2 = {10000, 20000, 20500, 30000};
+    pxl::int32x4_t v_out = pxl::vmull_lane_s16(v1, v2, lane);
+#endif
+    int32_t expected_out[4] = {20500, 61500, 102500, 143500};
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+        //ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
