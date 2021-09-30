@@ -90,6 +90,25 @@ TEST(mul, vmull)
     //fprintf(stderr, "\n");
 }
 
+TEST(mul, vmull_n)
+{
+    int16x4_t v1 = {1, 3, 5, 7};
+    int16_t s = 10000;
+    int32x4_t v_out = vmull_n_s16(v1, s);
+    int32_t expected_out[4] = {10000, 30000, 50000, 70000};
+
+    pxl::int16x4_t pv1 = {1, 3, 5, 7};
+    pxl::int32x4_t pv_out = pxl::vmull_n_s16(pv1, s);
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
+    }
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);

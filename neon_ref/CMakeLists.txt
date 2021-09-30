@@ -80,6 +80,9 @@ add_library(pixel_neon
   multiply/vmull.hpp
   multiply/vmull.cpp
 
+  multiply/vmull_n.hpp
+  multiply/vmull_n.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )

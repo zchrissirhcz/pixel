@@ -13,9 +13,11 @@ otherwise it will cause conflicts of macros (neon_neon.h) and functions(pixel_ne
 
 ## References
 
-- ARM DEN0018A (NEON Programmer's Guide), Appendix D。
+- ARM DEN0018A (NEON Programmer's Guide), Appendix D
 
 - https://github.com/thenifty/neon-guide
+
+- https://github.com/dingjikerbo/Android-Boost
 
 - https://blog.csdn.net/EmSoftEn/article/details/51718763
 
