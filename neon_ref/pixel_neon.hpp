@@ -18,5 +18,7 @@
 
 #include "multiply/vmul.hpp"
 #include "multiply/vmul_n.hpp"
+#include "multiply/vmul_lane.hpp"
+#include "multiply/vmull.hpp"
 
 #include "misc/vdup_n.hpp"

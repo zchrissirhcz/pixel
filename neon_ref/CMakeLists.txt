@@ -5,7 +5,7 @@ project(pixel_neon)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-include("overlook.cmake")
+include("../overlook.cmake")
 
 #--- GoogleTest
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
@@ -55,7 +55,7 @@ add_library(pixel_neon
 
   arithmetic/vsubw.hpp
   arithmetic/vsubw.cpp
-  
+
   arithmetic/vsubhn.hpp
   arithmetic/vsubhn.cpp
 
@@ -73,6 +73,12 @@ add_library(pixel_neon
 
   multiply/vmul_n.hpp
   multiply/vmul_n.cpp
+
+  multiply/vmul_lane.hpp
+  multiply/vmul_lane.cpp
+
+  multiply/vmull.hpp
+  multiply/vmull.cpp
 
   misc/vdup_n.hpp
   misc/vdup_n.cpp

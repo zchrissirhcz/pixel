@@ -1,8 +1,7 @@
 #include "gtest/gtest.h"
 
-#include <arm_neon.h>
-
 #include "pixel_neon.hpp"
+#include <arm_neon.h>
 
 TEST(mul, vmul_s8)
 {
@@ -43,6 +42,52 @@ TEST(mul, vmul_n_s16)
         ASSERT_EQ(expected_out[i], out[i]);
         ASSERT_EQ(pv_out[i], out[i]);
     }
+}
+
+TEST(mul, vmul_lane)
+{
+    const int lane = 0;
+    int16_t expected_out[4] = {0, 2, 4, 6};
+#if __ARM_NEON
+    int16x4_t v1 = {0, 1, 2, 3};
+    int16x4_t v2 = {2, 4, 6, 8};
+    int16x4_t v_out = vmul_lane_s16(v1, v2, lane);
+#else
+    pxl::int16x4_t v1 = {0, 1, 2, 3};
+    pxl::int16x4_t v2 = {2, 4, 6, 8};
+    pxl::int16x4_t v_out = ::pxl::vmul_lane_s16(v1, v2, lane);
+#endif
+
+    int16_t out[4];
+    vst1_s16(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vmull)
+{
+    int8x8_t v1 = {1, 2, 3, 4, 5, 6, 7, 8};
+    int8x8_t v2 = vdup_n_s8(100);
+    int16x8_t v_out = vmull_s8(v1, v2);
+    int16_t expected_out[8] = {100, 200, 300, 400, 500, 600, 700, 800};
+
+    pxl::int8x8_t pv1 = {1, 2, 3, 4, 5, 6, 7, 8};
+    pxl::int8x8_t pv2 = pxl::vdup_n_s8(100);
+    pxl::int16x8_t pv_out = pxl::vmull_s8(pv1, pv2);
+
+    int16_t out[8];
+    vst1q_s16(out, v_out);
+    for (int i=0; i<8; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
 }
 
 int main(int argc, char* argv[])

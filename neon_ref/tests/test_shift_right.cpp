@@ -1,10 +1,10 @@
 #include "gtest/gtest.h"
+
+#include "pixel_neon.hpp"
+#include <arm_neon.h>
+
 #include <stdio.h>
 #include <cmath>
-
-#if __ARM_NEON
-#include <arm_neon.h>
-#endif // __ARM_NEON
 
 /// compare vshrn_n_u16 and vrshrn_n_u16 result
 TEST(shift_right, round_or_not)

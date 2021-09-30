@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 
+#include "pixel_neon.hpp"
 #include <arm_neon.h>
 
 // vext_type
