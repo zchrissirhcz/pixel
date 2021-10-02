@@ -134,6 +134,83 @@ TEST(mul, vmull_lane)
     //fprintf(stderr, "\n");
 }
 
+TEST(mul, vqdmull)
+{
+    int16x4_t v1 = {1, 2, 3, 32000};
+    int16x4_t v2 = {2, 3, 4, 32000};
+    int32x4_t v_out = vqdmull_s16(v1, v2);
+    int32_t expected_out[4] = {4, 12, 24, 2048000000};
+
+    pxl::int16x4_t pv1 = {1, 2, 3, 32000};
+    pxl::int16x4_t pv2 = {2, 3, 4, 32000};
+    pxl::int32x4_t pv_out = pxl::vqdmull_s16(pv1, pv2);
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+
+TEST(mul, vqdmull_n)
+{
+    int16x4_t v1 = {1, 2, 3, 32000};
+    int16_t scale = 30000;
+    int32x4_t v_out = vqdmull_n_s16(v1, scale);
+    int32_t expected_out[4] = {60000, 120000, 180000, 1920000000};
+
+    pxl::int16x4_t pv1 = {1, 2, 3, 32000};
+    pxl::int32x4_t pv_out = pxl::vqdmull_n_s16(pv1, scale);
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+
+
+TEST(mul, vqdmull_lane)
+{
+    const int lane = 1;
+    int32_t expected_out[4] = {4, 8, 12, 128000};
+#if __ARM_NEON
+    int16x4_t v1 = {1, 2, 3, 32000};
+    int16x4_t v2 = {0, 2, 4, 6};
+    int32x4_t v_out = vqdmull_lane_s16(v1, v2, lane);
+#else
+    pxl::int16x4_t pv1 = {1, 2, 3, 32000};
+    pxl::int16x4_t pv2 = {0, 2, 4, 6};
+    pxl::int32x4_t pv_out = pxl::vqdmull_lane_s16(pv1, pv2, lane);
+#endif
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+        //ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vqdmulh)
+{
+    
+}
+
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
