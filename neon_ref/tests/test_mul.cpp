@@ -178,8 +178,6 @@ TEST(mul, vqdmull_n)
     //fprintf(stderr, "\n");
 }
 
-
-
 TEST(mul, vqdmull_lane)
 {
     const int lane = 1;
@@ -207,7 +205,69 @@ TEST(mul, vqdmull_lane)
 
 TEST(mul, vqdmulh)
 {
-    
+    int16x4_t v1 = {1, 2, 3, 4};
+    int16x4_t v2 = {10000, 15000, 20000, 25000};
+    int16x4_t v_out = vqdmulh_s16(v1, v2);
+    int16_t expected_out[4] = {0, 0, 1, 3};
+
+    pxl::int16x4_t pv1 = {1, 2, 3, 4};
+    pxl::int16x4_t pv2 = {10000, 15000, 20000, 25000};
+    pxl::int16x4_t pv_out = pxl::vqdmulh_s16(pv1, pv2);
+
+    int16_t out[4];
+    vst1_s16(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "[%d %d], ", out[i], pv_out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vqdmulh_n)
+{
+    int16x4_t v1 = {1, 2, 3, 4};
+    int16_t scale = 30000;
+    int16x4_t v_out = vqdmulh_n_s16(v1, scale);
+    int16_t expected_out[4] = {0, 1, 2, 3};
+
+    pxl::int16x4_t pv1 = {1, 2, 3, 4};
+    pxl::int16x4_t pv_out = pxl::vqdmulh_n_s16(pv1, scale);
+
+    int16_t out[4];
+    vst1_s16(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "[%d %d], ", out[i], pv_out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+
+TEST(mul, vqdmulh_lane)
+{
+    const int lane = 1;
+#if __ARM_NEON
+    int16x4_t v1 = {1, 2, 3, 4};
+    int16x4_t v2 = {10000, 15000, 20000, 25000};
+    int16x4_t v_out = vqdmulh_lane_s16(v1, v2, lane);
+#else
+    pxl::int16x4_t pv1 = {1, 2, 3, 4};
+    pxl::int16x4_t pv2 = {10000, 15000, 20000, 25000};
+    pxl::int16x4_t pv_out = pxl::vqdmulh_lane_s16(pv1, pv2, lane);
+#endif
+    int16_t expected_out[4] = {0, 0, 1, 1};
+
+    int16_t out[4];
+    vst1_s16(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+        //ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
 }
 
 

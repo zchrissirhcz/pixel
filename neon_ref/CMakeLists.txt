@@ -95,6 +95,15 @@ add_library(pixel_neon
   multiply/vqdmull_lane.hpp
   multiply/vqdmull_lane.cpp
 
+  multiply/vqdmulh.hpp
+  multiply/vqdmulh.cpp
+
+  multiply/vqdmulh_n.hpp
+  multiply/vqdmulh_n.cpp
+
+  multiply/vqdmulh_lane.hpp
+  multiply/vqdmulh_lane.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
