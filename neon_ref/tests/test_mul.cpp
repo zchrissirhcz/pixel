@@ -426,15 +426,15 @@ TEST(mul, vmla_n_lane)
     pxl::int16x4_t pv3 = {5, 6, 7, 8};
     pxl::int16x4_t pv_out = pxl::vmla_lane_s16(pv1, pv2, pv3, lane);
 #endif
-    int16_t expected_out[4] = {7, 8, 9, 14464};
+    int16_t expected_out[4] = {8, 16, 24, 20028};
 
     int16_t out[4];
     vst1_s16(out, v_out);
     for (int i=0; i<4; i++)
     {
         //ASSERT_EQ(pv_out[i], out[i]);
-        //ASSERT_EQ(expected_out[i], out[i]);
-        fprintf(stderr, "%d, ", out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
     }
     //fprintf(stderr, "\n");
 }
