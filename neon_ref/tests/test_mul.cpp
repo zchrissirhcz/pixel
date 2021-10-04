@@ -514,6 +514,30 @@ TEST(mul, vfma)
     //fprintf(stderr, "\n");
 }
 
+TEST(mul, vqdmlal)
+{
+    int32x4_t v1 = {200, 300, 400, 500};
+    int16x4_t v2 = {1, 2, 3, 4};
+    int16x4_t v3 = {10000, 15000, 20000, 25000};
+    int32x4_t v_out = vqdmlal_s16(v1, v2, v3);
+    int32_t expected_out[4] = {20200, 60300, 120400, 200500};
+
+    pxl::int32x4_t pv1 = {200, 300, 400, 500};
+    pxl::int16x4_t pv2 = {1, 2, 3, 4};
+    pxl::int16x4_t pv3 = {10000, 15000, 20000, 25000};
+    pxl::int32x4_t pv_out = vqdmlal_s16(pv1, pv2, pv3);
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);

@@ -38,5 +38,6 @@
 #include "multiply/vmlal_n.hpp"
 #include "multiply/vmlal_lane.hpp"
 #include "multiply/vfma.hpp"
+#include "multiply/vqdmlal.hpp"
 
 #include "misc/vdup_n.hpp"
