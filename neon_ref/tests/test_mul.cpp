@@ -361,7 +361,31 @@ TEST(mul, vmla)
         ASSERT_EQ(expected_out[i], out[i]);
         //fprintf(stderr, "%d, ", out[i]);
     }
-    fprintf(stderr, "\n");
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vmlal)
+{
+    int16x8_t v1 = {1, 2, 3, 4, 5, 6, 7, 8};
+    int8x8_t v2 = {1, 2, 3, 4, 5, 6, 7, 8};
+    int8x8_t v3 = {-120, -60, -30, 0, 30, 60, 90, 120};
+    int16x8_t v_out = vmlal_s8(v1, v2, v3);
+    int16_t expected_out[8] = {-119, -118, -87, 4, 155, 366, 637, 968};
+
+    pxl::int16x8_t pv1 = {1, 2, 3, 4, 5, 6, 7, 8};
+    pxl::int8x8_t pv2 = {1, 2, 3, 4, 5, 6, 7, 8};
+    pxl::int8x8_t pv3 = {-120, -60, -30, 0, 30, 60, 90, 120};
+    pxl::int16x8_t pv_out = pxl::vmlal_s8(pv1, pv2, pv3);
+
+    int16_t out[8];
+    vst1q_s16(out, v_out);
+    for (int i=0; i<8; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
 }
 
 int main(int argc, char* argv[])

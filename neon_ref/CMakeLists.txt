@@ -116,6 +116,9 @@ add_library(pixel_neon
   multiply/vmla.hpp
   multiply/vmla.cpp
 
+  multiply/vmlal.hpp
+  multiply/vmlal.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
