@@ -32,6 +32,10 @@
 #include "multiply/vqrdmulh_n.hpp"
 #include "multiply/vqrdmulh_lane.hpp"
 #include "multiply/vmla.hpp"
+#include "multiply/vmla_n.hpp"
+#include "multiply/vmla_lane.hpp"
 #include "multiply/vmlal.hpp"
+#include "multiply/vmlal_n.hpp"
+#include "multiply/vmlal_lane.hpp"
 
 #include "misc/vdup_n.hpp"

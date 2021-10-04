@@ -70,54 +70,52 @@ add_library(pixel_neon
 
   multiply/vmul.hpp
   multiply/vmul.cpp
-
   multiply/vmul_n.hpp
   multiply/vmul_n.cpp
-
   multiply/vmul_lane.hpp
   multiply/vmul_lane.cpp
 
   multiply/vmull.hpp
   multiply/vmull.cpp
-
   multiply/vmull_n.hpp
   multiply/vmull_n.cpp
-
   multiply/vmull_lane.hpp
   multiply/vmull_lane.cpp
 
   multiply/vqdmull.hpp
   multiply/vqdmull.cpp
-
   multiply/vqdmull_n.hpp
   multiply/vqdmull_n.cpp
-
   multiply/vqdmull_lane.hpp
   multiply/vqdmull_lane.cpp
 
   multiply/vqdmulh.hpp
   multiply/vqdmulh.cpp
-
   multiply/vqdmulh_n.hpp
   multiply/vqdmulh_n.cpp
-
   multiply/vqdmulh_lane.hpp
   multiply/vqdmulh_lane.cpp
 
   multiply/vqrdmulh.hpp
   multiply/vqrdmulh.cpp
-
   multiply/vqrdmulh_n.hpp
   multiply/vqrdmulh_n.cpp
-
   multiply/vqrdmulh_lane.hpp
   multiply/vqrdmulh_lane.cpp
 
   multiply/vmla.hpp
   multiply/vmla.cpp
+  multiply/vmla_n.hpp
+  multiply/vmla_n.cpp
+  multiply/vmla_lane.hpp
+  multiply/vmla_lane.cpp
 
   multiply/vmlal.hpp
   multiply/vmlal.cpp
+  multiply/vmlal_n.hpp
+  multiply/vmlal_n.cpp
+  multiply/vmlal_lane.hpp
+  multiply/vmlal_lane.cpp
 
   misc/vdup_n.hpp
   misc/vdup_n.cpp
