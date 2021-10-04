@@ -31,5 +31,6 @@
 #include "multiply/vqrdmulh.hpp"
 #include "multiply/vqrdmulh_n.hpp"
 #include "multiply/vqrdmulh_lane.hpp"
+#include "multiply/vmla.hpp"
 
 #include "misc/vdup_n.hpp"

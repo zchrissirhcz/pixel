@@ -336,6 +336,29 @@ TEST(mul, vqrdmulh_lane)
     //fprintf(stderr, "\n");
 }
 
+TEST(mul, vmla)
+{
+    int16x4_t v1 = {1, 2, 3, 4};
+    int16x4_t v2 = {2, 2, 2, 2};
+    int16x4_t v3 = {3, 3, 3, 3};
+    int16x4_t v_out = vmla_s16(v1, v2, v3);
+    int16_t expected_out[4] = {5, 7, 9, 11};
+
+    pxl::int16x4_t pv1 = {1, 2, 3, 4};
+    pxl::int16x4_t pv2 = {2, 2, 2, 2};
+    pxl::int16x4_t pv3 = {3, 3, 3, 3};
+    pxl::int16x4_t pv_out = pxl::vmla_s16(pv1, pv2, pv3);
+
+    int16_t out[4];
+    vst1_s16(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "[%d %d], ", out[i], pv_out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
