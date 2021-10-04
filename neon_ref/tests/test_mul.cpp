@@ -490,6 +490,30 @@ TEST(mul, vmlal_lane)
     //fprintf(stderr, "\n");
 }
 
+TEST(mul, vfma)
+{
+    float32x2_t v1 = {1.2, 7.8};
+    float32x2_t v2 = {1.2, 1.2};
+    float32x2_t v3 = {2,   3};
+    float32x2_t v_out = vfma_f32(v1, v2, v3);
+    float32_t expected_out[2] = {3.6, 11.4};
+
+    pxl::float32x2_t pv1 = {1.2, 7.8};
+    pxl::float32x2_t pv2 = {1.2, 1.2};
+    pxl::float32x2_t pv3 = {2,   3};
+    pxl::float32x2_t pv_out = vfma_f32(pv1, pv2, pv3);
+
+    float32_t out[2];
+    vst1_f32(out, v_out);
+    for (int i=0; i<2; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_NEAR(expected_out[i], out[i], 1e-5);
+        //fprintf(stderr, "%.4f, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
