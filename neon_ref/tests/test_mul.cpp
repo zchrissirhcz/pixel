@@ -538,6 +538,57 @@ TEST(mul, vqdmlal)
     //fprintf(stderr, "\n");
 }
 
+TEST(mul, vqdmlal_n)
+{
+    int32x4_t v1 = {200, 300, 400, 500};
+    int16x4_t v2 = {1, 2, 3, 4};
+    int16_t c = 30000;
+    int32x4_t v_out = vqdmlal_n_s16(v1, v2, c);
+    int32_t expected_out[4] = {60200, 120300, 180400, 240500};
+
+    pxl::int32x4_t pv1 = {200, 300, 400, 500};
+    pxl::int16x4_t pv2 = {1, 2, 3, 4};
+    pxl::int32x4_t pv_out = vqdmlal_n_s16(pv1, pv2, c);
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+
+TEST(mul, vqdmlal_lane)
+{
+    const int lane = 2;
+#if __ARM_NEON
+    int32x4_t v1 = {200, 300, 400, 500};
+    int16x4_t v2 = {1, 2, 3, 4};
+    int16x4_t v3 = {10000, 15000, 20000, 25000};
+    int32x4_t v_out = vqdmlal_lane_s16(v1, v2, v3, lane);
+#else
+    pxl::int32x4_t pv1 = {200, 300, 400, 500};
+    pxl::int16x4_t pv2 = {1, 2, 3, 4};
+    pxl::int16x4_t pv3 = {10000, 15000, 20000, 25000};
+    pxl::int32x4_t pv_out = vqdmlal_lane_s16(pv1, pv2, pv3, lane);
+#endif
+    int32_t expected_out[4] = {40200, 80300, 120400, 160500};
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        //ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);

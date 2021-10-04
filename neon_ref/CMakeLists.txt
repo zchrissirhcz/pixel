@@ -122,6 +122,10 @@ add_library(pixel_neon
 
   multiply/vqdmlal.hpp
   multiply/vqdmlal.cpp
+  multiply/vqdmlal_n.hpp
+  multiply/vqdmlal_n.cpp
+  multiply/vqdmlal_lane.hpp
+  multiply/vqdmlal_lane.cpp
 
   misc/vdup_n.hpp
   misc/vdup_n.cpp
