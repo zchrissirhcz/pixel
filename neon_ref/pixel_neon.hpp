@@ -27,5 +27,9 @@
 #include "multiply/vqdmull_lane.hpp"
 #include "multiply/vqdmulh.hpp"
 #include "multiply/vqdmulh_n.hpp"
+#include "multiply/vqdmulh_lane.hpp"
+#include "multiply/vqrdmulh.hpp"
+#include "multiply/vqrdmulh_n.hpp"
+#include "multiply/vqrdmulh_lane.hpp"
 
 #include "misc/vdup_n.hpp"
