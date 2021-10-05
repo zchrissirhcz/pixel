@@ -501,7 +501,7 @@ TEST(mul, vfma)
     pxl::float32x2_t pv1 = {1.2, 7.8};
     pxl::float32x2_t pv2 = {1.2, 1.2};
     pxl::float32x2_t pv3 = {2,   3};
-    pxl::float32x2_t pv_out = vfma_f32(pv1, pv2, pv3);
+    pxl::float32x2_t pv_out = pxl::vfma_f32(pv1, pv2, pv3);
 
     float32_t out[2];
     vst1_f32(out, v_out);
@@ -525,7 +525,7 @@ TEST(mul, vqdmlal)
     pxl::int32x4_t pv1 = {200, 300, 400, 500};
     pxl::int16x4_t pv2 = {1, 2, 3, 4};
     pxl::int16x4_t pv3 = {10000, 15000, 20000, 25000};
-    pxl::int32x4_t pv_out = vqdmlal_s16(pv1, pv2, pv3);
+    pxl::int32x4_t pv_out = pxl::vqdmlal_s16(pv1, pv2, pv3);
 
     int32_t out[4];
     vst1q_s32(out, v_out);
@@ -548,7 +548,7 @@ TEST(mul, vqdmlal_n)
 
     pxl::int32x4_t pv1 = {200, 300, 400, 500};
     pxl::int16x4_t pv2 = {1, 2, 3, 4};
-    pxl::int32x4_t pv_out = vqdmlal_n_s16(pv1, pv2, c);
+    pxl::int32x4_t pv_out = pxl::vqdmlal_n_s16(pv1, pv2, c);
 
     int32_t out[4];
     vst1q_s32(out, v_out);
@@ -577,6 +577,252 @@ TEST(mul, vqdmlal_lane)
     pxl::int32x4_t pv_out = vqdmlal_lane_s16(pv1, pv2, pv3, lane);
 #endif
     int32_t expected_out[4] = {40200, 80300, 120400, 160500};
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        //ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vmls)
+{
+    int16x4_t v1 = {1, 2, 3, 20000};
+    int16x4_t v2 = {2, 2, 2, 20000};
+    int16x4_t v3 = {3, 3, 3, 3};
+    int16x4_t v_out = vmls_s16(v1, v2, v3);
+    int16_t expected_out[4] = {-5, -4, -3, 25536};
+
+    pxl::int16x4_t pv1 = {1, 2, 3, 20000};
+    pxl::int16x4_t pv2 = {2, 2, 2, 20000};
+    pxl::int16x4_t pv3 = {3, 3, 3, 3};
+    pxl::int16x4_t pv_out = pxl::vmls_s16(pv1, pv2, pv3);
+
+    int16_t out[4];
+    vst1_s16(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vmls_n)
+{
+    int16x4_t v1 = {1, 2, 3, 20000};
+    int16x4_t v2 = {2, 2, 2, 20000};
+    int16_t scale = 3;
+    int16x4_t v_out = vmls_n_s16(v1, v2, scale);
+    int16_t expected_out[4] = {-5, -4, -3, 25536};
+
+    pxl::int16x4_t pv1 = {1, 2, 3, 20000};
+    pxl::int16x4_t pv2 = {2, 2, 2, 20000};
+    pxl::int16x4_t pv_out = pxl::vmls_n_s16(pv1, pv2, scale);
+
+    int16_t out[4];
+    vst1_s16(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vmls_lane)
+{
+    const int lane = 2;
+#if __ARM_NEON
+    int16x4_t v1 = {1, 2, 3, 20000};
+    int16x4_t v2 = {1, 2, 3, 4};
+    int16x4_t v3 = {5, 6, 7, 8};
+    int16x4_t v_out = vmls_lane_s16(v1, v2, v3, lane);
+#else
+    pxl::int16x4_t pv1 = {1, 2, 3, 20000};
+    pxl::int16x4_t pv2 = {1, 2, 3, 4};
+    pxl::int16x4_t pv3 = {5, 6, 7, 8};
+    pxl::int16x4_t pv_out = pxl::vmls_lane_s16(pv1, pv2, pv3, lane);
+#endif
+    int16_t expected_out[4] = {-6, -12, -18, 19972};
+
+    int16_t out[4];
+    vst1_s16(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        //ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vmlsl)
+{
+    int16x8_t v1 = {1, 2, 3, 4, 5, 6, 7, 8};
+    int8x8_t v2 = {1, 2, 3, 4, 5, 6, 7, 8};
+    int8x8_t v3 = {-120, -60, -30, 0, 30, 60, 90, 120};
+    int16x8_t v_out = vmlsl_s8(v1, v2, v3);
+    int16_t expected_out[8] = {121, 122, 93, 4, -145, -354, -623, -952};
+
+    pxl::int16x8_t pv1 = {1, 2, 3, 4, 5, 6, 7, 8};
+    pxl::int8x8_t pv2 = {1, 2, 3, 4, 5, 6, 7, 8};
+    pxl::int8x8_t pv3 = {-120, -60, -30, 0, 30, 60, 90, 120};
+    pxl::int16x8_t pv_out = pxl::vmlsl_s8(pv1, pv2, pv3);
+
+    int16_t out[8];
+    vst1q_s16(out, v_out);
+    for (int i=0; i<8; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vmlsl_n)
+{
+    int32x4_t v1 = {1, 2, 3, 4};
+    int16x4_t v2 = {5, 6, 7, 8};
+    int16_t c = 30000;
+    int32x4_t v_out = vmlsl_n_s16(v1, v2, c);
+    int32_t expected_out[4] = {-149999, -179998, -209997, -239996};
+
+    pxl::int32x4_t pv1 = {1, 2, 3, 4};
+    pxl::int16x4_t pv2 = {5, 6, 7, 8};
+    pxl::int32x4_t pv_out = pxl::vmlsl_n_s16(pv1, pv2, c);
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vmlsl_lane)
+{
+    const int lane = 2;
+#if __ARM_NEON
+    int32x4_t v1 = {1, 2, 3, 4};
+    int16x4_t v2 = {5, 6, 7, 8};
+    int16x4_t v3 = {10000, 15000, 20000, 25000};
+    int32x4_t v_out = vmlsl_lane_s16(v1, v2, v3, lane);
+#else
+    pxl::int32x4_t v1 = {1, 2, 3, 4};
+    pxl::int16x4_t v2 = {5, 6, 7, 8};
+    pxl::int16x4_t v3 = {10000, 15000, 20000, 25000};
+    pxl::int32x4_t pv_out = pxl::vmlsl_lane_s16(pv1, pv2, pv3, lane);
+#endif
+    int32_t expected_out[4] = {-99999, -119998, -139997, -159996};
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        //ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vfms)
+{
+    float32x2_t v1 = {1.2, 7.8};
+    float32x2_t v2 = {1.2, 1.2};
+    float32x2_t v3 = {2,   3};
+    float32x2_t v_out = vfms_f32(v1, v2, v3);
+    float32_t expected_out[2] = {-1.2000, 4.2000};
+
+    pxl::float32x2_t pv1 = {1.2, 7.8};
+    pxl::float32x2_t pv2 = {1.2, 1.2};
+    pxl::float32x2_t pv3 = {2,   3};
+    pxl::float32x2_t pv_out = pxl::vfms_f32(pv1, pv2, pv3);
+
+    float32_t out[2];
+    vst1_f32(out, v_out);
+    for (int i=0; i<2; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_NEAR(expected_out[i], out[i], 1e-5);
+        //fprintf(stderr, "%.4f, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vqdmlsl)
+{
+    int32x4_t v1 = {200, 300, 400, 500};
+    int16x4_t v2 = {1, 2, 3, 4};
+    int16x4_t v3 = {10000, 15000, 20000, 25000};
+    int32x4_t v_out = vqdmlsl_s16(v1, v2, v3);
+    int32_t expected_out[4] = {-19800, -59700, -119600, -199500};
+
+    pxl::int32x4_t pv1 = {200, 300, 400, 500};
+    pxl::int16x4_t pv2 = {1, 2, 3, 4};
+    pxl::int16x4_t pv3 = {10000, 15000, 20000, 25000};
+    pxl::int32x4_t pv_out = vqdmlsl_s16(pv1, pv2, pv3);
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vqdmlsl_n)
+{
+    int32x4_t v1 = {200, 300, 400, 500};
+    int16x4_t v2 = {1, 2, 3, 4};
+    int16_t c = 30000;
+    int32x4_t v_out = vqdmlsl_n_s16(v1, v2, c);
+    int32_t expected_out[4] = {-59800, -119700, -179600, -239500};
+
+    pxl::int32x4_t pv1 = {200, 300, 400, 500};
+    pxl::int16x4_t pv2 = {1, 2, 3, 4};
+    pxl::int32x4_t pv_out = pxl::vqdmlsl_n_s16(pv1, pv2, c);
+
+    int32_t out[4];
+    vst1q_s32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(pv_out[i], out[i]);
+        ASSERT_EQ(expected_out[i], out[i]);
+        //fprintf(stderr, "%d, ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
+TEST(mul, vqdmlsl_lane)
+{
+    const int lane = 2;
+#if __ARM_NEON
+    int32x4_t v1 = {200, 300, 400, 500};
+    int16x4_t v2 = {1, 2, 3, 4};
+    int16x4_t v3 = {10000, 15000, 20000, 25000};
+    int32x4_t v_out = vqdmlsl_lane_s16(v1, v2, v3, lane);
+#else
+    pxl::int32x4_t pv1 = {200, 300, 400, 500};
+    pxl::int16x4_t pv2 = {1, 2, 3, 4};
+    pxl::int16x4_t pv3 = {10000, 15000, 20000, 25000};
+    pxl::int32x4_t pv_out = pxl::vqdmlsl_lane_s16(pv1, pv2, pv3, lane);
+#endif
+    int32_t expected_out[4] = {-39800, -79700, -119600, -159500};
 
     int32_t out[4];
     vst1q_s32(out, v_out);

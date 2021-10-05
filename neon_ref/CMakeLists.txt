@@ -127,6 +127,30 @@ add_library(pixel_neon
   multiply/vqdmlal_lane.hpp
   multiply/vqdmlal_lane.cpp
 
+  multiply/vmls.hpp
+  multiply/vmls.cpp
+  multiply/vmls_n.hpp
+  multiply/vmls_n.cpp
+  multiply/vmls_lane.hpp
+  multiply/vmls_lane.cpp
+
+  multiply/vmlsl.hpp
+  multiply/vmlsl.cpp
+  multiply/vmlsl_n.hpp
+  multiply/vmlsl_n.cpp
+  multiply/vmlsl_lane.hpp
+  multiply/vmlsl_lane.cpp
+
+  multiply/vfms.hpp
+  multiply/vfms.cpp
+
+  multiply/vqdmlsl.hpp
+  multiply/vqdmlsl.cpp
+  multiply/vqdmlsl_n.hpp
+  multiply/vqdmlsl_n.cpp
+  multiply/vqdmlsl_lane.hpp
+  multiply/vqdmlsl_lane.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
