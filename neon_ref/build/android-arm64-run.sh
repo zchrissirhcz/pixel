@@ -101,6 +101,15 @@ test_mul()
     adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
 }
 
+test_round()
+{
+    DST_DIR=/data/local/tmp
+    EXE_FILE=test_round
+
+    adb push $BUILD_DIR/$EXE_FILE $DST_DIR
+    adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
+}
+
 # test_shift_right
 # test_arithmetic
 # test_load_store
@@ -113,4 +122,5 @@ test_mul()
 
 #test_add
 #test_sub
-test_mul
+#test_mul
+test_round

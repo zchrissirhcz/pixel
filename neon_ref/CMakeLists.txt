@@ -151,6 +151,15 @@ add_library(pixel_neon
   multiply/vqdmlsl_lane.hpp
   multiply/vqdmlsl_lane.cpp
 
+  round/vrnd.hpp
+  round/vrnd.cpp
+  
+  round/vrndn.hpp
+  round/vrndn.cpp
+
+  round/vrnda.hpp
+  round/vrnda.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
@@ -183,5 +192,6 @@ pixel_add_test(register_data_rearrange)
 pixel_add_test(add)
 pixel_add_test(sub)
 pixel_add_test(mul)
+pixel_add_test(round)
 
 pixel_add_test(shift_right)

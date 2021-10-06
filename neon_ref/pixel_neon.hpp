@@ -51,4 +51,8 @@
 #include "multiply/vqdmlsl_n.hpp"
 #include "multiply/vqdmlsl_lane.hpp"
 
+#include "round/vrnd.hpp"
+#include "round/vrndn.hpp"
+#include "round/vrnda.hpp"
+
 #include "misc/vdup_n.hpp"

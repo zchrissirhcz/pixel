@@ -13,9 +13,11 @@ otherwise it will cause conflicts of macros (neon_neon.h) and functions(pixel_ne
 
 ## References
 
-- ARM DEN0018A (NEON Programmer's Guide), Appendix D
+- ARM DEN0018A (NEON Programmer's Guide 1.0), Appendix D (not covering all intrinsics)
 
-- https://developer.arm.com/architectures/instruction-sets/intrinsics/
+- https://developer.arm.com/architectures/instruction-sets/intrinsics/ (online query, contains nearly all intrinsics)
+
+- https://github.com/rogerou/Arm-neon-intrinsics/blob/master/IHI0073B_arm_neon_intrinsics_ref.pdf (A more comprehensive NEON intrinsics reference pdf)
 
 - https://github.com/thenifty/neon-guide
 
