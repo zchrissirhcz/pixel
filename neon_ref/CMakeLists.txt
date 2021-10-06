@@ -160,6 +160,12 @@ add_library(pixel_neon
   round/vrnda.hpp
   round/vrnda.cpp
 
+  round/vrndp.hpp
+  round/vrndp.cpp
+
+  round/vrndm.hpp
+  round/vrndm.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )

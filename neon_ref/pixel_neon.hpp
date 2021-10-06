@@ -54,5 +54,7 @@
 #include "round/vrnd.hpp"
 #include "round/vrndn.hpp"
 #include "round/vrnda.hpp"
+#include "round/vrndp.hpp"
+#include "round/vrndm.hpp"
 
 #include "misc/vdup_n.hpp"
