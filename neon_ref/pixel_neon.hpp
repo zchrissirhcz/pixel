@@ -58,5 +58,6 @@
 #include "round/vrndm.hpp"
 
 #include "logical_and_compare/vceq.hpp"
+#include "logical_and_compare/vcge.hpp"
 
 #include "misc/vdup_n.hpp"

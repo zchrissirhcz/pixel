@@ -169,6 +169,9 @@ add_library(pixel_neon
   logical_and_compare/vceq.hpp
   logical_and_compare/vceq.cpp
 
+  logical_and_compare/vcge.hpp
+  logical_and_compare/vcge.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
