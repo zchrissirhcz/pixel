@@ -2,7 +2,12 @@
 
 namespace pxl {
 
-// vcagt means vector compare absolute value, greater than or equal to
+// vcagt means vector compare absolute value, greater than
+
+/*
+如果| a[i] | > | b[i] |，那么D[i]的二进制是全1的
+如果| a[i] | <= | b[i] |，那么D[i]的二进制是全0的
+*/
 
 //----------------------------------------------------------------------
 // vcagt_type

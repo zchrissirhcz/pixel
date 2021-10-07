@@ -2,7 +2,12 @@
 
 namespace pxl {
 
-// vcalt means vector compare absolute value, less than or equal to
+// vcalt means vector compare absolute value, less than
+
+/*
+如果| a[i] | < | b[i] |，那么D[i]的二进制是全1的
+如果| a[i] | >= | b[i] |，那么D[i]的二进制是全0的
+*/
 
 //----------------------------------------------------------------------
 // vcalt_type
