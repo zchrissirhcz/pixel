@@ -61,5 +61,6 @@
 #include "logical_and_compare/vcge.hpp"
 #include "logical_and_compare/vcle.hpp"
 #include "logical_and_compare/vcgt.hpp"
+#include "logical_and_compare/vclt.hpp"
 
 #include "misc/vdup_n.hpp"
