@@ -110,6 +110,15 @@ test_round()
     adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
 }
 
+test_logical_and_compare()
+{
+    DST_DIR=/data/local/tmp
+    EXE_FILE=test_logical_and_compare
+
+    adb push $BUILD_DIR/$EXE_FILE $DST_DIR
+    adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
+}
+
 # test_shift_right
 # test_arithmetic
 # test_load_store
@@ -123,4 +132,5 @@ test_round()
 #test_add
 #test_sub
 #test_mul
-test_round
+#test_round
+test_logical_and_compare

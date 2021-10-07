@@ -166,6 +166,9 @@ add_library(pixel_neon
   round/vrndm.hpp
   round/vrndm.cpp
 
+  logical_and_compare/vceq.hpp
+  logical_and_compare/vceq.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
@@ -199,5 +202,6 @@ pixel_add_test(add)
 pixel_add_test(sub)
 pixel_add_test(mul)
 pixel_add_test(round)
+pixel_add_test(logical_and_compare)
 
 pixel_add_test(shift_right)
