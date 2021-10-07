@@ -70,6 +70,29 @@ TEST(logical_and_compare, vcle)
     //fprintf(stderr, "\n");
 }
 
+
+TEST(logical_and_compare, vcgt)
+{
+    int8x8_t v1 = {1, 2, 3, 4, 5, 6, 7, 8};
+    int8x8_t v2 = {1, 3, 2, 4, 5, 7, 6, 8};
+    uint8x8_t v_out = vcgt_s8(v1, v2);
+    uint8_t expected_out[8] = {0, 0, 255, 0, 0, 0, 255, 0};
+
+    pxl::int8x8_t pv1 = {1, 2, 3, 4, 5, 6, 7, 8};
+    pxl::int8x8_t pv2 = {1, 3, 2, 4, 5, 7, 6, 8};
+    pxl::uint8x8_t pv_out = vcgt_s8(pv1, pv2);
+
+    uint8_t out[8];
+    vst1_u8(out, v_out);
+    for (int i=0; i<8; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "%d ", out[i]);
+    }
+    //fprintf(stderr, "\n");
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
