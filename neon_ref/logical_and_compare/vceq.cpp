@@ -3,10 +3,6 @@
 namespace pxl {
 
 /*
-VCEQ compares the value of each element in a vector with the value of the corresponding element
-of a second vector, or zero. If they are equal, the corresponding element in the destination vector
-is set to all ones. Otherwise, it is set to all zeros.
-
 如果N[i]==M[i]，那么D[i]的二进制是全1的
 如果N[i]!=M[i]，那么D[i]的二进制是全0的
 */
