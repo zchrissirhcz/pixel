@@ -137,6 +137,28 @@ TEST(logical_and_compare, vcage)
     //fprintf(stderr, "\n");
 }
 
+TEST(logical_and_compare, vcale)
+{
+    float32x4_t v1 = {1,-2, 3,-4};
+    float32x4_t v2 = {-2, 2, 3, 3};
+    uint32x4_t v_out = vcaleq_f32(v1, v2);
+    uint32_t expected_out[4] = {4294967295, 4294967295, 4294967295, 0};
+
+    pxl::float32x4_t pv1 = {1,-2, 3,-4};
+    pxl::float32x4_t pv2 = {-2, 2, 3, 3};
+    pxl::uint32x4_t pv_out = pxl::vcaleq_f32(pv1, pv2);
+
+    uint32_t out[4];
+    vst1q_u32(out, v_out);
+    for (int i=0; i<4; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "%u, ", out[i]); // note, use %u instead of %d
+    }
+    //fprintf(stderr, "\n");
+}
+
 
 int main(int argc, char* argv[])
 {
