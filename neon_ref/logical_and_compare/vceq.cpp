@@ -176,7 +176,7 @@ uint32x4_t vceqq_u32(uint32x4_t N, uint32x4_t M)
 uint32x4_t vceqq_f32(float32x4_t N, float32x4_t M)
 {
     uint32x4_t D;
-    for (int i=0; i<2; i++)
+    for (int i=0; i<4; i++)
     {
         if (N[i]==M[i]) {
             D[i] = 0xFFFFFFFF;
