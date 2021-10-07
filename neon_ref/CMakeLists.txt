@@ -187,6 +187,9 @@ add_library(pixel_neon
   logical_and_compare/vcale.hpp
   logical_and_compare/vcale.cpp
 
+  logical_and_compare/vcagt.hpp
+  logical_and_compare/vcagt.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
