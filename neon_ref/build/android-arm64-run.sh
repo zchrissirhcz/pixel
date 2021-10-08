@@ -119,6 +119,16 @@ test_logical_and_compare()
     adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
 }
 
+test_data_processing()
+{
+    DST_DIR=/data/local/tmp
+    EXE_FILE=test_data_processing
+
+    adb push $BUILD_DIR/$EXE_FILE $DST_DIR
+    adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
+}
+
+
 # test_shift_right
 # test_arithmetic
 # test_load_store
@@ -133,4 +143,5 @@ test_logical_and_compare()
 #test_sub
 #test_mul
 #test_round
-test_logical_and_compare
+#test_logical_and_compare
+test_data_processing

@@ -196,6 +196,9 @@ add_library(pixel_neon
   logical_and_compare/vtst.hpp
   logical_and_compare/vtst.cpp
 
+  data_processing/vabs.hpp
+  data_processing/vabs.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
@@ -230,5 +233,6 @@ pixel_add_test(sub)
 pixel_add_test(mul)
 pixel_add_test(round)
 pixel_add_test(logical_and_compare)
+pixel_add_test(data_processing)
 
 pixel_add_test(shift_right)

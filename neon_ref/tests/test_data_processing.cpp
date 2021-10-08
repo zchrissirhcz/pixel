@@ -56,6 +56,23 @@ TEST(add, vpadal)
     }
 }
 
+TEST(add, vabs)
+{
+    int8x8_t v1 = {-1, 2, -3, 4, -5, 6, -7, 8};
+    int8x8_t v_out = vabs_s8(v1);
+    int8_t expected_out[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+    
+    pxl::int8x8_t pv1 = {-1, 2, -3, 4, -5, 6, -7, 8};
+    pxl::int8x8_t pv_out = pxl::vabs_s8(pv1);
+
+    int8_t out[8];
+    vst1_s8(out, v_out);
+    for (int i=0; i<8; i++)
+    {
+        ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
+    }
+}
 
 
 

@@ -68,4 +68,6 @@
 #include "logical_and_compare/vcalt.hpp"
 #include "logical_and_compare/vtst.hpp"
 
+#include "data_processing/vabs.hpp"
+
 #include "misc/vdup_n.hpp"
