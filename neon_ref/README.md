@@ -1,6 +1,32 @@
 # Neon Intrinsics Reference Implementations
 
-There is a (WIP) reference implementation of ARM NEON intrinsics with C++, compared with its counterpart with unittests.
+## Intro
+Here is a (WIP) reference implementation of ARM NEON intrinsics with C++, compared with its counterpart with unittests. The purpose is running neon intrinsics on PC, with benifits:
+- easily debugging with neon intrinsics
+- don't have to buy an ARM device such Apple M1
+- don't have to learn how to configure and run android console application
+
+## Usage
+```c++
+#include "pixel_neon.hpp" // instead of `#include <arm_neon.h>` directly
+using namespace pxl; // required
+
+int main()
+{
+    // same usage as ARM NEON
+    int8x8_t v1 = {120, 2, 3, 4, 5,  6,  7,   1};
+    int8x8_t v2 = {121, 3, 5, 7, 9, 11, 13, -15};
+    int8x8_t v_out = vrhadd_s8(v1, v2);
+
+    // easily print, or debug with break points
+    for (int i=0; i<8; i++)
+    {
+        printf("%d, ", v_out[i]);
+    }
+    printf("\n");
+    return 0;
+}
+```
 
 ## Known issue
 
