@@ -93,6 +93,48 @@ TEST(add, vqabs)
     }
 }
 
+TEST(add, vabd)
+{
+    {
+        int8x8_t v1 = {-1, 2, -3, 4, -5, 6, -7, 8};
+        int8x8_t v2 = {3,7 ,4, 9, 1, 2, 6, 8};
+        int8x8_t v_out = vabd_s8(v1, v2);
+        int8_t expected_out[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+        
+        pxl::int8x8_t pv1 = {-1, 2, -3, 4, -5, 6, -7, 8};
+        pxl::int8x8_t pv2 = {3,7 ,4, 9, 1, 2, 6, 8};
+        pxl::int8x8_t pv_out = pxl::vabd_s8(pv1, pv2);
+
+        int8_t out[8];
+        vst1_s8(out, v_out);
+        for (int i=0; i<8; i++)
+        {
+            //ASSERT_EQ(expected_out[i], out[i]);
+            ASSERT_EQ(pv_out[i], out[i]);
+        }
+    }
+
+    {
+        uint32x4_t v1 = {100, 4294967295, 233, 456};
+        uint32x4_t v2 = {4294967295, 100, 456, 233};
+        uint32x4_t v_out = vabdq_u32(v1, v2);
+        uint32_t expected_out[4] = {4294967195, 4294967195, 223, 223};
+        
+        pxl::uint32x4_t pv1 = {100, 4294967295, 233, 456};
+        pxl::uint32x4_t pv2 = {4294967295, 100, 456, 233};
+        pxl::uint32x4_t pv_out = pxl::vabdq_u32(pv1, pv2);
+        
+        uint32_t out[4];
+        vst1q_u32(out, v_out);
+        for (int i=0; i<4; i++)
+        {
+            ASSERT_EQ(expected_out[i], out[i]);
+            ASSERT_EQ(pv_out[i], out[i]);
+            //fprintf(stderr, "[%u, %u], ", pv_out[i], out[i]);
+        }
+    }
+}
+
 
 int main(int argc, char* argv[])
 {
