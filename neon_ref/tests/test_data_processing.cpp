@@ -135,6 +135,48 @@ TEST(add, vabd)
     }
 }
 
+TEST(add, vabdl)
+{
+    {
+        int8x8_t v1 = {-2, -120, 1, 2, 3, 4, 5, 6};
+        int8x8_t v2 = {127, 100, 9, -2, 5, -6, 7, 3};
+        int16x8_t v_out = vabdl_s8(v1, v2);
+        int16_t expected_out[8] = {129, 220, 8, 4, 2, 10, 2, 3};
+        
+        pxl::int8x8_t pv1 = {-2, -120, 1, 2, 3, 4, 5, 6};
+        pxl::int8x8_t pv2 = {127, 100, 9, -2, 5, -6, 7, 3};
+        pxl::int16x8_t pv_out = pxl::vabdl_s8(pv1, pv2);
+
+        int16_t out[8];
+        vst1q_s16(out, v_out);
+        for (int i=0; i<8; i++)
+        {
+            ASSERT_EQ(expected_out[i], out[i]);
+            ASSERT_EQ(pv_out[i], out[i]);
+            //fprintf(stderr, "[%u, %u], ", pv_out[i], out[i]);
+        }
+    }
+
+    {
+        uint8x8_t v1 = {2,  120, 1, 2, 3, 4, 5, 6};
+        uint8x8_t v2 = {127, 100, 9, 2, 5, 6, 7, 3};
+        uint16x8_t v_out = vabdl_u8(v1, v2);
+        uint16_t expected_out[8] = {125, 20, 8, 0, 2, 2, 2, 3};
+        
+        pxl::uint8x8_t pv1 = {2,  120, 1, 2, 3, 4, 5, 6};
+        pxl::uint8x8_t pv2 = {127, 100, 9, 2, 5, 6, 7, 3};
+        pxl::uint16x8_t pv_out = pxl::vabdl_u8(pv1, pv2);
+
+        uint16_t out[8];
+        vst1q_u16(out, v_out);
+        for (int i=0; i<8; i++)
+        {
+            ASSERT_EQ(expected_out[i], out[i]);
+            ASSERT_EQ(pv_out[i], out[i]);
+            //fprintf(stderr, "[%u, %u], ", pv_out[i], out[i]);
+        }
+    }
+}
 
 int main(int argc, char* argv[])
 {
