@@ -199,6 +199,9 @@ add_library(pixel_neon
   data_processing/vabs.hpp
   data_processing/vabs.cpp
 
+  data_processing/vqabs.hpp
+  data_processing/vqabs.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
