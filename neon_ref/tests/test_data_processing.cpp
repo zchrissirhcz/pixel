@@ -205,6 +205,33 @@ TEST(add, vaba)
     }
 }
 
+TEST(add, vabal)
+{
+    {
+        int16x8_t v1 = {127, 0, 1, 2, 3, 4, 5, 6};
+        int8x8_t v2 = {-1, 2, -3, 4, -5, 6, -7, 8};
+        int8x8_t v3 = {3,7 ,4, 9, 1, 2, 6, 8};
+        int16x8_t v_out = vabal_s8(v1, v2, v3);
+        int16_t expected_out[8] = {131, 5, 8, 7, 9, 8, 18, 6};
+        
+        pxl::int16x8_t pv1 = {127, 0, 1, 2, 3, 4, 5, 6};
+        pxl::int8x8_t pv2 = {-1, 2, -3, 4, -5, 6, -7, 8};
+        pxl::int8x8_t pv3 = {3,7 ,4, 9, 1, 2, 6, 8};
+        pxl::int16x8_t pv_out = pxl::vabal_s8(pv1, pv2, pv3);
+
+        int16_t out[8];
+        vst1q_s16(out, v_out);
+        for (int i=0; i<8; i++)
+        {
+            ASSERT_EQ(expected_out[i], out[i]);
+            ASSERT_EQ(pv_out[i], out[i]);
+            //fprintf(stderr, "[%u, %u], ", pv_out[i], out[i]);
+            //fprintf(stderr, "%d, ", out[i]);
+        }
+    }
+}
+
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
