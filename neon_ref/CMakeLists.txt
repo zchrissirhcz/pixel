@@ -208,6 +208,9 @@ add_library(pixel_neon
   data_processing/vabdl.hpp
   data_processing/vabdl.cpp
 
+  data_processing/vaba.hpp
+  data_processing/vaba.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )

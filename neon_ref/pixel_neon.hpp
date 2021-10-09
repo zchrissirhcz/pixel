@@ -72,5 +72,6 @@
 #include "data_processing/vqabs.hpp"
 #include "data_processing/vabd.hpp"
 #include "data_processing/vabdl.hpp"
+#include "data_processing/vaba.hpp"
 
 #include "misc/vdup_n.hpp"

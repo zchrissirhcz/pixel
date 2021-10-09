@@ -99,7 +99,7 @@ TEST(add, vabd)
         int8x8_t v1 = {-1, 2, -3, 4, -5, 6, -7, 8};
         int8x8_t v2 = {3,7 ,4, 9, 1, 2, 6, 8};
         int8x8_t v_out = vabd_s8(v1, v2);
-        int8_t expected_out[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+        int8_t expected_out[8] = {4, 5, 7, 5, 6, 4, 13, 0};
         
         pxl::int8x8_t pv1 = {-1, 2, -3, 4, -5, 6, -7, 8};
         pxl::int8x8_t pv2 = {3,7 ,4, 9, 1, 2, 6, 8};
@@ -109,8 +109,9 @@ TEST(add, vabd)
         vst1_s8(out, v_out);
         for (int i=0; i<8; i++)
         {
-            //ASSERT_EQ(expected_out[i], out[i]);
+            ASSERT_EQ(expected_out[i], out[i]);
             ASSERT_EQ(pv_out[i], out[i]);
+            //fprintf(stderr, "%d, ", pv_out[i]);
         }
     }
 
@@ -174,6 +175,32 @@ TEST(add, vabdl)
             ASSERT_EQ(expected_out[i], out[i]);
             ASSERT_EQ(pv_out[i], out[i]);
             //fprintf(stderr, "[%u, %u], ", pv_out[i], out[i]);
+        }
+    }
+}
+
+TEST(add, vaba)
+{
+    {
+        int8x8_t v1 = {127, 0, 1, 2, 3, 4, 5, 6};
+        int8x8_t v2 = {-1, 2, -3, 4, -5, 6, -7, 8};
+        int8x8_t v3 = {3,7 ,4, 9, 1, 2, 6, 8};
+        int8x8_t v_out = vaba_s8(v1, v2, v3);
+        int8_t expected_out[8] = {-125, 5, 8, 7, 9, 8, 18, 6};
+        
+        pxl::int8x8_t pv1 = {127, 0, 1, 2, 3, 4, 5, 6};
+        pxl::int8x8_t pv2 = {-1, 2, -3, 4, -5, 6, -7, 8};
+        pxl::int8x8_t pv3 = {3,7 ,4, 9, 1, 2, 6, 8};
+        pxl::int8x8_t pv_out = pxl::vaba_s8(pv1, pv2, pv3);
+
+        int8_t out[8];
+        vst1_s8(out, v_out);
+        for (int i=0; i<8; i++)
+        {
+            ASSERT_EQ(expected_out[i], out[i]);
+            ASSERT_EQ(pv_out[i], out[i]);
+            //fprintf(stderr, "[%u, %u], ", pv_out[i], out[i]);
+            //fprintf(stderr, "%d, ", pv_out[i]);
         }
     }
 }
