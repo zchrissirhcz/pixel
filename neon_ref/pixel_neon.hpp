@@ -75,5 +75,6 @@
 #include "data_processing/vaba.hpp"
 #include "data_processing/vabal.hpp"
 #include "data_processing/vmax.hpp"
+#include "data_processing/vpmax.hpp"
 
 #include "misc/vdup_n.hpp"
