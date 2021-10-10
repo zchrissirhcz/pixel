@@ -78,5 +78,6 @@
 #include "data_processing/vpmax.hpp"
 #include "data_processing/vmin.hpp"
 #include "data_processing/vpmin.hpp"
+#include "data_processing/vrecpe.hpp"
 
 #include "misc/vdup_n.hpp"

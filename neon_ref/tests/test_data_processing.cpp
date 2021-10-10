@@ -331,6 +331,30 @@ TEST(add, vpmin)
 }
 
 
+TEST(add, vrecpe)
+{
+    {
+        float32x4_t v1 = {1, 2, 3, 4};
+        float32x4_t v_out = vrecpeq_f32(v1);
+        float expected_out[4] = {0, 1, 3, 5};
+        
+        pxl::float32x4_t pv1 = {1, 2, 3, 4};
+        pxl::float32x4_t pv_out = pxl::vrecpeq_f32(pv1);
+
+        float out[4];
+        vst1q_f32(out, v_out);
+        for (int i=0; i<4; i++)
+        {
+            //ASSERT_EQ(expected_out[i], out[i]);
+            //ASSERT_EQ(pv_out[i], out[i]);
+            fprintf(stderr, "[%.5f, %.5f], ", pv_out[i], out[i]);
+            //fprintf(stderr, "%d, ", out[i]);
+        }
+    }
+}
+
+
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
