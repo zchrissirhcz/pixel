@@ -223,6 +223,9 @@ add_library(pixel_neon
   data_processing/vmin.hpp
   data_processing/vmin.cpp
 
+  data_processing/vpmin.hpp
+  data_processing/vpmin.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
