@@ -128,6 +128,14 @@ test_data_processing()
     adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
 }
 
+test_shift()
+{
+    DST_DIR=/data/local/tmp
+    EXE_FILE=test_shift
+
+    adb push $BUILD_DIR/$EXE_FILE $DST_DIR
+    adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
+}
 
 # test_shift_right
 # test_arithmetic
@@ -139,9 +147,11 @@ test_data_processing()
 
 #test_shift_right
 
+#-------------
 #test_add
 #test_sub
 #test_mul
 #test_round
 #test_logical_and_compare
-test_data_processing
+#test_data_processing
+test_shift

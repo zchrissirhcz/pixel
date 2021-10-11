@@ -153,7 +153,7 @@ add_library(pixel_neon
 
   round/vrnd.hpp
   round/vrnd.cpp
-  
+
   round/vrndn.hpp
   round/vrndn.cpp
 
@@ -267,5 +267,6 @@ pixel_add_test(mul)
 pixel_add_test(round)
 pixel_add_test(logical_and_compare)
 pixel_add_test(data_processing)
+pixel_add_test(shift)
 
 pixel_add_test(shift_right)
