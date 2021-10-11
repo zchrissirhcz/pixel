@@ -7,7 +7,7 @@ int8x8_t vhsub_s8(int8x8_t N, int8x8_t M)
     int8x8_t D;
     for (int i=0; i<8; i++)
     {
-        //D[i] = (N[i] - M[i])>>1; //not ok: result differs with `>>1`. 说明，移位和除法，是不一样的！
+        //D[i] = (N[i] - M[i]) / 2; //not ok: result differs with `>>1`. 说明，移位和除法，是不一样的！
         D[i] = (N[i] - M[i])>>1; //ok
     }
     return D;

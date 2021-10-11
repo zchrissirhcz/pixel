@@ -14,7 +14,7 @@ int8x8_t vshr_n_s8(int8x8_t v, const int n)
     int8x8_t D;
     for (int i=0; i<8; i++)
     {
-        D[i] = v[i] >> n;
+        D[i] = v[i] >> n; // 注意是 >> n 而不是 / (1<<n)， 因为v可能是负数，负数时>>和/结果不同
     }
     return D;
 }

@@ -81,5 +81,6 @@
 #include "data_processing/vrecpe.hpp"
 
 #include "shift/vshr_n.hpp"
+#include "shift/vqshrun_n.hpp"
 
 #include "misc/vdup_n.hpp"
