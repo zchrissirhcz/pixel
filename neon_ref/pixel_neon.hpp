@@ -80,4 +80,6 @@
 #include "data_processing/vpmin.hpp"
 #include "data_processing/vrecpe.hpp"
 
+#include "shift/vshr_n.hpp"
+
 #include "misc/vdup_n.hpp"

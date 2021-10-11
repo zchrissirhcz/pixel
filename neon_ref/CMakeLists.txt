@@ -229,6 +229,9 @@ add_library(pixel_neon
   data_processing/vrecpe.hpp
   data_processing/vrecpe.cpp
 
+  shift/vshr_n.hpp
+  shift/vshr_n.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
