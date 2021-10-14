@@ -238,6 +238,9 @@ add_library(pixel_neon
   shift/vshl.hpp
   shift/vshl.cpp
 
+  shift/vshl_n.hpp
+  shift/vshl_n.cpp
+
   misc/vdup_n.hpp
   misc/vdup_n.cpp
 )
