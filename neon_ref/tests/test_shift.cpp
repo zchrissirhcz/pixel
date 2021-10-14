@@ -79,6 +79,30 @@ TEST(shift, vqshrun_n_s16)
     }
 }
 
+TEST(shift, vshl_s8)
+{
+    int8x8_t v1 = {12, 34, 56, 78, 101, 123, -12, -120};
+    int8x8_t v2 = {1, 2, 3, 4, 5, 6, 7, 8};
+    int8x8_t v_out = vshl_s8(v1, v2);
+    int8_t expected_out[8] = {24, -120, -64, -32, -96, -64, 0, 0};
+
+    pxl::int8x8_t pv1 = {12, 34, 56, 78, 101, 123, -12, -120};
+    pxl::int8x8_t pv2 = {1, 2, 3, 4, 5, 6, 7, 8};
+    pxl::int8x8_t pv_out = pxl::vshl_s8(pv1, pv2);
+
+    int8_t out[8];
+    vst1_s8(out, v_out);
+    for (int i=0; i<8; i++) {
+        ASSERT_EQ(expected_out[i], out[i]);
+        ASSERT_EQ(pv_out[i], out[i]);
+        //fprintf(stderr, "[%d, %d], ", out[i], pv_out[i]);
+        //fprintf(stderr, "  %d, ", out[i]);
+        //fprintf(stderr, "%d, ", pv_out[i]);
+    }
+    
+    int8x8_t vshl_s8(int8x8_t M, int8x8_t N);
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);

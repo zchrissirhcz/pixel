@@ -82,5 +82,6 @@
 
 #include "shift/vshr_n.hpp"
 #include "shift/vqshrun_n.hpp"
+#include "shift/vshl.hpp"
 
 #include "misc/vdup_n.hpp"

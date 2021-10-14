@@ -77,7 +77,7 @@ float slow_reciprocal(float x)
             }
         }
     } else if (x>1) {
-        return 
+        return 0; //TODO
     }
     return 1;
 }
