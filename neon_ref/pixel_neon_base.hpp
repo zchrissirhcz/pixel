@@ -3,6 +3,8 @@
 #include <iostream>
 #include <array>
 #include <stdint.h>
+#include <math.h> // fabs
+#include <limits.h> // INT_MAX
 
 typedef float float32_t;
 typedef double float64_t;

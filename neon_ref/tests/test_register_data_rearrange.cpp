@@ -47,9 +47,10 @@ TEST(register_data_rearrange, vtb2)
 {
     // vtbl2_type: 数组长度扩大到2个 vector
     // 仍然是用第二个数组作为索引， 从第一个数组中取元素； 如果索引超过范围则返回0元素
-    int8x8x2_t v_src;
-    v_src.val[0] = {1, 2, 3, 4, 5, 6, 7, 8};
-    v_src.val[1] = {9, 10, 11, 12, 13, 14, 15, 16};
+    int8x8x2_t v_src = {
+        1, 2, 3, 4, 5, 6, 7, 8,
+        9, 10, 11, 12, 13, 14, 15, 16,
+    };
     int8x8_t v_src2 = {0, 0, 1, 1, 2, 8, 10, 16};
     int8x8_t v_out = vtbl2_s8(v_src, v_src2);
     int8_t expected_out[8] = {1, 1, 2, 2, 3, 9, 11, 0};

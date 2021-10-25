@@ -1,6 +1,6 @@
 #include "vrndn.hpp"
-#include <cmath>
-#include <iostream>
+#include <math.h>
+#include <limits.h>
 
 namespace pxl {
 
