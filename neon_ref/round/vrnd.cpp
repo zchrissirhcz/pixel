@@ -1,5 +1,7 @@
 #include "vrnd.hpp"
 
+#include <limits.h>
+
 namespace pxl {
 
 // vrnd means vector rounding to zero
