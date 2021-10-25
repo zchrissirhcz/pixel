@@ -5,7 +5,8 @@ project(pixel_neon)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-include("../overlook.cmake")
+include("../cmake/overlook.cmake")
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/../cmake/modules")
 
 #--- GoogleTest
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
@@ -256,9 +257,16 @@ find_package(GTest REQUIRED)
 
 enable_testing() # `ctest` or `make test` or `ctest -VV` or `ctest --output-on-failure`
 macro(pixel_add_test name)
-    add_executable(test_${name} tests/test_${name}.cpp)
-    target_link_libraries(test_${name} PRIVATE pixel_neon ${ARGN} GTest::gtest)
+  add_executable(test_${name} tests/test_${name}.cpp)
+  target_link_libraries(test_${name} PRIVATE pixel_neon ${ARGN} GTest::gtest)
+  if ( (NOT ANDROID) AND CMAKE_SYSTEM_NAME MATCHES "Linux" AND CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+    gtest_add_tests(
+      TARGET test_${name}
+      COMMAND ${CMAKE_COMMAND} -DTEST_EXECUTABLE=$<TARGET_FILE:test_${name}> -P ${CMAKE_SOURCE_DIR}/cmake/qemu_run_test.cmake
+    )
+  else()
     gtest_add_tests(TARGET test_${name})
+  endif()
 endmacro()
 
 
