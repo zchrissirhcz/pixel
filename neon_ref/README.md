@@ -1,5 +1,7 @@
 # Neon Intrinsics Reference Implementations
 
+[![linux-aarch64](https://github.com/zchrissirhcz/pixel/actions/workflows/linux-aarch64.yml/badge.svg)](https://github.com/zchrissirhcz/pixel/actions/workflows/linux-aarch64.yml)
+
 ## Intro
 Here is a (WIP) reference implementation of ARM NEON intrinsics with C++, compared with its counterpart with unittests. The purpose is running neon intrinsics on PC, with benifits:
 - easily debugging with neon intrinsics
