@@ -262,7 +262,7 @@ macro(pixel_add_test name)
   if ( (NOT ANDROID) AND CMAKE_SYSTEM_NAME MATCHES "Linux" AND CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
     gtest_add_tests(
       TARGET test_${name}
-      COMMAND ${CMAKE_COMMAND} -DTEST_EXECUTABLE=$<TARGET_FILE:test_${name}> -P ${CMAKE_SOURCE_DIR}/cmake/qemu_run_test.cmake
+      COMMAND ${CMAKE_COMMAND} -DTEST_EXECUTABLE=$<TARGET_FILE:test_${name}> -P "${CMAKE_SOURCE_DIR}/../cmake/qemu_run_test.cmake"
     )
   else()
     gtest_add_tests(TARGET test_${name})
