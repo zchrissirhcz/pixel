@@ -32,12 +32,31 @@ int main()
 
 ## Known issue
 
-header file order: `arm_neon.h` must be after `pixel_neon.hpp` when using:
+**header file ordr**
+
+`arm_neon.h` must be after `pixel_neon.hpp` when using:
 ```c++
 #include "pixel_neon.hpp"
 #include <arm_neon.h>
 ```
 otherwise it will cause conflicts of macros (neon_neon.h) and functions(pixel_neon.hpp), such as `vmul_lane_s16` .
+
+
+**test**
+
+Vector array element assign would be error (on some platform):
+```c++
+int8x8x2_t v_src;
+v_src.val[0] = {1, 2, 3, 4, 5, 6, 7, 8};
+v_src.val[1] = {9, 10, 11, 12, 13, 14, 15, 16};
+```
+Replacement:
+```c++
+int8x8x2_t v_src = {
+    {1, 2, 3, 4, 5, 6, 7, 8},
+    {9, 10, 11, 12, 13, 14, 15, 16}
+}
+```
 
 ## References
 
