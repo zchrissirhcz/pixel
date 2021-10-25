@@ -50,7 +50,7 @@ TEST(register_data_rearrange, vtb2)
     int8x8x2_t v_src = {
         {1, 2, 3, 4, 5, 6, 7, 8},
         {9, 10, 11, 12, 13, 14, 15, 16}
-    }
+    };
     int8x8_t v_src2 = {0, 0, 1, 1, 2, 8, 10, 16};
     int8x8_t v_out = vtbl2_s8(v_src, v_src2);
     int8_t expected_out[8] = {1, 1, 2, 2, 3, 9, 11, 0};
