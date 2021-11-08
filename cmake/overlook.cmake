@@ -80,7 +80,7 @@ endfunction()
 option(USE_OVERLOOK_FLAGS "use safe compilation flags?" ON)
 option(OVERLOOK_STRICT_FLAGS "strict c/c++ flags checking?" OFF)
 option(USE_CPPCHECK "use cppcheck for static checkingg?" OFF)
-option(OVERLOOK_VERBOSE "verbose output?" ON)
+option(OVERLOOK_VERBOSE "verbose output?" OFF)
 
 #################################################
 #

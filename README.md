@@ -4,6 +4,8 @@
 
 Image processing in C and ARM NEON, beats OpenCV on Android armv8-a sometimes.
 
+See [benchmark.md](benchmark.md) for result.
+
 
 | folder | description |
 | ------ | ----------- |

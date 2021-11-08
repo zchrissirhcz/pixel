@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#ifdef __ANDROID__
+#if __linux__ || __ANDROID__
 #include <sys/syscall.h>
 #include <unistd.h>
 #include <stdint.h>
