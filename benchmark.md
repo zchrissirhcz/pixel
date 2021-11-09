@@ -21,3 +21,20 @@ Rgb2grayFixture/fixed_asimd       2.75 ms         2.73 ms          253
 Rgb2grayFixture/opencv            4.74 ms         4.66 ms          129
 Rgb2grayFixture/fixed_asimd       2.98 ms         2.95 ms          236
 ```
+
+## rgb2bgr
+```
+-----------------------------------------------------------------------------
+Benchmark                                   Time             CPU   Iterations
+-----------------------------------------------------------------------------
+Rgb2bgrFixture/naive                     11.9 ms         11.8 ms           55
+Rgb2bgrFixture/idxopt                    2.46 ms         2.44 ms          282
+Rgb2bgrFixture/asimd                     11.9 ms         11.8 ms           55
+Rgb2bgrFixture/asm                       11.9 ms         11.8 ms           55
+Rgb2bgrFixture/opencv                    3.35 ms         3.26 ms          190
+Rgb2bgrInplaceFixture/naive              7.95 ms         7.88 ms           88
+Rgb2bgrInplaceFixture/naive2             7.81 ms         7.75 ms           90
+Rgb2bgrInplaceFixture/asm                7.93 ms         7.87 ms           89
+Rgb2bgrInplaceFixture/opencv             20.0 ms         19.8 ms           37
+Rgb2bgrInplaceFixture/opencv_trick       2.55 ms         2.49 ms          251
+```

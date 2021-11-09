@@ -1,130 +1,151 @@
-#include <stdio.h>
-
-#ifdef __ARM_NEON
-#include "common/pixel_cpu_affinity.h"
-#endif
+#include "rgb2bgr.h"
 #include "common/pixel_benchmark.h"
 #include "common/pixel_log.h"
+#include "common/pixel_cpu_affinity.h"
 
 #include <opencv2/opencv.hpp>
+#include <gtest/gtest.h>
 
-#include "rgb2bgr.h"
-
-int main() {
-#ifdef __ARM_NEON
-    size_t mask = 0;
-    for (int i = 0; i < 8; ++i) {
-      if (i >= 5) {
-        mask |= (1 << i);
-      }
+bool isImageNearlyEqual(const cv::Mat expected, const cv::Mat actual, const uint32_t tolerance=0)
+{
+    if ( (expected.rows!=actual.rows) ||
+         (expected.cols!=actual.cols) ||
+         (expected.channels()!=actual.channels())
+    )
+    {
+        return false;
     }
-    int ret = set_sched_affinity(mask);
-#endif
 
-    cv::Mat image = cv::imread("sky.jpg");
-    cv::Size size = image.size();
-    size_t height = (int)size.height;
-    size_t width = (int)size.width;
-
-    cv::Mat mat_naive = cv::Mat(size, CV_8UC3);
-    cv::Mat mat_idxopt = cv::Mat(size, CV_8UC3);
-    cv::Mat mat_asimd = cv::Mat(size, CV_8UC3);
-    cv::Mat mat_asm = cv::Mat(size, CV_8UC3);
-    cv::Mat mat_opencv = cv::Mat(size, CV_8UC3);
-
-    unsigned char* src_buf = image.data;
-    unsigned char* dst_buf;
-
-    double t_start, t_cost1, t_cost2, t_cost3, t_cost4, t_cost5;
-
-    dst_buf = mat_naive.data;
-    t_start = pixel_get_current_time();
-    rgb2bgr_naive(src_buf, height, width, dst_buf);
-    t_cost1 = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2bgr, naive impl cost %.4lf ms", t_cost1);
-
-    dst_buf = mat_idxopt.data;
-    t_start = pixel_get_current_time();
-    rgb2bgr_idxopt(src_buf, height, width, dst_buf);
-    t_cost2 = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2bgr, idxopt cost %.4lf ms", t_cost2);
-
-    dst_buf = mat_asimd.data;
-    t_start = pixel_get_current_time();
-    rgb2bgr_asimd(src_buf, height, width, dst_buf);
-    t_cost3 = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2bgr, asimd cost %.4lf ms", t_cost3);
-
-    dst_buf = mat_asm.data;
-    t_start = pixel_get_current_time();
-    rgb2bgr_asm(src_buf, height, width, dst_buf);
-    t_cost4 = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2bgr, asm cost %.4lf ms", t_cost4);
-
-    t_start = pixel_get_current_time();
-    cv::cvtColor(image, mat_opencv, cv::COLOR_BGR2RGB);
-    t_cost5 = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2bgr, opencv cost %.4lf ms", t_cost5);
-
-    cv::imwrite("sky_rgb_naive.bmp", mat_naive);
-    cv::imwrite("sky_rgb_idxopt.bmp", mat_idxopt);
-    cv::imwrite("sky_rgb_asimd.bmp", mat_asimd);
-    cv::imwrite("sky_rgb_asm.bmp", mat_asm);
-    cv::imwrite("sky_rgb_opencv.bmp", mat_opencv);
-
-    // ---------
-    double t_cost6, t_cost7, t_cost8, t_cost9, t_cost10;
-    cv::Mat image_shadow6 = image.clone();
-    cv::Mat image_shadow7 = image.clone();
-    cv::Mat image_shadow8 = image.clone();
-    cv::Mat image_shadow9 = image.clone();
-
-    t_start = pixel_get_current_time();
-    src_buf = image_shadow6.data;
-#if 0
-    rgb2bgr_inplace_naive(src_buf, height, width);
-#else
-    unsigned char* src_buf_line = src_buf;
-    for (int hi=0; hi<height; hi++) {
-        rgb2bgr_inplace_naive(src_buf_line, 1, width);
-        src_buf_line += width * 3;
+    const int h = expected.rows;
+    const int w = expected.cols;
+    const int c = expected.channels();
+    for (int i=0; i<h; i++)
+    {
+        for (int j=0; j<w; j++)
+        {
+            for (int k=0; k<c; k++)
+            {
+                const int idx = i * expected.step + j * c + k;
+                uint32_t diff = abs(expected.data[idx] - actual.data[idx]);
+                if (diff > tolerance) {
+                    PIXEL_LOGE("pixel not equal, (%d,%d,%d)[%d]!=(%d,%d,%d)[%d]\n",
+                        i, j, k, expected.data[idx],
+                        i, j, k, actual.data[idx]
+                    );
+                    return false;
+                }
+            }
+        }
     }
-#endif
-    t_cost6 = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2bgr_inplace, naive impl cost %.4lf ms", t_cost6);
-
-    t_start = pixel_get_current_time();
-    src_buf = image_shadow7.data;
-    rgb2bgr_inplace_naive2(src_buf, height, width);
-    t_cost7 = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2bgr_inplace, naive2 impl cost %.4lf ms", t_cost7);
-
-    t_start = pixel_get_current_time();
-    src_buf = image_shadow8.data;
-    rgb2bgr_inplace_asm(src_buf, height, width);
-    t_cost8 = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2bgr_inplace, asm impl cost %.4lf ms", t_cost8);
-
-    t_start = pixel_get_current_time();
-    cv::cvtColor(image_shadow9, image_shadow9, cv::COLOR_BGR2RGB);
-    t_cost9 = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2bgr_inplace, opencv cost %.4lf ms", t_cost9);
-
-    t_start = pixel_get_current_time();
-    cv::Mat image_shadow10 = image_shadow9;
-    cv::cvtColor(image_shadow9, image_shadow10, cv::COLOR_BGR2RGB);
-    t_cost10 = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("rgb2bgr_inplace, opencv trick cost %.4lf ms", t_cost10);
-
-    cv::imwrite("sky_rgb_inplace_naive.bmp", image_shadow6);
-    cv::imwrite("sky_rgb_inpalce_naive2.bmp", image_shadow7);
-    cv::imwrite("sky_rgb_inplace_asm.bmp", image_shadow8);
-    cv::imwrite("sky_rgb_inplace_opencv.bmp", image_shadow9);
-    cv::imwrite("sky_rgb_inplace_opencv_trick.bmp", image_shadow10);
-
-    return 0;
+    return true;
 }
 
+class Rgb2bgrFixture : public testing::Test {
+public:
+    virtual void SetUp() override
+    {
+        src = cv::imread("sky.jpg");
+        ASSERT_TRUE(!src.empty());
+        expected = src.clone();
+        cv::cvtColor(src, src, cv::COLOR_BGR2RGB);
+        src_buf = src.data;
+        height = src.rows;
+        width = src.cols;
+        res = cv::Mat(src.size(), CV_8UC3);
+        dst_buf = res.data;
+    }
+
+    virtual void TearDown() override {
+        EXPECT_TRUE(isImageNearlyEqual(expected, res, 0));
+    }
+
+    cv::Mat src;
+    unsigned char* src_buf;
+    unsigned char* dst_buf;
+    size_t height;
+    size_t width;
+    cv::Mat res;
+    cv::Mat expected;
+};
+
+TEST_F(Rgb2bgrFixture, naive)
+{
+    rgb2bgr_naive(src_buf, height, width, dst_buf);
+}
+
+TEST_F(Rgb2bgrFixture, idxopt)
+{
+    rgb2bgr_idxopt(src_buf, height, width, dst_buf);
+}
+
+TEST_F(Rgb2bgrFixture, asimd)
+{
+    rgb2bgr_asimd(src_buf, height, width, dst_buf);
+}
+
+TEST_F(Rgb2bgrFixture, asm)
+{
+    rgb2bgr_asm(src_buf, height, width, dst_buf);
+}
+
+TEST_F(Rgb2bgrFixture, opencv)
+{
+    cv::cvtColor(src, res, cv::COLOR_BGR2RGB);
+}
+
+class Rgb2bgrInplaceFixture : public testing::Test {
+public:
+    virtual void SetUp() override
+    {
+        src = cv::imread("sky.jpg");
+        ASSERT_TRUE(!src.empty());
+        expected = src.clone();
+        cv::cvtColor(src, src, cv::COLOR_BGR2RGB);
+        src_buf = src.data;
+        height = src.rows;
+        width = src.cols;
+    }
+
+    virtual void TearDown() override {
+        EXPECT_TRUE(isImageNearlyEqual(expected, src, 0));
+    }
+
+    cv::Mat src;
+    unsigned char* src_buf;
+    size_t height;
+    size_t width;
+    cv::Mat expected;
+};
+
+TEST_F(Rgb2bgrInplaceFixture, naive)
+{
+    rgb2bgr_inplace_naive(src_buf, height, width);
+    // for (int hi=0; hi<height; hi++) {
+    //     rgb2bgr_inplace_naive(src_buf_line, 1, width);
+    //     src_buf_line += width * 3;
+    // }
+}
+
+TEST_F(Rgb2bgrInplaceFixture, naive2)
+{
+    rgb2bgr_inplace_naive2(src_buf, height, width);
+}
+
+TEST_F(Rgb2bgrInplaceFixture, asm)
+{
+    rgb2bgr_inplace_asm(src_buf, height, width);
+}
+
+TEST_F(Rgb2bgrInplaceFixture, opencv)
+{
+    cv::cvtColor(src, src, cv::COLOR_BGR2RGB);
+}
+
+TEST_F(Rgb2bgrInplaceFixture, opencv_trick)
+{
+    cv::Mat shadow = src;
+    cv::cvtColor(src, shadow, cv::COLOR_BGR2RGB);
+}
 
 // 最初用来探索着写 arm neon 汇编代码的 snippet
 #ifdef __ARM_NEON
@@ -194,3 +215,10 @@ void swap_u8() {
 }
 
 #endif
+
+
+int main(int argc, char* argv[])
+{
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
