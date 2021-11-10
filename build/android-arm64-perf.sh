@@ -25,6 +25,16 @@ perf_rgb2bgr()
     adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
 }
 
-#perf_rgb2gray
-perf_rgb2bgr
+perf_flip()
+{
+    DST_DIR=/data/local/tmp
+    EXE_FILE=perf_flip
 
+    adb push $BUILD_DIR/$EXE_FILE $DST_DIR
+    adb push ../assets/sky.jpg $DST_DIR
+    adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
+}
+
+#perf_rgb2gray
+#perf_rgb2bgr
+perf_flip

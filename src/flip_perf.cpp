@@ -71,12 +71,12 @@ public:
     void SetUp(const ::benchmark::State& state) {
         src = cv::imread("sky.jpg");
         assert(!src.empty());
-        cv::cvtColor(src, expected, cv::COLOR_BGR2GRAY);
-        cv::flip(expected, expected, 1);
+        cv::cvtColor(src, src, cv::COLOR_BGR2GRAY);
+        cv::flip(src, expected, 1);
         src_buf = src.data;
         height = src.rows;
         width = src.cols;
-        res = cv::Mat(src.size(), CV_8UC3);
+        res = cv::Mat(src.size(), CV_8UC1);
         dst_buf = res.data;
     }
 
@@ -179,12 +179,12 @@ public:
     void SetUp(const ::benchmark::State& state) {
         src = cv::imread("sky.jpg");
         assert(!src.empty());
-        cv::cvtColor(src, expected, cv::COLOR_BGR2GRAY);
-        cv::flip(expected, expected, 0);
+        cv::cvtColor(src, src, cv::COLOR_BGR2GRAY);
+        cv::flip(src, expected, 0);
         src_buf = src.data;
         height = src.rows;
         width = src.cols;
-        res = cv::Mat(src.size(), CV_8UC3);
+        res = cv::Mat(src.size(), CV_8UC1);
         dst_buf = res.data;
     }
 

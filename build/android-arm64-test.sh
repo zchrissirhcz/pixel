@@ -25,6 +25,17 @@ test_rgb2bgr()
     adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
 }
 
+test_flip()
+{
+    DST_DIR=/data/local/tmp
+    EXE_FILE=test_flip
+
+    adb push $BUILD_DIR/$EXE_FILE $DST_DIR
+    adb push ../assets/sky.jpg $DST_DIR
+    adb shell "cd $DST_DIR; chmod +x $DST_DIR/$EXE_FILE; ./$EXE_FILE"
+}
+
 #test_rgb2gray
-test_rgb2bgr
+#test_rgb2bgr
+test_flip
 
