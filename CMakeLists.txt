@@ -8,38 +8,35 @@ include("cmake/overlook.cmake")
 include("cmake/deps.cmake")
 
 add_library(pixel STATIC
-  imgproc/rgb2gray.h
-  imgproc/rgb2gray.c
+  src/rgb2gray.h
+  src/rgb2gray.c
 
-  imgproc/rgb2bgr.h
-  imgproc/rgb2bgr.c
+  src/rgb2bgr.h
+  src/rgb2bgr.c
+
+  src/flip.h
+  src/flip.c
 )
 target_include_directories(pixel PUBLIC ${CMAKE_SOURCE_DIR})
 
-#------------------------------
+macro(pixel_add_test name)
+  add_executable(test_${name}  src/${name}_test.cpp)
+  target_link_libraries(test_${name} pixel ${OpenCV_LIBS} GTest::gtest)
+endmacro()
+
+macro(pixel_add_perf name)
+  add_executable(perf_${name}  src/${name}_perf.cpp)
+  target_link_libraries(perf_${name} pixel ${OpenCV_LIBS} benchmark::benchmark)
+endmacro()
+
 # rgb2gray
-#------------------------------
-add_executable(test_rgb2gray
-  imgproc/rgb2gray_test.cpp
-)
+pixel_add_test(rgb2gray)
+pixel_add_perf(rgb2gray)
 
-add_executable(perf_rgb2gray
-  imgproc/rgb2gray_perf.cpp
-)
-
-target_link_libraries(test_rgb2gray pixel ${OpenCV_LIBS} GTest::gtest)
-target_link_libraries(perf_rgb2gray pixel ${OpenCV_LIBS} benchmark::benchmark)
-
-#------------------------------
 # rgb2bgr
-#------------------------------
-add_executable(test_rgb2bgr
-  imgproc/rgb2bgr_test.cpp
-)
+pixel_add_test(rgb2bgr)
+pixel_add_perf(rgb2bgr)
 
-add_executable(perf_rgb2bgr
-  imgproc/rgb2bgr_perf.cpp
-)
-
-target_link_libraries(test_rgb2bgr pixel ${OpenCV_LIBS} GTest::gtest)
-target_link_libraries(perf_rgb2bgr pixel ${OpenCV_LIBS} benchmark::benchmark)
+# flip
+pixel_add_test(flip)
+pixel_add_perf(flip)
