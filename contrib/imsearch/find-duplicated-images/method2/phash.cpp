@@ -5,12 +5,18 @@
 void get_phash(const cv::Mat& image, std::bitset<64>& feature) {
     // step1 resize to 8x8
     cv::Size size(8, 8);
-    cv::Mat small(size, CV_8UC3);
+    cv::Mat small(size, image.type());
     cv::resize(image, small, size);
 
     // step2 color image to grayscale image
     cv::Mat gray(size, CV_8UC1);
-    cv::cvtColor(small, gray, cv::COLOR_BGR2GRAY);
+    if (small.type() == CV_8UC1)
+    {
+        gray = small;
+    }
+    else {
+        cv::cvtColor(small, gray, cv::COLOR_BGR2GRAY);
+    }
 
     // step3 get mean value of gray image
     cv::Scalar mean_scalar = cv::mean(gray);
@@ -30,6 +36,24 @@ std::string get_phash(cv::Mat& image) {
     std::bitset<64> feature;
     get_phash(image, feature);
     return feature.to_string();
+}
+
+int hamming_distance(const std::string& feature, const std::string& feature2)
+{
+    if (feature.length() != feature2.length()) {
+        return -1;
+    }
+    if (feature.length() == 0 || feature2.length() == 0) {
+        return -2;
+    }
+    int len = feature.length();
+    int dist = 0;
+    for (int i=0; i<len; i++) {
+        if (feature[i]!=feature2[i]) {
+            dist ++;
+        }
+    }
+    return dist;
 }
 
 #ifdef UNIT_TEST
