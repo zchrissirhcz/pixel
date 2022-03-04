@@ -18,13 +18,13 @@ uint8x8_t vqshrun_n_s16(int16x8_t v, const int n)
     uint8x8_t D;
     for (int i=0; i<8; i++) {
         int16_t temp = ( v[i] + (1<<(n-1) ) ) >> n;
-		if (temp > UINT8_MAX) {
+        if (temp > UINT8_MAX) {
             temp = UINT8_MAX;
         } else if (temp < 0) {
             temp = 0;
         }
     }
-	return D;
+    return D;
 }
 
 /// @param n 1-16
