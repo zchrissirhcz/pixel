@@ -150,8 +150,8 @@ test_shift()
 #-------------
 #test_add
 #test_sub
-#test_mul
+test_mul
 #test_round
 #test_logical_and_compare
 #test_data_processing
-test_shift
+#test_shift
