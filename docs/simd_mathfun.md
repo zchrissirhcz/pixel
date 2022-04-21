@@ -25,3 +25,5 @@ https://github.com/Tencent/ncnn/blob/master/src/layer/x86/avx512_mathfun.h
 ## neon_mathfun.h tanh加速
 https://github.com/Tencent/ncnn/pull/3722
 
+## http://code.google.com/p/math-neon
+
