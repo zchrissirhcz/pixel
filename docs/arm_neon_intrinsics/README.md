@@ -50,6 +50,9 @@ https://github.com/zchrissirhcz/pixel/tree/master/neon_ref
 ### neon_sim
 暂不对外提供
 
+## neon intrinsics 语法和实践
+[neon_intrinsics.md](neon_intrinsics.md)
+
 ## 调试技巧
 intrinsics 数据类型和 C 类型相互转换
     - 打印调试
