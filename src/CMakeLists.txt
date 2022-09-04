@@ -7,6 +7,7 @@ add_library(pixel STATIC
   px_cnn.c
   px_relu.c
   px_sigmoid.c
+  px_max_pooling.c
 
   # rgb2gray.h
   # rgb2gray.c

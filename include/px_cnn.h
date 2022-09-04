@@ -10,7 +10,8 @@ typedef struct px_array_t
 
 typedef struct px_matrix_dim_t
 {
-    int h, w;
+    int h;
+    int w;
 } px_matrix_dim_t;
 
 typedef struct px_matrix_t
@@ -18,6 +19,29 @@ typedef struct px_matrix_t
     float* data;
     int h, w; // px_matrix_dim_t
 } px_matrix_t;
+
+typedef struct px_kernel_size_t
+{
+    int h;
+    int w;
+} px_kernel_size_t;
+
+typedef struct px_pooling_param_t
+{
+    int kernel_h;
+    int kernel_w;
+
+    int stride_h;
+    int stride_w;
+
+    // TODO: pad
+} px_pooling_param_t;
+
+typedef struct px_stride_t
+{
+    int h;
+    int w;
+} px_stride_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,6 +70,13 @@ px_matrix_t* px_forward_eltwise_layer_for_matrix(const px_matrix_t* input, PxElt
 px_matrix_t* px_forward_sigmoid_layer_for_matrix(const px_matrix_t* input);
 px_matrix_t* px_forward_tanh_layer_for_matrix(const px_matrix_t* input);
 px_matrix_t* px_forward_relu_layer_for_matrix(const px_matrix_t* input);
+
+px_matrix_t* px_forward_max_pooling_layer_for_matrix(const px_matrix_t* input, const px_pooling_param_t pooling_param);
+px_matrix_dim_t px_get_pooling_output_matrix_dim(const px_matrix_dim_t input_dim, const px_pooling_param_t pooling_param);
+
+px_kernel_size_t px_make_kernel_size(const int h, const int w);
+px_stride_t px_make_stride(const int h, const int w);
+px_pooling_param_t px_make_pooling_param(const px_kernel_size_t kernel_size, const px_stride_t stride);
 
 #ifdef __cplusplus
 }

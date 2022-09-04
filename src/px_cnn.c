@@ -131,3 +131,12 @@ px_matrix_t* px_forward_eltwise_layer_for_matrix(const px_matrix_t* input, PxElt
     }
     return output;
 }
+
+px_stride_t px_make_stride(const int h, const int w)
+{
+    px_stride_t stride;
+    stride.h = h;
+    stride.w = w;
+
+    return stride;
+}
