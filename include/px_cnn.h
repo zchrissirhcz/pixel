@@ -43,6 +43,21 @@ typedef struct px_stride_t
     int w;
 } px_stride_t;
 
+typedef struct px_cube_t
+{
+    float* data;
+    int c;
+    int h;
+    int w;
+} px_cube_t;
+
+typedef struct px_cube_dim_t
+{
+    int c;
+    int h;
+    int w;
+} px_cube_dim_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -79,6 +94,15 @@ px_stride_t px_make_stride(const int h, const int w);
 px_pooling_param_t px_make_pooling_param(const px_kernel_size_t kernel_size, const px_stride_t stride);
 
 float px_inner_product(px_array_t* v1, px_array_t* v2);
+
+px_cube_dim_t px_get_cube_dim(const px_cube_t* cube);
+px_cube_t* px_make_cube(const px_cube_dim_t dim);
+int px_get_cube_volume(const px_cube_t* cube);
+
+px_cube_t* px_forward_eltwise_layer_for_cube(const px_cube_t* input, PxEltwiseFunction eltwise_func);
+px_cube_t* px_forward_relu_layer_for_cube(const px_cube_t* input);
+px_cube_t* px_forward_sigmoid_layer_for_cube(const px_cube_t* input);
+px_cube_t* px_forward_tanh_layer_for_cube(const px_cube_t* input);
 
 #ifdef __cplusplus
 }

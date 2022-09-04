@@ -123,9 +123,9 @@ px_matrix_t* px_forward_eltwise_layer_for_matrix(const px_matrix_t* input, PxElt
 {
     px_matrix_dim_t input_dim = px_get_matrix_dim(input);
     px_matrix_t* output = px_make_matrix(input_dim);
-    const int area = px_get_matrix_area(input);
+    const int len = px_get_matrix_area(input);
 
-    for (int i=0; i<area; i++)
+    for (int i = 0; i < len; i++)
     {
         output->data[i] = eltwise_func(input->data[i]);
     }
@@ -139,4 +139,45 @@ px_stride_t px_make_stride(const int h, const int w)
     stride.w = w;
 
     return stride;
+}
+
+px_cube_t* px_forward_eltwise_layer_for_cube(const px_cube_t* input, PxEltwiseFunction eltwise_func)
+{
+    px_cube_dim_t input_dim = px_get_cube_dim(input);
+    px_cube_t* output = px_make_cube(input_dim);
+    const int len = px_get_cube_volume(input);
+
+    for (int i = 0; i < len; i++)
+    {
+        output->data[i] = eltwise_func(input->data[i]);
+    }
+    return output;
+}
+
+px_cube_dim_t px_get_cube_dim(const px_cube_t* cube)
+{
+    px_cube_dim_t cube_dim = {0};
+    cube_dim.h = cube->h;
+    cube_dim.w = cube->w;
+    cube_dim.c = cube->c;
+    return cube_dim;
+}
+
+px_cube_t* px_make_cube(const px_cube_dim_t dim)
+{
+    const int c = dim.c;
+    const int h = dim.h;
+    const int w = dim.w;
+    px_cube_t* cube = (px_cube_t*)malloc(sizeof(px_cube_t));
+    const size_t buf_size = c * h * w * sizeof(float);
+    cube->data = (float*) malloc(buf_size);
+    cube->c = c;
+    cube->h = h;
+    cube->w = w;
+    return cube;
+}
+
+int px_get_cube_volume(const px_cube_t* cube)
+{
+    return cube->h * cube->w * cube->c;
 }
