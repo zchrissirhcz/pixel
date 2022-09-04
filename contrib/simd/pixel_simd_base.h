@@ -1,5 +1,4 @@
-#ifndef PIXEL_SIMD_BASE_H
-#define PIXEL_SIMD_BASE_H
+#pragma once
 
 //----------------------------------------------------------------------
 // => including header file
@@ -429,4 +428,3 @@ static inline v_uint32x4    vq_bitselect_u32(v_uint32x4 mask, v_uint32x4 v1, v_u
 static inline v_uint64x2    vq_bitselect_u64(v_uint64x2 mask, v_uint64x2 v1, v_uint64x2 v2);
 
 
-#endif // PIXEL_SIMD_BASE_H

@@ -1,5 +1,4 @@
-#ifndef PIXEL_ALLOC_H
-#define PIXEL_ALLOC_H
+#pragma once
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -60,5 +59,3 @@ static inline void pixel_fast_free(void* ptr)
     }
 }
 
-
-#endif // PIXEL_ALLOC_H

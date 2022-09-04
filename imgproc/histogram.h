@@ -1,5 +1,4 @@
-#ifndef PIXEL_IMPROC_HISTOGRAM_H
-#define PIXEL_IMPROC_HISTOGRAM_H
+#pragma once
 
 #include <stddef.h>
 
@@ -17,5 +16,3 @@ void histogram_rgb_naive(unsigned char* rgb, size_t height, size_t width, unsign
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_IMPROC_HISTOGRAM_H

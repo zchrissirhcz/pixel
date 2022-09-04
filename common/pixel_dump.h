@@ -1,5 +1,4 @@
-#ifndef PIXEL_DUMP_H
-#define PIXEL_DUMP_H
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,5 +43,3 @@ float* load_array_f32_as_bin(int* _len, const char* filename)
     *_len = len;
     return data;
 }
-
-#endif // PIXEL_DUMP_H

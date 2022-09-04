@@ -1,5 +1,4 @@
-#ifndef PIXEL_SIMD_OLD_H
-#define PIXEL_SIMD_OLD_H
+#pragma once
 
 // len   abbv
 // 64bit  d  double     (2x)
@@ -466,5 +465,3 @@ inline v_uint32x4 vq_cmpge_f32(v_float32x4 v1, v_float32x4 v2) {
 #endif
 
 
-
-#endif // PIXEL_SIMD_OLD_H

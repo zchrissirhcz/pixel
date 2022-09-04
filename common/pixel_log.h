@@ -26,8 +26,7 @@
  *  3. `_PXL_` will be potentially conflict with compiler implementations
  *********************************************************************************/
 
-#ifndef PIXEL_LOG_H
-#define PIXEL_LOG_H
+#pragma once
 
 #include <stdio.h>
 #include <time.h>
@@ -265,4 +264,3 @@ static inline char* timenow() {
 #endif
 
 
-#endif // PIXEL_LOG_H

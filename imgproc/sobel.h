@@ -1,5 +1,4 @@
-#ifndef PIXEL_IMPROC_SOBEL_H
-#define PIXEL_IMPROC_SOBEL_H
+#pragma once
 
 #include <stddef.h>
 
@@ -12,5 +11,3 @@ void sobel_gray(unsigned char* src);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_IMPROC_SOBEL_H

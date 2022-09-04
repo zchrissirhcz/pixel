@@ -1,5 +1,4 @@
-#ifndef PIXEL_IMPROC_BORDER_CLIP_H
-#define PIXEL_IMPROC_BORDER_CLIP_H
+#pragma once
 
 // https://docs.opencv.org/4.5.2/d2/de8/group__core__array.html
 // https://vovkos.github.io/doxyrest-showcase/opencv/sphinx_rtd_theme/enum_cv_BorderTypes.html
@@ -116,5 +115,3 @@ int border_clip(BorderType border_type, int x, int size)
     }
 }
 
-
-#endif // PIXEL_IMPROC_BORDER_CLIP_H

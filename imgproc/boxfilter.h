@@ -1,5 +1,4 @@
-#ifndef PIXEL_IMPROC_BOXFILTER_H
-#define PIXEL_IMPROC_BOXFILTER_H
+#pragma once
 
 #include "boxfilter.h"
 #include "border_clip.h"
@@ -15,6 +14,4 @@ void boxfilter_naive(unsigned char* src, unsigned char* dst, int height, int wid
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

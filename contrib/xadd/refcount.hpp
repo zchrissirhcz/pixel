@@ -1,8 +1,7 @@
 // from http://www.cs.cmu.edu/~lemur/doxygen/lemur-3.1/html/RefCount_8hpp-source.html
 // seems not working
 
-#ifndef REFCOUNT_HPP
-#define REFCOUNT_HPP
+#pragma once
 
 template<class T>
 class RefCount
@@ -63,5 +62,3 @@ public:
         return RefCount<newType>(ref);
     }
 };
-
-#endif // REFCOUNT_HPP

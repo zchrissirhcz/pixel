@@ -10,8 +10,7 @@
 *
 */
 
-#ifndef PIXEL_RNG_H
-#define PIXEL_RNG_H
+#pragma once
 
 #include <stdint.h>
 
@@ -98,5 +97,3 @@ static uint8_t pixel_random_uint8(uint8_t a, uint8_t b)
 #undef PXL_RNG_RAND_REFILL_COUNT
 #undef PXL_RNG_RAND_MAX
 #undef PXL_RAND
-
-#endif // PIXEL_RNG_H

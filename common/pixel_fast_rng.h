@@ -1,5 +1,4 @@
-#ifndef PIXEL_FAST_RNG_H
-#define PIXEL_FAST_RNG_H
+#pragma once
 
 /*
  * Use xorshift algorithm for fast random float number generation
@@ -52,4 +51,3 @@ float pixel_fast_random_float(float a, float b)
     return a + r;
 }
 
-#endif

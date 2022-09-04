@@ -1,5 +1,4 @@
-#ifndef PIXEL_SIMD_H
-#define PIXEL_SIMD_H
+#pragma once
 
 #include "pixel_simd_base.h"
 
@@ -14,5 +13,3 @@
 #include "pixel_simd_simu.h"
 #endif // PIXEL_NEON
 
-
-#endif // PIXEL_SIMD_H

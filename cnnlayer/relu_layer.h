@@ -1,5 +1,4 @@
-#ifndef PIXEL_CNNLAYER_RELU_LAYER_H
-#define PIXEL_CNNLAYER_RELU_LAYER_H
+#pragma once
 
 #include <stdint.h>
 
@@ -18,6 +17,4 @@ void relu_f32_forward_asm3(float* src, float* dst, uint32_t len);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

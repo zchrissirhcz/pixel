@@ -1,5 +1,4 @@
-#ifndef PIXEL_BMP_H
-#define PIXEL_BMP_H
+#pragma once
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -24,5 +23,3 @@ void pxl_encode_bmp(const char* fn, int h, int w, int c, const unsigned char* bu
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_BMP_H

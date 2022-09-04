@@ -1,5 +1,4 @@
-#ifndef PIXEL_CHECK_H
-#define PIXEL_CHECK_H
+#pragma once
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -58,5 +57,3 @@ int check_array_equal_u8(size_t len, uint8_t* data, uint8_t* gt)
     }
     return cnt;
 }
-
-#endif // PIXEL_CHECK_H

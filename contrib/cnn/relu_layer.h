@@ -1,5 +1,4 @@
-#ifndef PIXEL_CNN_RELU_LAYER_H
-#define PIXEL_CNN_RELU_LAYER_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,5 +15,3 @@ void relu_inplace_forward_asm(float* data, size_t len);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_CNN_RELU_LAYER_H

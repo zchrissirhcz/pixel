@@ -1,5 +1,4 @@
-#ifndef PIXEL_IMPROC_COPY_CUT_BORDER_H
-#define PIXEL_IMPROC_COPY_CUT_BORDER_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,5 +9,3 @@ void copy_cut_border(unsigned char* src, int src_height, int src_width, int chan
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_IMPROC_COPY_CUT_BORDER_H

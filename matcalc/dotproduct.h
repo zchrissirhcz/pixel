@@ -1,5 +1,4 @@
-#ifndef PIXEL_MATCALC_DOTPRODUCT_H
-#define PIXEL_MATCALC_DOTPRODUCT_H
+#pragma once
 
 #include <stdint.h>
 
@@ -24,5 +23,3 @@ uint64_t dotproduct_u8_asimd4(uint8_t* a, uint8_t* b, uint32_t len);
 }
 #endif
 
-
-#endif // PIXEL_MATCALC_DOTPRODUCT_H

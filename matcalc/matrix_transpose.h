@@ -1,5 +1,4 @@
-#ifndef PIXEL_MATCALC_MATRIX_TRANSPOSE_H
-#define PIXEL_MATCALC_MATRIX_TRANSPOSE_H
+#pragma once
 
 #include <stdint.h>
 
@@ -34,5 +33,3 @@ void transpose_f32_4x4_asimd(float* data0, float* data1, float* data2, float* da
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_MATCALC_MATRIX_TRANSPOSE_H

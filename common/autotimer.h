@@ -4,8 +4,7 @@
  * 析构函数是在生命周期结束时调用
  */
 
-#ifndef PIXEL_AUTOTIMER_H
-#define PIXEL_AUTOTIMER_H
+#pragma once
 
 #include <string>
 
@@ -20,5 +19,3 @@ private:
     class Impl;
     Impl* mImpl;
 };
-
-#endif // PIXEL_AUTOTIMER_H

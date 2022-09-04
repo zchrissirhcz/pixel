@@ -1,5 +1,4 @@
-#ifndef PIXEL_PLATFORM_H
-#define PIXEL_PLATFORM_H
+#pragma once
 
 #include "pixel_log.h"
 #include <inttypes.h>
@@ -64,5 +63,3 @@ void pxl_platform_echo()
 }
 
 
-
-#endif // PIXEL_PLATFORM_H

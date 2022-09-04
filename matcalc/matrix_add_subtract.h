@@ -1,5 +1,4 @@
-#ifndef PIXEL_MATCALC_MATRIX_ADD_SUBTRACT_H
-#define PIXEL_MATCALC_MATRIX_ADD_SUBTRACT_H
+#pragma once
 
 #include <stddef.h>
 
@@ -26,4 +25,3 @@ void matrix_subtract_f32_asimd(float* mA, float* mB, float* mC, const size_t M, 
 }
 #endif
 
-#endif // PIXEL_MATCALC_MATRIX_ADD_SUBTRACT_H

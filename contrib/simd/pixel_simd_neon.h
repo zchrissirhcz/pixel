@@ -1,5 +1,4 @@
-#ifndef PIXEL_SIMD_NEON_H
-#define PIXEL_SIMD_NEON_H
+#pragma once
 
 #include "pixel_simd_base.h"
 
@@ -442,5 +441,3 @@ inline v_uint16x8 vq_bitselect_u16(v_uint16x8 mask, v_uint16x8 v1, v_uint16x8 v2
 inline v_uint32x4 vq_bitselect_u32(v_uint32x4 mask, v_uint32x4 v1, v_uint32x4 v2) { return vbslq_u32(mask, v1, v2); }
 inline v_uint64x2 vq_bitselect_u64(v_uint64x2 mask, v_uint64x2 v1, v_uint64x2 v2) { return vbslq_u64(mask, v1, v2); }
 
-
-#endif // PIXEL_SIMD_NEON_H

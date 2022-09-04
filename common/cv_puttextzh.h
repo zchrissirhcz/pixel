@@ -2,7 +2,7 @@
   Example usage:
     cv::putTextZH(
         image,
-        "你好师姐",
+        "你好世界",
         cv::Point(10, image.rows / 2),
         CV_RGB(255, 255, 255),
         20,
@@ -10,8 +10,7 @@
     );
 */
 
-#ifndef CV_PUTTEXTZH_H
-#define CV_PUTTEXTZH_H
+#pragma once
 
 #include "opencv2/opencv.hpp"
 
@@ -156,5 +155,3 @@ namespace cv {
     }
 
 }
-
-#endif // CV_PUTTEXTZH_H

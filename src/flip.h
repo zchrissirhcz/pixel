@@ -1,5 +1,4 @@
-#ifndef PIXEL_IMPROC_FLIP_H
-#define PIXEL_IMPROC_FLIP_H
+#pragma once
 
 #include <stddef.h>
 
@@ -32,7 +31,4 @@ void flip_horiz_rgb_inplace(unsigned char* src, size_t height, size_t width);
 
 #ifdef __cplusplus
 }
-#endif
-
-
 #endif

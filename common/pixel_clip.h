@@ -1,5 +1,4 @@
-#ifndef PIXEL_CLIP_H
-#define PIXEL_CLIP_H
+#pragma once
 
 static int pixel_clip(int val, int minval, int maxval);
 
@@ -16,5 +15,3 @@ int pixel_clip(int val, int minval, int maxval)
     }
     return val;
 }
-
-#endif // PIXEL_CLIP_H

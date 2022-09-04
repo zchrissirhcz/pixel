@@ -1,5 +1,4 @@
-#ifndef PIXEL_MATCALC_ARRAY_MEAN_H
-#define PIXEL_MATCALC_ARRAY_MEAN_H
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -23,5 +22,3 @@ float array_mean_s8_asimd(int8_t* data, size_t len);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_MATCALC_ARRAY_MEAN_H

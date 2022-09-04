@@ -1,5 +1,4 @@
-#ifndef PIXEL_MATCALC_MEAN_STDDEV_H
-#define PIXEL_MATCALC_MEAN_STDDEV_H
+#pragma once
 
 #include <stddef.h>
 
@@ -16,5 +15,3 @@ extern "C" {
 }
 #endif
 
-
-#endif // PIXEL_MATCALC_MEAN_STDDEV_H

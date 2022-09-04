@@ -1,5 +1,4 @@
-#ifndef PIXEL_MATCALC_MATRIX_COLUMN_MAX_H
-#define PIXEL_MATCALC_MATRIX_COLUMN_MAX_H
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -23,5 +22,3 @@ void matrix_column_max_and_idx_u8_cacheline_asimd(unsigned char* src, size_t hei
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_MATCALC_MATRIX_COLUMN_MAX_H

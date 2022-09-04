@@ -1,5 +1,4 @@
-#ifndef PIXEL_RGB2BGR_H
-#define PIXEL_RGB2BGR_H
+#pragma once
 
 #include <stddef.h>
 
@@ -25,5 +24,3 @@ void rgb2bgr_inplace_asm(unsigned char* buf, size_t height, size_t width);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_RGB2BGR_H

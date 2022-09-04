@@ -1,5 +1,4 @@
-#ifndef PIXEL_IMPROC_THRESHOLD_H
-#define PIXEL_IMPROC_THRESHOLD_H
+#pragma once
 
 #include <stddef.h>
 
@@ -34,4 +33,3 @@ void threshold_gray_inplace(unsigned char* gray_buf, size_t height, size_t width
 }
 #endif
 
-#endif

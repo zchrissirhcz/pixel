@@ -1,5 +1,4 @@
-#ifndef IMPROC_ZCX
-#define IMPROC_ZCX
+#pragma once
 
 #include <vector>
 #include <iostream>
@@ -32,5 +31,3 @@ int upsample_bilinear2d(float *output_data, const float *input_data, int input_h
 // nearest interpolate function
 int upsample_nearest2d(unsigned char *output_data, const unsigned char *input_data, int input_height, int input_width,
     int output_height, int output_width, int channels);
-
-#endif// IMPROC_ZCX

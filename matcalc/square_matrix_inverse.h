@@ -1,5 +1,4 @@
-#ifndef PIXEL_MATCALC_SQUARE_MATRIX_INVERSE_H
-#define PIXEL_MATCALC_SQUARE_MATRIX_INVERSE_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,5 +10,3 @@ void square_matrix_inverse(float* src, uint32_t n, float* dst);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_MATCALC_SQUARE_MATRIX_INVERSE_H

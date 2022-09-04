@@ -1,5 +1,4 @@
-#ifndef PIXEL_CPU_AFFINITY_H
-#define PIXEL_CPU_AFFINITY_H
+#pragma once
 
 #include <stdio.h>
 
@@ -29,5 +28,3 @@ static int set_sched_affinity(size_t thread_affinity_mask)
     return 0;
 }
 
-
-#endif

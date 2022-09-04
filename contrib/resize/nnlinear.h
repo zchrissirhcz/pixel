@@ -1,5 +1,4 @@
-#ifndef PIXEL_RESIZE_NNLINEAR_H
-#define PIXEL_RESIZE_NNLINEAR_H
+#pragma once
 
 #include <stddef.h>
 
@@ -13,4 +12,3 @@ void nnlinear_rgb(unsigned char* src_buf, size_t src_h, size_t src_w, unsigned c
 }
 #endif
 
-#endif // PIXEL_RESIZE_NNLINEAR_H

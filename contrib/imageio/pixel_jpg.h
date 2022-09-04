@@ -1,5 +1,4 @@
-#ifndef PIXEL_JPG_H
-#define PIXEL_JPG_H
+#pragma once
 
 #include <stdbool.h>
 
@@ -17,5 +16,3 @@ void pxl_encode_jpg(const char* fn, int h, int w, int c, const unsigned char* bu
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_JPG_H

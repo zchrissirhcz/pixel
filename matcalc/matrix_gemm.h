@@ -1,5 +1,4 @@
-#ifndef PIXEL_MATCALC_MATRIX_GEMM_H
-#define PIXEL_MATCALC_MATRIX_GEMM_H
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -22,5 +21,3 @@ void matrix_gemm_f32_asimd(float* mA, float* mB, float* mC, const uint32_t M, co
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_MATCALC_MATRIX_GEMM_H

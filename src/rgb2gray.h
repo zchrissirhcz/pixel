@@ -1,5 +1,4 @@
-#ifndef PIXEL_IMPROC_RGB2GRAY
-#define PIXEL_IMPROC_RGB2GRAY
+#pragma once
 
 #include <stddef.h>
 
@@ -18,5 +17,3 @@ void pixel_rgb2gray_fixed_asm(unsigned char* rgb_buf, size_t height, size_t widt
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PIXEL_IMPROC_RGB2GRAY

@@ -1,5 +1,4 @@
-#ifndef PIXEL_MKDIR_H
-#define PIXEL_MKDIR_H
+#pragma once
 
 #if __linux__ || __APPLE__
 #include <sys/stat.h>
@@ -41,4 +40,3 @@ static void pixel_mkdir(const char* dirname) {
 #endif
 }
 
-#endif // PIXEL_MKDIR_H
