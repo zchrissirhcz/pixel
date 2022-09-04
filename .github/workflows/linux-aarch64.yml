@@ -55,7 +55,6 @@ jobs:
 
     - name: build
       run: |
-        cd neon_ref
         mkdir build-aarch64 && cd build-aarch64
         cmake -DCMAKE_TOOLCHAIN_FILE=../../toolchains/aarch64-linux-gnu.toolchain.cmake -DGTest_DIR=$GITHUB_WORKSPACE/googletest-install/lib/cmake/GTest ..
         cmake --build . -j 2
