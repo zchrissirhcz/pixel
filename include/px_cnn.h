@@ -37,6 +37,14 @@ float px_get_matrix_value(const px_matrix_t* matrix, int i, int j);
 int px_matrix_add_matrix(px_matrix_t* input, const px_matrix_t* plus);
 int px_matrix_add_scalar(px_matrix_t* input, const float bias);
 
+px_matrix_dim_t px_get_matrix_dim(const px_matrix_t* matrix);
+int px_get_matrix_area(const px_matrix_t* matrix);
+
+typedef float (*PxEltwiseFunction)(const float);
+
+px_matrix_t* px_forward_sigmoid_layer_for_matrix(const px_matrix_t* input);
+px_matrix_t* px_forward_eltwise_layer_for_matrix(const px_matrix_t* input, PxEltwiseFunction eltwise_func);
+
 #ifdef __cplusplus
 }
 #endif

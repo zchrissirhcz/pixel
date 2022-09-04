@@ -90,3 +90,49 @@ bool px_array_almost_equal(px_array_t* expected, px_array_t* actual, float eps)
 
     return true;
 }
+
+
+bool px_matrix_almost_equal(px_matrix_t* expected, px_matrix_t* actual, float eps)
+{
+    if (expected == NULL && actual == NULL)
+    {
+        return true;
+    }
+    else if ( (expected == NULL && actual != NULL) || (expected != NULL && actual == NULL) )
+    {
+        return false;
+    }
+    else if (expected->h != actual->h)
+    {
+        PX_LOGE("height not match: expected(%d) != actual(%d)\n", expected->h, actual->h);
+        return false;
+    }
+    else if (expected->w != actual->w)
+    {
+        PX_LOGE("width not match: expected(%d) != actual(%d)\n", expected->w, actual->w);
+        return false;
+    }
+
+    const int h = expected->h;
+    const int w = expected->w;
+    for (int i = 0; i < h; i++)
+    {
+        float* sp = expected->data + i * expected->w;
+        float* dp = actual->data + i * actual->w;
+        for (int j = 0; j < w; j++)
+        {
+            const float diff = fabs(sp[i] - dp[i]);
+            if (diff > eps)
+            {
+                PX_LOGE("actual[%d,%d] (%f) != expected[%d,%d] (%f), diff = %f, EPS = %f\n",
+                    i, j, dp[j],
+                    i, j, sp[j],
+                    diff, eps
+                );
+
+                return false;
+            }
+        }
+    }
+    return true;
+}

@@ -105,3 +105,29 @@ int px_matrix_add_scalar(px_matrix_t* input, const float bias)
     }
     return 0;
 }
+
+px_matrix_dim_t px_get_matrix_dim(const px_matrix_t* matrix)
+{
+    px_matrix_dim_t matrix_dim = {0};
+    matrix_dim.h = matrix->h;
+    matrix_dim.w = matrix->w;
+    return matrix_dim;
+}
+
+int px_get_matrix_area(const px_matrix_t* matrix)
+{
+    return matrix->h * matrix->w;
+}
+
+px_matrix_t* px_forward_eltwise_layer_for_matrix(const px_matrix_t* input, PxEltwiseFunction eltwise_func)
+{
+    px_matrix_dim_t input_dim = px_get_matrix_dim(input);
+    px_matrix_t* output = px_make_matrix(input_dim);
+    const int area = px_get_matrix_area(input);
+
+    for (int i=0; i<area; i++)
+    {
+        output->data[i] = eltwise_func(input->data[i]);
+    }
+    return output;
+}
