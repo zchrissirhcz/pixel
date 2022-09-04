@@ -136,3 +136,37 @@ bool px_matrix_almost_equal(px_matrix_t* expected, px_matrix_t* actual, float ep
     }
     return true;
 }
+
+
+
+void px_dump_matrix(const px_matrix_t* matrix)
+{
+    for (int i = 0; i < matrix->h; i++)
+    {
+        for (int j = 0; j < matrix->w; j++)
+        {
+            int idx = i * matrix->w + j;
+            PX_LOGE("%f, ", matrix->data[idx]);
+        }
+        PX_LOGE("\n");
+    }
+}
+
+void px_dump_cube(const px_cube_t* cube)
+{
+    PX_LOGE(">>> cube.dims: h=%d, w=%d, c=%d\n", cube->h, cube->w, cube->c);
+    for (int k = 0; k < cube->c; k++)
+    {
+        for (int i = 0; i < cube->h; i++)
+        {
+            for (int j = 0; j < cube->w; j++)
+            {
+                int idx = k * cube->w * cube->h + i * cube->w + j;
+                PX_LOGE("%f, ", cube->data[idx]);
+            }
+            PX_LOGE("\n");
+        }
+        PX_LOGE("\n----------\n");
+    }
+    PX_LOGE("\n");
+}

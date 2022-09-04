@@ -58,6 +58,25 @@ typedef struct px_cube_dim_t
     int w;
 } px_cube_dim_t;
 
+typedef struct px_pad_t
+{
+    int top;
+    int bottom;
+    int left;
+    int right;
+} px_pad_t;
+
+typedef struct px_conv_param_t
+{
+    int stride_h;
+    int stride_w;
+
+    int pad_top;
+    int pad_bottom;
+    int pad_left;
+    int pad_right;
+} px_conv_param_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -95,14 +114,31 @@ px_pooling_param_t px_make_pooling_param(const px_kernel_size_t kernel_size, con
 
 float px_inner_product(px_array_t* v1, px_array_t* v2);
 
-px_cube_dim_t px_get_cube_dim(const px_cube_t* cube);
 px_cube_t* px_make_cube(const px_cube_dim_t dim);
+void px_release_cube(px_cube_t* cube);
+px_cube_dim_t px_get_cube_dim(const px_cube_t* cube);
 int px_get_cube_volume(const px_cube_t* cube);
 
 px_cube_t* px_forward_eltwise_layer_for_cube(const px_cube_t* input, PxEltwiseFunction eltwise_func);
 px_cube_t* px_forward_relu_layer_for_cube(const px_cube_t* input);
 px_cube_t* px_forward_sigmoid_layer_for_cube(const px_cube_t* input);
 px_cube_t* px_forward_tanh_layer_for_cube(const px_cube_t* input);
+
+px_matrix_t* px_copy_make_border_for_matrix(const px_matrix_t* matrix, const px_pad_t pad);
+
+px_matrix_dim_t px_get_conv_output_matrix_dim(const px_matrix_dim_t input_dim, const px_matrix_dim_t kernel_dim, const px_conv_param_t conv_param);
+
+px_pad_t px_make_pad(const int top, const int bottom, const int left, const int right);
+px_conv_param_t px_make_conv_param(const px_stride_t stride, const px_pad_t pad);
+
+px_matrix_dim_t px_get_channel_wise_matrix_dim(const px_cube_t* cube);
+px_matrix_t* px_forward_convolution_layer_for_cube_with_one_kernel(const px_cube_t* input, px_cube_t* kernel, const px_conv_param_t conv_param, const float bias);
+float* px_get_matrix_data_from_cube(const px_cube_t* cube, const int channel_idx);
+px_matrix_t px_get_matrix_from_cube(const px_cube_t* cube, const int channel_idx);
+
+px_matrix_t* px_forward_convolution_layer_for_matrix(const px_matrix_t* input, const px_matrix_t* kernel, const px_conv_param_t conv_param, const float bias);
+px_pad_t px_get_pad_from_conv_param(const px_conv_param_t conv_param);
+px_cube_t* px_forward_convolution_layer_for_cube(const px_cube_t* input, px_cube_t** kernels, const int kernels_num, const px_conv_param_t conv_param, float* bias, const int bias_num);
 
 #ifdef __cplusplus
 }

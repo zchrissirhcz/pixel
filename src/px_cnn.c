@@ -181,3 +181,90 @@ int px_get_cube_volume(const px_cube_t* cube)
 {
     return cube->h * cube->w * cube->c;
 }
+
+px_matrix_t* px_copy_make_border_for_matrix(const px_matrix_t* matrix, const px_pad_t pad)
+{
+    if (pad.top<0 || pad.bottom<0 || pad.left<0 || pad.right<0) {
+        PX_LOGE("invalid padding\n");
+        return NULL;
+    }
+    if (matrix==NULL || matrix->data==NULL || matrix->h<0 || matrix->w<0) {
+        PX_LOGE("invalid matrix\n");
+        return NULL;
+    }
+
+    const int padded_h = matrix->h + pad.top + pad.bottom;
+    const int padded_w = matrix->w + pad.left + pad.right;
+    px_matrix_dim_t padded_dim = {0};
+    padded_dim.h = padded_h;
+    padded_dim.w = padded_w;
+    px_matrix_t* padded_matrix = px_make_matrix(padded_dim);
+
+    const int pad_value = 0;
+    for (int i=0; i<padded_h; i++) {
+        for (int j=0; j<padded_w; j++) {
+            if (i<pad.top || i>=matrix->h+pad.top
+             || j<pad.left || j>=matrix->w+pad.left)
+            {
+                px_set_matrix_value(padded_matrix, i, j, pad_value);
+            }
+            else
+            {
+                const int si = i - pad.top;
+                const int sj = j - pad.left;
+                const float value = px_get_matrix_value(matrix, si, sj);
+                px_set_matrix_value(padded_matrix, i, j, value);
+            }
+        }
+    }
+
+    return padded_matrix;
+}
+
+void px_release_cube(px_cube_t* cube)
+{
+    if (cube != NULL)
+    {
+        if (cube->data)
+        {
+            free(cube->data);
+            cube->data = NULL;
+        }
+        free(cube);
+    }
+}
+
+px_pad_t px_make_pad(const int top, const int bottom, const int left, const int right)
+{
+    px_pad_t pad;
+    pad.top = top;
+    pad.bottom = bottom;
+    pad.left = left;
+    pad.right = right;
+
+    return pad;
+}
+
+px_matrix_dim_t px_get_channel_wise_matrix_dim(const px_cube_t* cube)
+{
+    px_matrix_dim_t matrix_dim = {0};
+    matrix_dim.h = cube->h;
+    matrix_dim.w = cube->w;
+    return matrix_dim;
+}
+
+float* px_get_matrix_data_from_cube(const px_cube_t* cube, const int channel_idx)
+{
+    const int cstep = cube->h * cube->w;
+    return cube->data + channel_idx * cstep;
+}
+
+px_matrix_t px_get_matrix_from_cube(const px_cube_t* cube, const int channel_idx)
+{
+    px_matrix_t matrix = {0};
+    matrix.h = cube->h;
+    matrix.w = cube->w;
+    const int cstep = cube->h * cube->w;
+    matrix.data = cube->data + channel_idx * cstep;
+    return matrix;
+}
