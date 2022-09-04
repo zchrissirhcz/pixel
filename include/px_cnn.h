@@ -78,6 +78,8 @@ px_kernel_size_t px_make_kernel_size(const int h, const int w);
 px_stride_t px_make_stride(const int h, const int w);
 px_pooling_param_t px_make_pooling_param(const px_kernel_size_t kernel_size, const px_stride_t stride);
 
+float px_inner_product(px_array_t* v1, px_array_t* v2);
+
 #ifdef __cplusplus
 }
 #endif
