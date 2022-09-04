@@ -7,5 +7,5 @@ endmacro()
 pixel_add_test(px_rgb2bgr_test)
 pixel_add_test(px_rgb2gray_test)
 pixel_add_test(px_relu_test)
-
 pixel_add_test(px_flip_test)
+pixel_add_test(px_matrix_test)
