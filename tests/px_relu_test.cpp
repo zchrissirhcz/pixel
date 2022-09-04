@@ -28,3 +28,27 @@ TEST(naive, relu)
     px_destroy_array(actual);
     px_destroy_array(expected);
 }
+
+TEST(relu, matrix)
+{
+    px_matrix_dim_t input_dim = {2, 2};
+    px_matrix_t* input = px_make_matrix(input_dim);
+    px_set_matrix_value(input, 0, 0, 1);
+    px_set_matrix_value(input, 0, 1, -1);
+    px_set_matrix_value(input, 1, 0, 233);
+    px_set_matrix_value(input, 1, 1, -42);
+
+    px_matrix_t* output = px_forward_relu_layer_for_matrix(input);
+
+    px_matrix_t* expected_output = px_make_matrix(input_dim);
+    px_set_matrix_value(expected_output, 0, 0, 1);
+    px_set_matrix_value(expected_output, 0, 1, 0);
+    px_set_matrix_value(expected_output, 1, 0, 233);
+    px_set_matrix_value(expected_output, 1, 1, 0);
+
+    EXPECT_TRUE(px_matrix_almost_equal(expected_output, output, 0));
+
+    px_release_matrix(input);
+    px_release_matrix(expected_output);
+    px_release_matrix(output);
+}

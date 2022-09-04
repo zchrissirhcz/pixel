@@ -1,6 +1,11 @@
 #include "px_cnn.h"
 #include "px_assert.h"
 
+static float relu(float x)
+{
+    return (x > 0) ? x: 0;
+}
+
 void px_relu_forward(px_array_t* input, px_array_t* output)
 {
     PX_ASSERT(output != NULL);
@@ -11,4 +16,9 @@ void px_relu_forward(px_array_t* input, px_array_t* output)
     {
         output->data[i] = (input->data[i] > 0) ? input->data[i] : 0;
     }
+}
+
+px_matrix_t* px_forward_relu_layer_for_matrix(const px_matrix_t* input)
+{
+    return px_forward_eltwise_layer_for_matrix(input, relu);
 }
