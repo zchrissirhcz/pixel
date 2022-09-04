@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BUILD_DIR=linux-x64
+BUILD_DIR=mac-arm64
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 

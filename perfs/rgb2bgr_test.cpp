@@ -1,4 +1,4 @@
-#include "rgb2bgr.h"
+#include "px_rgb2bgr.h"
 #include "common/pixel_benchmark.h"
 #include "common/pixel_log.h"
 #include "common/pixel_cpu_affinity.h"

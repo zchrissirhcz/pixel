@@ -1,0 +1,21 @@
+add_library(pixel STATIC
+  px_rgb2bgr.c
+  px_rgb2gray.c
+  px_flip.c
+  px_image.c
+  px_compare.c
+  px_cnn.c
+  px_relu.c
+
+  # rgb2gray.h
+  # rgb2gray.c
+
+  # rgb2bgr.h
+  # rgb2bgr.c
+
+  # flip.h
+  # flip.c
+)
+target_include_directories(pixel PUBLIC
+  ${CMAKE_SOURCE_DIR}/include
+)
