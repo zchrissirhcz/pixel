@@ -1,15 +1,19 @@
 add_library(pixel STATIC
-  px_rgb2bgr.c
-  px_rgb2gray.c
-  px_flip.c
   px_image.c
   px_compare.c
+  
+  px_rgb2bgr.c
+  px_rgb2gray.c
+  px_flip.c  
+
   px_cnn.c
   px_relu.c
   px_sigmoid.c
   px_max_pooling.c
   px_inner_product.c
   px_convolution.c
+
+  px_array_mean.c
 
   # rgb2gray.h
   # rgb2gray.c
