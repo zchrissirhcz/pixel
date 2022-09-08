@@ -6,9 +6,8 @@
 
 void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE flipmode)
 {
-    PX_ASSERT(src != NULL);
-    PX_ASSERT(dst != NULL);
-    PX_ASSERT(src->height == dst->height && src->width == dst->width && src->channel == dst->channel);
+    PX_ASSERT(src != NULL && dst != NULL);
+    PX_ASSERT(px_image_shape_equal(src, dst, false));
     const int h = src->height;
     const int w = src->width;
     const int cn = src->channel;
