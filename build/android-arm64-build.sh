@@ -6,6 +6,8 @@ TOOLCHAIN=$ANDROID_NDK/build/cmake/android.toolchain.cmake
 # echo "=== TOOLCHAIN is: $TOOLCHAIN"
 
 BUILD_DIR=android-arm64
+CVBUILD_PLATFORM=android
+CVBUILD_ARCH=arm64
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 

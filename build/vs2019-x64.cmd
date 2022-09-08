@@ -1,6 +1,8 @@
 @echo off
 
 set BUILD_DIR=vs2019-x64
+CVBUILD_PLATFORM=vs2019
+CVBUILD_ARCH=x64
 
 if not exist %BUILD_DIR% md %BUILD_DIR%
 

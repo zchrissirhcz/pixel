@@ -10,6 +10,8 @@ echo "TOOLCHAIN is: %TOOLCHAIN%"
 echo "ARTIFACTS_DIR is %ARTIFACTS_DIR%"
 
 set BUILD_DIR=android-arm64
+set CVBUILD_PLATFORM=android
+set CVBUILD_ARCH=arm64
 if not exist %BUILD_DIR% md %BUILD_DIR%
 cd %BUILD_DIR%
 
