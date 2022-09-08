@@ -1,12 +1,13 @@
 #pragma once
 
 #include <stddef.h>
+#include "px_image.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void flip_horiz_rgb_naive(unsigned char* src, size_t height, size_t width, unsigned char* dst);
+void flip_horiz_rgb_naive(px_image_t* src, px_image_t* dst);
 void flip_horiz_rgb_idxopt(unsigned char* src, size_t height, size_t width, unsigned char* dst);
 void flip_horiz_rgb_asimd(unsigned char* src, size_t height, size_t width, unsigned char* dst);
 

@@ -1,6 +1,7 @@
 #include <benchmark/benchmark.h>
 #include <opencv2/opencv.hpp>
 #include "flip.h"
+#include "px_image.h"
 
 
 //cv::flip(src, dst, mode);
@@ -34,9 +35,16 @@ public:
     cv::Mat expected;
 };
 
-BENCHMARK_DEFINE_F(FlipHorizonRgbFixture, naive)(benchmark::State& st) {
-    for (auto _ : st) {
-        flip_horiz_rgb_naive(src_buf, height, width, dst_buf);
+BENCHMARK_DEFINE_F(FlipHorizonRgbFixture, naive)(benchmark::State& st)
+{
+    for (auto _ : st)
+    {
+        px_image_t* src_image = px_create_image_header(height, width, src.channels());
+        src_image->data = src_buf;
+        px_image_t* dst_image = px_create_image(height, width, src.channels());
+        flip_horiz_rgb_naive(src_image, dst_image);
+        px_destroy_image_header(src_image);
+        px_destroy_image(dst_image);
     }
 }
 BENCHMARK_REGISTER_F(FlipHorizonRgbFixture, naive)->Unit(benchmark::kMillisecond);

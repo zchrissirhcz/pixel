@@ -1,4 +1,6 @@
 #include "flip.h"
+#include "px_assert.h"
+#include "px_compare.h"
 
 #ifdef __ARM_NEON
 #include <arm_neon.h>
@@ -8,21 +10,30 @@
 #include <stdlib.h>
 #include <string.h>
 
-void flip_horiz_rgb_naive(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+void flip_horiz_rgb_naive(px_image_t* src, px_image_t* dst)
 {
-    unsigned char* src_line = src;
-    unsigned char* dst_line = dst;
-    size_t linebytes = width * 3;
-    for (size_t i=0; i<height; i++) {
-        for (size_t j=0; j<width; j++) {
-            size_t src_idx = j*3;
-            size_t dst_idx = (width-1-j)*3;
-            dst_line[dst_idx  ] = src_line[src_idx];
-            dst_line[dst_idx+1] = src_line[src_idx+1];
-            dst_line[dst_idx+2] = src_line[src_idx+2];
+    PX_ASSERT(src != NULL && dst != NULL);
+    PX_ASSERT(px_image_shape_equal(src, dst, false));
+    PX_ASSERT(src->channel == 3);
+
+    const int cn = 3;
+    const int width = src->width;
+    const int height = src->height;
+
+    for (int i = 0; i < height; i++)
+    {
+        unsigned char* src_line = src->data + i * src->stride;
+        unsigned char* dst_line = dst->data + i * dst->stride;
+        for (int j = 0; j < width; j++)
+        {
+            size_t src_idx = j * cn;
+            size_t dst_idx = (width-1-j) * cn;
+            dst_line[dst_idx + 0] = src_line[src_idx + 0];
+            dst_line[dst_idx + 1] = src_line[src_idx + 1];
+            dst_line[dst_idx + 2] = src_line[src_idx + 2];
         }
-        src_line += linebytes;
-        dst_line += linebytes;
+        src_line += src->stride;
+        dst_line += dst->stride;
     }
 }
 
