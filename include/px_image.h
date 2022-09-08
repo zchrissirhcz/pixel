@@ -59,6 +59,15 @@ typedef enum PX_FLIP_MODE
 } PX_FLIP_MODE;
 void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE flipmode);
 
+typedef enum PX_HISTOGRAM_MODE
+{
+    PX_HISTOGRAM_GRAY = 0,
+    PX_HISTOGRAM_R = 1,
+    PX_HISTOGRAM_G = 2,
+    PX_HISTOGRAM_B = 3
+} PX_HISTOGRAM_MODE;
+void px_histogram_rgb(px_image_t* src, px_image_t* hist, PX_HISTOGRAM_MODE mode);
+
 void px_resize_nearest(px_image_t* src, px_image_t* dst, px_size_t dsize);
 void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize);
 void px_resize_cubic(px_image_t* src, px_image_t* dst, px_size_t dsize);
