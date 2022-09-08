@@ -42,6 +42,7 @@ extern "C" {
 px_image_t* px_create_image_header(int height, int width, int channel);
 px_image_t* px_create_image(int height, int width, int channel);
 void px_destroy_image(px_image_t* image);
+void px_destroy_image_header(px_image_t* image);
 
 void px_rgb2bgr(px_image_t* src, px_image_t* dst);
 void px_rgb2gray(px_image_t* src, px_image_t* dst);

@@ -34,3 +34,11 @@ void px_destroy_image(px_image_t* image)
         free(image);
     }
 }
+
+void px_destroy_image_header(px_image_t* image)
+{
+    if (image)
+    {
+        free(image);
+    }
+}
