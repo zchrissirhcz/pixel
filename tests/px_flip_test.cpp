@@ -20,7 +20,7 @@ TEST(naive, flip_gray)
     {
         // C  D
         // A  B
-        int flipmode = PX_FLIP_VERTICAL;
+        PX_FLIP_MODE flipmode = PX_FLIP_VERTICAL;
         expected->data[0] = 'C';
         expected->data[1] = 'D';
         expected->data[2] = 'A';
@@ -33,7 +33,7 @@ TEST(naive, flip_gray)
     {
         // B  A
         // D  C
-        int flipmode = PX_FLIP_HORIZONTAL;
+        PX_FLIP_MODE flipmode = PX_FLIP_HORIZONTAL;
         expected->data[0] = 'B';
         expected->data[1] = 'A';
         expected->data[2] = 'D';
@@ -49,7 +49,7 @@ TEST(naive, flip_gray)
     {
         // D  C
         // B  A
-        int flipmode = PX_FLIP_BOTH;
+        PX_FLIP_MODE flipmode = PX_FLIP_BOTH;
         expected->data[0] = 'D';
         expected->data[1] = 'C';
         expected->data[2] = 'B';
@@ -96,7 +96,7 @@ TEST(naive, flip_rgb)
     {
         // CDE  DEF
         // ABC  BCD
-        int flipmode = PX_FLIP_VERTICAL;
+        PX_FLIP_MODE flipmode = PX_FLIP_VERTICAL;
         expected->data[0] = 'C';
         expected->data[1] = 'D';
         expected->data[2] = 'E';
@@ -121,7 +121,7 @@ TEST(naive, flip_rgb)
     {
         // BCD  ABC
         // DEF  CDE
-        int flipmode = PX_FLIP_HORIZONTAL;
+        PX_FLIP_MODE flipmode = PX_FLIP_HORIZONTAL;
         expected->data[0] = 'B';
         expected->data[1] = 'C';
         expected->data[2] = 'D';
@@ -149,7 +149,7 @@ TEST(naive, flip_rgb)
     {
         // DEF  CDE
         // BCD  ABC
-        int flipmode = PX_FLIP_BOTH;
+        PX_FLIP_MODE flipmode = PX_FLIP_BOTH;
         expected->data[0] = 'D';
         expected->data[1] = 'E';
         expected->data[2] = 'F';

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void px_flip(px_image_t* src, px_image_t* dst, int flipmode)
+void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE flipmode)
 {
     PX_ASSERT(src != NULL);
     PX_ASSERT(dst != NULL);
