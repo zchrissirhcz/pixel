@@ -68,6 +68,13 @@ typedef enum PX_HISTOGRAM_MODE
 } PX_HISTOGRAM_MODE;
 void px_histogram_rgb(px_image_t* src, px_image_t* hist, PX_HISTOGRAM_MODE mode);
 
+typedef enum PX_INTERP_MODE
+{
+    PX_INTERP_NEAREST,
+    PX_INTERP_LINEAR,
+    PX_INTERP_CUBIC
+} PX_INTERP_MODE;
+
 void px_resize_nearest(px_image_t* src, px_image_t* dst, px_size_t dsize);
 void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize);
 void px_resize_cubic(px_image_t* src, px_image_t* dst, px_size_t dsize);

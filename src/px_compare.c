@@ -192,3 +192,8 @@ bool px_image_shape_equal(px_image_t* expected, px_image_t* actual, bool compare
     }
     return true;
 }
+
+bool px_size_equal(px_size_t expected, px_size_t actual)
+{
+    return (expected.width == actual.width) && (expected.height == actual.height);
+}

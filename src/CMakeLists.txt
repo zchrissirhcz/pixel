@@ -1,11 +1,13 @@
 add_library(pixel STATIC
   px_image.c
   px_compare.c
+  px_arithm.c
   
   px_rgb2bgr.c
   px_rgb2gray.c
   px_flip.c
   px_histogram.c
+  px_resize.c
 
   px_cnn.c
   px_relu.c
