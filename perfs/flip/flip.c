@@ -35,22 +35,32 @@ void flip_horiz_rgb_naive(px_image_t* src, px_image_t* dst)
     }
 }
 
-void flip_horiz_rgb_idxopt(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+void flip_horiz_rgb_idxopt(px_image_t* src_image, px_image_t* dst_image)
 {
-    size_t linebytes = width * 3;
-    size_t double_linebytes = linebytes * 2;
+    unsigned char* src = src_image->data;
+
+    const int cn = 3;
+    const int width = src_image->width;
+    const int height = src_image->height;
+
+    size_t linebytes = width * cn;
     src = src - linebytes;
-    for (size_t i=0; i<height; i++) {
-        src += double_linebytes;
-        for (size_t j=0; j<width; j++) {
-            *dst = src[-3];
-            dst++;
+    for (int i = 0; i < height; i++)
+    {
+        // src line, end to begin
+        unsigned char* sp = src_image->data + (i + 1) * src_image->stride;
+        // dst line, begin to end
+        unsigned char* dp = dst_image->data + i * dst_image->stride;
+        for (int j = 0; j < width; j++)
+        {
+            *dp = sp[-3];
+            dp++;
 
-            *dst = src[-2];
-            dst++;
+            *dp = sp[-2];
+            dp++;
 
-            *dst = src[-1];
-            dst++;
+            *dp = sp[-1];
+            dp++;
 
             src -= 3;
         }

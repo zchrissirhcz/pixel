@@ -21,9 +21,15 @@ public:
         width = src.cols;
         res = cv::Mat(src.size(), CV_8UC3);
         dst_buf = res.data;
+
+        src_image = px_create_image_header(height, width, src.channels());
+        src_image->data = src_buf;
+        dst_image = px_create_image(height, width, src.channels());
     }
 
     void TearDown(const ::benchmark::State& state) {
+        px_destroy_image_header(src_image);
+        px_destroy_image(dst_image);
     }
 
     cv::Mat src;
@@ -33,26 +39,26 @@ public:
     size_t width;
     cv::Mat res;
     cv::Mat expected;
+
+    px_image_t* src_image;
+    px_image_t* dst_image;
 };
 
 BENCHMARK_DEFINE_F(FlipHorizonRgbFixture, naive)(benchmark::State& st)
 {
     for (auto _ : st)
     {
-        px_image_t* src_image = px_create_image_header(height, width, src.channels());
-        src_image->data = src_buf;
-        px_image_t* dst_image = px_create_image(height, width, src.channels());
         flip_horiz_rgb_naive(src_image, dst_image);
-        px_destroy_image_header(src_image);
-        px_destroy_image(dst_image);
     }
 }
 BENCHMARK_REGISTER_F(FlipHorizonRgbFixture, naive)->Unit(benchmark::kMillisecond);
 
 
-BENCHMARK_DEFINE_F(FlipHorizonRgbFixture, idxopt)(benchmark::State& st) {
-    for (auto _ : st) {
-        flip_horiz_rgb_idxopt(src_buf, height, width, dst_buf);
+BENCHMARK_DEFINE_F(FlipHorizonRgbFixture, idxopt)(benchmark::State& st)
+{
+    for (auto _ : st)
+    {
+        flip_horiz_rgb_idxopt(src_image, dst_image);
     }
 }
 BENCHMARK_REGISTER_F(FlipHorizonRgbFixture, idxopt)->Unit(benchmark::kMillisecond);
