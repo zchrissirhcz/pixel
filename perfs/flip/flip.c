@@ -32,8 +32,6 @@ void flip_horiz_rgb_naive(px_image_t* src, px_image_t* dst)
             dst_line[dst_idx + 1] = src_line[src_idx + 1];
             dst_line[dst_idx + 2] = src_line[src_idx + 2];
         }
-        src_line += src->stride;
-        dst_line += dst->stride;
     }
 }
 
