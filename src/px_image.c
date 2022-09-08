@@ -42,3 +42,15 @@ void px_destroy_image_header(px_image_t* image)
         free(image);
     }
 }
+
+uint8_t px_get_pixel(px_image_t* image, int i, int j, int k)
+{
+    const int idx = i * image->stride + j * image->channel + k;
+    return image->data[idx];
+}
+
+void px_set_pixel(px_image_t* image, int i, int j, int k, uint8_t value)
+{
+    const int idx = i * image->stride + j * image->channel + k;
+    image->data[idx] = value;
+}
