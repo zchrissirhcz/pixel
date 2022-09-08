@@ -39,6 +39,7 @@ typedef struct px_fourcc_t
 extern "C" {
 #endif
 
+px_image_t* px_create_image_header(int height, int width, int channel);
 px_image_t* px_create_image(int height, int width, int channel);
 void px_destroy_image(px_image_t* image);
 

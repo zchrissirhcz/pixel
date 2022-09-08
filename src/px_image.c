@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-px_image_t* px_create_image(int height, int width, int channel)
+px_image_t* px_create_image_header(int height, int width, int channel)
 {
     px_image_t* image = (px_image_t*) malloc(sizeof(px_image_t));
     memset(image, 0, sizeof(px_image_t));
@@ -10,8 +10,13 @@ px_image_t* px_create_image(int height, int width, int channel)
     image->width = width;
     image->channel = channel;
     image->stride = width * channel;
+    return image;
+}
 
-    const int bufsize = sizeof(uint8_t) * image->stride;
+px_image_t* px_create_image(int height, int width, int channel)
+{
+    px_image_t* image = image = px_create_image_header(height, width, channel);
+    const int bufsize = sizeof(uint8_t) * image->stride * image->height;
     image->data = (uint8_t*) malloc(bufsize);
 
     return image;
