@@ -2,6 +2,7 @@
 #include "px_cnn.h"
 #include "px_compare.h"
 #include "px_log.h"
+#include "px_assert.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -168,4 +169,26 @@ void px_dump_cube(const px_cube_t* cube)
         PX_LOGE("\n----------\n");
     }
     PX_LOGE("\n");
+}
+
+bool px_image_shape_equal(px_image_t* expected, px_image_t* actual, bool compare_stride)
+{
+    PX_ASSERT(expected != NULL && actual != NULL);
+    if (expected->height != actual->height)
+    {
+        return false;
+    }
+    else if (expected->width != actual->width)
+    {
+        return false;
+    }
+    else if (expected->channel != actual->channel)
+    {
+        return false;
+    }
+    else if (compare_stride && expected->stride != actual->stride)
+    {
+        return false;
+    }
+    return true;
 }
