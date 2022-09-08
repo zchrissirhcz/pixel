@@ -1,10 +1,14 @@
 #include "threshold.h"
-#include "simd/pixel_simd.h"
+
+#if __ARM_NEON
+#include <arm_neon.h>
+#endif // __ARM_NEON
 
 void threshold_gray_naive(unsigned char* input_gray, size_t height, size_t width, unsigned char* output_gray, unsigned char thresh, unsigned char minval, unsigned char maxval)
 {
     size_t total_len = height * width;
-    for (size_t done=0; done<total_len; done++) {
+    for (size_t done=0; done<total_len; done++)
+    {
         *output_gray = (input_gray[0]>thresh) ? maxval : minval;
         input_gray++;
         output_gray++;
@@ -15,7 +19,7 @@ void threshold_gray_asimd(unsigned char* input_gray, size_t height, size_t width
 {
     size_t total_len = height * width;
     size_t done = 0;
-#ifdef PIXEL_SIMD_NEON
+#if __ARM_NEON
     size_t step = 16;
     size_t vec_size = total_len - total_len % step;
     uint8x16_t v1;
@@ -23,7 +27,8 @@ void threshold_gray_asimd(unsigned char* input_gray, size_t height, size_t width
     uint8x16_t vthresh = vdupq_n_u8(thresh);
     uint8x16_t vmaxval = vdupq_n_u8(maxval);
     uint8x16_t vminval = vdupq_n_u8(minval);
-    for (size_t i=0; i<vec_size; i+=step) {
+    for (size_t i=0; i<vec_size; i+=step)
+    {
         v1 = vld1q_u8(input_gray);
         input_gray += step;
         vmask_gt = vcgtq_u8(v1, vthresh);
@@ -32,8 +37,9 @@ void threshold_gray_asimd(unsigned char* input_gray, size_t height, size_t width
         output_gray += step;
     }
     done = vec_size;
-#endif
-    for (; done<total_len; done++) {
+#endif // __ARM_NEON
+    for (; done<total_len; done++)
+    {
         *output_gray = (input_gray[0]>thresh) ? maxval : minval;
         input_gray++;
         output_gray++;
@@ -44,7 +50,7 @@ void threshold_gray_asm(unsigned char* input_gray, size_t height, size_t width, 
 {
     size_t total_len = height * width;
     size_t done = 0;
-#ifdef PIXEL_SIMD_NEON
+#if __ARM_NEON
     size_t step = 16;
     size_t vec_size = total_len - total_len % step;
     size_t neon_len = vec_size / step;
@@ -96,7 +102,7 @@ void threshold_gray_asm(unsigned char* input_gray, size_t height, size_t width, 
     );
     #endif // __aarch64__
     done = vec_size;
-#endif // PIXEL_SIMD_NEON
+#endif // __ARM_NEON
 
     for (; done<total_len; done++) {
         *output_gray = (input_gray[0]>thresh) ? maxval : minval;
@@ -111,7 +117,8 @@ void threshold_rgb_naive(unsigned char* rgb_buf, size_t height, size_t width, un
 {
     size_t total_len = height * width;
     unsigned char gray;
-    for (size_t i=0; i<total_len; i++) {
+    for (size_t i=0; i<total_len; i++)
+    {
 #if 1
         gray = (0.299*rgb_buf[0] + 0.587*rgb_buf[1] + 0.114*rgb_buf[2]);
 #elif 0

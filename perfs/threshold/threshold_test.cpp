@@ -5,8 +5,11 @@
 #include <opencv2/opencv.hpp>
 #include "threshold.h"
 
-#include "common/pixel_benchmark.h"
-#include "simd/pixel_simd.h"
+#include "px_timer.h"
+
+#if __ARM_NEON
+#include <arm_neon.h>
+#endif // __ARM_NEON
 
 #ifdef PIXEL_SIMD_NEON
 #include <arm_neon.h>
@@ -16,7 +19,8 @@ static int test_threshold_gray();
 static int test_threshold_rgb();
 
 
-int test_threshold_gray() {
+int test_threshold_gray()
+{
 
     cv::Mat image = cv::imread("sky.png");
     cv::Mat gray;
@@ -38,26 +42,26 @@ int test_threshold_gray() {
     unsigned char thresh = 60;
 
     output_gray = result_naive.data;
-    t_start = pixel_get_current_time();
+    t_start = px_get_current_time();
     threshold_gray_naive(gray.data, height, width, output_gray, thresh, 0, 255);
-    t_cost = pixel_get_current_time() - t_start;
+    t_cost = px_get_current_time() - t_start;
     printf("threshold, naive, time cost is %.4lf ms\n", t_cost);
 
-    t_start = pixel_get_current_time();
+    t_start = px_get_current_time();
     cv::threshold(gray, result_opencv, thresh, 255, 0);
-    t_cost = pixel_get_current_time() - t_start;
+    t_cost = px_get_current_time() - t_start;
     printf("threshold, opencv, time cost is %.4lf ms\n", t_cost);
 
     output_gray = result_asimd.data;
-    t_start = pixel_get_current_time();
+    t_start = px_get_current_time();
     threshold_gray_asimd(gray.data, height, width, output_gray, thresh, 0, 255);
-    t_cost = pixel_get_current_time() - t_start;
+    t_cost = px_get_current_time() - t_start;
     printf("threshold, asimd, time cost is %.4lf ms\n", t_cost);
 
     output_gray = result_asm.data;
-    t_start = pixel_get_current_time();
+    t_start = px_get_current_time();
     threshold_gray_asm(gray.data, height, width, output_gray, thresh, 0, 255);
-    t_cost = pixel_get_current_time() - t_start;
+    t_cost = px_get_current_time() - t_start;
     printf("threshold, asm, time cost is %.4lf ms\n", t_cost);
 
     cv::imwrite("sky_thresh60_naive.png", result_naive);
@@ -91,27 +95,27 @@ int test_threshold_rgb()
 
     rgb_input = image.data;
     gray_output = result_naive.data;
-    t_start = pixel_get_current_time();
+    t_start = px_get_current_time();
     threshold_rgb_naive(rgb_input, height, width, gray_output, thresh, minval, maxval);
-    t_cost = pixel_get_current_time() - t_start;
+    t_cost = px_get_current_time() - t_start;
     printf("threshold_rgb, naive, time cost %.4lf ms\n", t_cost);
 
-    t_start = pixel_get_current_time();
+    t_start = px_get_current_time();
     cv::cvtColor(image, gray, cv::COLOR_RGB2GRAY);
     cv::threshold(gray, result_opencv, thresh, maxval, 0);
-    t_cost = pixel_get_current_time() - t_start;
+    t_cost = px_get_current_time() - t_start;
     printf("threshold_rgb, opencv, time cost %.4lf ms\n", t_cost);
     
     gray_output = result_asimd.data;
-    t_start = pixel_get_current_time();
+    t_start = px_get_current_time();
     threshold_rgb_asimd(rgb_input, height, width, gray_output, thresh, minval, maxval);
-    t_cost = pixel_get_current_time() - t_start;
+    t_cost = px_get_current_time() - t_start;
     printf("threshold_rgb, asimd, time cost %.4lf ms\n", t_cost);
     
     gray_output = result_asm.data;
-    t_start = pixel_get_current_time();
+    t_start = px_get_current_time();
     threshold_rgb_asm(rgb_input, height, width, gray_output, thresh, minval, maxval);
-    t_cost = pixel_get_current_time() - t_start;
+    t_cost = px_get_current_time() - t_start;
     printf("threshold_rgb, asm, time cost %.4lf ms\n", t_cost);
 
     cv::imwrite("sky_thresh120_naive.png", result_naive);
