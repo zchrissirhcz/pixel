@@ -17,6 +17,24 @@ typedef struct px_size_t
     int height;
 } px_size_t;
 
+typedef enum px_fourcc_fmt_t{
+    PX_FOURCC_FMT_NV21,
+    PX_FOURCC_FMT_NV12,
+    PX_FOURCC_FMT_BGR,
+    PX_FOURCC_FMT_RGB,
+    PX_FOURCC_FMT_RGBA,
+    PX_FOURCC_FMT_BGRA,
+} px_fourcc_fmt_t;
+
+typedef struct px_fourcc_t
+{
+    int width;
+    int height;
+    int pitch[4];
+    uint8_t planes[4];
+    px_fourcc_fmt_t fmt;
+} px_fourcc_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif

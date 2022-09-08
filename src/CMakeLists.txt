@@ -23,3 +23,7 @@ add_library(pixel STATIC
 target_include_directories(pixel PUBLIC
   ${CMAKE_SOURCE_DIR}/include
 )
+
+if(ANDROID)
+  target_link_libraries(pixel PUBLIC log)
+endif()
