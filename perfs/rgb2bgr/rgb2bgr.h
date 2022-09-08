@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pixel_image.h"
+#include "px_image.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,4 +1,4 @@
-#include "rgb2gray.h"
+#include "rgb2bgr.h"
 #include <stdint.h>
 
 void rgb2bgr_naive(unsigned char* src_buf, size_t height, size_t width, unsigned char* dst_buf)

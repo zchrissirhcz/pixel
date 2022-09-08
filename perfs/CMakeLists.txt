@@ -17,4 +17,4 @@ execute_process(
 add_subdirectory(flip)
 add_subdirectory(array_mean)
 add_subdirectory(histogram)
-
+add_subdirectory(rgb2bgr)
