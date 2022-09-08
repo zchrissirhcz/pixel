@@ -10,20 +10,21 @@ typedef struct px_array_t
 
 typedef struct px_matrix_dim_t
 {
-    int h;
-    int w;
+    int height;
+    int width;
 } px_matrix_dim_t;
 
 typedef struct px_matrix_t
 {
     float* data;
-    int h, w; // px_matrix_dim_t
+    int height;
+    int width;
 } px_matrix_t;
 
 typedef struct px_kernel_size_t
 {
-    int h;
-    int w;
+    int height;
+    int width;
 } px_kernel_size_t;
 
 typedef struct px_pooling_param_t
@@ -39,23 +40,23 @@ typedef struct px_pooling_param_t
 
 typedef struct px_stride_t
 {
-    int h;
-    int w;
+    int height;
+    int width;
 } px_stride_t;
 
 typedef struct px_cube_t
 {
     float* data;
-    int c;
-    int h;
-    int w;
+    int channel;
+    int height;
+    int width;
 } px_cube_t;
 
 typedef struct px_cube_dim_t
 {
-    int c;
-    int h;
-    int w;
+    int channel;
+    int height;
+    int width;
 } px_cube_dim_t;
 
 typedef struct px_pad_t
@@ -108,8 +109,8 @@ px_matrix_t* px_forward_relu_layer_for_matrix(const px_matrix_t* input);
 px_matrix_t* px_forward_max_pooling_layer_for_matrix(const px_matrix_t* input, const px_pooling_param_t pooling_param);
 px_matrix_dim_t px_get_pooling_output_matrix_dim(const px_matrix_dim_t input_dim, const px_pooling_param_t pooling_param);
 
-px_kernel_size_t px_make_kernel_size(const int h, const int w);
-px_stride_t px_make_stride(const int h, const int w);
+px_kernel_size_t px_make_kernel_size(const int height, const int width);
+px_stride_t px_make_stride(const int height, const int width);
 px_pooling_param_t px_make_pooling_param(const px_kernel_size_t kernel_size, const px_stride_t stride);
 
 float px_inner_product(px_array_t* v1, px_array_t* v2);

@@ -5,9 +5,9 @@ TEST(max_pooling_layer, forward)
 {
     px_matrix_dim_t input_dim = {5, 5};
     px_matrix_t* input = px_make_matrix(input_dim);
-    for (int i=0; i<input->h; i++)
+    for (int i = 0; i < input->height; i++)
     {
-        for (int j=0; j<input->w; j++)
+        for (int j = 0; j < input->width; j++)
         {
             px_set_matrix_value(input, i, j, i*10 + j);
         }
@@ -19,8 +19,8 @@ TEST(max_pooling_layer, forward)
 
     px_matrix_t* output = px_forward_max_pooling_layer_for_matrix(input, pooling_param);
 
-    EXPECT_EQ(output->h, 4);
-    EXPECT_EQ(output->w, 4);
+    EXPECT_EQ(output->height, 4);
+    EXPECT_EQ(output->width, 4);
 
     // PCNN_LOGE("input:\n");
     // dump_matrix(input);

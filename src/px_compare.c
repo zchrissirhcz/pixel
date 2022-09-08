@@ -102,23 +102,23 @@ bool px_matrix_almost_equal(px_matrix_t* expected, px_matrix_t* actual, float ep
     {
         return false;
     }
-    else if (expected->h != actual->h)
+    else if (expected->height != actual->height)
     {
-        PX_LOGE("height not match: expected(%d) != actual(%d)\n", expected->h, actual->h);
+        PX_LOGE("height not match: expected(%d) != actual(%d)\n", expected->height, actual->height);
         return false;
     }
-    else if (expected->w != actual->w)
+    else if (expected->width != actual->width)
     {
-        PX_LOGE("width not match: expected(%d) != actual(%d)\n", expected->w, actual->w);
+        PX_LOGE("width not match: expected(%d) != actual(%d)\n", expected->width, actual->width);
         return false;
     }
 
-    const int h = expected->h;
-    const int w = expected->w;
+    const int h = expected->height;
+    const int w = expected->width;
     for (int i = 0; i < h; i++)
     {
-        float* sp = expected->data + i * expected->w;
-        float* dp = actual->data + i * actual->w;
+        float* sp = expected->data + i * expected->width;
+        float* dp = actual->data + i * actual->width;
         for (int j = 0; j < w; j++)
         {
             const float diff = fabs(sp[i] - dp[i]);
@@ -138,14 +138,13 @@ bool px_matrix_almost_equal(px_matrix_t* expected, px_matrix_t* actual, float ep
 }
 
 
-
 void px_dump_matrix(const px_matrix_t* matrix)
 {
-    for (int i = 0; i < matrix->h; i++)
+    for (int i = 0; i < matrix->height; i++)
     {
-        for (int j = 0; j < matrix->w; j++)
+        for (int j = 0; j < matrix->width; j++)
         {
-            int idx = i * matrix->w + j;
+            int idx = i * matrix->width + j;
             PX_LOGE("%f, ", matrix->data[idx]);
         }
         PX_LOGE("\n");
@@ -154,14 +153,14 @@ void px_dump_matrix(const px_matrix_t* matrix)
 
 void px_dump_cube(const px_cube_t* cube)
 {
-    PX_LOGE(">>> cube.dims: h=%d, w=%d, c=%d\n", cube->h, cube->w, cube->c);
-    for (int k = 0; k < cube->c; k++)
+    PX_LOGE(">>> cube.dims: h=%d, w=%d, c=%d\n", cube->height, cube->width, cube->channel);
+    for (int k = 0; k < cube->channel; k++)
     {
-        for (int i = 0; i < cube->h; i++)
+        for (int i = 0; i < cube->height; i++)
         {
-            for (int j = 0; j < cube->w; j++)
+            for (int j = 0; j < cube->width; j++)
             {
-                int idx = k * cube->w * cube->h + i * cube->w + j;
+                int idx = k * cube->width * cube->height + i * cube->width + j;
                 PX_LOGE("%f, ", cube->data[idx]);
             }
             PX_LOGE("\n");

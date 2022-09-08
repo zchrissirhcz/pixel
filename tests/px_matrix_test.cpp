@@ -7,11 +7,11 @@ TEST(matrix, create)
     int h = 3;
     int w = 5;
     px_matrix_dim_t dim = {0};
-    dim.h = h;
-    dim.w = w;
+    dim.height = h;
+    dim.width = w;
     px_matrix_t* matrix = px_make_matrix(dim);
-    EXPECT_EQ(matrix->h, h);
-    EXPECT_EQ(matrix->w, w);
+    EXPECT_EQ(matrix->height, h);
+    EXPECT_EQ(matrix->width, w);
     EXPECT_TRUE(matrix->data != NULL);
 
     px_release_matrix(matrix);
@@ -33,7 +33,7 @@ TEST(matrix, get_value_invalid_idx)
 {
     px_matrix_dim_t dim {2, 3};
     px_matrix_t* matrix = px_make_matrix(dim);
-    EXPECT_DEATH(px_get_matrix_value(matrix, dim.h, dim.w), "");
+    EXPECT_DEATH(px_get_matrix_value(matrix, dim.height, dim.width), "");
 
     px_release_matrix(matrix);
 }
@@ -42,7 +42,7 @@ TEST(matrix, get_value_invalid_null)
 {
     px_matrix_dim_t dim {2, 3};
     px_matrix_t* matrix = NULL;
-    EXPECT_DEATH(px_get_matrix_value(matrix, dim.h, dim.w), "");
+    EXPECT_DEATH(px_get_matrix_value(matrix, dim.height, dim.width), "");
 
     px_release_matrix(matrix);
 }
@@ -51,7 +51,7 @@ TEST(matrix, set_value_invalid_idx)
 {
     px_matrix_dim_t dim {2, 3};
     px_matrix_t* matrix = px_make_matrix(dim);
-    EXPECT_DEATH(px_set_matrix_value(matrix, dim.h, dim.w, 233.0f), "");
+    EXPECT_DEATH(px_set_matrix_value(matrix, dim.height, dim.width, 233.0f), "");
 
     px_release_matrix(matrix);
 }
@@ -60,7 +60,7 @@ TEST(matrix, set_value_null)
 {
     px_matrix_dim_t dim {2, 3};
     px_matrix_t* matrix = NULL;
-    EXPECT_DEATH(px_set_matrix_value(matrix, dim.h, dim.w, 233.0f), "");
+    EXPECT_DEATH(px_set_matrix_value(matrix, dim.height, dim.width, 233.0f), "");
 
     px_release_matrix(matrix);
 }

@@ -21,7 +21,7 @@ typedef struct px_size_t
 extern "C" {
 #endif
 
-px_image_t* px_create_image(int h, int w, int c);
+px_image_t* px_create_image(int height, int width, int channel);
 void px_destroy_image(px_image_t* image);
 
 void px_rgb2bgr(px_image_t* src, px_image_t* dst);
@@ -42,6 +42,8 @@ void px_flip(px_image_t* src, px_image_t* dst, int flipmode);
 void px_resize_nearest(px_image_t* src, px_image_t* dst, px_size_t dsize);
 void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize);
 void px_resize_cubic(px_image_t* src, px_image_t* dst, px_size_t dsize);
+
+void px_rgb_to_nv21(px_image_t* rgb, px_image_t* nv21);
 
 #ifdef __cplusplus
 }

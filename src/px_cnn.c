@@ -29,13 +29,13 @@ void px_destroy_array(px_array_t* array)
 
 px_matrix_t* px_make_matrix(px_matrix_dim_t dim)
 {
-    const int h = dim.h;
-    const int w = dim.w;
+    const int height = dim.height;
+    const int width = dim.width;
     px_matrix_t* matrix = (px_matrix_t*)malloc(sizeof(px_matrix_t));
-    const size_t buf_size = h * w * sizeof(float);
+    const size_t buf_size = height * width * sizeof(float);
     matrix->data = (float*)malloc(buf_size);
-    matrix->h = h;
-    matrix->w = w;
+    matrix->height = height;
+    matrix->width = width;
 
     // https://stackoverflow.com/questions/370195/when-and-why-will-a-compiler-initialise-memory-to-0xcd-0xdd-etc-on-malloc-fre
     memset(matrix->data, 0xcd, buf_size);
@@ -60,9 +60,9 @@ void px_release_matrix(px_matrix_t* matrix)
 int px_set_matrix_value(px_matrix_t* matrix, int i, int j, float value)
 {
     PX_ASSERT(matrix != NULL && matrix->data != NULL);
-    PX_ASSERT(i >= 0 && j >= 0 && i < matrix->h && j < matrix->w);
+    PX_ASSERT(i >= 0 && j >= 0 && i < matrix->height && j < matrix->width);
 
-    int idx = i * matrix->w + j;
+    int idx = i * matrix->width + j;
     matrix->data[idx] = value;
     return 0;
 }
@@ -70,23 +70,23 @@ int px_set_matrix_value(px_matrix_t* matrix, int i, int j, float value)
 float px_get_matrix_value(const px_matrix_t* matrix, int i, int j)
 {
     PX_ASSERT(matrix != NULL && matrix->data != NULL);
-    PX_ASSERT(i >= 0 && j >= 0 && i < matrix->h && j < matrix->w);
+    PX_ASSERT(i >= 0 && j >= 0 && i < matrix->height && j < matrix->width);
     
-    int idx = i * matrix->w + j;
+    int idx = i * matrix->width + j;
     return matrix->data[idx];
 }
 
 int px_matrix_add_matrix(px_matrix_t* input, const px_matrix_t* plus)
 {
     PX_ASSERT(input != NULL && plus != NULL);
-    PX_ASSERT(input->h == plus->h && input->w == plus->w);
+    PX_ASSERT(input->height == plus->height && input->width == plus->width);
     PX_ASSERT(input->data != NULL && plus->data != NULL);
     
-    for (int i = 0; i < input->h; i++)
+    for (int i = 0; i < input->height; i++)
     {
-        for (int j = 0; j < input->w; j++)
+        for (int j = 0; j < input->width; j++)
         {
-            int idx = i * input->w + j;
+            int idx = i * input->width + j;
             input->data[idx] += plus->data[idx];
         }
     }
@@ -96,9 +96,9 @@ int px_matrix_add_matrix(px_matrix_t* input, const px_matrix_t* plus)
 int px_matrix_add_scalar(px_matrix_t* input, const float bias)
 {
     PX_ASSERT(input != NULL && input->data != NULL);
-    PX_ASSERT(input->h > 0 && input->w > 0);
+    PX_ASSERT(input->height > 0 && input->width > 0);
     
-    const int size = input->h * input->w;
+    const int size = input->height * input->width;
     for (int i = 0; i < size; i++)
     {
         input->data[i] += bias;
@@ -109,14 +109,14 @@ int px_matrix_add_scalar(px_matrix_t* input, const float bias)
 px_matrix_dim_t px_get_matrix_dim(const px_matrix_t* matrix)
 {
     px_matrix_dim_t matrix_dim = {0};
-    matrix_dim.h = matrix->h;
-    matrix_dim.w = matrix->w;
+    matrix_dim.height = matrix->height;
+    matrix_dim.width = matrix->width;
     return matrix_dim;
 }
 
 int px_get_matrix_area(const px_matrix_t* matrix)
 {
-    return matrix->h * matrix->w;
+    return matrix->height * matrix->width;
 }
 
 px_matrix_t* px_forward_eltwise_layer_for_matrix(const px_matrix_t* input, PxEltwiseFunction eltwise_func)
@@ -132,11 +132,11 @@ px_matrix_t* px_forward_eltwise_layer_for_matrix(const px_matrix_t* input, PxElt
     return output;
 }
 
-px_stride_t px_make_stride(const int h, const int w)
+px_stride_t px_make_stride(const int height, const int width)
 {
     px_stride_t stride;
-    stride.h = h;
-    stride.w = w;
+    stride.height = height;
+    stride.width = width;
 
     return stride;
 }
@@ -157,54 +157,58 @@ px_cube_t* px_forward_eltwise_layer_for_cube(const px_cube_t* input, PxEltwiseFu
 px_cube_dim_t px_get_cube_dim(const px_cube_t* cube)
 {
     px_cube_dim_t cube_dim = {0};
-    cube_dim.h = cube->h;
-    cube_dim.w = cube->w;
-    cube_dim.c = cube->c;
+    cube_dim.height = cube->height;
+    cube_dim.width = cube->width;
+    cube_dim.channel = cube->channel;
     return cube_dim;
 }
 
 px_cube_t* px_make_cube(const px_cube_dim_t dim)
 {
-    const int c = dim.c;
-    const int h = dim.h;
-    const int w = dim.w;
+    const int c = dim.channel;
+    const int h = dim.height;
+    const int w = dim.width;
     px_cube_t* cube = (px_cube_t*)malloc(sizeof(px_cube_t));
     const size_t buf_size = c * h * w * sizeof(float);
     cube->data = (float*) malloc(buf_size);
-    cube->c = c;
-    cube->h = h;
-    cube->w = w;
+    cube->channel = c;
+    cube->height = h;
+    cube->width = w;
     return cube;
 }
 
 int px_get_cube_volume(const px_cube_t* cube)
 {
-    return cube->h * cube->w * cube->c;
+    return cube->height * cube->width * cube->channel;
 }
 
 px_matrix_t* px_copy_make_border_for_matrix(const px_matrix_t* matrix, const px_pad_t pad)
 {
-    if (pad.top<0 || pad.bottom<0 || pad.left<0 || pad.right<0) {
+    if (pad.top < 0 || pad.bottom < 0 || pad.left < 0 || pad.right < 0)
+    {
         PX_LOGE("invalid padding\n");
         return NULL;
     }
-    if (matrix==NULL || matrix->data==NULL || matrix->h<0 || matrix->w<0) {
+    if (matrix == NULL || matrix->data == NULL || matrix->height < 0 || matrix->width < 0)
+    {
         PX_LOGE("invalid matrix\n");
         return NULL;
     }
 
-    const int padded_h = matrix->h + pad.top + pad.bottom;
-    const int padded_w = matrix->w + pad.left + pad.right;
+    const int padded_h = matrix->height + pad.top + pad.bottom;
+    const int padded_w = matrix->width + pad.left + pad.right;
     px_matrix_dim_t padded_dim = {0};
-    padded_dim.h = padded_h;
-    padded_dim.w = padded_w;
+    padded_dim.height = padded_h;
+    padded_dim.width = padded_w;
     px_matrix_t* padded_matrix = px_make_matrix(padded_dim);
 
     const int pad_value = 0;
-    for (int i=0; i<padded_h; i++) {
-        for (int j=0; j<padded_w; j++) {
-            if (i<pad.top || i>=matrix->h+pad.top
-             || j<pad.left || j>=matrix->w+pad.left)
+    for (int i = 0; i < padded_h; i++)
+    {
+        for (int j = 0; j < padded_w; j++)
+        {
+            if (i < pad.top || i >= matrix->height + pad.top
+             || j < pad.left || j >= matrix->width + pad.left)
             {
                 px_set_matrix_value(padded_matrix, i, j, pad_value);
             }
@@ -248,23 +252,23 @@ px_pad_t px_make_pad(const int top, const int bottom, const int left, const int 
 px_matrix_dim_t px_get_channel_wise_matrix_dim(const px_cube_t* cube)
 {
     px_matrix_dim_t matrix_dim = {0};
-    matrix_dim.h = cube->h;
-    matrix_dim.w = cube->w;
+    matrix_dim.height = cube->height;
+    matrix_dim.width = cube->width;
     return matrix_dim;
 }
 
 float* px_get_matrix_data_from_cube(const px_cube_t* cube, const int channel_idx)
 {
-    const int cstep = cube->h * cube->w;
+    const int cstep = cube->height * cube->width;
     return cube->data + channel_idx * cstep;
 }
 
 px_matrix_t px_get_matrix_from_cube(const px_cube_t* cube, const int channel_idx)
 {
     px_matrix_t matrix = {0};
-    matrix.h = cube->h;
-    matrix.w = cube->w;
-    const int cstep = cube->h * cube->w;
+    matrix.height = cube->height;
+    matrix.width = cube->width;
+    const int cstep = cube->height * cube->width;
     matrix.data = cube->data + channel_idx * cstep;
     return matrix;
 }

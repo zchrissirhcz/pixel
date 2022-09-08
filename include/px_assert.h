@@ -2,13 +2,13 @@
 
 #ifdef USE_DEBUGGER
 #  if __GNUC__
-#    define PX_ASSERT(c) if (!(c)) __builtin_trap()
+#    define PX_ASSERT(expr) if (!(expr)) __builtin_trap()
 #  elif _MSC_VER
-#    define PX_ASSERT(c) if (!(c)) __debugbreak()
+#    define PX_ASSERT(expr) if (!(expr)) __debugbreak()
 #  else
-#    define PX_ASSERT(c) if (!(c)) *(volatile int *)0 = 0
+#    define PX_ASSERT(expr) if (!(expr)) *(volatile int *)0 = 0
 #  endif
 #else
 #  include <assert.h>
-#  define PX_ASSERT(c) assert(c)
+#  define PX_ASSERT(expr) assert(expr)
 #endif
