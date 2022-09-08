@@ -44,12 +44,17 @@ void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize)
 
             for (int k = 0; k < channel; k++)
             {
-                double A = px_get_pixel(src, Ai, Aj, k);
-                double B = px_get_pixel(src, Bi, Bj, k);
-                double C = px_get_pixel(src, Ci, Cj, k);
-                double D = px_get_pixel(src, Di, Dj, k);
+                uint8_t A = px_get_pixel(src, Ai, Aj, k);
+                uint8_t B = px_get_pixel(src, Bi, Bj, k);
+                uint8_t C = px_get_pixel(src, Ci, Cj, k);
+                uint8_t D = px_get_pixel(src, Di, Dj, k);
 
-                double M = (1 - x) * (1 - y) * A + x * (1 - y) * B + y * (1 - x) * C + x * y * D;
+                double coeffA = (1 - x) * (1 - y);
+                double coeffB = x * (1 - y);
+                double coeffC = (1 - x) * y;
+                double coeffD = x * y;
+                double M = coeffA * A + coeffB * B + coeffC * C + coeffD * D;
+                
                 const int dst_idx = dst_i * dst->stride + dst_j * channel + k;
                 dst->data[dst_idx] = (uint8_t)(M + 0.5); // rounding
             }
