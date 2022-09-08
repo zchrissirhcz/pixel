@@ -104,16 +104,23 @@ void flip_horiz_rgb_asimd(unsigned char* src, size_t height, size_t width, unsig
 }
 
 
-void flip_horiz_gray_naive(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+void flip_horiz_gray_naive(px_image_t* src, px_image_t* dst)
 {
-    unsigned char* dst_line = dst;
-    unsigned char* src_line = src;
-    for (size_t i=0; i<height; i++) {
-        for (size_t j=0; j<width; j++) {
+    PX_ASSERT(src != NULL && dst != NULL);
+    PX_ASSERT(px_image_shape_equal(src, dst, false));
+    PX_ASSERT(src->channel == 1);
+
+    const int width = src->width;
+    const int height = src->height;
+
+    for (int i = 0; i < height; i++)
+    {
+        unsigned char* dst_line = dst->data + i * dst->stride;
+        unsigned char* src_line = src->data + i * dst->stride;
+        for (int j = 0; j < width; j++)
+        {
             dst_line[j] = src_line[width-1-j];
         }
-        dst_line += width;
-        src_line += width;
     }
 }
 

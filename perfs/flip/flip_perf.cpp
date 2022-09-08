@@ -9,7 +9,8 @@
 //mode=1，左右颠倒  horizontally
 //mode=-1, against center point
 
-class FlipHorizonRgbFixture : public benchmark::Fixture {
+class FlipHorizonRgbFixture : public benchmark::Fixture
+{
 public:
     void SetUp(const ::benchmark::State& state)
     {
@@ -27,7 +28,8 @@ public:
         dst_image = px_create_image(height, width, src.channels());
     }
 
-    void TearDown(const ::benchmark::State& state) {
+    void TearDown(const ::benchmark::State& state)
+    {
         px_destroy_image_header(src_image);
         px_destroy_image(dst_image);
     }
@@ -80,9 +82,11 @@ BENCHMARK_DEFINE_F(FlipHorizonRgbFixture, opencv)(benchmark::State& st) {
 BENCHMARK_REGISTER_F(FlipHorizonRgbFixture, opencv)->Unit(benchmark::kMillisecond);
 
 
-class FlipHorizonGrayFixture : public benchmark::Fixture {
+class FlipHorizonGrayFixture : public benchmark::Fixture
+{
 public:
-    void SetUp(const ::benchmark::State& state) {
+    void SetUp(const ::benchmark::State& state)
+    {
         src = cv::imread("sky.jpg");
         assert(!src.empty());
         cv::cvtColor(src, src, cv::COLOR_BGR2GRAY);
@@ -92,9 +96,16 @@ public:
         width = src.cols;
         res = cv::Mat(src.size(), CV_8UC1);
         dst_buf = res.data;
+
+        src_image = px_create_image_header(height, width, src.channels());
+        src_image->data = src_buf;
+        dst_image = px_create_image(height, width, src.channels());
     }
 
-    void TearDown(const ::benchmark::State& state) {
+    void TearDown(const ::benchmark::State& state)
+    {
+        px_destroy_image_header(src_image);
+        px_destroy_image(dst_image);
     }
 
     cv::Mat src;
@@ -104,11 +115,16 @@ public:
     size_t width;
     cv::Mat res;
     cv::Mat expected;
+
+    px_image_t* src_image;
+    px_image_t* dst_image;
 };
 
-BENCHMARK_DEFINE_F(FlipHorizonGrayFixture, naive)(benchmark::State& st) {
-    for (auto _ : st) {
-        flip_horiz_gray_naive(src_buf, height, width, dst_buf);
+BENCHMARK_DEFINE_F(FlipHorizonGrayFixture, naive)(benchmark::State& st)
+{
+    for (auto _ : st)
+    {
+        flip_horiz_gray_naive(src_image, dst_image);
     }
 }
 BENCHMARK_REGISTER_F(FlipHorizonGrayFixture, naive)->Unit(benchmark::kMillisecond);
