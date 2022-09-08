@@ -130,9 +130,11 @@ BENCHMARK_DEFINE_F(FlipHorizonGrayFixture, naive)(benchmark::State& st)
 BENCHMARK_REGISTER_F(FlipHorizonGrayFixture, naive)->Unit(benchmark::kMillisecond);
 
 
-BENCHMARK_DEFINE_F(FlipHorizonGrayFixture, asimd)(benchmark::State& st) {
-    for (auto _ : st) {
-        flip_horiz_gray_asimd(src_buf, height, width, dst_buf);
+BENCHMARK_DEFINE_F(FlipHorizonGrayFixture, asimd)(benchmark::State& st)
+{
+    for (auto _ : st)
+    {
+        flip_horiz_gray_asimd(src_image, dst_image);
     }
 }
 BENCHMARK_REGISTER_F(FlipHorizonGrayFixture, asimd)->Unit(benchmark::kMillisecond);

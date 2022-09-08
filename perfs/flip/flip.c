@@ -124,35 +124,46 @@ void flip_horiz_gray_naive(px_image_t* src, px_image_t* dst)
     }
 }
 
-void flip_horiz_gray_asimd(unsigned char* src, size_t height, size_t width, unsigned char* dst)
+void flip_horiz_gray_asimd(px_image_t* src, px_image_t* dst)
 {
-#ifdef __ARM_NEON
-    size_t done = 0;
-    size_t step = 8;
-    size_t vec_size = width - width % step;
-    src = src - step;
-    uint8x8_t vsrc;
-    uint8x8_t vdst;
-    for (size_t i=0; i<height; i++) {
-        src = src + width;
-        for (size_t j=0; j<vec_size; j+=step) {
+    PX_ASSERT(src != NULL && dst != NULL);
+    PX_ASSERT(px_image_shape_equal(src, dst, false));
+    PX_ASSERT(src->channel == 1);
+
+    const int width = src->width;
+    const int height = src->height;
+
+    for (int i = 0; i < height; i++)
+    {
+        unsigned char* dp = dst->data + i * dst->stride;
+        unsigned char* sp = src->data + (i + 1) * dst->stride;
+
+#if __ARM_NEON
+        int nn = width >> 3;
+        int remain = width - nn << 3;
+#else
+        int remain = width;
+#endif // __ARM_NEON
+
+#if __ARM_NEON
+        uint8x8_t vsrc;
+        uint8x8_t vdst;
+        for (int j = 0; j < nn; j++)
+        {
+            src -= 8;
             vsrc = vld1_u8(src);
-            src -= step;
             vdst = vrev64_u8(vsrc);
             vst1_u8(dst, vdst);
-            dst += step;
+            dst += 8;
         }
-        done = vec_size;
-        for (; done<width; done++) {
-            *dst = *src;
-            dst++;
-            src--;
-        }
-        src += width;
-    }
-#else
-    printf("TODO: not implemented yet!\n");
 #endif // __ARM_NEON
+
+        for (; remain > 0; remain--)
+        {
+            sp--;
+            *dp++ = *sp;
+        }
+    }
 }
 
 
