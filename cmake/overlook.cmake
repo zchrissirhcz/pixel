@@ -15,7 +15,7 @@ if(OVERLOOK_INCLUDE_GUARD)
 endif()
 set(OVERLOOK_INCLUDE_GUARD TRUE)
 
-set(OVERLOOK_VERSION "2022.04.30")
+set(OVERLOOK_VERSION "2022.09.08")
 
 ###############################################################
 #
@@ -559,116 +559,5 @@ if(USE_CPPCHECK)
     )
   else()
     message(STATUS "cppcheck not found. ignore it")
-  endif()
-endif()
-
-
-###############################################################
-#
-# Platform determinations
-#
-###############################################################
-if (CMAKE_SYSTEM_NAME MATCHES "Windows")
-  set(OVERLOOK_SYSTEM "Windows")
-elseif (ANDROID)
-  set(OVERLOOK_SYSTEM "Android")
-elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
-  set(OVERLOOK_SYSTEM "Linux")
-elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  set(OVERLOOK_SYSTEM "MacOS")
-else ()
-  message(FATAL_ERROR "un-configured system: ${CMAKE_SYSTEM_NAME}")
-endif()
-if (OVERLOOK_VERBOSE)
-  message(STATUS "----- OVERLOOK_SYSTEM: ${OVERLOOK_SYSTEM}")
-endif()
-
-###############################################################
-#
-# Architecture determinations
-#
-###############################################################
-if((IOS AND CMAKE_OSX_ARCHITECTURES MATCHES "arm") #没匹配ARM
-  OR (CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|Arm|ARM|aarch64|AAarch64|AARCH64)"))
-  set(OVERLOOK_ARCH arm)
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(mips|Mips|MIPS)")
-  set(OVERLOOK_ARCH mips)
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(riscv|Riscv|RISCV)")
-  set(OVERLOOK_ARCH riscv)
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(powerpc|PowerPC|POWERPC)")
-  set(OVERLOOK_ARCH powerpc)
-else()
-  set(OVERLOOK_ARCH x86)
-  #if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten") #wasm
-  #endif()
-endif()
-if (OVERLOOK_VERBOSE)
-  message(STATUS "----- OVERLOOK_ARCH: ${OVERLOOK_ARCH}")
-endif()
-
-###############################################################
-#
-# ABI determinations
-#
-###############################################################
-if (ANDROID)
-  set(OVERLOOK_ABI ${ANDROID_ABI})
-elseif (OVERLOOK_ARCH STREQUAL x86)
-  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(OVERLOOK_ABI "x64")
-  else()
-    set(OVERLOOK_ABI "x86")
-  endif()
-elseif (OVERLOOK_ARCH STREQUAL arm)
-  # determine ARCH from compiler name. Note: we can't use MATCHES for c++ compiler, since `++` failed for regular expression
-  if(CMAKE_C_COMPILER MATCHES "aarch64-linux-gnu-gcc")
-    set(OVERLOOK_ABI "aarch64")
-  elseif(CMAKE_C_COMPILER MATCHES "arm-linux-gnueabihf-gcc")
-    set(OVERLOOK_ABI "arm-eabihf")
-  elseif(CMAKE_C_COMPILER MATCHES "aarch64-none-linux-gnu-gcc")
-    set(OVERLOOK_ABI "aarch64")
-  elseif(NOT CMAKE_CROSS_COMPILATION)
-    if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-      set(OVERLOOK_ABI "aarch64")
-    else()
-      message(FATAL_ERROR "un-assigned ABI, please add it now")
-    endif()
-  else()
-    message(FATAL_ERROR "un-assigned ABI, please add it now")
-  endif()
-else()
-  message(FATAL_ERROR "un-assigned ABI, please add it now")
-endif()
-if (OVERLOOK_VERBOSE)
-  message(STATUS "----- OVERLOOK_ABI: ${OVERLOOK_ABI}")
-endif()
-
-###############################################################
-#
-# Visual Studio stuffs: vs_version, vc_version
-#
-###############################################################
-if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-  if(MSVC_VERSION EQUAL 1600)
-    set(vs_version vs2010)
-    set(vc_version vc10)
-  elseif(MSVC_VERSION EQUAL 1700)
-    set(vs_version vs2012)
-    set(vc_version vc11)
-  elseif(MSVC_VERSION EQUAL 1800)
-    set(vs_version vs2013)
-    set(vc_version vc12)
-  elseif(MSVC_VERSION EQUAL 1900)
-    set(vs_version vs2015)
-    set(vc_version vc14)
-  elseif(MSVC_VERSION GREATER_EQUAL 1910 AND MSVC_VERSION LESS_EQUAL 1920)
-    set(vs_version vs2017)
-    set(vc_version vc15)
-  elseif(MSVC_VERSION GREATER_EQUAL 1920 AND MSVC_VERSION LESS_EQUAL 1930)
-    set(vs_version vs2019)
-    set(vc_version vc16)
-  elseif(MSVC_VERSION GREATER_EQUAL 1930)
-    set(vs_version vs2022)
-    set(vc_version vc17)
   endif()
 endif()

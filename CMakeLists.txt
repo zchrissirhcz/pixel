@@ -8,8 +8,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include("cmake/overlook.cmake")
+include("cmake/cvbuild.cmake")
 include("cmake/deps.cmake")
 include("cmake/output_dir.cmake")
+include("cmake/brief_summary.cmake")
 
 enable_testing()
 
