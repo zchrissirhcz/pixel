@@ -85,6 +85,7 @@ void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize);
 void px_resize_cubic(px_image_t* src, px_image_t* dst, px_size_t dsize);
 
 void px_rgb_to_nv21(px_image_t* rgb, px_image_t* y_plane, px_image_t* uv_plane);
+void px_nv21_to_rgb(px_image_t* y_plane, px_image_t* uv_plane, px_image_t* rgb);
 
 #ifdef __cplusplus
 }
