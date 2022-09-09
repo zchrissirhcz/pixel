@@ -9,6 +9,7 @@ add_library(pixel STATIC
   px_histogram.c
   px_resize_linear.c
   px_resize_nearest.c
+  px_rgb_to_nv21.cpp
 
   px_cnn.c
   px_relu.c

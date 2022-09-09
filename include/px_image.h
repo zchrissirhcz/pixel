@@ -44,6 +44,8 @@ px_image_t* px_create_image(int height, int width, int channel);
 void px_destroy_image(px_image_t* image);
 void px_destroy_image_header(px_image_t* image);
 
+px_size_t px_get_image_size(px_image_t* image);
+
 uint8_t px_get_pixel(px_image_t* image, int i, int j, int k);
 void px_set_pixel(px_image_t* image, int i, int j, int k, uint8_t value);
 
