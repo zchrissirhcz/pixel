@@ -87,6 +87,8 @@ void px_resize_cubic(px_image_t* src, px_image_t* dst, px_size_t dsize);
 void px_rgb_to_nv21(px_image_t* rgb, px_image_t* y_plane, px_image_t* uv_plane);
 void px_nv21_to_rgb(px_image_t* y_plane, px_image_t* uv_plane, px_image_t* rgb);
 
+void px_threshold(px_image_t* gray, px_image_t* binary, uint8_t thresh, uint8_t minval, uint8_t maxval);
+
 #ifdef __cplusplus
 }
 #endif
