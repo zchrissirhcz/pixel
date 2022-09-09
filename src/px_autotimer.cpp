@@ -1,10 +1,12 @@
-#include "autotimer.h"
+#include "px_timer.h"
 //#include <iostream>
 #if _WIN32
 #include <windows.h>
 #else
 #include <sys/time.h>
 #endif
+
+namespace pixel {
 
 #if 0
 class AutoTimer::Impl
@@ -92,9 +94,11 @@ AutoTimer::~AutoTimer()
 {
     // std::cout << mImpl->mName << ": took " << mImpl->GetElapsed()
     //     << " ms" << std::endl;
-    fprintf(stderr, "%s: took %lf ms\n", mImpl->GetElapsed());
+    fprintf(stderr, "%s: took %lf ms\n", mImpl->mName.c_str(), mImpl->GetElapsed());
     delete mImpl;
     mImpl = NULL;
 }
+
+} // namespace pixel
 
 #endif 

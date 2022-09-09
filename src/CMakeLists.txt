@@ -2,6 +2,8 @@ add_library(pixel STATIC
   px_image.c
   px_compare.c
   px_arithm.c
+  px_timer.c
+  px_autotimer.cpp
   
   px_rgb2bgr.c
   px_rgb2gray.c
