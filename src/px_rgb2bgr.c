@@ -1,5 +1,6 @@
 #include "px_image.h"
 #include "px_assert.h"
+#include "px_compare.h"
 
 void px_rgb2bgr(px_image_t* src, px_image_t* dst)
 {

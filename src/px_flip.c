@@ -1,6 +1,7 @@
 #include "px_image.h"
 #include "px_log.h"
 #include "px_assert.h"
+#include "px_compare.h"
 #include <stdlib.h>
 #include <string.h>
 

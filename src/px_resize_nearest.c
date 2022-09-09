@@ -1,13 +1,14 @@
 #include "px_image.h"
 #include "px_assert.h"
 #include "px_arithm.h"
+#include "px_compare.h"
 
 void px_resize_nearest(px_image_t* src, px_image_t* dst, px_size_t dsize)
 {
     // TODO: implement by calling interpolation function
 
     PX_ASSERT(src != NULL && dst != NULL);
-    PX_ASSERT(px_size_equal(dsize, dst->size));
+    PX_ASSERT(px_image_size_equal(dst, dsize));
     PX_ASSERT(src->channel == dst->channel);
 
     const int height = dst->height;

@@ -197,3 +197,17 @@ bool px_size_equal(px_size_t expected, px_size_t actual)
 {
     return (expected.width == actual.width) && (expected.height == actual.height);
 }
+
+px_size_t px_get_image_size(px_image_t* image)
+{
+    px_size_t size;
+    size.height = image->height;
+    size.width = image->width;
+    return size;
+}
+
+bool px_image_size_equal(px_image_t* image, px_size_t expected_size)
+{
+    px_size_t image_size = px_get_image_size(image);
+    return px_size_equal(expected_size, image_size);
+}
