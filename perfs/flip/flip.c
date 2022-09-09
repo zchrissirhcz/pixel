@@ -140,7 +140,7 @@ void flip_horiz_gray_asimd(px_image_t* src, px_image_t* dst)
 
 #if __ARM_NEON
         int nn = width >> 3;
-        int remain = width - nn << 3;
+        int remain = width - (nn << 3);
 #else
         int remain = width;
 #endif // __ARM_NEON
@@ -150,11 +150,11 @@ void flip_horiz_gray_asimd(px_image_t* src, px_image_t* dst)
         uint8x8_t vdst;
         for (int j = 0; j < nn; j++)
         {
-            src -= 8;
-            vsrc = vld1_u8(src);
+            sp -= 8;
+            vsrc = vld1_u8(sp);
             vdst = vrev64_u8(vsrc);
-            vst1_u8(dst, vdst);
-            dst += 8;
+            vst1_u8(dp, vdst);
+            dp += 8;
         }
 #endif // __ARM_NEON
 
