@@ -4,6 +4,8 @@
 #include "px_arithm.h"
 #include <algorithm>
 
+namespace {
+
 class YuvToRgb_Converter_v1
 {
 public:
@@ -60,6 +62,8 @@ public:
         return px_clamp(b, 0, 255);
     }
 };
+
+} // namespace
 
 void px_nv21_to_rgb(px_image_t* y_plane, px_image_t* uv_plane, px_image_t* rgb)
 {

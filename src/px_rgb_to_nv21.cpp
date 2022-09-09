@@ -4,6 +4,8 @@
 #include "px_assert.h"
 #include "px_log.h"
 
+namespace {
+
 class RgbToYuv_Converter_v1
 {
 public:
@@ -58,6 +60,8 @@ public:
         return px_clamp(v, 0, 255);
     }
 };
+
+} // namespace
 
 void px_rgb_to_nv21(px_image_t* rgb, px_image_t* y_plane, px_image_t* uv_plane)
 {
