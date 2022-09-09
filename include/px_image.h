@@ -62,7 +62,7 @@ typedef enum PX_FLIP_MODE
     PX_FLIP_HORIZONTAL = 1,
     PX_FLIP_BOTH = 2
 } PX_FLIP_MODE;
-void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE flipmode);
+void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE mode);
 
 typedef enum PX_HISTOGRAM_MODE
 {

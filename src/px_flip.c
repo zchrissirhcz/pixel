@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE flipmode)
+void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE mode)
 {
     PX_ASSERT(src != NULL && dst != NULL);
     PX_ASSERT(px_image_shape_equal(src, dst, false));
@@ -13,7 +13,7 @@ void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE flipmode)
     const int w = src->width;
     const int cn = src->channel;
     const int rowlen = src->width * cn;
-    if (flipmode == PX_FLIP_VERTICAL)
+    if (mode == PX_FLIP_VERTICAL)
     {
         const int bufsize = sizeof(uint8_t) * rowlen;
         uint8_t* bufline = (uint8_t*) malloc(bufsize);
@@ -25,7 +25,7 @@ void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE flipmode)
         }
         free(bufline);
     }
-    else if (flipmode == PX_FLIP_HORIZONTAL)
+    else if (mode == PX_FLIP_HORIZONTAL)
     {
         for (int i = 0; i < h; i++)
         {
@@ -41,7 +41,7 @@ void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE flipmode)
             }
         }
     }
-    else if (flipmode == PX_FLIP_BOTH)
+    else if (mode == PX_FLIP_BOTH)
     {
         px_image_t* tmp = px_create_image(src->height, src->width, src->channel);
         px_flip(src, tmp, PX_FLIP_VERTICAL);
@@ -50,6 +50,6 @@ void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE flipmode)
     }
     else
     {
-        PX_LOGE("invalid flipmode: %d\n", flipmode);
+        PX_LOGE("invalid flipmode: %d\n", mode);
     }
 }
