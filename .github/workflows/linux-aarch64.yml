@@ -49,14 +49,14 @@ jobs:
         git clone https://github.com/google/googletest --depth 1
         cd googletest
         mkdir build && cd build
-        cmake -DCMAKE_TOOLCHAIN_FILE=../../toolchains/aarch64-linux-gnu.toolchain.cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/googletest-install ..
+        cmake -DCMAKE_TOOLCHAIN_FILE=../../cmake/aarch64-linux-gnu.toolchain.cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/googletest-install ..
         cmake --build . -j 2
         cmake --install .
 
     - name: build
       run: |
         mkdir build-aarch64 && cd build-aarch64
-        cmake -DCMAKE_TOOLCHAIN_FILE=../toolchains/aarch64-linux-gnu.toolchain.cmake -DGTest_DIR=$GITHUB_WORKSPACE/googletest-install/lib/cmake/GTest ..
+        cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/aarch64-linux-gnu.toolchain.cmake -DGTest_DIR=$GITHUB_WORKSPACE/googletest-install/lib/cmake/GTest ..
         cmake --build . -j 2
     - name: test
       run: |
