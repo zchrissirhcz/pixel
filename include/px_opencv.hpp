@@ -1,5 +1,8 @@
 #pragma once
 
+#include <opencv2/opencv.hpp>
+#include "px_log.h"
+
 static
 bool isImageNearlyEqual(const cv::Mat expected, const cv::Mat actual, const uint32_t tolerance=0)
 {
