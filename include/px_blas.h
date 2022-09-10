@@ -4,7 +4,7 @@
 extern "C" {
 #endif
 
-float array_mean_u8(unsigned char* data, int len);
+float px_array_mean_u8(unsigned char* data, int len);
 
 #ifdef __cplusplus
 }

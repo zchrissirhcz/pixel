@@ -1,7 +1,7 @@
 #include "px_blas.h"
 #include <stdint.h>
 
-float array_mean_u8(unsigned char* data, int len)
+float px_array_mean_u8(unsigned char* data, int len)
 {
     uint64_t sum = 0; // note: if use float type for `sum`, when sum>=16777216 and as integer, sum would be incorrect
     for (int i = 0; i < len; i++)
