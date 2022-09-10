@@ -34,14 +34,10 @@ class RgbToYuv_Converter_v2
 public:
     static int get_y(int r, int g, int b, bool require_shift_right=true)
     {
-        int y;
+        int y = (19 * r + 38 * g + 7 * b);
         if (require_shift_right)
         {
-            y = (19 * r + 38 * g + 7 * b) >> 6;
-        }
-        else
-        {
-            y = (19 * r + 38 * g + 7 * b);
+            y = y >> 6;
         }
         return y;
     }
