@@ -130,6 +130,8 @@ px_matrix_t* px_forward_convolution_layer_for_matrix(const px_matrix_t* input, c
 px_pad_t px_get_pad_from_conv_param(const px_conv_param_t conv_param);
 px_cube_t* px_forward_convolution_layer_for_cube(const px_cube_t* input, px_cube_t** kernels, const int kernels_num, const px_conv_param_t conv_param, float* bias, const int bias_num);
 
+px_matrix_dim_t px_create_matrix_dim(const int height, const int width);
+
 #ifdef __cplusplus
 }
 #endif

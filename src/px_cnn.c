@@ -247,3 +247,8 @@ px_kernel_size_t px_make_kernel_size(const int height, const int width)
 {
     return px_create_size(height, width);
 }
+
+px_matrix_dim_t px_create_matrix_dim(const int height, const int width)
+{
+    return px_create_size(height, width);
+}
