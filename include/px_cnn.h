@@ -75,8 +75,8 @@ void px_relu_forward(px_array_t* input, px_array_t* output);
 px_array_t* px_create_array(int len);
 void px_destroy_array(px_array_t* array);
 
-px_matrix_t* px_make_matrix(px_matrix_dim_t dim);
-void px_release_matrix(px_matrix_t* matrix);
+px_matrix_t* px_create_matrix(px_matrix_dim_t dim);
+void px_destroy_matrix(px_matrix_t* matrix);
 
 int px_set_matrix_value(px_matrix_t* matrix, int i, int j, float value);
 float px_get_matrix_value(const px_matrix_t* matrix, int i, int j);
@@ -103,14 +103,14 @@ void px_forward_tanh_layer_for_cube(const px_cube_t* input, px_cube_t* output);
 px_matrix_t* px_forward_max_pooling_layer_for_matrix(const px_matrix_t* input, const px_pooling_param_t pooling_param);
 px_matrix_dim_t px_get_pooling_output_matrix_dim(const px_matrix_dim_t input_dim, const px_pooling_param_t pooling_param);
 
-px_kernel_size_t px_make_kernel_size(const int height, const int width);
-px_stride_t px_make_stride(const int height, const int width);
-px_pooling_param_t px_make_pooling_param(const px_kernel_size_t kernel_size, const px_stride_t stride);
+px_kernel_size_t px_create_kernel_size(const int height, const int width);
+px_stride_t px_create_stride(const int height, const int width);
+px_pooling_param_t px_create_pooling_param(const px_kernel_size_t kernel_size, const px_stride_t stride);
 
 float px_inner_product(px_array_t* v1, px_array_t* v2);
 
-px_cube_t* px_make_cube(const px_cube_dim_t dim);
-void px_release_cube(px_cube_t* cube);
+px_cube_t* px_create_cube(const px_cube_dim_t dim);
+void px_destroy_cube(px_cube_t* cube);
 px_cube_dim_t px_get_cube_dim(const px_cube_t* cube);
 int px_get_cube_volume(const px_cube_t* cube);
 
@@ -118,8 +118,8 @@ px_matrix_t* px_copy_make_border_for_matrix(const px_matrix_t* matrix, const px_
 
 px_matrix_dim_t px_get_conv_output_matrix_dim(const px_matrix_dim_t input_dim, const px_matrix_dim_t kernel_dim, const px_conv_param_t conv_param);
 
-px_pad_t px_make_pad(const int top, const int bottom, const int left, const int right);
-px_conv_param_t px_make_conv_param(const px_stride_t stride, const px_pad_t pad);
+px_pad_t px_create_pad(const int top, const int bottom, const int left, const int right);
+px_conv_param_t px_create_conv_param(const px_stride_t stride, const px_pad_t pad);
 
 px_matrix_dim_t px_get_channel_wise_matrix_dim(const px_cube_t* cube);
 px_matrix_t* px_forward_convolution_layer_for_cube_with_one_kernel(const px_cube_t* input, px_cube_t* kernel, const px_conv_param_t conv_param, const float bias);

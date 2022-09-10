@@ -27,7 +27,7 @@ void px_destroy_array(px_array_t* array)
     }
 }
 
-px_matrix_t* px_make_matrix(px_matrix_dim_t dim)
+px_matrix_t* px_create_matrix(px_matrix_dim_t dim)
 {
     const int height = dim.height;
     const int width = dim.width;
@@ -44,7 +44,7 @@ px_matrix_t* px_make_matrix(px_matrix_dim_t dim)
     return matrix;
 }
 
-void px_release_matrix(px_matrix_t* matrix)
+void px_destroy_matrix(px_matrix_t* matrix)
 {
     if (matrix != NULL)
     {
@@ -119,7 +119,7 @@ int px_get_matrix_area(const px_matrix_t* matrix)
     return matrix->height * matrix->width;
 }
 
-px_stride_t px_make_stride(const int height, const int width)
+px_stride_t px_create_stride(const int height, const int width)
 {
     return px_create_size(height, width);
 }
@@ -133,7 +133,7 @@ px_cube_dim_t px_get_cube_dim(const px_cube_t* cube)
     return cube_dim;
 }
 
-px_cube_t* px_make_cube(const px_cube_dim_t dim)
+px_cube_t* px_create_cube(const px_cube_dim_t dim)
 {
     const int c = dim.channel;
     const int h = dim.height;
@@ -170,7 +170,7 @@ px_matrix_t* px_copy_make_border_for_matrix(const px_matrix_t* matrix, const px_
     px_matrix_dim_t padded_dim = {0};
     padded_dim.height = padded_h;
     padded_dim.width = padded_w;
-    px_matrix_t* padded_matrix = px_make_matrix(padded_dim);
+    px_matrix_t* padded_matrix = px_create_matrix(padded_dim);
 
     const int pad_value = 0;
     for (int i = 0; i < padded_h; i++)
@@ -195,7 +195,7 @@ px_matrix_t* px_copy_make_border_for_matrix(const px_matrix_t* matrix, const px_
     return padded_matrix;
 }
 
-void px_release_cube(px_cube_t* cube)
+void px_destroy_cube(px_cube_t* cube)
 {
     if (cube != NULL)
     {
@@ -208,7 +208,7 @@ void px_release_cube(px_cube_t* cube)
     }
 }
 
-px_pad_t px_make_pad(const int top, const int bottom, const int left, const int right)
+px_pad_t px_create_pad(const int top, const int bottom, const int left, const int right)
 {
     px_pad_t pad;
     pad.top = top;
@@ -243,7 +243,7 @@ px_matrix_t px_get_matrix_from_cube(const px_cube_t* cube, const int channel_idx
     return matrix;
 }
 
-px_kernel_size_t px_make_kernel_size(const int height, const int width)
+px_kernel_size_t px_create_kernel_size(const int height, const int width)
 {
     return px_create_size(height, width);
 }

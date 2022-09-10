@@ -23,7 +23,7 @@ px_matrix_dim_t px_get_conv_output_matrix_dim(const px_matrix_dim_t input_dim, c
     return output_dim;
 }
 
-px_conv_param_t px_make_conv_param(const px_stride_t stride, const px_pad_t pad)
+px_conv_param_t px_create_conv_param(const px_stride_t stride, const px_pad_t pad)
 {
     px_conv_param_t conv_param;
 
@@ -49,7 +49,7 @@ px_cube_t* px_forward_convolution_layer_for_cube(const px_cube_t* input, px_cube
     output_dim.height = output_channel_dim.height;
     output_dim.width = output_channel_dim.width;
     output_dim.channel = kernels_num;
-    px_cube_t* output_cube = px_make_cube(output_dim);
+    px_cube_t* output_cube = px_create_cube(output_dim);
 
     const int output_h = output_dim.height;
     const int output_w = output_dim.width;
@@ -81,7 +81,7 @@ px_matrix_t* px_forward_convolution_layer_for_cube_with_one_kernel(const px_cube
     const int input_h = input->height;
     const int input_w = input->width;
 
-    px_matrix_t* output = px_make_matrix(output_channel_dim);
+    px_matrix_t* output = px_create_matrix(output_channel_dim);
     memset(output->data, 0, output_h*output_w*sizeof(float));
 
     const int input_c = input->channel;
@@ -91,12 +91,12 @@ px_matrix_t* px_forward_convolution_layer_for_cube_with_one_kernel(const px_cube
         size_t buf_size = 0;
 
         // prepare input matrix
-        px_matrix_t* input_matrix = px_make_matrix(input_channel_dim);
+        px_matrix_t* input_matrix = px_create_matrix(input_channel_dim);
         buf_size = input_h * input_w * sizeof(float);
         memcpy(input_matrix->data, px_get_matrix_from_cube(input, k).data, buf_size);
 
         // prepare kernel matrix
-        px_matrix_t* kernel_matrix = px_make_matrix(kernel_channel_dim);
+        px_matrix_t* kernel_matrix = px_create_matrix(kernel_channel_dim);
         buf_size = kernel_h * kernel_w * sizeof(float);
         memcpy(kernel_matrix->data, px_get_matrix_from_cube(kernel, k).data, buf_size);
 
@@ -138,7 +138,7 @@ px_matrix_t* px_forward_convolution_layer_for_matrix(const px_matrix_t* input, c
 
     // PCNN_LOGE(">>> input_h=%d, kernel_h=%d, stride_h=%d, output_h=%d\n",
     //         input_h, kernel_h, stride_h, output_h);
-    px_matrix_t* output = px_make_matrix(output_dim);
+    px_matrix_t* output = px_create_matrix(output_dim);
 
     for (int i=0; i+kernel_h-1<input_h; i+=stride_h) {
         for (int j=0; j+kernel_w-1<input_w; j+=stride_w) {
@@ -158,7 +158,7 @@ px_matrix_t* px_forward_convolution_layer_for_matrix(const px_matrix_t* input, c
         }
     }
 
-    px_release_matrix(padded_input);
+    px_destroy_matrix(padded_input);
 
     // PCNN_LOGE(" output:\n");
     // dump_matrix(output);

@@ -36,7 +36,7 @@ px_matrix_t* px_forward_max_pooling_layer_for_matrix(const px_matrix_t* input, c
     const int stride_h = pooling_param.stride_h;
     const int stride_w = pooling_param.stride_w;
 
-    px_matrix_t* output = px_make_matrix(output_dim);
+    px_matrix_t* output = px_create_matrix(output_dim);
     for (int i = 0; i+kernel_h-1 < input_h; i+=stride_h)
     {
         for (int j = 0; j+kernel_w-1 < input_w; j+=stride_w)
@@ -64,7 +64,7 @@ px_matrix_t* px_forward_max_pooling_layer_for_matrix(const px_matrix_t* input, c
     return output;
 }
 
-px_pooling_param_t px_make_pooling_param(const px_kernel_size_t kernel_size, const px_stride_t stride)
+px_pooling_param_t px_create_pooling_param(const px_kernel_size_t kernel_size, const px_stride_t stride)
 {
     px_pooling_param_t pooling_param;
     pooling_param.kernel_h = kernel_size.height;
