@@ -1,5 +1,6 @@
 #include "px_timer.h"
-//#include <iostream>
+#include "px_log.h"
+
 #if _WIN32
 #include <windows.h>
 #else
@@ -7,53 +8,6 @@
 #endif
 
 namespace pixel {
-
-#if 0
-class AutoTimer::Impl
-{
-public:
-    double GetElapsed() const
-    {
-#ifdef _WIN32
-        return (GetTickCount() - mStartTime) / 1e3;
-#else
-        struct timeval end_time;
-        gettimeofday(&end_time, NULL);
-        double t1 = mStartTime.tv_usec / 1e6 + mStartTime.tv_sec;
-        double t2 = end_time.tv_usec / 1e6 + end_time.tv_sec;
-        return t2 - t1;
-#endif
-    }
-
-    std::string mName;
-#ifdef _WIN32
-    DWORD mStartTime;
-#else
-    struct timeval mStartTime;
-#endif
-};
-
-AutoTimer::AutoTimer(const std::string& name):
-    mImpl(new AutoTimer::Impl())
-{
-    mImpl->mName = name;
-#ifdef _WIN32
-    mImpl->mStartTime = GetTickCount();
-#else
-    gettimeofday(&mImpl->mStartTime, NULL);
-#endif
-}
-
-AutoTimer::~AutoTimer()
-{
-    // std::cout << mImpl->mName << ": took " << 
-    //     << " secs" << std::endl;
-    fprintf(stderr, "%s: took %lf secs\n", mImpl->GetElapsed());
-    delete mImpl;
-    mImpl = NULL;
-}
-
-#else
 
 class AutoTimer::Impl
 {
@@ -92,13 +46,9 @@ AutoTimer::AutoTimer(const std::string& name):
 
 AutoTimer::~AutoTimer()
 {
-    // std::cout << mImpl->mName << ": took " << mImpl->GetElapsed()
-    //     << " ms" << std::endl;
-    fprintf(stderr, "%s: took %lf ms\n", mImpl->mName.c_str(), mImpl->GetElapsed());
+    PX_LOGE("%s: took %lf ms", mImpl->mName.c_str(), mImpl->GetElapsed());
     delete mImpl;
     mImpl = NULL;
 }
 
 } // namespace pixel
-
-#endif 
