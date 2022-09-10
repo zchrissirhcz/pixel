@@ -5,35 +5,34 @@
 
 void px_resize_nearest(px_image_t* src, px_image_t* dst, px_size_t dsize)
 {
-    // TODO: implement by calling interpolation function
-
     PX_ASSERT(src != NULL && dst != NULL);
     PX_ASSERT(px_image_size_equal(dst, dsize));
     PX_ASSERT(src->channel == dst->channel);
 
-    const int height = dst->height;
-    const int width = dst->width;
     const int channel = dst->channel;
 
-    const float scale_height = src->height * 1.0 / dst->height;
-    const float scale_width = src->width * 1.0 / dst->width;
+    const double scale_height = src->height * 1.0 / dst->height;
+    const double scale_width = src->width * 1.0 / dst->width;
 
-    for (int i = 0; i < height; i++)
+    for (int i = 0; i < dst->height; i++)
     {
-        for (int j = 0; j < width; j++)
+        for (int j = 0; j < dst->width; j++)
         {
-            int dst_i = i;
-            int dst_j = j;
-            int src_i = (dst_i * scale_height) + 0.5f;
-            int src_j = (dst_j * scale_width) + 0.5f;
+            int di = i;
+            int dj = j;
 
-            src_i = px_clamp(src_i, 0, src->height - 1);
-            src_j = px_clamp(src_j, 0, src->width - 1);
+            // interpolation
+            int si = (di * scale_height) + 0.5;
+            int sj = (dj * scale_width) + 0.5;
+
+            si = px_clamp(si, 0, src->height - 1);
+            sj = px_clamp(sj, 0, src->width - 1);
             
+            // dst[i, j, k] = src[si, sj, k]
             for (int k = 0; k < channel; k++)
             {
-                const int dst_idx = dst_i * dst->stride + dst_j * channel + k;
-                const int src_idx = src_i * src->stride + src_j * channel + k;
+                const int dst_idx = di * dst->stride + dj * channel + k;
+                const int src_idx = si * src->stride + sj * channel + k;
                 dst->data[dst_idx] = src->data[src_idx];
             }
         }
