@@ -1,0 +1,67 @@
+#build binary folders
+# 所有目录下的build子目录中的任何目录，都忽略
+**/build/*/
+
+#VSCode
+**/.vscode/c_cpp_properties.json
+**/.vscode/settings.json
+
+# JetBrains
+.idea/
+cmake-build-debug/
+
+# QtCreator
+CMakeLists.txt.user
+build-*-unknown-Debug
+build-*-unknown-Release
+
+#silly vscode cmake tools plugin automatic generated files
+build.ninja
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+plainConfig.cmake
+
+#c/c++ object files
+*.dSYM
+*.o
+*.out
+
+#python Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+#tex
+*.aux
+*.log
+*.synctex.gz
+*.toc
+
+#log files
+**/log.txt
+
+#clangd cache
+**/.cache/
+
+# compiled output
+tools/bin_diff
+tools/image_viewer
+
+# save result
+output
+
+# performance analysis
+perf.data
+perf.data.old
+perf.data.old*
+
+# simpleperf report
+build/report.html
+build/*.txt
+
+# Data
+mnist/t10k-images.idx3-ubyte
+mnist/t10k-labels.idx1-ubyte
+mnist/train-images.idx3-ubyte
+mnist/train-labels.idx1-ubyte
