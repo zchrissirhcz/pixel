@@ -20,6 +20,7 @@ add_library(pixel STATIC
   px_max_pooling.c
   px_inner_product.c
   px_convolution.c
+  px_eltwise.c
 
   px_array_mean.c
 )
