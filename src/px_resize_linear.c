@@ -10,38 +10,51 @@ void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize)
     PX_ASSERT(px_image_size_equal(dst, dsize));
     PX_ASSERT(src->channel == dst->channel);
 
-    const int height = dst->height;
-    const int width = dst->width;
     const int channel = dst->channel;
 
     double scale_height = src->height * 1.0 / dst->height;
     double scale_width = src->width * 1.0 / dst->width;
 
     int Ai, Aj, Bi, Bj, Ci, Cj, Di, Dj;
-    for (int i = 0; i < height; i++)
+    for (int i = 0; i < dst->height; i++)
     {
-        for (int j = 0; j < width; j++)
+        for (int j = 0; j < dst->width; j++)
         {
-            int dst_i = i;
-            int dst_j = j;
+            int di = i;
+            int dj = j;
 
-            // + 0.5 then - 0.5: align to geometric center
-            double src_i = (dst_i + 0.5) * scale_height - 0.5;
-            double src_j = (dst_j + 0.5) * scale_width - 0.5;
-            double y = src_i - (int)src_i;
-            double x = src_j - (int)src_j;
+            // interpolation: + 0.5 then - 0.5: align to geometric center
+            double si = (di + 0.5) * scale_height - 0.5;
+            double sj = (dj + 0.5) * scale_width - 0.5;
+            double y = si - (int)si;
+            double x = sj - (int)sj;
 
-            Ai = floor(src_i);
-            Aj = floor(src_j);
+            //   |-- x --|-- 1-x --|
+            // - A       |         B
+            // |         |
+            // |         |
+            // y         |
+            // |         |
+            // |         |
+            // ------(si, sj)
+            // |
+            // |
+            //1-y
+            // |
+            // |
+            // - C                 D
 
-            Bi = floor(src_i);
-            Bj = ceil(src_j);
+            Ai = floor(si);
+            Aj = floor(sj);
 
-            Ci = ceil(src_i);
-            Cj = floor(src_j);
+            Bi = floor(si);
+            Bj = ceil(sj);
 
-            Di = ceil(src_i);
-            Dj = ceil(src_j);
+            Ci = ceil(si);
+            Cj = floor(sj);
+
+            Di = ceil(si);
+            Dj = ceil(sj);
 
             for (int k = 0; k < channel; k++)
             {
@@ -56,7 +69,7 @@ void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize)
                 double coeffD = x * y;
                 double M = coeffA * A + coeffB * B + coeffC * C + coeffD * D;
                 
-                const int dst_idx = dst_i * dst->stride + dst_j * channel + k;
+                const int dst_idx = di * dst->stride + dj * channel + k;
                 dst->data[dst_idx] = (uint8_t)(M + 0.5); // rounding
             }
         }
