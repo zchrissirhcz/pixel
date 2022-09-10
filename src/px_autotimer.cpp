@@ -32,8 +32,8 @@ public:
 #endif // _WIN32
     }
 
+public:
     std::string mName;
-
     double mStartTime;
 };
 

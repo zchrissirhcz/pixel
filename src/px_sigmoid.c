@@ -1,7 +1,6 @@
 #include "px_cnn.h"
 #include <math.h>
 
-
 static float sigmoid(const float x)
 {
     return 1 / (1 + exp(-x));

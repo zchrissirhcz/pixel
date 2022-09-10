@@ -25,5 +25,4 @@ void px_rgb2gray(px_image_t* src, px_image_t* dst)
             sp += cn;
         }
     }
-
 }
