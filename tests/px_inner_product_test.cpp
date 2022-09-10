@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "px_compare.h"
 
-TEST(naive, innerproduct)
+TEST(innerproduct, naive)
 {
     const int len = 3;
     px_array_t* v1 = px_create_array(len);

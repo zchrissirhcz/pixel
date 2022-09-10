@@ -4,7 +4,7 @@
 
 #include <opencv2/opencv.hpp>
 
-TEST(naive, flip_gray)
+TEST(flip_gray, naive)
 {
     px_image_t* src = px_create_image(2, 2, 1);
     // A  B
@@ -69,7 +69,7 @@ TEST(naive, flip_gray)
 }
 
 
-TEST(naive, flip_rgb)
+TEST(flip_rgb, naive)
 {
     px_image_t* src = px_create_image(2, 2, 3);
     // ABC  BCD
@@ -180,7 +180,7 @@ TEST(naive, flip_rgb)
     px_destroy_image(expected);
 }
 
-TEST(opencv, flip)
+TEST(flip, opencv)
 {
     cv::Mat src(2, 2, CV_8UC1);
     src.data[0] = 'A';

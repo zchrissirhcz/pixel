@@ -7,12 +7,12 @@ static float sigmoid(const float x)
     return 1 / (1 + exp(-x));
 }
 
-px_matrix_t* px_forward_sigmoid_layer_for_matrix(const px_matrix_t* input)
+void px_forward_sigmoid_layer_for_matrix(const px_matrix_t* input, px_matrix_t* output)
 {
-    return px_forward_eltwise_layer_for_matrix(input, sigmoid);
+    return px_forward_eltwise_layer_for_matrix(input, output, sigmoid);
 }
 
-px_cube_t* px_forward_sigmoid_layer_for_cube(const px_cube_t* input)
+void px_forward_sigmoid_layer_for_cube(const px_cube_t* input, px_cube_t* output)
 {
-    return px_forward_eltwise_layer_for_cube(input, sigmoid);
+    return px_forward_eltwise_layer_for_cube(input, output, sigmoid);
 }

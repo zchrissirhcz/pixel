@@ -171,7 +171,7 @@ void px_dump_cube(const px_cube_t* cube)
     PX_LOGE("\n");
 }
 
-bool px_image_shape_equal(px_image_t* expected, px_image_t* actual, bool compare_stride)
+bool px_image_equal_in_shape(px_image_t* expected, px_image_t* actual, bool compare_stride)
 {
     PX_ASSERT(expected != NULL && actual != NULL);
     if (expected->height != actual->height)
@@ -210,4 +210,22 @@ bool px_image_size_equal(px_image_t* image, px_size_t expected_size)
 {
     px_size_t image_size = px_get_image_size(image);
     return px_size_equal(expected_size, image_size);
+}
+
+void px_dump_image_meta(const px_image_t* image, const char* msg)
+{
+    if (msg)
+    {
+        PX_LOGE("%s:", msg);
+    }
+    PX_LOGE("width=%d, height=%d, channel=%d, data=%p, stride=%d",
+        image->width, image->height, image->channel, image->data, image->stride
+    );
+}
+
+bool px_image_equal_in_size(px_image_t* expected, px_image_t* actual)
+{
+    px_size_t sz_expected = px_get_image_size(expected);
+    px_size_t sz_actual = px_get_image_size(actual);
+    return px_size_equal(sz_expected, sz_actual);
 }

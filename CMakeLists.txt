@@ -12,6 +12,7 @@ include("cmake/cvbuild.cmake")
 include("cmake/deps.cmake")
 include("cmake/output_dir.cmake")
 include("cmake/brief_summary.cmake")
+include("cmake/asan.cmake")
 
 enable_testing()
 

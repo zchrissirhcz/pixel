@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "px_compare.h"
 
-TEST(naive, rgb2bgr)
+TEST(rgb2bgr, naive)
 {
     px_image_t* src = px_create_image(1, 2, 3);
 

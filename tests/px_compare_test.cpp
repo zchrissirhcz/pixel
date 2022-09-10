@@ -42,11 +42,11 @@ TEST(compare, image_shape_equal)
 {
     px_image_t* im0 = px_create_image(10, 20, 3);
     px_image_t* im1 = px_create_image(10, 20, 3);
-    EXPECT_TRUE(px_image_shape_equal(im0, im1, true));
+    EXPECT_TRUE(px_image_equal_in_shape(im0, im1, true));
     px_image_t* im2 = px_create_image_header(10, 20, 3);
     im2->stride = im2->stride + 1;
-    EXPECT_TRUE(px_image_shape_equal(im0, im2, false));
-    EXPECT_FALSE(px_image_shape_equal(im0, im2, true));
+    EXPECT_TRUE(px_image_equal_in_shape(im0, im2, false));
+    EXPECT_FALSE(px_image_equal_in_shape(im0, im2, true));
 
     px_destroy_image(im0);
     px_destroy_image(im1);

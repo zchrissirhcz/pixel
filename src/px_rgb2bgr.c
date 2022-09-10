@@ -5,7 +5,7 @@
 void px_rgb2bgr(px_image_t* src, px_image_t* dst)
 {
     PX_ASSERT(src != NULL && dst != NULL);
-    PX_ASSERT(px_image_shape_equal(src, dst, false));
+    PX_ASSERT(px_image_equal_in_shape(src, dst, false));
     PX_ASSERT(src->channel == 3);
     const int h = src->height;
     const int w = src->width;

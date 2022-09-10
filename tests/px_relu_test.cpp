@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "px_compare.h"
 
-TEST(naive, relu)
+TEST(relu, naive)
 {
     px_array_t* input = px_create_array(5);
 
@@ -38,7 +38,8 @@ TEST(relu, matrix)
     px_set_matrix_value(input, 1, 0, 233);
     px_set_matrix_value(input, 1, 1, -42);
 
-    px_matrix_t* output = px_forward_relu_layer_for_matrix(input);
+    px_matrix_t* output = px_make_matrix(input_dim);
+    px_forward_relu_layer_for_matrix(input, output);
 
     px_matrix_t* expected_output = px_make_matrix(input_dim);
     px_set_matrix_value(expected_output, 0, 0, 1);

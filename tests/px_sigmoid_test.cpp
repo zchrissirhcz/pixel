@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "px_compare.h"
 
-TEST(naive, sigmoid)
+TEST(sigmoid, naive)
 {
     px_matrix_dim_t input_dim = {2, 2};
     px_matrix_t* input = px_make_matrix(input_dim);
@@ -11,7 +11,8 @@ TEST(naive, sigmoid)
     px_set_matrix_value(input, 1, 0, 0.3f);
     px_set_matrix_value(input, 1, 1, 0.1f);
 
-    px_matrix_t* output = px_forward_sigmoid_layer_for_matrix(input);
+    px_matrix_t* output = px_make_matrix(input_dim);
+    px_forward_sigmoid_layer_for_matrix(input, output);
 
     px_matrix_t* expected_output = px_make_matrix(input_dim);
     px_set_matrix_value(expected_output, 0, 0, 0.622459f);

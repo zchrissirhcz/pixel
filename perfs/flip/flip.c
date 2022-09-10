@@ -13,7 +13,7 @@
 void flip_horiz_rgb_naive(px_image_t* src, px_image_t* dst)
 {
     PX_ASSERT(src != NULL && dst != NULL);
-    PX_ASSERT(px_image_shape_equal(src, dst, false));
+    PX_ASSERT(px_image_equal_in_shape(src, dst, false));
     PX_ASSERT(src->channel == 3);
 
     const int cn = 3;
@@ -107,7 +107,7 @@ void flip_horiz_rgb_asimd(unsigned char* src, size_t height, size_t width, unsig
 void flip_horiz_gray_naive(px_image_t* src, px_image_t* dst)
 {
     PX_ASSERT(src != NULL && dst != NULL);
-    PX_ASSERT(px_image_shape_equal(src, dst, false));
+    PX_ASSERT(px_image_equal_in_shape(src, dst, false));
     PX_ASSERT(src->channel == 1);
 
     const int width = src->width;
@@ -127,7 +127,7 @@ void flip_horiz_gray_naive(px_image_t* src, px_image_t* dst)
 void flip_horiz_gray_asimd(px_image_t* src, px_image_t* dst)
 {
     PX_ASSERT(src != NULL && dst != NULL);
-    PX_ASSERT(px_image_shape_equal(src, dst, false));
+    PX_ASSERT(px_image_equal_in_shape(src, dst, false));
     PX_ASSERT(src->channel == 1);
 
     const int width = src->width;

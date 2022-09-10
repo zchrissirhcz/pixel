@@ -119,19 +119,6 @@ int px_get_matrix_area(const px_matrix_t* matrix)
     return matrix->height * matrix->width;
 }
 
-px_matrix_t* px_forward_eltwise_layer_for_matrix(const px_matrix_t* input, PxEltwiseFunction eltwise_func)
-{
-    px_matrix_dim_t input_dim = px_get_matrix_dim(input);
-    px_matrix_t* output = px_make_matrix(input_dim);
-    const int len = px_get_matrix_area(input);
-
-    for (int i = 0; i < len; i++)
-    {
-        output->data[i] = eltwise_func(input->data[i]);
-    }
-    return output;
-}
-
 px_stride_t px_make_stride(const int height, const int width)
 {
     px_stride_t stride;
@@ -141,17 +128,52 @@ px_stride_t px_make_stride(const int height, const int width)
     return stride;
 }
 
-px_cube_t* px_forward_eltwise_layer_for_cube(const px_cube_t* input, PxEltwiseFunction eltwise_func)
+void px_forward_eltwise_layer_for_array(const px_array_t* input, px_array_t* output, PxEltwiseFunction eltwise_func)
 {
-    px_cube_dim_t input_dim = px_get_cube_dim(input);
-    px_cube_t* output = px_make_cube(input_dim);
-    const int len = px_get_cube_volume(input);
+    PX_ASSERT(input != NULL && output != NULL);
+    PX_ASSERT(input->data != NULL && output->data != NULL);
+    PX_ASSERT(input->len <= output->len);
 
-    for (int i = 0; i < len; i++)
+    for (int i = 0; i < input->len; i++)
     {
         output->data[i] = eltwise_func(input->data[i]);
     }
-    return output;
+}
+
+void px_forward_eltwise_layer_for_matrix(const px_matrix_t* input, px_matrix_t* output, PxEltwiseFunction eltwise_func)
+{
+    PX_ASSERT(input != NULL && output != NULL);
+    PX_ASSERT(input->data != NULL && output->data != NULL);
+    PX_ASSERT(input->height <= output->height);
+    PX_ASSERT(input->width <= output->width);
+
+    px_array_t input_array;
+    input_array.data = input->data;
+    input_array.len = px_get_matrix_area(input);
+    
+    px_array_t output_array;
+    output_array.data = output->data;
+    output_array.len = px_get_matrix_area(output);
+
+    px_forward_eltwise_layer_for_array(&input_array, &output_array, eltwise_func);
+}
+
+void px_forward_eltwise_layer_for_cube(const px_cube_t* input, px_cube_t* output, PxEltwiseFunction eltwise_func)
+{
+    PX_ASSERT(input != NULL && output != NULL);
+    PX_ASSERT(input->data != NULL && output->data != NULL);
+    PX_ASSERT(input->height <= output->height);
+    PX_ASSERT(input->width <= output->width);
+
+    px_array_t input_array;
+    input_array.data = input->data;
+    input_array.len = px_get_cube_volume(input);
+    
+    px_array_t output_array;
+    output_array.data = output->data;
+    output_array.len = px_get_cube_volume(output);
+
+    px_forward_eltwise_layer_for_array(&input_array, &output_array, eltwise_func);
 }
 
 px_cube_dim_t px_get_cube_dim(const px_cube_t* cube)

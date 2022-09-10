@@ -100,11 +100,17 @@ px_matrix_dim_t px_get_matrix_dim(const px_matrix_t* matrix);
 int px_get_matrix_area(const px_matrix_t* matrix);
 
 typedef float (*PxEltwiseFunction)(const float);
-px_matrix_t* px_forward_eltwise_layer_for_matrix(const px_matrix_t* input, PxEltwiseFunction eltwise_func);
+void px_forward_eltwise_layer_for_array(const px_array_t* input, px_array_t* output, PxEltwiseFunction eltwise_func);
+void px_forward_eltwise_layer_for_matrix(const px_matrix_t* input, px_matrix_t* output, PxEltwiseFunction eltwise_func);
+void px_forward_eltwise_layer_for_cube(const px_cube_t* input, px_cube_t* output, PxEltwiseFunction eltwise_func);
 
-px_matrix_t* px_forward_sigmoid_layer_for_matrix(const px_matrix_t* input);
-px_matrix_t* px_forward_tanh_layer_for_matrix(const px_matrix_t* input);
-px_matrix_t* px_forward_relu_layer_for_matrix(const px_matrix_t* input);
+void px_forward_sigmoid_layer_for_matrix(const px_matrix_t* input, px_matrix_t* output);
+void px_forward_tanh_layer_for_matrix(const px_matrix_t* input, px_matrix_t* output);
+void px_forward_relu_layer_for_matrix(const px_matrix_t* input, px_matrix_t* output);
+
+void px_forward_relu_layer_for_cube(const px_cube_t* input, px_cube_t* output);
+void px_forward_sigmoid_layer_for_cube(const px_cube_t* input, px_cube_t* output);
+void px_forward_tanh_layer_for_cube(const px_cube_t* input, px_cube_t* output);
 
 px_matrix_t* px_forward_max_pooling_layer_for_matrix(const px_matrix_t* input, const px_pooling_param_t pooling_param);
 px_matrix_dim_t px_get_pooling_output_matrix_dim(const px_matrix_dim_t input_dim, const px_pooling_param_t pooling_param);
@@ -119,11 +125,6 @@ px_cube_t* px_make_cube(const px_cube_dim_t dim);
 void px_release_cube(px_cube_t* cube);
 px_cube_dim_t px_get_cube_dim(const px_cube_t* cube);
 int px_get_cube_volume(const px_cube_t* cube);
-
-px_cube_t* px_forward_eltwise_layer_for_cube(const px_cube_t* input, PxEltwiseFunction eltwise_func);
-px_cube_t* px_forward_relu_layer_for_cube(const px_cube_t* input);
-px_cube_t* px_forward_sigmoid_layer_for_cube(const px_cube_t* input);
-px_cube_t* px_forward_tanh_layer_for_cube(const px_cube_t* input);
 
 px_matrix_t* px_copy_make_border_for_matrix(const px_matrix_t* matrix, const px_pad_t pad);
 
