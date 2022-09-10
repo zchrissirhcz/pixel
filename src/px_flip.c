@@ -9,6 +9,7 @@ void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE mode)
 {
     PX_ASSERT(src != NULL && dst != NULL);
     PX_ASSERT(px_image_equal_in_shape(src, dst, false));
+    
     const int h = src->height;
     const int w = src->width;
     const int cn = src->channel;

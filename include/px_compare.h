@@ -24,6 +24,10 @@ void px_dump_cube(const px_cube_t* cube);
 
 void px_dump_image_meta(const px_image_t* image, const char* msg);
 
+bool px_is_valid_rgb_image(px_image_t* image);
+bool px_is_valid_gray_image(px_image_t* image);
+bool px_is_valid_yuv420sp_image_pair(px_image_t* y_plane, px_image_t* uv_plane);
+
 #ifdef __cplusplus
 }
 #endif

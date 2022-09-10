@@ -229,3 +229,42 @@ bool px_image_equal_in_size(px_image_t* expected, px_image_t* actual)
     px_size_t sz_actual = px_get_image_size(actual);
     return px_size_equal(sz_expected, sz_actual);
 }
+
+bool px_is_valid_rgb_image(px_image_t* image)
+{
+    return (image != NULL && image->data != NULL && image->channel == 3);
+}
+
+bool px_is_valid_gray_image(px_image_t* image)
+{
+    return (image != NULL && image->data != NULL && image->channel == 1);
+}
+
+bool px_is_valid_yuv420sp_image_pair(px_image_t* y_plane, px_image_t* uv_plane)
+{
+    if (y_plane == NULL || y_plane->data == NULL)
+    {
+        return false;
+    }
+    else if (uv_plane == NULL || uv_plane->data == NULL)
+    {
+        return false;
+    }
+    else if (y_plane->height != 2 * uv_plane->height)
+    {
+        return false;
+    }
+    else if (y_plane->width != 2 * uv_plane->width)
+    {
+        return false;
+    }
+    else if (y_plane->channel != 1)
+    {
+        return false;
+    }
+    else if (uv_plane->channel != 2)
+    {
+        return false;
+    }
+    return true;
+}

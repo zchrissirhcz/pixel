@@ -67,18 +67,12 @@ public:
 
 void px_nv21_to_rgb(px_image_t* y_plane, px_image_t* uv_plane, px_image_t* rgb)
 {
-    /// param checking
+    PX_ASSERT(px_is_valid_yuv420sp_image_pair(y_plane, uv_plane));
+    PX_ASSERT(px_is_valid_rgb_image(rgb));
+    PX_ASSERT(px_image_equal_in_size(rgb, y_plane));
+
     const int width = y_plane->width;
     const int height = y_plane->height;
-    PX_ASSERT(width >= 2 && height >= 2);
-    PX_ASSERT(uv_plane->height * 2 == y_plane->height);
-    PX_ASSERT(uv_plane->width * 2 == y_plane->width);
-    PX_ASSERT(uv_plane->channel == 2 && y_plane->channel == 1);
-    PX_ASSERT(rgb->channel == 3);
-
-    px_size_t y_size = px_get_image_size(y_plane);
-    px_size_t rgb_size = px_get_image_size(rgb);
-    PX_ASSERT(px_size_equal(y_size, rgb_size));
 
     const int uIdx = 1;
     const int bIdx = 2;

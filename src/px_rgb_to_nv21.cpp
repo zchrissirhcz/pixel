@@ -61,21 +61,12 @@ public:
 
 void px_rgb_to_nv21(px_image_t* rgb, px_image_t* y_plane, px_image_t* uv_plane)
 {
-    px_size_t rgb_size = px_get_image_size(rgb);
-    px_size_t y_size = px_get_image_size(y_plane);
-    px_size_t uv_size = px_get_image_size(uv_plane);
-    PX_ASSERT(px_size_equal(rgb_size, y_size));
-    PX_ASSERT(y_size.height == 2 * uv_size.height);
-    PX_ASSERT(y_size.width == 2 * uv_size.width);
-    PX_ASSERT(uv_plane->channel == 2);
+    PX_ASSERT(px_is_valid_rgb_image(rgb));
+    PX_ASSERT(px_is_valid_yuv420sp_image_pair(y_plane, uv_plane));
+    PX_ASSERT(px_image_equal_in_size(rgb, y_plane));
 
-    const int width = y_size.width;
-    const int height = y_size.height;
-    if (width < 2 || height < 2)
-    {
-        PX_LOGE("invalid dimension\n");
-        return;
-    }
+    const int width = y_plane->width;
+    const int height = y_plane->height;
 
     const int bIdx = 2;
     const int cn = rgb->channel;

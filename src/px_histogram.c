@@ -1,9 +1,13 @@
 #include "px_image.h"
 #include "px_log.h"
 #include "px_assert.h"
+#include "px_compare.h"
 
 void px_histogram_rgb(px_image_t* src, px_image_t* hist, PX_HISTOGRAM_MODE mode)
 {
+    PX_ASSERT(px_is_valid_rgb_image(src));
+    PX_ASSERT(px_is_valid_gray_image(hist));
+
     const int cn = 3;
     PX_ASSERT(src->channel == cn);
 
