@@ -1,14 +1,6 @@
 #include "px_cnn.h"
 #include <float.h> // FLT_MIN
 
-px_kernel_size_t px_make_kernel_size(const int height, const int width)
-{
-    px_kernel_size_t kernel_size;
-    kernel_size.height = height;
-    kernel_size.width = width;
-    return kernel_size;
-}
-
 px_matrix_dim_t px_get_pooling_output_matrix_dim(const px_matrix_dim_t input_dim, const px_pooling_param_t pooling_param)
 {
     const int input_h = input_dim.height;

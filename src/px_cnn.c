@@ -246,3 +246,11 @@ px_matrix_t px_get_matrix_from_cube(const px_cube_t* cube, const int channel_idx
     matrix.data = cube->data + channel_idx * cstep;
     return matrix;
 }
+
+px_kernel_size_t px_make_kernel_size(const int height, const int width)
+{
+    px_kernel_size_t kernel_size;
+    kernel_size.height = height;
+    kernel_size.width = width;
+    return kernel_size;
+}
