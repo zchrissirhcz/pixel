@@ -27,7 +27,5 @@
 #pragma error
 #endif
 
-static int nc_align_up(int x, int n) {
-    return ((x + n - 1) / n ) * n;
-}
+
 

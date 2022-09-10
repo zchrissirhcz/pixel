@@ -5,6 +5,8 @@
 #include "nc_image.h"
 #include "nc_memory.h"
 
+#include "px_arithm.h"
+
 #define NC_LOADBMP_FILE_NOT_FOUND 1
 #define NC_LOADBMP_INVALID_FILE_FORMAT 2
 #define NC_LOADBMP_INVALID_SIGNATURE 3
@@ -51,7 +53,7 @@ void nc_image_load_bmp(const char* filename, uchar** _buf, uint* _height, uint* 
     unsigned char* buf = NULL;
     if (width>0 && height>0) {
         // w*3: we only need to store BGR instead of BGRA image
-        uint line_bytes = line_align ? nc_align_up(width*3, 4) : width*3;
+        uint line_bytes = line_align ? px_align_up(width*3, 4) : width*3;
         uint line_pad = line_bytes - width*3; // for store
         buf = (uchar*)malloc(line_bytes*channel);
         if (!buf) {
@@ -59,7 +61,7 @@ void nc_image_load_bmp(const char* filename, uchar** _buf, uint* _height, uint* 
             nc_bark_exit(NC_LOADBMP_OUT_OF_MEMORY);
         }
 
-        uint padding = nc_align_up(width*3,4) - width*3; // for read
+        uint padding = px_align_up(width*3,4) - width*3; // for read
         unsigned char bmp_pad[3];
         unsigned char* cur = buf;
         for(uint h=height-1; h>0; h--) {
@@ -126,7 +128,7 @@ void nc_image_save_bmp(const char* filename, const uchar* buf, uint height, uint
     
     char bmp_pad[3] = {0, 0, 0};
     uint pixel_bytes = width * 3;
-    uint line_bytes = nc_align_up(width*3, 4);
+    uint line_bytes = px_align_up(width*3, 4);
     uint line_pad = line_bytes - pixel_bytes;
     buf += line_bytes * (height-1);
     for(uint h=height-1; h!=-1; h--) {

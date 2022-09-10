@@ -5,6 +5,7 @@
 #include <time.h>
 #include "mat.h"
 #include "naive_config.h"
+#include "px_arithm.h"
 
 
 // create image
@@ -13,7 +14,7 @@ NcImage* nc_make_image(int h, int w, int c, unsigned char* data){
     im->h = h;
     im->w = w;
     im->c = c;
-    im->linebytes = nc_align_up(h*w, NC_IMAGE_ALIGN);
+    im->linebytes = px_align_up(h*w, NC_IMAGE_ALIGN);
     im->elem_num = im->linebytes * c;
     im->data = data;
     return im;
@@ -25,7 +26,7 @@ NcImage* nc_make_empty_image(int h, int w, int c){
     im->h = h;
     im->w = w;
     im->c = c;
-    im->linebytes = nc_align_up(h*w, NC_IMAGE_ALIGN);
+    im->linebytes = px_align_up(h*w, NC_IMAGE_ALIGN);
     im->elem_num = im->linebytes * c;
     im->data = (unsigned char*)malloc(sizeof(unsigned char)*im->elem_num);
     return im;

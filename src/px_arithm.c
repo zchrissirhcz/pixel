@@ -18,3 +18,9 @@ int px_clamp(int x, int minval, int maxval)
     }
     return x;
 }
+
+int px_align_up(int x, int power_of_2)
+{
+    const int n = power_of_2;
+    return ((x + n - 1) / n ) * n;
+}
