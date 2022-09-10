@@ -8,11 +8,7 @@ typedef struct px_array_t
     int len;
 } px_array_t;
 
-typedef struct px_matrix_dim_t
-{
-    int height;
-    int width;
-} px_matrix_dim_t;
+typedef struct px_size_t px_matrix_dim_t;
 
 typedef struct px_matrix_t
 {
@@ -21,11 +17,7 @@ typedef struct px_matrix_t
     int width;
 } px_matrix_t;
 
-typedef struct px_kernel_size_t
-{
-    int height;
-    int width;
-} px_kernel_size_t;
+typedef struct px_size_t px_kernel_size_t;
 
 typedef struct px_pooling_param_t
 {
@@ -38,11 +30,7 @@ typedef struct px_pooling_param_t
     // TODO: pad
 } px_pooling_param_t;
 
-typedef struct px_stride_t
-{
-    int height;
-    int width;
-} px_stride_t;
+typedef struct px_size_t px_stride_t;
 
 typedef struct px_cube_t
 {

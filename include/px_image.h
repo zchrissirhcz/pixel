@@ -11,12 +11,6 @@ typedef struct px_image_t
     int stride;
 } px_image_t;
 
-typedef struct px_size_t
-{
-    int width;
-    int height;
-} px_size_t;
-
 typedef enum px_fourcc_fmt_t{
     PX_FOURCC_FMT_NV21,
     PX_FOURCC_FMT_NV12,

@@ -121,11 +121,7 @@ int px_get_matrix_area(const px_matrix_t* matrix)
 
 px_stride_t px_make_stride(const int height, const int width)
 {
-    px_stride_t stride;
-    stride.height = height;
-    stride.width = width;
-
-    return stride;
+    return px_create_size(height, width);
 }
 
 px_cube_dim_t px_get_cube_dim(const px_cube_t* cube)
@@ -249,8 +245,5 @@ px_matrix_t px_get_matrix_from_cube(const px_cube_t* cube, const int channel_idx
 
 px_kernel_size_t px_make_kernel_size(const int height, const int width)
 {
-    px_kernel_size_t kernel_size;
-    kernel_size.height = height;
-    kernel_size.width = width;
-    return kernel_size;
+    return px_create_size(height, width);
 }

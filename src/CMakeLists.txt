@@ -4,6 +4,7 @@ add_library(pixel STATIC
   px_arithm.c
   px_timer.c
   px_autotimer.cpp
+  px_typebase.c
   
   px_rgb2bgr.c
   px_rgb2gray.c
