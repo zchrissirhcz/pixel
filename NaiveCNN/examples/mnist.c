@@ -16,15 +16,15 @@
 #include "naive_convolution.h"
 #include "naive_pooling.h"
 
-//英特尔处理器和其他低端机用户必须翻转头字节。  
-int reverse_int(int i)   
-{  
-    unsigned char ch1, ch2, ch3, ch4;  
-    ch1 = i & 255;  
-    ch2 = (i >> 8) & 255;  
-    ch3 = (i >> 16) & 255;  
-    ch4 = (i >> 24) & 255;  
-    return((int) ch1 << 24) + ((int)ch2 << 16) + ((int)ch3 << 8) + ch4;  
+//英特尔处理器和其他低端机用户必须翻转头字节。
+int reverse_int(int i)
+{
+    unsigned char ch1, ch2, ch3, ch4;
+    ch1 = i & 255;
+    ch2 = (i >> 8) & 255;
+    ch3 = (i >> 16) & 255;
+    ch4 = (i >> 24) & 255;
+    return((int) ch1 << 24) + ((int)ch2 << 16) + ((int)ch3 << 8) + ch4;
 }
 
 MnistImgArr* read_mnist_image(const char* filename) // 读入图像
@@ -38,17 +38,17 @@ MnistImgArr* read_mnist_image(const char* filename) // 读入图像
     int n_cols = 0;
     //从文件中读取sizeof(magic_number) 个字符到 &magic_number
     fread((char*)&magic_number,sizeof(magic_number),1,fp);
-    magic_number = reverse_int(magic_number);  
+    magic_number = reverse_int(magic_number);
     //获取训练或测试image的个数number_of_images
-    fread((char*)&number_of_images,sizeof(number_of_images),1,fp);  
-    number_of_images = reverse_int(number_of_images);    
+    fread((char*)&number_of_images,sizeof(number_of_images),1,fp);
+    number_of_images = reverse_int(number_of_images);
     //获取训练或测试图像的高度Height
-    fread((char*)&n_rows,sizeof(n_rows),1,fp); 
-    n_rows = reverse_int(n_rows);                  
+    fread((char*)&n_rows,sizeof(n_rows),1,fp);
+    n_rows = reverse_int(n_rows);
     //获取训练或测试图像的宽度Width
-    fread((char*)&n_cols,sizeof(n_cols),1,fp); 
-    n_cols = reverse_int(n_cols);  
-    //获取第i幅图像，保存到vec中 
+    fread((char*)&n_cols,sizeof(n_cols),1,fp);
+    n_cols = reverse_int(n_cols);
+    //获取第i幅图像，保存到vec中
     int i,r,c;
 
     // 图像数组的初始化
@@ -56,21 +56,21 @@ MnistImgArr* read_mnist_image(const char* filename) // 读入图像
     imgarr->ImgNum=number_of_images;
     imgarr->ImgPtr=(MnistImg*)malloc(number_of_images*sizeof(MnistImg));
 
-    for(i = 0; i < number_of_images; ++i)  
-    {  
+    for(i = 0; i < number_of_images; ++i)
+    {
         imgarr->ImgPtr[i].h=n_rows;
         imgarr->ImgPtr[i].w=n_cols;
         imgarr->ImgPtr[i].ImgData=(float**)malloc(n_rows*sizeof(float*));
-        for(r = 0; r < n_rows; ++r)      
+        for(r = 0; r < n_rows; ++r)
         {
             imgarr->ImgPtr[i].ImgData[r]=(float*)malloc(n_cols*sizeof(float));
             for(c = 0; c < n_cols; ++c)
-            { 
-                unsigned char temp = 0;  
-                fread((char*) &temp, sizeof(temp),1,fp); 
+            {
+                unsigned char temp = 0;
+                fread((char*) &temp, sizeof(temp),1,fp);
                 imgarr->ImgPtr[i].ImgData[r][c]=(float)temp/255.0f;
-            }  
-        }    
+            }
+        }
     }
 
     fclose(fp);
@@ -86,35 +86,35 @@ MnistLabelArr* read_mnist_label(const char* filename)
     FILE* fp=fopen(filename,"rb");
     CHECK_READ_FILE(fp, filename);
 
-    int magic_number = 0;  
-    int number_of_labels = 0; 
+    int magic_number = 0;
+    int number_of_labels = 0;
     int label_long = 10;
 
-    //从文件中读取sizeof(magic_number) 个字符到 &magic_number  
-    fread((char*)&magic_number,sizeof(magic_number),1,fp); 
-    magic_number = reverse_int(magic_number);  
-    //获取训练或测试image的个数number_of_images 
-    fread((char*)&number_of_labels,sizeof(number_of_labels),1,fp);  
-    number_of_labels = reverse_int(number_of_labels);    
+    //从文件中读取sizeof(magic_number) 个字符到 &magic_number
+    fread((char*)&magic_number,sizeof(magic_number),1,fp);
+    magic_number = reverse_int(magic_number);
+    //获取训练或测试image的个数number_of_images
+    fread((char*)&number_of_labels,sizeof(number_of_labels),1,fp);
+    number_of_labels = reverse_int(number_of_labels);
 
     int i;
-    
+
     // 图像标记数组的初始化
     MnistLabelArr* labarr=(MnistLabelArr*)malloc(sizeof(MnistLabelArr));
     labarr->LabelNum=number_of_labels;
     labarr->LabelPtr=(MnistLabel*)malloc(number_of_labels*sizeof(MnistLabel));
 
-    for(i = 0; i < number_of_labels; ++i)  
-    {  
+    for(i = 0; i < number_of_labels; ++i)
+    {
         labarr->LabelPtr[i].l=10;
         labarr->LabelPtr[i].LabelData=(float*)calloc(label_long,sizeof(float));
-        unsigned char temp = 0;  
-        fread((char*) &temp, sizeof(temp),1,fp); 
-        labarr->LabelPtr[i].LabelData[(int)temp]=1.0;    
+        unsigned char temp = 0;
+        fread((char*) &temp, sizeof(temp),1,fp);
+        labarr->LabelPtr[i].LabelData[(int)temp]=1.0;
     }
 
     fclose(fp);
-    return labarr;	
+    return labarr;
 }
 
 void mnist_cnn_train(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData, CNNOpts opts, int trainNum, FILE* fout)
@@ -178,24 +178,24 @@ float mnist_cnn_test(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData
 void extract_mnist_image_and_save(){
     char test_image_pth[NC_MAX_PATH];
     sprintf(test_image_pth, "%s/mnist/t10k-images.idx3-ubyte", project_dir);
-    
+
     NcImage** images;
     int image_num;
     nc_read_mnist_image(test_image_pth, &images, &image_num);
     printf("=== got %d test images\n", image_num);
-    
+
     for(int i=0; i<image_num; i++) {
         char save_pth[NC_MAX_PATH];
         sprintf(save_pth, "%s/mnist/testImgs/%d.bmp", project_dir, i);
         FILE* fp = fopen(save_pth, "wb");
         unsigned int err = loadbmp_encode_file(save_pth, images[i]->data, images[i]->w, images[i]->h, 1);
-        
+
         if (err){
             printf("LoadBMP Load Error: %u\n", err);
         }
         fclose(fp);
     }
-    
+
     for(int i=0; i<image_num; i++) {
         free(images[i]->data);
         free(images[i]);
@@ -208,26 +208,26 @@ int test_mnist_train_test()
     char train_label_pth[NC_MAX_PATH];
     sprintf(train_label_pth, "%s/mnist/train-labels.idx1-ubyte", project_dir);
     MnistLabelArr* trainLabel=read_mnist_label(train_label_pth);
-    
+
     char train_image_pth[NC_MAX_PATH];
     sprintf(train_image_pth, "%s/mnist/train-images.idx3-ubyte", project_dir);
     MnistImgArr* trainImg=read_mnist_image(train_image_pth);
-    
+
     char test_label_pth[NC_MAX_PATH];
     sprintf(test_label_pth, "%s/mnist/t10k-labels.idx1-ubyte", project_dir);
     MnistLabelArr* testLabel= read_mnist_label(test_label_pth);
-    
+
     char test_image_pth[NC_MAX_PATH];
     sprintf(test_image_pth, "%s/mnist/t10k-images.idx3-ubyte", project_dir);
     MnistImgArr* testImg= read_mnist_image(test_image_pth);
-    
+
     NcSize2D inputSize={testImg->ImgPtr[0].w,testImg->ImgPtr[0].h};
     int outSize=testLabel->LabelPtr[0].l;
-    
+
     // CNN structure init
     CNN* cnn=(CNN*)malloc(sizeof(CNN));
     lenet5_setup(cnn,inputSize,outSize);
-    
+
     // CNN training
 #if 1
     CNNOpts opts;
@@ -256,8 +256,8 @@ int test_mnist_train_test()
     fwrite(cnn->L,sizeof(float),trainNum,fp);
     fclose(fp);
 #endif
-    
-    
+
+
     // CNN test
     printf("--- mnist test start\n");
     char test_model_pth[NC_MAX_PATH];
@@ -271,9 +271,9 @@ int test_mnist_train_test()
     float accuracy = 1 - incorrectRatio;
     printf("--- accuracy: %f\n", accuracy);
     printf("test finished!!\n");
-    
+
     free(cnn);
-    
+
     return 0;
 }
 
@@ -299,33 +299,33 @@ char* layer_type_str(NcLayerType type) {
 void lenet5_setup(CNN* cnn, NcSize2D inputSize,int outputSize)
 {
     cnn->layerNum=5;
-    
+
     NcSize2D inSize;
     int mapSize=5;
     inSize.w=inputSize.w;
     inSize.h =inputSize.h;
     cnn->C1=init_conv_layer(inSize.w,inSize.h,5,1,6);
-    
-    
+
+
     inSize.w =inSize.w -mapSize+1;
     inSize.h=inSize.h-mapSize+1;
     cnn->S2=init_pooling_layer(inSize.w,inSize.h,2,6,6,AvePool);
-    
-    
+
+
     inSize.w =inSize.w /2;
     inSize.h=inSize.h/2;
     cnn->C3=init_conv_layer(inSize.w,inSize.h,5,6,12);
-    
-    
+
+
     inSize.w =inSize.w -mapSize+1;
     inSize.h=inSize.h-mapSize+1;
     cnn->S4=init_pooling_layer(inSize.w,inSize.h,2,12,12,AvePool);
-    
-    
+
+
     inSize.w =inSize.w /2;
     inSize.h=inSize.h/2;
     cnn->O5=init_innerproduct_layer(inSize.w*inSize.h*12,outputSize);
-    
+
     cnn->e=(float*)calloc(cnn->O5->outputNum,sizeof(float));
 }
 
@@ -360,13 +360,13 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     //input_size.h = 28; input_size.w = 28;
     //int output_size = 10;
     //NcNet* net = (NcNet*)malloc(sizeof(NcNet));
-    
+
     net->layers_num = 5;
     net->layers = (NcLayer**)malloc(sizeof(NcLayer*)*net->layers_num);
     for (int i = 0; i < net->layers_num; i++) {
         net->layers[i] = NULL;
     }
-    
+
     net->blobs_num = 6;
     net->blobs = (NcBlob**)malloc(sizeof(NcBlob*)*net->blobs_num);
     for (int i = 0; i < net->blobs_num; i++) {
@@ -389,7 +389,7 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
 
     // allocate network's input blobs
     net->blobs[0] = nc_blob_make3d(28, 28, 1);
-    
+
     NcSize2D in_size;
     int map_size;
     int in_channels;
@@ -403,9 +403,9 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     for (int i = 0; i < NC_MAX_BLOB_PER_LAYER; i++) {
         output_blobs[i] = NULL;
     }
-    
+
     NcLayer* layer=NULL;
-    
+
     //----------------------------------------------------------------
     // C1 layer
     //----------------------------------------------------------------
@@ -434,7 +434,7 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 0 };
     layer->input = nc_train_make_layer_input(input_blobs_num, input_blob_ids, net);
-    
+
     // setup layer output
     // for each layer's output blobs, some may be allocated (in-place operation, like relu)
     // however, some are not allocated, such as convolution, pooling
@@ -564,7 +564,7 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     output_blob_ids = (int[]) { 5 };
     output_blobs[0] = nc_blob_make3d(O5->out_height, O5->out_width, O5->out_channels);
     layer->output = nc_train_make_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
-    
+
     // --- Loss
     net->e = (float*)calloc(out_num,sizeof(float));
 
@@ -597,9 +597,9 @@ void nc_train_trial(){
     int output_size = 10;
     NcNet* net = (NcNet*)malloc(sizeof(NcNet));
     nc_lenet5_train_setup(net, input_size, output_size);
-    
+
     //----- training
-    
+
     // ---[train config]
     NcTrainConfig train_cfg;
     train_cfg.num_epoch = 1;
@@ -607,16 +607,16 @@ void nc_train_trial(){
     //train_cfg.train_num = 55000;
     train_cfg.train_num = 1; // make it faster!
     sprintf(train_cfg.log_pth, "%s/debug/nc-train-log.txt", project_dir);
-    
+
     // ---[data config]
     NcClsDataConfig data_cfg;
     sprintf(data_cfg.dataset, "%s", "MNIST");
     sprintf(data_cfg.splitset, "%s", "train");
     nc_cls_data_loader(&data_cfg);
-    
+
     // ---! train
     nc_train_cls_net(net, &train_cfg, &data_cfg);
-    
+
 //    CNNOpts opts;
 //    opts.numepochs=1;
 //    opts.alpha=1.0;
@@ -642,9 +642,9 @@ void nc_train_trial(){
 //    CHECK_WRITE_FILE(fp, train_err_pth);
 //    fwrite(cnn->L,sizeof(float),trainNum,fp);
 //    fclose(fp);
-    
-    
-    
+
+
+
     // free the network related memory
     printf("=== free layers begin\n");
     NcLayer* layer;
@@ -691,7 +691,7 @@ void nc_lenet5_infer_setup(NcNet* net) {
     // setup layer type & infer function
     layer->type = NC_LAYER_CONVOLUTION;
     layer->infer = nc_infer_convolution;
-    
+
     // setup layer input
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 0 };
@@ -746,7 +746,7 @@ void nc_lenet5_infer_setup(NcNet* net) {
     // setup layer type & infer function
     layer->type = NC_LAYER_CONVOLUTION;
     layer->infer = nc_infer_convolution;
-    
+
     // setup layer input
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 2 };
@@ -801,7 +801,7 @@ void nc_lenet5_infer_setup(NcNet* net) {
     // setup layer type & infer function
     layer->type = NC_LAYER_INNERPRODUCT;
     layer->infer = nc_infer_innerproduct;
-    
+
     // setup layer input
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 4 };
@@ -886,7 +886,7 @@ int main() {
     //test_mnist_train_test();
     //nc_train_trial();
     nc_infer_trial();
-    
+
     //nc_convolution_test_nchw();
     //nc_convolution_test_nhwc();
 

@@ -38,7 +38,7 @@ typedef struct ConvLayer{
     float*** y; // 激活函数后神经元的输出
 
     // 输出像素的局部梯度
-    float*** d; // 网络的局部梯度,δ值  
+    float*** d; // 网络的局部梯度,δ值
 }ConvLayer;
 
 // 池化层 pooling
@@ -106,10 +106,10 @@ extern "C" {
 
     // 初始化卷积层
     ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_channels, int out_channels);
-    
+
     // 初始化采样层
     PoolingLayer* init_pooling_layer(int in_width, int in_height, int map_size, int in_channels, int out_channels, int pool_type);
-    
+
     // 初始化输出层
     InnerproductLayer* init_innerproduct_layer(int in_num, int out_num);
 
@@ -117,11 +117,11 @@ extern "C" {
     float activation_sigma(float input, float bias); // sigma激活函数
 
     void cnn_forward(CNN* cnn, float** input_data); // 网络的前向传播
-    
+
     void cnn_backward(CNN* cnn, float* output_data); // 网络的后向传播
-    
+
     void cnn_applygrads(CNN* cnn, CNNOpts opts, float** input_data);
-    
+
     void cnn_clear(CNN* cnn); // 将数据vyd清零
 
     /*

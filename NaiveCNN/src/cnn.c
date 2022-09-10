@@ -33,7 +33,7 @@ ConvLayer* init_conv_layer(int in_width,int in_height,int map_size,int in_channe
             for(r=0;r<map_size;r++){
                 covL->mapData[i][j][r]=(float*)malloc(map_size*sizeof(float));
                 for(c=0;c<map_size;c++){
-                    float randnum=(((float)rand()/(float)RAND_MAX)-0.5)*2; 
+                    float randnum=(((float)rand()/(float)RAND_MAX)-0.5)*2;
                     covL->mapData[i][j][r][c]=randnum*sqrt((float)6.0/(float)(map_size*map_size*(in_channels+out_channels)));
                 }
             }
@@ -83,7 +83,7 @@ PoolingLayer* init_pooling_layer(int inputWidth,int inputHeight,int mapSize,int 
     poolL->map_size=mapSize;
     poolL->in_channels=inChannels;
     poolL->out_channels=outChannels;
-    poolL->pool_type=pool_type; 
+    poolL->pool_type=pool_type;
 
     poolL->biasData=(float*)calloc(outChannels,sizeof(float));
 
@@ -313,7 +313,7 @@ void cnn_forward(CNN* cnn, float** inputData)
 
     // 输出层O5的处理
     // 首先需要将前面的多维输出展开成一维向量
-    float* O5inData=(float*)malloc((cnn->O5->inputNum)*sizeof(float)); 
+    float* O5inData=(float*)malloc((cnn->O5->inputNum)*sizeof(float));
     for (i = 0; i < (cnn->S4->out_channels); i++) {
         for (r = 0; r < outSize.h; r++) {
             for (c = 0; c < outSize.w; c++) {
@@ -375,7 +375,7 @@ void nnff(float* output,float* input,float** wdata,float* bas, NcSize2D nnSize)
 {
     int w=nnSize.w;
     int h=nnSize.h;
-    
+
     int i;
     for (i = 0; i < h; i++) {
         output[i] = dot_product(input, wdata[i], w) + bas[i];
@@ -468,7 +468,7 @@ void cnn_backward(CNN* cnn,float* outputData) // 网络的后向传播
             free(C1e[r]);
         }
         free(C1e);
-    }	
+    }
 }
 
 void cnn_applygrads(CNN* cnn,CNNOpts opts,float** inputData) // 更新权重
@@ -527,7 +527,7 @@ void cnn_applygrads(CNN* cnn,CNNOpts opts,float** inputData) // 更新权重
 
     // 输出层
     // 首先需要将前面的多维输出展开成一维向量
-    float* O5inData=(float*)malloc((cnn->O5->inputNum)*sizeof(float)); 
+    float* O5inData=(float*)malloc((cnn->O5->inputNum)*sizeof(float));
     NcSize2D outSize={cnn->S4->in_width/cnn->S4->map_size,cnn->S4->in_height/cnn->S4->map_size};
     for (i = 0; i < (cnn->S4->out_channels); i++) {
         for (r = 0; r < outSize.h; r++) {
