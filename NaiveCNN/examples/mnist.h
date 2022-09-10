@@ -1,5 +1,4 @@
-#ifndef RAW_MNIST_H
-#define RAW_MNIST_H
+#pragma once
 
 #include <stdlib.h>
 #include <string.h>
@@ -51,6 +50,4 @@ extern "C" {
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

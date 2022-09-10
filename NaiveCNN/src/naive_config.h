@@ -1,5 +1,4 @@
-#ifndef NAIVE_CNN_CONFIG_H
-#define NAIVE_CNN_CONFIG_H
+#pragma once
 
 #define CHECK_WRITE_FILE(fp, filename) \
     if (fp==NULL) \
@@ -32,4 +31,3 @@ static int nc_align_up(int x, int n) {
     return ((x + n - 1) / n ) * n;
 }
 
-#endif

@@ -1,6 +1,5 @@
 // 这里库文件主要存在关于二维矩阵数组的操作
-#ifndef RAW_MAT_H
-#define RAW_MAT_H
+#pragma once
 
 #include <stdlib.h>
 #include <string.h>
@@ -48,4 +47,3 @@ extern "C" {
 }
 #endif
 
-#endif

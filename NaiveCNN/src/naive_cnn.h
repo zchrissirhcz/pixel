@@ -1,5 +1,4 @@
-#ifndef NAIVE_CNN_H
-#define NAIVE_CNN_H
+#pragma once
 
 #include <stdbool.h>
 #include "naive_config.h"
@@ -263,6 +262,4 @@ extern "C" {
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

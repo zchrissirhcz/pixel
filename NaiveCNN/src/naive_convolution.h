@@ -1,5 +1,4 @@
-#ifndef NAIVE_CONVOLUTION_H
-#define NAIVE_CONVOLUTION_H
+#pragma once
 
 #include "naive_cnn.h"
 
@@ -11,5 +10,3 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
 // unit test functions
 void nc_convolution_test_nchw();
 void nc_convolution_test_nhwc();
-
-#endif

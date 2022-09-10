@@ -35,8 +35,7 @@
 // #define LOADBMP_IMPLEMENTATION
 // #include "loadbmp.h"
 
-#ifndef LOADBMP_H
-#define LOADBMP_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -277,4 +276,3 @@ LOADBMP_API unsigned int loadbmp_encode_file(
 }
 #endif
 
-#endif

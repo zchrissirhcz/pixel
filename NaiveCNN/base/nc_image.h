@@ -1,5 +1,4 @@
-#ifndef NC_IMAGE_H
-#define NC_IMAGE_H
+#pragma once
 
 #include <stdbool.h>
 #include "nc_types.h"
@@ -41,6 +40,4 @@ void nc_image_bgr_to_rgb_inplace(NcImage* im);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif
