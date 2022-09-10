@@ -18,6 +18,7 @@ add_library(pixel STATIC
   px_cnn.c
   px_relu.c
   px_sigmoid.c
+  px_tanh.c
   px_max_pooling.c
   px_inner_product.c
   px_convolution.c
