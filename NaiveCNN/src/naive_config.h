@@ -23,7 +23,7 @@
 #elif __APPLE__ && !(__ARM_NEON)
     static const char* project_dir = "/Users/chris/work/gitee/NaiveCNN/";
 #elif __APPLE__ && __ARM_NEON
-    static const char* project_dir = "/Users/zz/work/NaiveCNN/";
+    static const char* project_dir = "/Users/zz/work/pixel/NaiveCNN/";
 #else
 #pragma error
 #endif
