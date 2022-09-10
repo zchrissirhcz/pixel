@@ -41,6 +41,7 @@ void px_histogram_rgb(px_image_t* src, px_image_t* hist, PX_HISTOGRAM_MODE mode)
         else
         {
             PX_LOGE("Un-supported histogram mode: %d", mode);
+            return;
         }
 
         for (int i = 0; i < height; i++)
