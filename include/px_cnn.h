@@ -100,6 +100,8 @@ void px_forward_relu_layer_for_cube(const px_cube_t* input, px_cube_t* output);
 void px_forward_sigmoid_layer_for_cube(const px_cube_t* input, px_cube_t* output);
 void px_forward_tanh_layer_for_cube(const px_cube_t* input, px_cube_t* output);
 
+void px_forward_relu6_layer_for_cube(const px_cube_t* input, px_cube_t* output);
+
 px_matrix_t* px_forward_max_pooling_layer_for_matrix(const px_matrix_t* input, const px_pooling_param_t pooling_param);
 px_matrix_dim_t px_get_pooling_output_matrix_dim(const px_matrix_dim_t input_dim, const px_pooling_param_t pooling_param);
 
