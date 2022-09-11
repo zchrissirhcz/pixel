@@ -38,16 +38,16 @@ matrix_t* conv(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize
 float** up_sample(float** mat, NcSize2D matSize, int upc, int upr);
 
 // 给二维矩阵边缘扩大，增加addw大小的0值边
-matrix_t* mat_edge_expand(matrix_t* mat, NcSize2D matSize, int addc, int addr);
+matrix_t* mat_edge_expand(matrix_t* input, int addc, int addr);
 
 // 给二维矩阵边缘缩小，擦除shrinkc大小的边
-matrix_t* mat_edge_shrink(matrix_t* mat, NcSize2D matSize, int shrinkc, int shrinkr);
+matrix_t* mat_edge_shrink(matrix_t* input, int shrinkc, int shrinkr);
 
-void savemat(float** mat, NcSize2D matSize, const char* filename);// 保存矩阵数据
+void save_mat_to_file(matrix_t* mat, const char* filename);
 
-void multifactor(matrix_t* res, matrix_t* mat, NcSize2D matSize, float factor);// 矩阵乘以系数
+void multifactor(matrix_t* res, matrix_t* mat, float factor);
 
-float summat(matrix_t* mat, NcSize2D matSize);// 矩阵各元素的和
+float summat(matrix_t* mat);
 
 #ifdef __cplusplus
 }

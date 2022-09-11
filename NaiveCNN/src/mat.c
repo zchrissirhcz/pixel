@@ -113,7 +113,7 @@ matrix_t* correlation(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D
     matrix_t* output = create_matrix(outSizeH, outSizeW);
 
     // 为了方便计算，将inputData扩大一圈
-    matrix_t* expaned_input = mat_edge_expand(input, inSize, mapSize.width-1, mapSize.height-1);
+    matrix_t* expaned_input = mat_edge_expand(input, mapSize.width-1, mapSize.height-1);
 
     for (j = 0; j < outSizeH; j++)
     {
@@ -136,7 +136,7 @@ matrix_t* correlation(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D
     case full: // 完全大小的情况
         return output;
     case same:{
-        matrix_t* sameres = mat_edge_shrink(output, outSize, halfmapsizew, halfmapsizeh);
+        matrix_t* sameres = mat_edge_shrink(output, halfmapsizew, halfmapsizeh);
         destroy_matrix(output);
         return sameres;
     }
@@ -144,11 +144,11 @@ matrix_t* correlation(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D
         matrix_t* validres;
         if (mapSize.height % 2 == 0 && mapSize.width % 2 == 0)
         {
-            validres = mat_edge_shrink(output, outSize, halfmapsizew * 2 - 1, halfmapsizeh * 2 - 1);
+            validres = mat_edge_shrink(output, halfmapsizew * 2 - 1, halfmapsizeh * 2 - 1);
         }
         else
         {
-            validres = mat_edge_shrink(output, outSize, halfmapsizew * 2, halfmapsizeh * 2);
+            validres = mat_edge_shrink(output, halfmapsizew * 2, halfmapsizeh * 2);
         }
         destroy_matrix(output);
         return validres;
@@ -204,65 +204,58 @@ float** up_sample(float** mat, NcSize2D matSize, int upc,int upr)
 }
 
 // 给二维矩阵边缘扩大，增加addw大小的0值边
-matrix_t* mat_edge_expand(matrix_t* mat, NcSize2D matSize, int addc,int addr)
+matrix_t* mat_edge_expand(matrix_t* input, int addc, int addr)
 {   
     // 向量边缘扩大
-    int i, j;
-    int c = matSize.width;
-    int r = matSize.height;
-    const int out_height = r + 2 * addr;
-    const int out_width = c + 2 * addc;
-    matrix_t* res = create_matrix(out_height, out_width);
+    const int out_height = input->height + 2 * addr;
+    const int out_width = input->width + 2 * addc;
+    matrix_t* output = create_matrix(out_height, out_width);
 
-    for(j = 0; j < r+2*addr; j++)
+    for(int j = 0; j < out_height; j++)
     {
-        for(i = 0; i < c+2*addc; i++)
+        for(int i = 0; i < out_width; i++)
         {
-            if (j < addr || i < addc || j >= (r + addr) || i >= (c + addc))
+            if (j < addr || i < addc || j >= (input->height + addr) || i >= (input->width + addc))
             {
-                res->data[j][i] = (float)0.0;
+                output->data[j][i] = (float)0.0;
             }
             else
             {
-                res->data[j][i] = mat->data[j - addr][i - addc]; // 复制原向量的数据
+                output->data[j][i] = input->data[j - addr][i - addc]; // 复制原向量的数据
             }
         }
     }
-    return res;
+    return output;
 }
 
 // 给二维矩阵边缘缩小，擦除shrinkc大小的边
-matrix_t* mat_edge_shrink(matrix_t* mat, NcSize2D matSize, int shrinkc, int shrinkr)
+matrix_t* mat_edge_shrink(matrix_t* input, int shrinkc, int shrinkr)
 {
-    // 向量的缩小，宽缩小addw，高缩小addh
-    int i, j;
-    int c = matSize.width;
-    int r = matSize.height;
-    const int out_height = r - 2 * shrinkr;
-    const int out_width = c - 2 * shrinkc;
-    matrix_t* res = create_matrix(out_height, out_width);
+    const int out_height = input->height - 2 * shrinkr;
+    const int out_width = input->width - 2 * shrinkc;
+    matrix_t* output = create_matrix(out_height, out_width);
 
-    for(j = 0; j < r; j++)
+    for(int j = 0; j < input->height; j++)
     {
-        for(i = 0; i < c; i++)
+        for(int i = 0; i < input->width; i++)
         {
-            if (j >= shrinkr && i >= shrinkc && j < (r - shrinkr) && i < (c - shrinkc))
+            if (j >= shrinkr && i >= shrinkc && j < (input->height - shrinkr) && i < (input->width - shrinkc))
             {
-                res->data[j - shrinkr][i - shrinkc] = mat->data[j][i]; // 复制原向量的数据
+                output->data[j - shrinkr][i - shrinkc] = input->data[j][i]; // 复制原向量的数据
             }
         }
     }
-    return res;
+    return output;
 }
 
-void savemat(float** mat, NcSize2D matSize,const char* filename)
+void save_mat_to_file(matrix_t* mat, const char* filename)
 {
-    FILE* fp=fopen(filename,"wb");
+    FILE* fp = fopen(filename, "wb");
     CHECK_WRITE_FILE(fp, filename);
 
-    for (int i = 0; i < matSize.height; i++)
+    for (int i = 0; i < mat->height; i++)
     {
-        fwrite(mat[i], sizeof(float), matSize.width, fp);
+        fwrite(mat->data[i], sizeof(float), mat->width, fp);
     }
     fclose(fp);
 }
@@ -270,15 +263,14 @@ void savemat(float** mat, NcSize2D matSize,const char* filename)
 // 矩阵相加
 void addmat(matrix_t* res, matrix_t* mat1, NcSize2D matSize1, matrix_t* mat2, NcSize2D matSize2)
 {
-    int i, j;
     if (matSize1.width != matSize2.width || matSize1.height != matSize2.height)
     {
         PX_LOGE("ERROR: Size is not same!");
     }
 
-    for (i = 0; i < matSize1.height; i++)
+    for (int i = 0; i < matSize1.height; i++)
     {
-        for (j = 0; j < matSize1.width; j++)
+        for (int j = 0; j < matSize1.width; j++)
         {
             res->data[i][j] = mat1->data[i][j] + mat2->data[i][j];
         }
@@ -286,12 +278,11 @@ void addmat(matrix_t* res, matrix_t* mat1, NcSize2D matSize1, matrix_t* mat2, Nc
 }
 
 // 矩阵乘以系数
-void multifactor(matrix_t* res, matrix_t* mat, NcSize2D matSize, float factor)
+void multifactor(matrix_t* res, matrix_t* mat, float factor)
 {
-    int i, j;
-    for (i = 0; i < matSize.height; i++)
+    for (int i = 0; i < mat->height; i++)
     {
-        for (j = 0; j < matSize.width; j++)
+        for (int j = 0; j < mat->width; j++)
         {
             res->data[i][j] = mat->data[i][j] * factor;
         }
@@ -299,13 +290,12 @@ void multifactor(matrix_t* res, matrix_t* mat, NcSize2D matSize, float factor)
 }
 
 // 矩阵各元素的和
-float summat(matrix_t* mat, NcSize2D matSize)
+float summat(matrix_t* mat)
 {
-    float sum=0.0;
-    int i, j;
-    for (i = 0; i < matSize.height; i++)
+    float sum = 0.0f;
+    for (int i = 0; i < mat->height; i++)
     {
-        for (j = 0; j < matSize.width; j++)
+        for (int j = 0; j < mat->width; j++)
         {
             sum = sum + mat->data[i][j];
         }

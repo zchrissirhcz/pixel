@@ -574,7 +574,7 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
             map.width = dSize.width;
             map.data = cnn->C1->d[i];
             matrix_t* C1dk = conv(&map, dSize, flipinput, ySize, valid);
-            multifactor(C1dk,C1dk,mapSize,-1*opts.alpha);
+            multifactor(C1dk, C1dk, -1*opts.alpha);
 
             matrix_t res;
             res.height = mapSize.height;
@@ -594,7 +594,7 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
         mat2.height = dSize.height;
         mat2.width = dSize.width;
         mat2.data = cnn->C1->d[i];
-        cnn->C1->biasData[i] = cnn->C1->biasData[i]-opts.alpha*summat(&mat2, dSize);
+        cnn->C1->biasData[i] = cnn->C1->biasData[i]-opts.alpha*summat(&mat2);
     }
 
     // C3层的权重更新
@@ -619,7 +619,7 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
             map.width = dSize.width;
             map.data = cnn->C3->d[i];
             matrix_t* C3dk = conv(&map, dSize, flipinput, ySize, valid);
-            multifactor(C3dk,C3dk,mapSize,-1.0*opts.alpha);
+            multifactor(C3dk, C3dk, -1.0*opts.alpha);
 
             matrix_t res;
             res.height = mapSize.height;
@@ -639,7 +639,7 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
         mat3.height = dSize.height;
         mat3.width = dSize.width;
         mat3.data = cnn->C3->d[i];
-        cnn->C3->biasData[i]=cnn->C3->biasData[i]-opts.alpha*summat(&mat3, dSize);
+        cnn->C3->biasData[i]=cnn->C3->biasData[i]-opts.alpha*summat(&mat3);
     }
 
     // 输出层
