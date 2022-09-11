@@ -161,10 +161,7 @@ typedef struct NcNet{
     float* L; // 瞬时误差能量
 } NcNet;
 
-typedef struct NcSize2D {
-    int w; // width
-    int h; // height
-} NcSize2D;
+typedef px_size_t NcSize2D;
 
 //NaiveCNN's Image struct
 typedef struct NcImage {

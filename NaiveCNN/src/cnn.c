@@ -247,66 +247,80 @@ void cnn_forward(CNN* cnn, float** inputData)
     // 第一层的传播
     int i,j,r,c;
     // 第一层输出数据
-    NcSize2D mapSize={cnn->C1->map_size,cnn->C1->map_size};
-    NcSize2D inSize={cnn->C1->in_width,cnn->C1->in_height};
-    NcSize2D outSize={cnn->S2->in_width,cnn->S2->in_height };
-    for(i=0;i<(cnn->C1->out_channels);i++){
-        for(j=0;j<(cnn->C1->in_channels);j++){
-            float** mapout=conv(cnn->C1->mapData[j][i],mapSize,inputData,inSize,valid);
+    NcSize2D mapSize = px_create_size(cnn->C1->map_size,cnn->C1->map_size);
+    NcSize2D inSize = px_create_size(cnn->C1->in_height, cnn->C1->in_width);
+    NcSize2D outSize = px_create_size(cnn->S2->in_height, cnn->S2->in_width);
+    for(i = 0; i < cnn->C1->out_channels; i++)
+    {
+        for(j = 0; j < cnn->C1->in_channels; j++)
+        {
+            float** mapout = conv(cnn->C1->mapData[j][i],mapSize,inputData,inSize,valid);
             addmat(cnn->C1->v[i],cnn->C1->v[i],outSize,mapout,outSize);
-            for (r = 0; r < outSize.h; r++) {
+            for (r = 0; r < outSize.height; r++)
+            {
                 free(mapout[r]);
             }
             free(mapout);
         }
-        for (r = 0; r < outSize.h; r++) {
-            for (c = 0; c < outSize.w; c++) {
+        for (r = 0; r < outSize.height; r++)
+        {
+            for (c = 0; c < outSize.width; c++)
+            {
                 cnn->C1->y[i][r][c] = activation_sigma(cnn->C1->v[i][r][c], cnn->C1->biasData[i]);
             }
         }
     }
 
     // 第二层的输出传播S2，采样层
-    outSize.w =cnn->C3->in_width;
-    outSize.h=cnn->C3->in_height;
-    inSize.w =cnn->S2->in_width;
-    inSize.h=cnn->S2->in_height;
-    for(i=0;i<(cnn->S2->out_channels);i++){
-        if (cnn->S2->pool_type == AvePool) {
+    outSize.width = cnn->C3->in_width;
+    outSize.height = cnn->C3->in_height;
+    inSize.width = cnn->S2->in_width;
+    inSize.height = cnn->S2->in_height;
+    for(i = 0; i < cnn->S2->out_channels; i++)
+    {
+        if (cnn->S2->pool_type == AvePool)
+        {
             avg_pooling(cnn->S2->y[i], outSize, cnn->C1->y[i], inSize, cnn->S2->map_size);
         }
     }
 
     // 第三层输出传播,这里是全连接
-    outSize.w =cnn->S4->in_width;
-    outSize.h=cnn->S4->in_height;
-    inSize.w =cnn->C3->in_width;
-    inSize.h=cnn->C3->in_height;
-    mapSize.w =cnn->C3->map_size;
-    mapSize.h=cnn->C3->map_size;
-    for(i=0;i<(cnn->C3->out_channels);i++){
-        for(j=0;j<(cnn->C3->in_channels);j++){
-            float** mapout=conv(cnn->C3->mapData[j][i],mapSize,cnn->S2->y[j],inSize,valid);
+    outSize.width = cnn->S4->in_width;
+    outSize.height = cnn->S4->in_height;
+    inSize.width = cnn->C3->in_width;
+    inSize.height = cnn->C3->in_height;
+    mapSize.width = cnn->C3->map_size;
+    mapSize.height = cnn->C3->map_size;
+    for(i = 0; i < (cnn->C3->out_channels); i++)
+    {
+        for(j = 0; j < cnn->C3->in_channels; j++)
+        {
+            float** mapout = conv(cnn->C3->mapData[j][i],mapSize,cnn->S2->y[j],inSize,valid);
             addmat(cnn->C3->v[i],cnn->C3->v[i],outSize,mapout,outSize);
-            for (r = 0; r < outSize.h; r++) {
+            for (r = 0; r < outSize.height; r++)
+            {
                 free(mapout[r]);
             }
             free(mapout);
         }
-        for (r = 0; r < outSize.h; r++) {
-            for (c = 0; c < outSize.w; c++) {
+        for (r = 0; r < outSize.height; r++)
+        {
+            for (c = 0; c < outSize.width; c++)
+            {
                 cnn->C3->y[i][r][c] = activation_sigma(cnn->C3->v[i][r][c], cnn->C3->biasData[i]);
             }
         }
     }
 
     // 第四层的输出传播
-    inSize.w =cnn->S4->in_width;
-    inSize.h=cnn->S4->in_height;
-    outSize.w =inSize.w /cnn->S4->map_size;
-    outSize.h=inSize.h/cnn->S4->map_size;
-    for(i=0;i<(cnn->S4->out_channels);i++){
-        if (cnn->S4->pool_type == AvePool) {
+    inSize.width = cnn->S4->in_width;
+    inSize.height = cnn->S4->in_height;
+    outSize.width = inSize.width / cnn->S4->map_size;
+    outSize.height = inSize.height / cnn->S4->map_size;
+    for(i = 0; i < (cnn->S4->out_channels); i++)
+    {
+        if (cnn->S4->pool_type == AvePool)
+        {
             avg_pooling(cnn->S4->y[i], outSize, cnn->C3->y[i], inSize, cnn->S4->map_size);
         }
     }
@@ -315,16 +329,17 @@ void cnn_forward(CNN* cnn, float** inputData)
     // 首先需要将前面的多维输出展开成一维向量
     float* O5inData=(float*)malloc((cnn->O5->inputNum)*sizeof(float));
     for (i = 0; i < (cnn->S4->out_channels); i++) {
-        for (r = 0; r < outSize.h; r++) {
-            for (c = 0; c < outSize.w; c++) {
-                O5inData[i*outSize.h*outSize.w + r * outSize.w + c] = cnn->S4->y[i][r][c];
+        for (r = 0; r < outSize.height; r++) {
+            for (c = 0; c < outSize.width; c++) {
+                O5inData[i*outSize.height*outSize.width + r * outSize.width + c] = cnn->S4->y[i][r][c];
             }
         }
     }
 
-    NcSize2D nnSize={cnn->O5->inputNum,cnn->O5->outputNum};
+    NcSize2D nnSize = px_create_size(cnn->O5->outputNum, cnn->O5->inputNum);
     nnff(cnn->O5->v,O5inData,cnn->O5->wData,cnn->O5->biasData,nnSize);
-    for (i = 0; i < cnn->O5->outputNum; i++) {
+    for (i = 0; i < cnn->O5->outputNum; i++)
+    {
         cnn->O5->y[i] = activation_sigma(cnn->O5->v[i], cnn->O5->biasData[i]);
     }
     free(O5inData);
@@ -337,25 +352,28 @@ float activation_sigma(float input,float bias) // sigma激活函数
     return (float)1.0/((float)(1.0+exp(-temp)));
 }
 
-void avg_pooling(float** output, NcSize2D outputSize,float** input, NcSize2D inputSize,int mapSize) // 求平均值
+void avg_pooling(float** output, NcSize2D outputSize,float** input, NcSize2D inputSize,int mapSize)
 {
-    int outputW=inputSize.w /mapSize;
-    int outputH=inputSize.h/mapSize;
-    if (outputSize.w != outputW || outputSize.h != outputH) {
+    int outputW = inputSize.width / mapSize;
+    int outputH = inputSize.height / mapSize;
+    if (outputSize.width != outputW || outputSize.height != outputH)
+    {
         printf("ERROR: output size is wrong!!");
     }
 
     int i,j,m,n;
-    for (i = 0; i < outputH; i++) {
+    for (i = 0; i < outputH; i++)
+    {
         for (j = 0; j < outputW; j++)
         {
             float sum = 0.0;
-            for (m = i * mapSize; m < i*mapSize + mapSize; m++) {
-                for (n = j * mapSize; n < j*mapSize + mapSize; n++) {
+            for (m = i * mapSize; m < i * mapSize + mapSize; m++)
+            {
+                for (n = j * mapSize; n < j * mapSize + mapSize; n++)
+                {
                     sum = sum + input[m][n];
                 }
             }
-
             output[i][j] = sum / (float)(mapSize*mapSize);
         }
     }
@@ -373,40 +391,49 @@ float dot_product(float* vec1,float* vec2,int vecL)
 
 void nnff(float* output,float* input,float** wdata,float* bas, NcSize2D nnSize)
 {
-    int w=nnSize.w;
-    int h=nnSize.h;
+    const int w = nnSize.width;
+    const int h = nnSize.height;
 
     int i;
-    for (i = 0; i < h; i++) {
+    for (i = 0; i < h; i++)
+    {
         output[i] = dot_product(input, wdata[i], w) + bas[i];
     }
 }
 
-float sigma_derivation(float y){ // Logic激活函数的自变量微分
-    return y*(1-y); // 这里y是指经过激活函数的输出值，而不是自变量
+// Logic激活函数的自变量微分
+float sigma_derivation(float y)
+{
+    return y * (1-y); // 这里y是指经过激活函数的输出值，而不是自变量
 }
 
-void cnn_backward(CNN* cnn,float* outputData) // 网络的后向传播
+void cnn_backward(CNN* cnn,float* outputData)
 {
     int i,j,c,r; // 将误差保存到网络中
-    for (i = 0; i < cnn->O5->outputNum; i++) {
+    for (i = 0; i < cnn->O5->outputNum; i++)
+    {
         cnn->e[i] = cnn->O5->y[i] - outputData[i];
     }
 
     /*从后向前反向计算*/
     // 输出层O5
-    for (i = 0; i < cnn->O5->outputNum; i++) {
+    for (i = 0; i < cnn->O5->outputNum; i++)
+    {
         cnn->O5->d[i] = cnn->e[i] * sigma_derivation(cnn->O5->y[i]);
     }
 
     // S4层，传递到S4层的误差
     // 这里没有激活函数
-    NcSize2D outSize={cnn->S4->in_width/cnn->S4->map_size,cnn->S4->in_height/cnn->S4->map_size };
-    for (i = 0; i < cnn->S4->out_channels; i++) {
-        for (r = 0; r < outSize.h; r++) {
-            for (c = 0; c < outSize.w; c++) {
-                for (j = 0; j < cnn->O5->outputNum; j++) {
-                    int wInt = i * outSize.w*outSize.h + r * outSize.w + c;
+    NcSize2D outSize = px_create_size(cnn->S4->in_height/cnn->S4->map_size, cnn->S4->in_width/cnn->S4->map_size);
+    for (i = 0; i < cnn->S4->out_channels; i++)
+    {
+        for (r = 0; r < outSize.height; r++)
+        {
+            for (c = 0; c < outSize.width; c++)
+            {
+                for (j = 0; j < cnn->O5->outputNum; j++)
+                {
+                    int wInt = i * outSize.width*outSize.height + r * outSize.width + c;
                     cnn->S4->d[i][r][c] = cnn->S4->d[i][r][c] + cnn->O5->d[j] * cnn->O5->wData[j][wInt];
                 }
             }
@@ -415,17 +442,21 @@ void cnn_backward(CNN* cnn,float* outputData) // 网络的后向传播
 
     // C3层
     // 由S4层传递的各反向误差,这里只是在S4的梯度上扩充一倍
-    int mapdata=cnn->S4->map_size;
-    NcSize2D S4dSize={cnn->S4->in_width/cnn->S4->map_size,cnn->S4->in_height /cnn->S4->map_size };
+    int mapdata = cnn->S4->map_size;
+    NcSize2D S4dSize = px_create_size(cnn->S4->in_height /cnn->S4->map_size, cnn->S4->in_width/cnn->S4->map_size);
     // 这里的Pooling是求平均，所以反向传递到下一神经元的误差梯度没有变化
-    for(i=0;i<cnn->C3->out_channels;i++){
-        float** C3e=up_sample(cnn->S4->d[i],S4dSize,cnn->S4->map_size,cnn->S4->map_size);
-        for (r = 0; r < cnn->S4->in_height; r++) {
-            for (c = 0; c < cnn->S4->in_width; c++) {
+    for(i = 0; i < cnn->C3->out_channels; i++)
+    {
+        float** C3e = up_sample(cnn->S4->d[i],S4dSize,cnn->S4->map_size,cnn->S4->map_size);
+        for (r = 0; r < cnn->S4->in_height; r++)
+        {
+            for (c = 0; c < cnn->S4->in_width; c++)
+            {
                 cnn->C3->d[i][r][c] = C3e[r][c] * sigma_derivation(cnn->C3->y[i][r][c]) / (float)(cnn->S4->map_size*cnn->S4->map_size);
             }
         }
-        for (r = 0; r < cnn->S4->in_height; r++) {
+        for (r = 0; r < cnn->S4->in_height; r++)
+        {
             free(C3e[r]);
         }
         free(C3e);
@@ -433,15 +464,18 @@ void cnn_backward(CNN* cnn,float* outputData) // 网络的后向传播
 
     // S2层，S2层没有激活函数，这里只有卷积层有激活函数部分
     // 由卷积层传递给采样层的误差梯度，这里卷积层共有6*12个卷积模板
-    outSize.w =cnn->C3->in_width;
-    outSize.h=cnn->C3->in_height;
-    NcSize2D inSize={cnn->S4->in_width,cnn->S4->in_height};
-    NcSize2D mapSize={cnn->C3->map_size,cnn->C3->map_size };
-    for(i=0;i<cnn->S2->out_channels;i++){
-        for(j=0;j<cnn->C3->out_channels;j++){
-            float** corr=correlation(cnn->C3->mapData[i][j],mapSize,cnn->C3->d[j],inSize,full);
+    outSize.width = cnn->C3->in_width;
+    outSize.height = cnn->C3->in_height;
+    NcSize2D inSize = px_create_size(cnn->S4->in_height, cnn->S4->in_width);
+    NcSize2D mapSize = px_create_size(cnn->C3->map_size, cnn->C3->map_size);
+    for(i = 0; i < cnn->S2->out_channels; i++)
+    {
+        for(j = 0; j < cnn->C3->out_channels; j++)
+        {
+            float** corr = correlation(cnn->C3->mapData[i][j],mapSize,cnn->C3->d[j],inSize,full);
             addmat(cnn->S2->d[i],cnn->S2->d[i],outSize,corr,outSize);
-            for (r = 0; r < outSize.h; r++) {
+            for (r = 0; r < outSize.height; r++)
+            {
                 free(corr[r]);
             }
             free(corr);
@@ -454,17 +488,21 @@ void cnn_backward(CNN* cnn,float* outputData) // 网络的后向传播
     }
 
     // C1层，卷积层
-    mapdata=cnn->S2->map_size;
-    NcSize2D S2dSize={cnn->S2->in_width/cnn->S2->map_size,cnn->S2->in_height/cnn->S2->map_size };
+    mapdata = cnn->S2->map_size;
+    NcSize2D S2dSize = px_create_size(cnn->S2->in_height/cnn->S2->map_size, cnn->S2->in_width/cnn->S2->map_size);
     // 这里的Pooling是求平均，所以反向传递到下一神经元的误差梯度没有变化
-    for(i=0;i<cnn->C1->out_channels;i++){
-        float** C1e=up_sample(cnn->S2->d[i],S2dSize,cnn->S2->map_size,cnn->S2->map_size);
-        for (r = 0; r < cnn->S2->in_height; r++) {
-            for (c = 0; c < cnn->S2->in_width; c++) {
+    for(i = 0; i < cnn->C1->out_channels; i++)
+    {
+        float** C1e = up_sample(cnn->S2->d[i],S2dSize,cnn->S2->map_size,cnn->S2->map_size);
+        for (r = 0; r < cnn->S2->in_height; r++)
+        {
+            for (c = 0; c < cnn->S2->in_width; c++)
+            {
                 cnn->C1->d[i][r][c] = C1e[r][c] * sigma_derivation(cnn->C1->y[i][r][c]) / (float)(cnn->S2->map_size*cnn->S2->map_size);
             }
         }
-        for (r = 0; r < cnn->S2->in_height; r++) {
+        for (r = 0; r < cnn->S2->in_height; r++)
+        {
             free(C1e[r]);
         }
         free(C1e);
@@ -478,46 +516,54 @@ void cnn_applygrads(CNN* cnn,CNNOpts opts,float** inputData) // 更新权重
     int i,j,r,c;
 
     // C1层的权重更新
-    NcSize2D dSize={cnn->S2->in_height,cnn->S2->in_width};
-    NcSize2D ySize={cnn->C1->in_height,cnn->C1->in_width };
-    NcSize2D mapSize={cnn->C1->map_size,cnn->C1->map_size };
+    NcSize2D dSize = px_create_size(cnn->S2->in_width, cnn->S2->in_height);
+    NcSize2D ySize = px_create_size(cnn->C1->in_width, cnn->C1->in_height);
+    NcSize2D mapSize = px_create_size(cnn->C1->map_size, cnn->C1->map_size);
 
-    for(i=0;i<cnn->C1->out_channels;i++){
-        for(j=0;j<cnn->C1->in_channels;j++){
-            float** flipinputData=rotate180(inputData,ySize);
-            float** C1dk=conv(cnn->C1->d[i],dSize,flipinputData,ySize,valid);
+    for(i = 0; i < cnn->C1->out_channels; i++)
+    {
+        for(j = 0; j < cnn->C1->in_channels; j++)
+        {
+            float** flipinputData = rotate180(inputData,ySize);
+            float** C1dk = conv(cnn->C1->d[i],dSize,flipinputData,ySize,valid);
             multifactor(C1dk,C1dk,mapSize,-1*opts.alpha);
             addmat(cnn->C1->mapData[j][i],cnn->C1->mapData[j][i],mapSize,C1dk,mapSize);
-            for (r = 0; r < (dSize.h - (ySize.h - 1)); r++) {
+            for (r = 0; r < (dSize.height - (ySize.height - 1)); r++)
+            {
                 free(C1dk[r]);
             }
             free(C1dk);
-            for (r = 0; r < ySize.h; r++) {
+            for (r = 0; r < ySize.height; r++)
+            {
                 free(flipinputData[r]);
             }
             free(flipinputData);
         }
-        cnn->C1->biasData[i]=cnn->C1->biasData[i]-opts.alpha*summat(cnn->C1->d[i],dSize);
+        cnn->C1->biasData[i] = cnn->C1->biasData[i]-opts.alpha*summat(cnn->C1->d[i],dSize);
     }
 
     // C3层的权重更新
-    dSize.w =cnn->S4->in_width;
-    dSize.h=cnn->S4->in_height;
-    ySize.w =cnn->C3->in_width;
-    ySize.h=cnn->C3->in_height;
-    mapSize.w =cnn->C3->map_size;
-    mapSize.h=cnn->C3->map_size;
-    for(i=0;i<cnn->C3->out_channels;i++){
-        for(j=0;j<cnn->C3->in_channels;j++){
+    dSize.width = cnn->S4->in_width;
+    dSize.height = cnn->S4->in_height;
+    ySize.width = cnn->C3->in_width;
+    ySize.height = cnn->C3->in_height;
+    mapSize.width = cnn->C3->map_size;
+    mapSize.height = cnn->C3->map_size;
+    for(i = 0; i < cnn->C3->out_channels; i++)
+    {
+        for(j = 0; j<cnn->C3->in_channels; j++)
+        {
             float** flipinputData=rotate180(cnn->S2->y[j],ySize);
             float** C3dk= conv(cnn->C3->d[i],dSize,flipinputData,ySize,valid);
             multifactor(C3dk,C3dk,mapSize,-1.0*opts.alpha);
             addmat(cnn->C3->mapData[j][i],cnn->C3->mapData[j][i],mapSize,C3dk,mapSize);
-            for (r = 0; r < (dSize.h - (ySize.h - 1)); r++) {
+            for (r = 0; r < (dSize.height - (ySize.height - 1)); r++)
+            {
                 free(C3dk[r]);
             }
             free(C3dk);
-            for (r = 0; r < ySize.h; r++) {
+            for (r = 0; r < ySize.height; r++)
+            {
                 free(flipinputData[r]);
             }
             free(flipinputData);
@@ -527,18 +573,23 @@ void cnn_applygrads(CNN* cnn,CNNOpts opts,float** inputData) // 更新权重
 
     // 输出层
     // 首先需要将前面的多维输出展开成一维向量
-    float* O5inData=(float*)malloc((cnn->O5->inputNum)*sizeof(float));
-    NcSize2D outSize={cnn->S4->in_width/cnn->S4->map_size,cnn->S4->in_height/cnn->S4->map_size};
-    for (i = 0; i < (cnn->S4->out_channels); i++) {
-        for (r = 0; r < outSize.h; r++) {
-            for (c = 0; c < outSize.w; c++) {
-                O5inData[i*outSize.h*outSize.w + r * outSize.w + c] = cnn->S4->y[i][r][c];
+    float* O5inData = (float*)malloc((cnn->O5->inputNum)*sizeof(float));
+    NcSize2D outSize = px_create_size(cnn->S4->in_height/cnn->S4->map_size, cnn->S4->in_width/cnn->S4->map_size);
+    for (i = 0; i < (cnn->S4->out_channels); i++)
+    {
+        for (r = 0; r < outSize.height; r++)
+        {
+            for (c = 0; c < outSize.width; c++)
+            {
+                O5inData[i*outSize.height*outSize.width + r * outSize.width + c] = cnn->S4->y[i][r][c];
             }
         }
     }
 
-    for(j=0;j<cnn->O5->outputNum;j++){
-        for (i = 0; i < cnn->O5->inputNum; i++) {
+    for(j = 0; j < cnn->O5->outputNum; j++)
+    {
+        for (i = 0; i < cnn->O5->inputNum; i++)
+        {
             cnn->O5->wData[j][i] = cnn->O5->wData[j][i] - opts.alpha*cnn->O5->d[j] * O5inData[i];
         }
         cnn->O5->biasData[j]=cnn->O5->biasData[j]-opts.alpha*cnn->O5->d[j];
@@ -551,48 +602,61 @@ void cnn_clear(CNN* cnn)
     // 将神经元的部分数据清除
     int j,c,r;
     // C1网络
-    for(j=0;j<cnn->C1->out_channels;j++){
-        for(r=0;r<cnn->S2->in_height;r++){
-            for(c=0;c<cnn->S2->in_width;c++){
-                cnn->C1->d[j][r][c]=(float)0.0;
-                cnn->C1->v[j][r][c]=(float)0.0;
-                cnn->C1->y[j][r][c]=(float)0.0;
+    for(j = 0; j < cnn->C1->out_channels; j++)
+    {
+        for(r = 0; r < cnn->S2->in_height; r++)
+        {
+            for(c = 0; c < cnn->S2->in_width; c++)
+            {
+                cnn->C1->d[j][r][c] = (float)0.0;
+                cnn->C1->v[j][r][c] = (float)0.0;
+                cnn->C1->y[j][r][c] = (float)0.0;
             }
         }
     }
     // S2网络
-    for(j=0;j<cnn->S2->out_channels;j++){
-        for(r=0;r<cnn->C3->in_height;r++){
-            for(c=0;c<cnn->C3->in_width;c++){
+    for(j = 0; j < cnn->S2->out_channels; j++)
+    {
+        for(r = 0; r < cnn->C3->in_height; r++)
+        {
+            for(c = 0; c < cnn->C3->in_width; c++)
+            {
                 cnn->S2->d[j][r][c]=0;
                 cnn->S2->y[j][r][c] = 0;
             }
         }
     }
     // C3网络
-    for(j=0;j<cnn->C3->out_channels;j++){
-        for(r=0;r<cnn->S4->in_height;r++){
-            for(c=0;c<cnn->S4->in_width;c++){
-                cnn->C3->d[j][r][c]=(float)0.0;
-                cnn->C3->v[j][r][c]=(float)0.0;
-                cnn->C3->y[j][r][c]=(float)0.0;
+    for(j = 0; j < cnn->C3->out_channels; j++)
+    {
+        for(r = 0; r < cnn->S4->in_height; r++)
+        {
+            for(c = 0; c < cnn->S4->in_width; c++)
+            {
+                cnn->C3->d[j][r][c] = (float)0.0;
+                cnn->C3->v[j][r][c] = (float)0.0;
+                cnn->C3->y[j][r][c] = (float)0.0;
             }
         }
     }
     // S4网络
-    for(j=0;j<cnn->S4->out_channels;j++){
-        for(r=0;r<cnn->S4->in_height/cnn->S4->map_size;r++){
-            for(c=0;c<cnn->S4->in_width/cnn->S4->map_size;c++){
-                cnn->S4->d[j][r][c]=(float)0.0;
-                cnn->S4->y[j][r][c]=(float)0.0;
+    for(j = 0; j < cnn->S4->out_channels; j++)
+    {
+        for(r = 0; r < cnn->S4->in_height/cnn->S4->map_size; r++)
+        {
+            for(c = 0; c < cnn->S4->in_width/cnn->S4->map_size; c++)
+            {
+                cnn->S4->d[j][r][c] = (float)0.0;
+                cnn->S4->y[j][r][c] = (float)0.0;
             }
         }
     }
     // O5输出
-    for(j=0;j<cnn->O5->outputNum;j++){
-        cnn->O5->d[j]=(float)0.0;
-        cnn->O5->v[j]=(float)0.0;
-        cnn->O5->y[j]=(float)0.0;
+    for(j = 0; j < cnn->O5->outputNum; j++)
+    {
+        cnn->O5->d[j] = (float)0.0;
+        cnn->O5->v[j] = (float)0.0;
+        cnn->O5->y[j] = (float)0.0;
     }
 }
 
@@ -605,12 +669,16 @@ void save_cnndata(CNN* cnn,const char* filename,float** inputdata) // 保存CNN�
     // C1的数据
     int i,j,r;
     // C1网络
-    for (i = 0; i < cnn->C1->in_height; i++) {
+    for (i = 0; i < cnn->C1->in_height; i++)
+    {
         fwrite(inputdata[i], sizeof(float), cnn->C1->in_width, fp);
     }
-    for (i = 0; i < cnn->C1->in_channels; i++) {
-        for (j = 0; j < cnn->C1->out_channels; j++) {
-            for (r = 0; r < cnn->C1->map_size; r++) {
+    for (i = 0; i < cnn->C1->in_channels; i++)
+    {
+        for (j = 0; j < cnn->C1->out_channels; j++)
+        {
+            for (r = 0; r < cnn->C1->map_size; r++)
+            {
                 fwrite(cnn->C1->mapData[i][j][r], sizeof(float), cnn->C1->map_size, fp);
             }
         }
@@ -618,31 +686,41 @@ void save_cnndata(CNN* cnn,const char* filename,float** inputdata) // 保存CNN�
 
     fwrite(cnn->C1->biasData,sizeof(float),cnn->C1->out_channels,fp);
 
-    for(j=0;j<cnn->C1->out_channels;j++){
-        for(r=0;r<cnn->S2->in_height;r++){
+    for(j = 0; j < cnn->C1->out_channels; j++)
+    {
+        for(r = 0; r < cnn->S2->in_height; r++)
+        {
             fwrite(cnn->C1->v[j][r],sizeof(float),cnn->S2->in_width,fp);
         }
-        for(r=0;r<cnn->S2->in_height;r++){
+        for(r = 0; r < cnn->S2->in_height; r++)
+        {
             fwrite(cnn->C1->d[j][r],sizeof(float),cnn->S2->in_width,fp);
         }
-        for(r=0;r<cnn->S2->in_height;r++){
+        for(r = 0; r < cnn->S2->in_height; r++)
+        {
             fwrite(cnn->C1->y[j][r],sizeof(float),cnn->S2->in_width,fp);
         }
     }
 
     // S2网络
-    for(j=0;j<cnn->S2->out_channels;j++){
-        for(r=0;r<cnn->C3->in_height;r++){
+    for(j = 0; j < cnn->S2->out_channels; j++)
+    {
+        for(r = 0; r < cnn->C3->in_height; r++)
+        {
             fwrite(cnn->S2->d[j][r],sizeof(float),cnn->C3->in_width,fp);
         }
-        for(r=0;r<cnn->C3->in_height;r++){
+        for(r = 0; r < cnn->C3->in_height; r++)
+        {
             fwrite(cnn->S2->y[j][r],sizeof(float),cnn->C3->in_width,fp);
         }
     }
     // C3网络
-    for (i = 0; i < cnn->C3->in_channels; i++) {
-        for (j = 0; j < cnn->C3->out_channels; j++) {
-            for (r = 0; r < cnn->C3->map_size; r++) {
+    for (i = 0; i < cnn->C3->in_channels; i++)
+    {
+        for (j = 0; j < cnn->C3->out_channels; j++)
+        {
+            for (r = 0; r < cnn->C3->map_size; r++)
+            {
                 fwrite(cnn->C3->mapData[i][j][r], sizeof(float), cnn->C3->map_size, fp);
             }
         }
@@ -650,30 +728,38 @@ void save_cnndata(CNN* cnn,const char* filename,float** inputdata) // 保存CNN�
 
     fwrite(cnn->C3->biasData,sizeof(float),cnn->C3->out_channels,fp);
 
-    for(j=0;j<cnn->C3->out_channels;j++){
-        for(r=0;r<cnn->S4->in_height;r++){
+    for(j = 0; j < cnn->C3->out_channels; j++)
+    {
+        for(r = 0; r <cnn->S4->in_height; r++)
+        {
             fwrite(cnn->C3->v[j][r],sizeof(float),cnn->S4->in_width,fp);
         }
-        for(r=0;r<cnn->S4->in_height;r++){
+        for(r = 0; r < cnn->S4->in_height; r++)
+        {
             fwrite(cnn->C3->d[j][r],sizeof(float),cnn->S4->in_width,fp);
         }
-        for(r=0;r<cnn->S4->in_height;r++){
+        for(r = 0; r < cnn->S4->in_height; r++)
+        {
             fwrite(cnn->C3->y[j][r],sizeof(float),cnn->S4->in_width,fp);
         }
     }
 
     // S4网络
-    for(j=0;j<cnn->S4->out_channels;j++){
-        for(r=0;r<cnn->S4->in_height /cnn->S4->map_size;r++){
+    for(j = 0; j <cnn->S4->out_channels; j++)
+    {
+        for(r = 0; r < cnn->S4->in_height / cnn->S4->map_size; r++)
+        {
             fwrite(cnn->S4->d[j][r],sizeof(float),cnn->S4->in_width /cnn->S4->map_size,fp);
         }
-        for(r=0;r<cnn->S4->in_height /cnn->S4->map_size;r++){
+        for(r = 0; r < cnn->S4->in_height / cnn->S4->map_size; r++)
+        {
             fwrite(cnn->S4->y[j][r],sizeof(float),cnn->S4->in_width /cnn->S4->map_size,fp);
         }
     }
 
     // O5输出层
-    for (i = 0; i < cnn->O5->outputNum; i++) {
+    for (i = 0; i < cnn->O5->outputNum; i++)
+    {
         fwrite(cnn->O5->wData[i], sizeof(float), cnn->O5->inputNum, fp);
     }
     fwrite(cnn->O5->biasData,sizeof(float),cnn->O5->outputNum,fp);

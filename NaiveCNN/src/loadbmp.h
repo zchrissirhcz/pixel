@@ -139,7 +139,7 @@ LOADBMP_API unsigned int loadbmp_decode_file(
 
     w = (bmp_info_header[4] + (bmp_info_header[5] << 8) + (bmp_info_header[6] << 16) + (bmp_info_header[7] << 24));
     h = (bmp_info_header[8] + (bmp_info_header[9] << 8) + (bmp_info_header[10] << 16) + (bmp_info_header[11] << 24));
-    
+
     if ((w > 0) && (h > 0))
     {
         data = (unsigned char*)malloc(w * h * components);

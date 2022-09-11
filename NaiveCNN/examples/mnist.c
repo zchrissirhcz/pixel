@@ -219,7 +219,7 @@ int test_mnist_train_test()
     sprintf(test_image_pth, "%s/mnist/t10k-images.idx3-ubyte", project_dir);
     MnistImgArr* testImg= read_mnist_image(test_image_pth);
 
-    NcSize2D inputSize={testImg->ImgPtr[0].w,testImg->ImgPtr[0].h};
+    NcSize2D inputSize = px_create_size(testImg->ImgPtr[0].h, testImg->ImgPtr[0].w);
     int outSize=testLabel->LabelPtr[0].l;
 
     // CNN structure init
@@ -296,35 +296,31 @@ char* layer_type_str(NcLayerType type) {
 // setup lenet5
 void lenet5_setup(CNN* cnn, NcSize2D inputSize,int outputSize)
 {
-    cnn->layerNum=5;
+    cnn->layerNum = 5;
 
     NcSize2D inSize;
-    int mapSize=5;
-    inSize.w=inputSize.w;
-    inSize.h =inputSize.h;
-    cnn->C1=init_conv_layer(inSize.w,inSize.h,5,1,6);
+    int mapSize = 5;
+    inSize.width = inputSize.width;
+    inSize.height = inputSize.height;
+    cnn->C1 = init_conv_layer(inSize.width, inSize.height, 5, 1, 6);
 
+    inSize.width = inSize.width - mapSize + 1;
+    inSize.height = inSize.height - mapSize + 1;
+    cnn->S2 = init_pooling_layer(inSize.width, inSize.height, 2, 6, 6, AvePool);
 
-    inSize.w =inSize.w -mapSize+1;
-    inSize.h=inSize.h-mapSize+1;
-    cnn->S2=init_pooling_layer(inSize.w,inSize.h,2,6,6,AvePool);
+    inSize.width = inSize.width / 2;
+    inSize.height = inSize.height / 2;
+    cnn->C3 = init_conv_layer(inSize.width, inSize.height, 5, 6, 12);
 
+    inSize.width = inSize.width - mapSize + 1;
+    inSize.height = inSize.height - mapSize + 1;
+    cnn->S4 = init_pooling_layer(inSize.width, inSize.height, 2, 12, 12, AvePool);
 
-    inSize.w =inSize.w /2;
-    inSize.h=inSize.h/2;
-    cnn->C3=init_conv_layer(inSize.w,inSize.h,5,6,12);
+    inSize.width = inSize.width / 2;
+    inSize.height = inSize.height / 2;
+    cnn->O5 = init_innerproduct_layer(inSize.width * inSize.height * 12, outputSize);
 
-
-    inSize.w =inSize.w -mapSize+1;
-    inSize.h=inSize.h-mapSize+1;
-    cnn->S4=init_pooling_layer(inSize.w,inSize.h,2,12,12,AvePool);
-
-
-    inSize.w =inSize.w /2;
-    inSize.h=inSize.h/2;
-    cnn->O5=init_innerproduct_layer(inSize.w*inSize.h*12,outputSize);
-
-    cnn->e=(float*)calloc(cnn->O5->outputNum,sizeof(float));
+    cnn->e = (float*)calloc(cnn->O5->outputNum,sizeof(float));
 }
 
 //
@@ -409,11 +405,11 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     //----------------------------------------------------------------
     // create layer param
     map_size = 5;
-    in_size.h = input_size.w;
-    in_size.w = input_size.h;
+    in_size.width = input_size.width;
+    in_size.height = input_size.height;
     in_channels = 1;
     out_channels = 6;
-    NcConvolutionParam* C1 = nc_train_make_convolution_param(in_size.h, in_size.w, map_size, in_channels, out_channels);
+    NcConvolutionParam* C1 = nc_train_make_convolution_param(in_size.height, in_size.width, map_size, in_channels, out_channels);
 
     // create layer
     layer = nc_make_layer();
@@ -446,13 +442,13 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     // S2 layer
     //----------------------------------------------------------------
     // create layer param
-    in_size.h = C1->out_height;
-    in_size.w = C1->out_width;
+    in_size.height = C1->out_height;
+    in_size.width = C1->out_width;
     map_size = 2;
     in_channels = C1->out_channels;
     out_channels = 6;
     pool_type = AvePool;
-    NcPoolingParam* S2 = nc_train_make_pooling_param(in_size.h, in_size.w, map_size, in_channels, out_channels, pool_type);
+    NcPoolingParam* S2 = nc_train_make_pooling_param(in_size.height, in_size.width, map_size, in_channels, out_channels, pool_type);
 
     // create layer
     layer = nc_make_layer();
@@ -477,12 +473,12 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     // C3 layer
     //----------------------------------------------------------------
     // create layer param
-    in_size.h = S2->out_height;
-    in_size.w = S2->out_width;
+    in_size.height = S2->out_height;
+    in_size.width = S2->out_width;
     map_size = 5;
     in_channels = S2->out_channels;
     out_channels = 12;
-    NcConvolutionParam* C3 = nc_train_make_convolution_param(in_size.h, in_size.w, map_size, in_channels, out_channels);
+    NcConvolutionParam* C3 = nc_train_make_convolution_param(in_size.height, in_size.width, map_size, in_channels, out_channels);
 
     // create layer
     layer = nc_make_layer();
@@ -507,13 +503,13 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     // S4 layer
     //----------------------------------------------------------------
     // create layer param
-    in_size.h = C3->out_height;
-    in_size.w = C3->out_width;
+    in_size.height = C3->out_height;
+    in_size.width = C3->out_width;
     map_size = 2;
     in_channels = C3->out_channels;
     out_channels = 12;
     pool_type = AvePool;
-    NcPoolingParam* S4 = nc_train_make_pooling_param(in_size.h, in_size.w, map_size, in_channels, out_channels, pool_type);
+    NcPoolingParam* S4 = nc_train_make_pooling_param(in_size.height, in_size.width, map_size, in_channels, out_channels, pool_type);
 
     // create layer
     layer = nc_make_layer();
@@ -538,9 +534,9 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     // O5 layer
     //----------------------------------------------------------------
     // create layer param
-    in_size.w = S4->out_width;
-    in_size.h = S4->out_height;
-    int in_num = in_size.h * in_size.w * S4->out_channels;
+    in_size.width = S4->out_width;
+    in_size.height = S4->out_height;
+    int in_num = in_size.height * in_size.width * S4->out_channels;
     int out_num = output_size;
     NcInnerproductParam* O5 = nc_train_make_innerproduct_param(in_num, out_num);
 
@@ -589,9 +585,11 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     }
 }
 
-void nc_train_trial(){
+void nc_train_trial()
+{
     NcSize2D input_size;
-    input_size.h = 28; input_size.w = 28;
+    input_size.height = 28;
+    input_size.width = 28;
     int output_size = 10;
     NcNet* net = (NcNet*)malloc(sizeof(NcNet));
     nc_lenet5_train_setup(net, input_size, output_size);
