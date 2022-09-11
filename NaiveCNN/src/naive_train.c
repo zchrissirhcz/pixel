@@ -113,7 +113,7 @@ NcLayerOutput* nc_train_create_layer_output(int n, const int* blob_ids, const Nc
 
 
 void nc_train_forward_convolution(void* param_, NcLayerInput* input, NcLayerOutput* output) {
-    printf("-- Convolution forward()\n");
+    PX_LOGE("-- Convolution forward()\n");
     NcConvolutionParam* param = (NcConvolutionParam*)param_;
     NcBlob* bottom = input->blobs[0];
     NcBlob* top = output->blobs[0];
@@ -128,31 +128,31 @@ void nc_train_forward_convolution(void* param_, NcLayerInput* input, NcLayerOutp
         nc_convolution_forward_nchw(param, bottom, top);
     }
     else {
-        printf("Error! Unsupported convolution input blob dimension order code: %d\n", bottom->order);
+        PX_LOGE("Error! Unsupported convolution input blob dimension order code: %d\n", bottom->order);
     }
 }
 
 void nc_train_forward_pooling(void* param_, NcLayerInput* input, NcLayerOutput* output) {
-    printf("-- Pooling forward()\n");
+    PX_LOGE("-- Pooling forward()\n");
     NcPoolingParam* param = (NcPoolingParam*)param_;
 }
 
 void nc_train_forward_innerproduct(void* param_, NcLayerInput* input, NcLayerOutput* output) {
-    printf("-- Innerproduct forward()\n");
+    PX_LOGE("-- Innerproduct forward()\n");
     NcInnerproductParam* param = (NcInnerproductParam*)param_;
 }
 
 void nc_train_backward_convolution(void* param_, NcLayerInput* input, NcLayerOutput* output) {
-    printf("-- Convolution backward()\n");
+    PX_LOGE("-- Convolution backward()\n");
     NcConvolutionParam* param = (NcConvolutionParam*)param_;
 }
 
 void nc_train_backward_pooling(void* param_, NcLayerInput* input, NcLayerOutput* output) {
-    printf("-- Pooling backward()\n");
+    PX_LOGE("-- Pooling backward()\n");
     NcPoolingParam* param = (NcPoolingParam*)param_;
 }
 
 void nc_train_backward_innerproduct(void* param_, NcLayerInput* input, NcLayerOutput* output) {
-    printf("-- Innerproduct backward()\n");
+    PX_LOGE("-- Innerproduct backward()\n");
     NcInnerproductParam* param = (NcInnerproductParam*)param_;
 }

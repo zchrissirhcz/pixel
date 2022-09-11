@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <math.h>
-#include <stdio.h>
+#include "px_log.h"
 
 // make convolution param for inference
 NcConvolutionParam* nc_infer_create_convolution_param(int map_size, int in_channels, int out_channels, NcPaddingType pad_type){
@@ -117,7 +117,7 @@ NcLayerOutput* nc_infer_create_layer_output(int n, const int* blob_ids, NcNet* n
 // note! for in-place operation, needn't considering the rely_cnt
 void nc_infer_convolution(void* param_, NcLayerInput* input, NcLayerOutput* output)
 {
-    printf("===> into NaiveCNN infer convolution\n");
+    PX_LOGE("===> into NaiveCNN infer convolution\n");
     // step1
     NcConvolutionParam* param = (NcConvolutionParam*)param_;
     NcBlob* bottom = input->blobs[0];
@@ -148,12 +148,12 @@ void nc_infer_convolution(void* param_, NcLayerInput* input, NcLayerOutput* outp
         bottom->data = NULL;
     }
 
-    printf("-- leave NaiveCNN infer convolution\n");
+    PX_LOGE("-- leave NaiveCNN infer convolution\n");
 }
 
 void nc_infer_pooling(void* param_, NcLayerInput* input, NcLayerOutput* output)
 {
-    printf("===> into NaiveCNN infer pooling\n");
+    PX_LOGE("===> into NaiveCNN infer pooling\n");
     // step1
     NcPoolingParam* param = (NcPoolingParam*)param_;
     NcBlob* bottom = input->blobs[0];
@@ -184,13 +184,13 @@ void nc_infer_pooling(void* param_, NcLayerInput* input, NcLayerOutput* output)
         bottom->data = NULL;
     }
 
-    printf("-- leave NaiveCNN infer pooling\n");
+    PX_LOGE("-- leave NaiveCNN infer pooling\n");
 }
 
 void nc_infer_innerproduct(void* param_, NcLayerInput* input, NcLayerOutput* output)
 {
-    printf("===> into NaiveCNN infer innerproduct\n");
+    PX_LOGE("===> into NaiveCNN infer innerproduct\n");
     NcInnerproductParam* param = (NcInnerproductParam*)param_;
 
-    printf("-- leave NaiveCNN infer innerproduct\n");
+    PX_LOGE("-- leave NaiveCNN infer innerproduct\n");
 }

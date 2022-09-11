@@ -307,9 +307,9 @@ void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBl
 #endif
 
     //per kernel
-    //printf("top->n=%d\n", top->n);
+    //PX_LOGE("top->n=%d\n", top->n);
     for (int n = 0; n < kernel->batch; n++) {
-        //printf("\t\t%d-th kernel\n", n);
+        //PX_LOGE("\t\t%d-th kernel\n", n);
         //fprintf(fout, "NHWC mode\n");
 
         int out_h = 0;
@@ -352,7 +352,7 @@ void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBl
     }
     
 #ifdef LOCAL_DEBUG
-    printf("top's dimension: h=%d, w=%d, c=%d\n", top->h, top->w, top->c);
+    PX_LOGE("top's dimension: h=%d, w=%d, c=%d\n", top->h, top->w, top->c);
         for (int h = 0; h < top->h; h++) {
             for (int w = 0; w < top->w; w++) {
                 for (int c = 0; c < top->c; c++) {

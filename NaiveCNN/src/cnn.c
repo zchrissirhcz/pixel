@@ -358,7 +358,7 @@ void avg_pooling(float** output, NcSize2D outputSize,float** input, NcSize2D inp
     int outputH = inputSize.height / mapSize;
     if (outputSize.width != outputW || outputSize.height != outputH)
     {
-        printf("ERROR: output size is wrong!!");
+        PX_LOGE("ERROR: output size is wrong!!");
     }
 
     int i,j,m,n;

@@ -267,7 +267,7 @@ void addmat(float** res, float** mat1, NcSize2D matSize1, float** mat2, NcSize2D
     int i, j;
     if (matSize1.width != matSize2.width || matSize1.height != matSize2.height)
     {
-        printf("ERROR: Size is not same!");
+        PX_LOGE("ERROR: Size is not same!");
     }
 
     for (i = 0; i < matSize1.height; i++)

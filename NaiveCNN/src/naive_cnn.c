@@ -106,7 +106,7 @@ void nc_destroy_layer(NcLayer* layer) {
     NcLayerType layer_type = layer->type;
     switch (layer_type) {
         case NC_LAYER_CONVOLUTION: {
-            //printf("-- free convolution layer\n");
+            //PX_LOGE("-- free convolution layer\n");
             NcConvolutionParam* param = (NcConvolutionParam*)layer->param;
             free(param->bias);
             //puts("\t free bias ok");
@@ -130,7 +130,7 @@ void nc_destroy_layer(NcLayer* layer) {
             //puts("\t free param ok");
         }break;
         case NC_LAYER_POOLING: {
-            //printf("-- free poolingg layer\n");
+            //PX_LOGE("-- free poolingg layer\n");
             NcPoolingParam* param = (NcPoolingParam*)layer->param;
 
             if(param->d)free(param->d);
@@ -143,7 +143,7 @@ void nc_destroy_layer(NcLayer* layer) {
             //puts("\t free param ok");
         }break;
         case NC_LAYER_INNERPRODUCT: {
-            //printf("-- free innerproduct layer\n");
+            //PX_LOGE("-- free innerproduct layer\n");
             NcInnerproductParam* param = (NcInnerproductParam*)layer->param;
             //puts("\t-- try to free bias");
             free(param->bias);
@@ -174,7 +174,7 @@ void nc_net_forward(NcNet* net, NcImage* image, int label) {
     NcLayer* layer = NULL;
     for (int i = 0; i < net->layers_num; i++) {
         layer = net->layers[i];
-        printf("\t-> layer: %d/%d ", i, net->layers_num);
+        PX_LOGE("\t-> layer: %d/%d ", i, net->layers_num);
         layer->forward(layer->param, layer->input, layer->output);
     }
 }
@@ -183,7 +183,7 @@ void nc_net_backward(NcNet* net) {
     NcLayer* layer = NULL;
     for (int i = 0; i < net->layers_num; i++) {
         layer = net->layers[i];
-        printf("\t<= layer: %d/%d ", i, net->layers_num);
+        PX_LOGE("\t<= layer: %d/%d ", i, net->layers_num);
         layer->backward(layer->param, layer->input, layer->output);
     }
 }
@@ -200,7 +200,7 @@ void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* dat
         for (int j = 0; j < train_cfg->train_num; j++) {
             image = data_cfg->images[i];
             label = data_cfg->labels[i];
-            printf("Iteration %d/%d\n", j, train_cfg->train_num);
+            PX_LOGE("Iteration %d/%d\n", j, train_cfg->train_num);
             nc_net_forward(net, image, label);
             //nc_net_backward(net);
         }
@@ -245,7 +245,7 @@ void nc_cls_data_loader(NcClsDataConfig* cfg) {
                 unsigned int err = loadbmp_encode_file(save_pth, images[i]->data, images[i]->w, images[i]->h, 1);
 
                 if (err) {
-                    printf("LoadBMP Load Error: %u\n", err);
+                    PX_LOGE("LoadBMP Load Error: %u\n", err);
                 }
                 fclose(fp);
             }
@@ -287,7 +287,7 @@ void nc_read_mnist_image(const char* filename, NcImage*** _images, int* _image_n
     fread((char*)&n_cols, sizeof(n_cols), 1, fp);
     n_cols = reverse_int(n_cols);
 
-    //printf("--- n_rows=%d, n_cols=%d\n", n_rows, n_cols);
+    //PX_LOGE("--- n_rows=%d, n_cols=%d\n", n_rows, n_cols);
     //获取第i幅图像，保存到vec中
     int i;
 
