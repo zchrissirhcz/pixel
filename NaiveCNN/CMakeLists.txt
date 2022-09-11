@@ -5,8 +5,6 @@ add_library(cnn STATIC
   src/mat.h
   
   src/loadbmp.h
-
-  src/naive_config.h
   
   src/naive_cnn.h
   src/naive_cnn.c
@@ -14,11 +12,8 @@ add_library(cnn STATIC
   src/naive_train.c
   src/naive_infer.c
 
-  src/naive_convolution.h
   src/naive_convolution.c
-  src/naive_pooling.h
   src/naive_pooling.c
-  src/naive_relu.h
   src/naive_relu.c
 )
 target_link_libraries(cnn PUBLIC pixel)
@@ -26,6 +21,8 @@ target_link_libraries(cnn PUBLIC pixel)
 add_executable(example-mnist
   examples/mnist.c
   examples/mnist.h
+  examples/lenet.c
+  examples/lenet.h
 )
 target_include_directories(example-mnist PRIVATE "src")
 
