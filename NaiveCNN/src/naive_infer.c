@@ -4,7 +4,6 @@
 #include <math.h>
 #include <stdio.h>
 #include "naive_convolution.h"
-#include "naive_pooling.h"
 
 // make convolution param for inference
 NcConvolutionParam* nc_infer_make_convolution_param(int map_size, int in_channels, int out_channels, NcPaddingType pad_type){

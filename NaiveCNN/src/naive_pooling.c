@@ -1,4 +1,4 @@
-#include "naive_pooling.h"
+#include "naive_cnn.h"
 #include <stdio.h>
 
 // nhwc
