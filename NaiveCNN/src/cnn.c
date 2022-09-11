@@ -579,7 +579,7 @@ void cnn_backward(CNN* cnn,float* outputData)
     }
 }
 
-void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
+void cnn_applygrads(CNN* cnn, CnnTrainOpts opts, matrix_t* input) // 更新权重
 {
     // 这里存在权重的主要是卷积层和输出层
     // 更新这两个地方的权重就可以了

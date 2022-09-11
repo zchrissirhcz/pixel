@@ -89,11 +89,11 @@ typedef struct cnn_network
     float* L; // 瞬时误差能量
 } CNN;
 
-typedef struct train_opts
+typedef struct CnnTrainOpts
 {
     int numepochs; // 训练的迭代次数
     float alpha; // 学习速率
-} CNNOpts;
+} CnnTrainOpts;
 
 
 #ifdef __cplusplus
@@ -122,7 +122,7 @@ void cnn_forward(CNN* cnn, matrix_t* input_data); // 网络的前向传播
 
 void cnn_backward(CNN* cnn, float* output_data); // 网络的后向传播
 
-void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input);
+void cnn_applygrads(CNN* cnn, CnnTrainOpts opts, matrix_t* input);
 
 void cnn_clear(CNN* cnn); // 将数据vyd清零
 
