@@ -34,7 +34,7 @@ NcImage* nc_create_empty_image(int height, int width, int channel)
     return im;
 }
 
-matrix_t* create_matrix(int height, int width)
+matrix_t* create_matrix_ptr(int height, int width)
 {
     matrix_t* matrix = (matrix_t*) malloc(sizeof(matrix_t));
     matrix->height = height;
@@ -48,7 +48,7 @@ matrix_t* create_matrix(int height, int width)
     return matrix;
 }
 
-void destroy_matrix(matrix_t* matrix)
+void destroy_matrix_ptr(matrix_t* matrix)
 {
     for (int i = 0; i < matrix->height; i++)
     {
@@ -66,7 +66,7 @@ matrix_t* get_rotate180_matrix(matrix_t* input)
 {
     const int h = input->height;
     const int w = input->width;
-    matrix_t* output = create_matrix(h, w);
+    matrix_t* output = create_matrix_ptr(h, w);
     for (int i = 0; i < h; i++)
     {
         for (int j = 0; j < w; j++)
@@ -110,7 +110,7 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
     int outSizeH = input->height + (map->height - 1);
 
     // 互相关的结果扩大了
-    matrix_t* output = create_matrix(outSizeH, outSizeW);
+    matrix_t* output = create_matrix_ptr(outSizeH, outSizeW);
 
     // 为了方便计算，将inputData扩大一圈
     px_pad_t pad = px_create_pad(map->height-1, map->height-1, map->width-1, map->width-1);
@@ -130,7 +130,7 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
         }
     }
 
-    destroy_matrix(expaned_input);
+    destroy_matrix_ptr(expaned_input);
 
     NcSize2D outSize = px_create_size(outSizeH, outSizeW);
     switch(type){ // 根据不同的情况，返回不同的结果
@@ -138,7 +138,7 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
         return output;
     case same:{
         matrix_t* sameres = mat_edge_shrink(output, halfmapsizew, halfmapsizeh);
-        destroy_matrix(output);
+        destroy_matrix_ptr(output);
         return sameres;
     }
     case valid:{
@@ -151,7 +151,7 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
         {
             validres = mat_edge_shrink(output, halfmapsizew * 2, halfmapsizeh * 2);
         }
-        destroy_matrix(output);
+        destroy_matrix_ptr(output);
         return validres;
     }
     default:
@@ -165,7 +165,7 @@ matrix_t* conv(matrix_t* map, matrix_t* input, int type)
     // 卷积操作可以用旋转180度的特征模板相关来求
     matrix_t* flipmap = get_rotate180_matrix(map); //旋转180度的特征模板
     matrix_t* res = correlation(flipmap, input, type);
-    destroy_matrix(flipmap);
+    destroy_matrix_ptr(flipmap);
     return res;
 }
 
@@ -174,7 +174,7 @@ matrix_t* up_sample(matrix_t* input, int upc, int upr)
 {
     const int out_height = input->height * upr;
     const int out_width = input->width * upc;
-    matrix_t* output = create_matrix(out_height, out_width);
+    matrix_t* output = create_matrix_ptr(out_height, out_width);
 
     for(int j = 0; j < output->height; j = j + upr)
     {
@@ -205,7 +205,7 @@ matrix_t* mat_edge_expand(matrix_t* input, px_pad_t pad)
     // 向量边缘扩大
     const int out_height = input->height + pad.top + pad.bottom;
     const int out_width = input->width + pad.left + pad.right;
-    matrix_t* output = create_matrix(out_height, out_width);
+    matrix_t* output = create_matrix_ptr(out_height, out_width);
 
     for(int j = 0; j < out_height; j++)
     {
@@ -229,7 +229,7 @@ matrix_t* mat_edge_shrink(matrix_t* input, int shrinkc, int shrinkr)
 {
     const int out_height = input->height - 2 * shrinkr;
     const int out_width = input->width - 2 * shrinkc;
-    matrix_t* output = create_matrix(out_height, out_width);
+    matrix_t* output = create_matrix_ptr(out_height, out_width);
 
     for(int j = 0; j < input->height; j++)
     {

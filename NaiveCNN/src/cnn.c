@@ -273,7 +273,7 @@ void cnn_forward(CNN* cnn, matrix_t* input)
             mat1.data = cnn->C1->v[i];
 
             addmat(&mat1, mapout, &res);
-            destroy_matrix(mapout);
+            destroy_matrix_ptr(mapout);
         }
         for (r = 0; r < outSize.height; r++)
         {
@@ -341,7 +341,7 @@ void cnn_forward(CNN* cnn, matrix_t* input)
             mat1.data = cnn->C3->v[i];
 
             addmat(&mat1, mapout, &res);
-            destroy_matrix(mapout);
+            destroy_matrix_ptr(mapout);
         }
         for (r = 0; r < outSize.height; r++)
         {
@@ -509,7 +509,7 @@ void cnn_backward(CNN* cnn,float* outputData)
                 cnn->C3->d[i][r][c] = C3e->data[r][c] * sigma_derivation(cnn->C3->y[i][r][c]) / (float)(cnn->S4->map_size*cnn->S4->map_size);
             }
         }
-        destroy_matrix(C3e);
+        destroy_matrix_ptr(C3e);
     }
 
     // S2层，S2层没有激活函数，这里只有卷积层有激活函数部分
@@ -545,7 +545,7 @@ void cnn_backward(CNN* cnn,float* outputData)
             mat1.data = cnn->S2->d[i];
 
             addmat(&mat1, corr, &res);
-            destroy_matrix(corr);
+            destroy_matrix_ptr(corr);
         }
         /*
         for(r=0;r<cnn->C3->inputHeight;r++)
@@ -572,7 +572,7 @@ void cnn_backward(CNN* cnn,float* outputData)
                 cnn->C1->d[i][r][c] = C1e->data[r][c] * sigma_derivation(cnn->C1->y[i][r][c]) / (float)(cnn->S2->map_size*cnn->S2->map_size);
             }
         }
-        destroy_matrix(C1e);
+        destroy_matrix_ptr(C1e);
     }
 }
 
@@ -610,8 +610,8 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
             mat1.data = cnn->C1->mapData[j][i];
             
             addmat(&mat1, C1dk, &res);
-            destroy_matrix(C1dk);
-            destroy_matrix(flipinput);
+            destroy_matrix_ptr(C1dk);
+            destroy_matrix_ptr(flipinput);
         }
         matrix_t mat2;
         mat2.height = dSize.height;
@@ -655,8 +655,8 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
             mat1.data = cnn->C3->mapData[j][i];
 
             addmat(&mat1, C3dk, &res);
-            destroy_matrix(C3dk);
-            destroy_matrix(flipinput);
+            destroy_matrix_ptr(C3dk);
+            destroy_matrix_ptr(flipinput);
         }
         matrix_t mat3;
         mat3.height = dSize.height;
