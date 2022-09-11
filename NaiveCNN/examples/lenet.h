@@ -20,6 +20,8 @@ float mnist_cnn_test(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array
 
 const char* layer_type_to_str(NcLayerType type);
 
+void nc_cls_data_loader(NcClsDataConfig* cfg);
+
 #ifdef __cplusplus
 }
 #endif

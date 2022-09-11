@@ -266,9 +266,6 @@ void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, 
 void nc_net_forward(NcNet* net, NcImage* image, int label);
 void nc_net_backward(NcNet* net);
 void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* data_cfg);
-void nc_cls_data_loader(NcClsDataConfig* cfg, const char* project_dir);
-void nc_read_mnist_image(const char* filename, NcImage*** _images, int* _image_num);
-void nc_read_mnist_label(const char* filename, int** _labels, int* _label_num);
 
 
 NcLayer* nc_create_layer();
