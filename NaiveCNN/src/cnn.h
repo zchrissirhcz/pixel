@@ -135,7 +135,7 @@ void nnff(float* output, float* input, float** wdata, float* bias, NcSize2D nn_s
 void save_cnndata(CNN* cnn, const char* filename, float** inputdata);
 
 // 返回向量最大数的序号
-int vecmax_index(float* vec, int veclength);
+int argmax(float* data, int len);
 
 #ifdef __cplusplus
 }

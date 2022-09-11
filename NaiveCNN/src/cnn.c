@@ -7,6 +7,7 @@
 #include "px_log.h"
 #include "cnn.h"
 #include "mat.h"
+#include <float.h>
 
 
 ConvLayer* init_conv_layer(int in_width,int in_height,int map_size,int in_channels,int out_channels)
@@ -136,18 +137,19 @@ InnerproductLayer* init_innerproduct_layer(int inputNum,int outputNum)
     return outL;
 }
 
-int vecmax_index(float* vec, int veclength)// 返回向量最大数的序号
+int argmax(float* data, int len)
 {
-    int i;
-    float maxnum=-1.0;
-    int maxIndex=0;
-    for(i=0;i<veclength;i++){
-        if(maxnum<vec[i]){
-            maxnum=vec[i];
-            maxIndex=i;
+    float max_value = FLT_MIN;
+    int max_index = 0;
+    for(int i = 0; i < len; i++)
+    {
+        if (max_value < data[i])
+        {
+            max_value = data[i];
+            max_index = i;
         }
     }
-    return maxIndex;
+    return max_index;
 }
 
 // 保存cnn

@@ -186,7 +186,7 @@ float mnist_cnn_test(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData
         input.width = inputData->ImgPtr[n].w;
         input.data = inputData->ImgPtr[n].ImgData;
         cnn_forward(cnn, &input);
-        if (vecmax_index(cnn->O5->y, cnn->O5->outputNum) != vecmax_index(outputData->LabelPtr[n].LabelData, cnn->O5->outputNum)) {
+        if (argmax(cnn->O5->y, cnn->O5->outputNum) != argmax(outputData->LabelPtr[n].LabelData, cnn->O5->outputNum)) {
             incorrectnum++;
         }
         cnn_clear(cnn);
