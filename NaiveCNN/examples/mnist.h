@@ -7,15 +7,11 @@
 #include <time.h>
 #include "cnn.h"
 
-typedef struct MnistImg{
-    int w;           // 图像宽
-    int h;           // 图像高
-    float** ImgData; // 图像数据二维动态数组
-} MnistImg;
+typedef matrix_t mnist_img_t;
 
 typedef struct MnistImgArr{
     int ImgNum;        // 存储图像的数目
-    MnistImg* ImgPtr;  // 存储图像数组指针
+    mnist_img_t* ImgPtr;  // 存储图像数组指针
 } MnistImgArr;         // 存储图像数据的数组
 
 typedef struct MnistLabel{

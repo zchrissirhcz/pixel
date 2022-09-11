@@ -41,7 +41,7 @@ int reverse_int(int i)
 
 MnistImgArr* read_mnist_image(const char* filename) // 读入图像
 {
-    FILE* fp=fopen(filename,"rb");
+    FILE* fp = fopen(filename, "rb");
     CHECK_READ_FILE(fp, filename);
 
     int magic_number = 0;
@@ -49,7 +49,7 @@ MnistImgArr* read_mnist_image(const char* filename) // 读入图像
     int n_rows = 0;
     int n_cols = 0;
     //从文件中读取sizeof(magic_number) 个字符到 &magic_number
-    fread((char*)&magic_number,sizeof(magic_number),1,fp);
+    fread((char*)&magic_number, sizeof(magic_number), 1, fp);
     magic_number = reverse_int(magic_number);
     //获取训练或测试image的个数number_of_images
     fread((char*)&number_of_images,sizeof(number_of_images),1,fp);
@@ -64,23 +64,23 @@ MnistImgArr* read_mnist_image(const char* filename) // 读入图像
     int i,r,c;
 
     // 图像数组的初始化
-    MnistImgArr* imgarr=(MnistImgArr*)malloc(sizeof(MnistImgArr));
-    imgarr->ImgNum=number_of_images;
-    imgarr->ImgPtr=(MnistImg*)malloc(number_of_images*sizeof(MnistImg));
+    MnistImgArr* imgarr = (MnistImgArr*)malloc(sizeof(MnistImgArr));
+    imgarr->ImgNum = number_of_images;
+    imgarr->ImgPtr = (mnist_img_t*)malloc(number_of_images*sizeof(mnist_img_t));
 
-    for(i = 0; i < number_of_images; ++i)
+    for(i = 0; i < number_of_images; i++)
     {
-        imgarr->ImgPtr[i].h=n_rows;
-        imgarr->ImgPtr[i].w=n_cols;
-        imgarr->ImgPtr[i].ImgData=(float**)malloc(n_rows*sizeof(float*));
-        for(r = 0; r < n_rows; ++r)
+        imgarr->ImgPtr[i].height = n_rows;
+        imgarr->ImgPtr[i].width = n_cols;
+        imgarr->ImgPtr[i].data = (float**)malloc(n_rows*sizeof(float*));
+        for(r = 0; r < n_rows; r++)
         {
-            imgarr->ImgPtr[i].ImgData[r]=(float*)malloc(n_cols*sizeof(float));
-            for(c = 0; c < n_cols; ++c)
+            imgarr->ImgPtr[i].data[r] = (float*)malloc(n_cols*sizeof(float));
+            for(c = 0; c < n_cols; c++)
             {
                 unsigned char temp = 0;
                 fread((char*) &temp, sizeof(temp),1,fp);
-                imgarr->ImgPtr[i].ImgData[r][c]=(float)temp/255.0f;
+                imgarr->ImgPtr[i].data[r][c] = (float)temp/255.0f;
             }
         }
     }
@@ -88,9 +88,6 @@ MnistImgArr* read_mnist_image(const char* filename) // 读入图像
     fclose(fp);
     return imgarr;
 }
-
-
-
 
 // 读入标签
 MnistLabelArr* read_mnist_label(const char* filename)
@@ -140,9 +137,9 @@ void mnist_cnn_train(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData
         for (n = 0; n < trainNum; n++)
         {
             matrix_t input;
-            input.height = inputData->ImgPtr[n].h;
-            input.width = inputData->ImgPtr[n].w;
-            input.data = inputData->ImgPtr[n].ImgData;
+            input.height = inputData->ImgPtr[n].height;
+            input.width = inputData->ImgPtr[n].width;
+            input.data = inputData->ImgPtr[n].data;
             cnn_forward(cnn, &input);  // 前向传播，这里主要计算各
             cnn_backward(cnn, outputData->LabelPtr[n].LabelData); // 后向传播，这里主要计算各神经元的误差梯度
 
@@ -182,9 +179,9 @@ float mnist_cnn_test(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData
     for (n = 0; n < testNum; n++)
     {
         matrix_t input;
-        input.height = inputData->ImgPtr[n].h;
-        input.width = inputData->ImgPtr[n].w;
-        input.data = inputData->ImgPtr[n].ImgData;
+        input.height = inputData->ImgPtr[n].height;
+        input.width = inputData->ImgPtr[n].width;
+        input.data = inputData->ImgPtr[n].data;
         cnn_forward(cnn, &input);
         if (argmax(cnn->O5->y, cnn->O5->outputNum) != argmax(outputData->LabelPtr[n].LabelData, cnn->O5->outputNum)) {
             incorrectnum++;
@@ -247,7 +244,7 @@ int test_mnist_train_test()
     sprintf(test_image_pth, "%s/mnist/t10k-images.idx3-ubyte", project_dir);
     MnistImgArr* testImg= read_mnist_image(test_image_pth);
 
-    NcSize2D inputSize = px_create_size(testImg->ImgPtr[0].h, testImg->ImgPtr[0].w);
+    NcSize2D inputSize = px_create_size(testImg->ImgPtr[0].height, testImg->ImgPtr[0].width);
     int outSize=testLabel->LabelPtr[0].l;
 
     // CNN structure init
