@@ -118,11 +118,11 @@ InnerproductLayer* init_innerproduct_layer(int in_num, int out_num);
 // 激活函数 input是数据，inputNum说明数据数目，bas表明偏置
 float activation_sigma(float input, float bias); // sigma激活函数
 
-void cnn_forward(CNN* cnn, float** input_data); // 网络的前向传播
+void cnn_forward(CNN* cnn, matrix_t* input_data); // 网络的前向传播
 
 void cnn_backward(CNN* cnn, float* output_data); // 网络的后向传播
 
-void cnn_applygrads(CNN* cnn, CNNOpts opts, float** input_data);
+void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input);
 
 void cnn_clear(CNN* cnn); // 将数据vyd清零
 

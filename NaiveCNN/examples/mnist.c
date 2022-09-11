@@ -134,17 +134,23 @@ void mnist_cnn_train(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData
     // 学习训练误差曲线
     cnn->L = (float*)malloc(trainNum * sizeof(float));
     int e;
-    for (e = 0; e < opts.numepochs; e++) {
+    for (e = 0; e < opts.numepochs; e++)
+    {
         int n = 0;
-        for (n = 0; n < trainNum; n++) {
-            cnn_forward(cnn, inputData->ImgPtr[n].ImgData);  // 前向传播，这里主要计算各
+        for (n = 0; n < trainNum; n++)
+        {
+            matrix_t input;
+            input.height = inputData->ImgPtr[n].h;
+            input.width = inputData->ImgPtr[n].w;
+            input.data = inputData->ImgPtr[n].ImgData;
+            cnn_forward(cnn, &input);  // 前向传播，这里主要计算各
             cnn_backward(cnn, outputData->LabelPtr[n].LabelData); // 后向传播，这里主要计算各神经元的误差梯度
 
 
             //char* filedir="E:\\Code\\debug\\CNNData\\";
             //const char* filename=combine_strings(filedir,combine_strings(intTochar(n),".cnn"));
             //save_nndata(cnn,filename,inputData->ImgPtr[n].ImgData);
-            cnn_applygrads(cnn, opts, inputData->ImgPtr[n].ImgData); // 更新权重
+            cnn_applygrads(cnn, opts, &input); // 更新权重
 
             cnn_clear(cnn);
             // 计算并保存误差能量
@@ -173,8 +179,13 @@ float mnist_cnn_test(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData
 {
     int n = 0;
     int incorrectnum = 0;
-    for (n = 0; n < testNum; n++) {
-        cnn_forward(cnn, inputData->ImgPtr[n].ImgData);
+    for (n = 0; n < testNum; n++)
+    {
+        matrix_t input;
+        input.height = inputData->ImgPtr[n].h;
+        input.width = inputData->ImgPtr[n].w;
+        input.data = inputData->ImgPtr[n].ImgData;
+        cnn_forward(cnn, &input);
         if (vecmax_index(cnn->O5->y, cnn->O5->outputNum) != vecmax_index(outputData->LabelPtr[n].LabelData, cnn->O5->outputNum)) {
             incorrectnum++;
         }

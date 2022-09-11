@@ -34,22 +34,27 @@ NcImage* nc_create_empty_image(int height, int width, int channel)
     return im;
 }
 
-float** create_matrix(int height, int width)
+matrix_t* create_matrix(int height, int width)
 {
-    float** matrix = (float**)malloc(height*sizeof(float*));
+    matrix_t* matrix = (matrix_t*) malloc(sizeof(matrix_t));
+    matrix->height = height;
+    matrix->width = width;
+
+    matrix->data = (float**) malloc(height*sizeof(float*));
     for (int i = 0; i < height; i++)
     {
-        matrix[i] = (float*)malloc(width * sizeof(float));
+        matrix->data[i] = (float*)malloc(width * sizeof(float));
     }
     return matrix;
 }
 
-void destroy_matrix(float** matrix, int height)
+void destroy_matrix(matrix_t* matrix)
 {
-    for (int i = 0; i < height; i++)
+    for (int i = 0; i < matrix->height; i++)
     {
-        free(matrix[i]);
+        free(matrix->data[i]);
     }
+    free(matrix->data);
     free(matrix);
 }
 
@@ -57,20 +62,20 @@ void destroy_matrix(float** matrix, int height)
 // A   B         D   C
 //   O      =>     O
 // C   D         B   A
-float** get_rotate180_matrix(float** mat, NcSize2D matSize)
+matrix_t* get_rotate180_matrix(matrix_t* input, NcSize2D matSize)
 {
     int outSizeW = matSize.width;
     int outSizeH = matSize.height;
-    float** outputData = create_matrix(outSizeH, outSizeW);
+    matrix_t* output = create_matrix(outSizeH, outSizeW);
     for (int i = 0; i < outSizeH; i++)
     {
         for (int j = 0; j < outSizeW; j++)
         {
-            outputData[i][j] = mat[outSizeH - i - 1][outSizeW - j - 1];
+            output->data[i][j] = input->data[outSizeH - i - 1][outSizeW - j - 1];
         }
     }
 
-    return outputData;
+    return output;
 }
 
 // 关于卷积和相关操作的输出选项
@@ -79,7 +84,7 @@ float** get_rotate180_matrix(float** mat, NcSize2D matSize)
 // same指同输入相同大小
 // valid指完全操作后的大小，一般为inSize-(mapSize-1)大小，其不需要将输入添0扩大。
 
-float** correlation(float** map, NcSize2D mapSize,float** inputData, NcSize2D inSize,int type)// 互相关
+matrix_t* correlation(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize, int type)
 {
     // 这里的互相关是在后向传播时调用，类似于将Map反转180度再卷积
     // 为了方便计算，这里先将图像扩充一圈
@@ -89,12 +94,13 @@ float** correlation(float** map, NcSize2D mapSize,float** inputData, NcSize2D in
     int halfmapsizeh;
 
     // 模板大小为偶数
-    if(mapSize.height % 2 == 0 && mapSize.width %2 == 0)
+    if (mapSize.height % 2 == 0 && mapSize.width %2 == 0)
     {
         halfmapsizew = (mapSize.width) / 2; // 卷积模块的半瓣大小
         halfmapsizeh = (mapSize.height) / 2;
     }
-    else{
+    else
+    {
         halfmapsizew = (mapSize.width - 1) / 2; // 卷积模块的半瓣大小
         halfmapsizeh = (mapSize.height - 1) / 2;
     }
@@ -102,14 +108,12 @@ float** correlation(float** map, NcSize2D mapSize,float** inputData, NcSize2D in
     // 这里先默认进行full模式的操作，full模式的输出大小为inSize+(mapSize-1)
     int outSizeW = inSize.width + (mapSize.width - 1); // 这里的输出扩大一部分
     int outSizeH = inSize.height + (mapSize.height - 1);
-    float** outputData = (float**)malloc(outSizeH*sizeof(float*)); // 互相关的结果扩大了
-    for (i = 0; i < outSizeH; i++)
-    {
-        outputData[i] = (float*)calloc(outSizeW, sizeof(float));
-    }
+
+    // 互相关的结果扩大了
+    matrix_t* output = create_matrix(outSizeH, outSizeW);
 
     // 为了方便计算，将inputData扩大一圈
-    float** exInputData = mat_edge_expand(inputData, inSize, mapSize.width-1, mapSize.height-1);
+    matrix_t* expaned_input = mat_edge_expand(input, inSize, mapSize.width-1, mapSize.height-1);
 
     for (j = 0; j < outSizeH; j++)
     {
@@ -119,64 +123,48 @@ float** correlation(float** map, NcSize2D mapSize,float** inputData, NcSize2D in
             {
                 for (c = 0; c < mapSize.width; c++)
                 {
-                    outputData[j][i] = outputData[j][i] + map[r][c] * exInputData[j + r][i + c];
+                    output->data[j][i] = output->data[j][i] + map->data[r][c] * expaned_input->data[j + r][i + c];
                 }
             }
         }
     }
 
-    for (i = 0; i < inSize.height + 2 * (mapSize.height - 1); i++)
-    {
-        free(exInputData[i]);
-    }
-    free(exInputData);
+    destroy_matrix(expaned_input);
 
     NcSize2D outSize = px_create_size(outSizeH, outSizeW);
     switch(type){ // 根据不同的情况，返回不同的结果
     case full: // 完全大小的情况
-        return outputData;
+        return output;
     case same:{
-        float** sameres=mat_edge_shrink(outputData,outSize,halfmapsizew,halfmapsizeh);
-        for (i = 0; i < outSize.height; i++)
-        {
-            free(outputData[i]);
-        }
-        free(outputData);
+        matrix_t* sameres = mat_edge_shrink(output, outSize, halfmapsizew, halfmapsizeh);
+        destroy_matrix(output);
         return sameres;
     }
     case valid:{
-        float** validres;
+        matrix_t* validres;
         if (mapSize.height % 2 == 0 && mapSize.width % 2 == 0)
         {
-            validres = mat_edge_shrink(outputData, outSize, halfmapsizew * 2 - 1, halfmapsizeh * 2 - 1);
+            validres = mat_edge_shrink(output, outSize, halfmapsizew * 2 - 1, halfmapsizeh * 2 - 1);
         }
         else
         {
-            validres = mat_edge_shrink(outputData, outSize, halfmapsizew * 2, halfmapsizeh * 2);
+            validres = mat_edge_shrink(output, outSize, halfmapsizew * 2, halfmapsizeh * 2);
         }
-        for (i = 0; i < outSize.height; i++)
-        {
-            free(outputData[i]);
-        }
-        free(outputData);
+        destroy_matrix(output);
         return validres;
     }
     default:
-        return outputData;
+        return output;
     }
 }
 
-float** conv(float** map, NcSize2D mapSize,float** inputData, NcSize2D inSize,int type) // 卷积操作
+// 卷积操作
+matrix_t* conv(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize, int type)
 {
     // 卷积操作可以用旋转180度的特征模板相关来求
-    float** flipmap = get_rotate180_matrix(map,mapSize); //旋转180度的特征模板
-    float** res = correlation(flipmap,mapSize,inputData,inSize,type);
-    int i;
-    for (i = 0; i < mapSize.height; i++)
-    {
-        free(flipmap[i]);
-    }
-    free(flipmap);
+    matrix_t* flipmap = get_rotate180_matrix(map,mapSize); //旋转180度的特征模板
+    matrix_t* res = correlation(flipmap, mapSize, input, inSize, type);
+    destroy_matrix(flipmap);
     return res;
 }
 
@@ -216,16 +204,15 @@ float** up_sample(float** mat, NcSize2D matSize, int upc,int upr)
 }
 
 // 给二维矩阵边缘扩大，增加addw大小的0值边
-float** mat_edge_expand(float** mat, NcSize2D matSize,int addc,int addr)
-{ // 向量边缘扩大
+matrix_t* mat_edge_expand(matrix_t* mat, NcSize2D matSize, int addc,int addr)
+{   
+    // 向量边缘扩大
     int i, j;
     int c = matSize.width;
     int r = matSize.height;
-    float** res = (float**)malloc((r+2*addr)*sizeof(float*)); // 结果的初始化
-    for (i = 0; i < (r + 2 * addr); i++)
-    {
-        res[i] = (float*)malloc((c + 2 * addc) * sizeof(float));
-    }
+    const int out_height = r + 2 * addr;
+    const int out_width = c + 2 * addc;
+    matrix_t* res = create_matrix(out_height, out_width);
 
     for(j = 0; j < r+2*addr; j++)
     {
@@ -233,11 +220,11 @@ float** mat_edge_expand(float** mat, NcSize2D matSize,int addc,int addr)
         {
             if (j < addr || i < addc || j >= (r + addr) || i >= (c + addc))
             {
-                res[j][i] = (float)0.0;
+                res->data[j][i] = (float)0.0;
             }
             else
             {
-                res[j][i] = mat[j - addr][i - addc]; // 复制原向量的数据
+                res->data[j][i] = mat->data[j - addr][i - addc]; // 复制原向量的数据
             }
         }
     }
@@ -245,16 +232,15 @@ float** mat_edge_expand(float** mat, NcSize2D matSize,int addc,int addr)
 }
 
 // 给二维矩阵边缘缩小，擦除shrinkc大小的边
-float** mat_edge_shrink(float** mat, NcSize2D matSize,int shrinkc,int shrinkr)
-{ // 向量的缩小，宽缩小addw，高缩小addh
+matrix_t* mat_edge_shrink(matrix_t* mat, NcSize2D matSize, int shrinkc, int shrinkr)
+{
+    // 向量的缩小，宽缩小addw，高缩小addh
     int i, j;
     int c = matSize.width;
     int r = matSize.height;
-    float** res=(float**)malloc((r-2*shrinkr)*sizeof(float*)); // 结果矩阵的初始化
-    for (i = 0; i < (r - 2 * shrinkr); i++)
-    {
-        res[i] = (float*)malloc((c - 2 * shrinkc) * sizeof(float));
-    }
+    const int out_height = r - 2 * shrinkr;
+    const int out_width = c - 2 * shrinkc;
+    matrix_t* res = create_matrix(out_height, out_width);
 
     for(j = 0; j < r; j++)
     {
@@ -262,7 +248,7 @@ float** mat_edge_shrink(float** mat, NcSize2D matSize,int shrinkc,int shrinkr)
         {
             if (j >= shrinkr && i >= shrinkc && j < (r - shrinkr) && i < (c - shrinkc))
             {
-                res[j - shrinkr][i - shrinkc] = mat[j][i]; // 复制原向量的数据
+                res->data[j - shrinkr][i - shrinkc] = mat->data[j][i]; // 复制原向量的数据
             }
         }
     }
@@ -281,7 +267,8 @@ void savemat(float** mat, NcSize2D matSize,const char* filename)
     fclose(fp);
 }
 
-void addmat(float** res, float** mat1, NcSize2D matSize1, float** mat2, NcSize2D matSize2)// 矩阵相加
+// 矩阵相加
+void addmat(matrix_t* res, matrix_t* mat1, NcSize2D matSize1, matrix_t* mat2, NcSize2D matSize2)
 {
     int i, j;
     if (matSize1.width != matSize2.width || matSize1.height != matSize2.height)
@@ -293,24 +280,26 @@ void addmat(float** res, float** mat1, NcSize2D matSize1, float** mat2, NcSize2D
     {
         for (j = 0; j < matSize1.width; j++)
         {
-            res[i][j] = mat1[i][j] + mat2[i][j];
+            res->data[i][j] = mat1->data[i][j] + mat2->data[i][j];
         }
     }
 }
 
-void multifactor(float** res, float** mat, NcSize2D matSize, float factor)// 矩阵乘以系数
+// 矩阵乘以系数
+void multifactor(matrix_t* res, matrix_t* mat, NcSize2D matSize, float factor)
 {
     int i, j;
     for (i = 0; i < matSize.height; i++)
     {
         for (j = 0; j < matSize.width; j++)
         {
-            res[i][j] = mat[i][j] * factor;
+            res->data[i][j] = mat->data[i][j] * factor;
         }
     }
 }
 
-float summat(float** mat, NcSize2D matSize) // 矩阵各元素的和
+// 矩阵各元素的和
+float summat(matrix_t* mat, NcSize2D matSize)
 {
     float sum=0.0;
     int i, j;
@@ -318,7 +307,7 @@ float summat(float** mat, NcSize2D matSize) // 矩阵各元素的和
     {
         for (j = 0; j < matSize.width; j++)
         {
-            sum = sum + mat[i][j];
+            sum = sum + mat->data[i][j];
         }
     }
     return sum;

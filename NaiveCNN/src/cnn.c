@@ -241,8 +241,8 @@ void load_cnn(CNN* cnn, const char* filename)
     fclose(fp);
 }
 
-// 这里InputData是图像数据，inputData[r][c],r行c列，这里根各权重模板是一致的
-void cnn_forward(CNN* cnn, float** inputData)
+// 这里 input 是图像数据， input[r][c],r行c列，这里根各权重模板是一致的
+void cnn_forward(CNN* cnn, matrix_t* input)
 {
     // 第一层的传播
     int i,j,r,c;
@@ -254,13 +254,24 @@ void cnn_forward(CNN* cnn, float** inputData)
     {
         for(j = 0; j < cnn->C1->in_channels; j++)
         {
-            float** mapout = conv(cnn->C1->mapData[j][i],mapSize,inputData,inSize,valid);
-            addmat(cnn->C1->v[i],cnn->C1->v[i],outSize,mapout,outSize);
-            for (r = 0; r < outSize.height; r++)
-            {
-                free(mapout[r]);
-            }
-            free(mapout);
+            matrix_t map;
+            map.height = mapSize.height;
+            map.width = mapSize.width;
+            map.data = cnn->C1->mapData[j][i];
+            matrix_t* mapout = conv(&map, mapSize, input, inSize, valid);
+
+            matrix_t res;
+            res.height = mapSize.height;
+            res.width = mapSize.width;
+            res.data = cnn->C1->v[i];
+
+            matrix_t mat1;
+            mat1.height = mapSize.height;
+            mat1.width = mapSize.width;
+            mat1.data = cnn->C1->v[i];
+
+            addmat(&res, &mat1, outSize, mapout, outSize);
+            destroy_matrix(mapout);
         }
         for (r = 0; r < outSize.height; r++)
         {
@@ -295,13 +306,29 @@ void cnn_forward(CNN* cnn, float** inputData)
     {
         for(j = 0; j < cnn->C3->in_channels; j++)
         {
-            float** mapout = conv(cnn->C3->mapData[j][i],mapSize,cnn->S2->y[j],inSize,valid);
-            addmat(cnn->C3->v[i],cnn->C3->v[i],outSize,mapout,outSize);
-            for (r = 0; r < outSize.height; r++)
-            {
-                free(mapout[r]);
-            }
-            free(mapout);
+            matrix_t map;
+            map.height = mapSize.height;
+            map.width = mapSize.width;
+            map.data = cnn->C3->mapData[j][i];
+
+            matrix_t tmp_input;
+            tmp_input.height = inSize.height;
+            tmp_input.width = inSize.height;
+            tmp_input.data = cnn->S2->y[j];
+            matrix_t* mapout = conv(&map, mapSize, &tmp_input, inSize, valid);
+
+            matrix_t res;
+            res.height = mapSize.height;
+            res.width = mapSize.width;
+            res.data = cnn->C3->v[i];
+
+            matrix_t mat1;
+            mat1.height = mapSize.height;
+            mat1.width = mapSize.width;
+            mat1.data = cnn->C3->v[i];
+
+            addmat(&res, &mat1, outSize, mapout, outSize);
+            destroy_matrix(mapout);
         }
         for (r = 0; r < outSize.height; r++)
         {
@@ -472,13 +499,30 @@ void cnn_backward(CNN* cnn,float* outputData)
     {
         for(j = 0; j < cnn->C3->out_channels; j++)
         {
-            float** corr = correlation(cnn->C3->mapData[i][j],mapSize,cnn->C3->d[j],inSize,full);
-            addmat(cnn->S2->d[i],cnn->S2->d[i],outSize,corr,outSize);
-            for (r = 0; r < outSize.height; r++)
-            {
-                free(corr[r]);
-            }
-            free(corr);
+            matrix_t map;
+            map.height = mapSize.height;
+            map.width = mapSize.width;
+            map.data = cnn->C3->mapData[i][j];
+
+            matrix_t input;
+            input.height = inSize.height;
+            input.width = inSize.width;
+            input.data = cnn->C3->d[j];
+
+            matrix_t* corr = correlation(&map, mapSize, &input, inSize, full);
+
+            matrix_t res;
+            res.height = mapSize.height;
+            res.width = mapSize.width;
+            res.data = cnn->S2->d[i];
+
+            matrix_t mat1;
+            mat1.height = mapSize.height;
+            mat1.width = mapSize.width;
+            mat1.data = cnn->S2->d[i];
+
+            addmat(&res, &mat1,outSize,corr,outSize);
+            destroy_matrix(corr);
         }
         /*
         for(r=0;r<cnn->C3->inputHeight;r++)
@@ -509,7 +553,7 @@ void cnn_backward(CNN* cnn,float* outputData)
     }
 }
 
-void cnn_applygrads(CNN* cnn,CNNOpts opts,float** inputData) // 更新权重
+void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
 {
     // 这里存在权重的主要是卷积层和输出层
     // 更新这两个地方的权重就可以了
@@ -524,18 +568,33 @@ void cnn_applygrads(CNN* cnn,CNNOpts opts,float** inputData) // 更新权重
     {
         for(j = 0; j < cnn->C1->in_channels; j++)
         {
-            float** flipinputData = get_rotate180_matrix(inputData,ySize);
-            float** C1dk = conv(cnn->C1->d[i],dSize,flipinputData,ySize,valid);
+            matrix_t* flipinput = get_rotate180_matrix(input, ySize);
+            matrix_t map;
+            map.height = dSize.height;
+            map.width = dSize.width;
+            map.data = cnn->C1->d[i];
+            matrix_t* C1dk = conv(&map, dSize, flipinput, ySize, valid);
             multifactor(C1dk,C1dk,mapSize,-1*opts.alpha);
-            addmat(cnn->C1->mapData[j][i],cnn->C1->mapData[j][i],mapSize,C1dk,mapSize);
-            for (r = 0; r < (dSize.height - (ySize.height - 1)); r++)
-            {
-                free(C1dk[r]);
-            }
-            free(C1dk);
-            destroy_matrix(flipinputData, ySize.height);
+
+            matrix_t res;
+            res.height = mapSize.height;
+            res.width = mapSize.width;
+            res.data = cnn->C1->mapData[j][i];
+
+            matrix_t mat1;
+            mat1.height = mapSize.height;
+            mat1.width = mapSize.width;
+            mat1.data = cnn->C1->mapData[j][i];
+            
+            addmat(&res, &mat1, mapSize, C1dk, mapSize);
+            destroy_matrix(C1dk);
+            destroy_matrix(flipinput);
         }
-        cnn->C1->biasData[i] = cnn->C1->biasData[i]-opts.alpha*summat(cnn->C1->d[i],dSize);
+        matrix_t mat2;
+        mat2.height = dSize.height;
+        mat2.width = dSize.width;
+        mat2.data = cnn->C1->d[i];
+        cnn->C1->biasData[i] = cnn->C1->biasData[i]-opts.alpha*summat(&mat2, dSize);
     }
 
     // C3层的权重更新
@@ -547,20 +606,40 @@ void cnn_applygrads(CNN* cnn,CNNOpts opts,float** inputData) // 更新权重
     mapSize.height = cnn->C3->map_size;
     for(i = 0; i < cnn->C3->out_channels; i++)
     {
-        for(j = 0; j<cnn->C3->in_channels; j++)
+        for(j = 0; j < cnn->C3->in_channels; j++)
         {
-            float** flipinputData = get_rotate180_matrix(cnn->S2->y[j],ySize);
-            float** C3dk = conv(cnn->C3->d[i],dSize,flipinputData,ySize,valid);
+            matrix_t tmp_input;
+            tmp_input.height = ySize.height;
+            tmp_input.width = ySize.width;
+            tmp_input.data = cnn->S2->y[j];
+            matrix_t* flipinput = get_rotate180_matrix(&tmp_input, ySize);
+
+            matrix_t map;
+            map.height = dSize.height;
+            map.width = dSize.width;
+            map.data = cnn->C3->d[i];
+            matrix_t* C3dk = conv(&map, dSize, flipinput, ySize, valid);
             multifactor(C3dk,C3dk,mapSize,-1.0*opts.alpha);
-            addmat(cnn->C3->mapData[j][i],cnn->C3->mapData[j][i],mapSize,C3dk,mapSize);
-            for (r = 0; r < (dSize.height - (ySize.height - 1)); r++)
-            {
-                free(C3dk[r]);
-            }
-            free(C3dk);
-            destroy_matrix(flipinputData, ySize.height);
+
+            matrix_t res;
+            res.height = mapSize.height;
+            res.width = mapSize.width;
+            res.data = cnn->C3->mapData[j][i];
+
+            matrix_t mat1;
+            mat1.height = mapSize.height;
+            mat1.width = mapSize.width;
+            mat1.data = cnn->C3->mapData[j][i];
+
+            addmat(&res, &mat1, mapSize,C3dk,mapSize);
+            destroy_matrix(C3dk);
+            destroy_matrix(flipinput);
         }
-        cnn->C3->biasData[i]=cnn->C3->biasData[i]-opts.alpha*summat(cnn->C3->d[i],dSize);
+        matrix_t mat3;
+        mat3.height = dSize.height;
+        mat3.width = dSize.width;
+        mat3.data = cnn->C3->d[i];
+        cnn->C3->biasData[i]=cnn->C3->biasData[i]-opts.alpha*summat(&mat3, dSize);
     }
 
     // 输出层
