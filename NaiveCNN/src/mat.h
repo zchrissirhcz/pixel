@@ -19,7 +19,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
     float** rotate180(float** mat, NcSize2D matSize);// 矩阵翻转180度
 
     void addmat(float** res, float** mat1, NcSize2D matSize1, float** mat2, NcSize2D matSize2);// 矩阵相加

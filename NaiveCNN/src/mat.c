@@ -145,7 +145,7 @@ float** conv(float** map, NcSize2D mapSize,float** inputData, NcSize2D inSize,in
 
 // 这个是矩阵的上采样（等值内插），upc及upr是内插倍数
 float** up_sample(float** mat, NcSize2D matSize,int upc,int upr)
-{ 
+{
     int i,j,m,n;
     int c=matSize.w;
     int r=matSize.h;
@@ -205,7 +205,7 @@ float** mat_edge_shrink(float** mat, NcSize2D matSize,int shrinkc,int shrinkr)
         res[i] = (float*)malloc((c - 2 * shrinkc) * sizeof(float));
     }
 
-    
+
     for(j=0;j<r;j++){
         for(i=0;i<c;i++){
             if (j >= shrinkr && i >= shrinkc && j < (r - shrinkr) && i < (c - shrinkc)) {
