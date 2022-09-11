@@ -8,6 +8,7 @@
 #include <time.h>
 #include <assert.h>
 
+#include "mat.h"
 #include "mnist.h"
 #include "cnn.h"
 
@@ -29,8 +30,22 @@
 #pragma error
 #endif
 
+matrix_t create_normalized_f32_matrix_from_u8_image(mnist_image_array_t* inputData, int n)
+{
+    const int height = inputData->images[n].height;
+    const int width = inputData->images[n].width;
+    matrix_t normalized_image = create_matrix(height, width);
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            normalized_image.data[i][j] = inputData->images->data[i * width + j] / 255.0f;
+        }
+    }
+    return normalized_image;
+}
 
-void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array_t* outputData, CNNOpts opts, int trainNum, FILE* fout)
+void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array_t* outputData, CnnTrainOpts opts, int trainNum, FILE* fout)
 {
     // 学习训练误差曲线
     cnn->L = (float*)malloc(trainNum * sizeof(float));
@@ -40,13 +55,10 @@ void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array
         int n = 0;
         for (n = 0; n < trainNum; n++)
         {
-            matrix_t input;
-            input.height = inputData->images_f32[n].height;
-            input.width = inputData->images_f32[n].width;
-            input.data = inputData->images_f32[n].data;
+            matrix_t input = create_normalized_f32_matrix_from_u8_image(inputData, n);
+
             cnn_forward(cnn, &input);  // 前向传播，这里主要计算各
             cnn_backward(cnn, outputData->one_hot_label[n].data); // 后向传播，这里主要计算各神经元的误差梯度
-
 
             //char* filedir="E:\\Code\\debug\\CNNData\\";
             //const char* filename=combine_strings(filedir,combine_strings(intTochar(n),".cnn"));
@@ -57,13 +69,16 @@ void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array
             // 计算并保存误差能量
             float l = 0.0;
             int i;
-            for (i = 0; i < cnn->O5->outputNum; i++) {
+            for (i = 0; i < cnn->O5->outputNum; i++)
+            {
                 l = l + cnn->e[i] * cnn->e[i];
             }
-            if (n == 0) {
+            if (n == 0)
+            {
                 cnn->L[n] = l / 2.0f;
             }
-            else {
+            else
+            {
                 cnn->L[n] = cnn->L[n - 1] * 0.99f + 0.01f*l / 2.0f;
             }
             fprintf(fout, "-- [train] sample: %5d/%d, epoch: %d/%d, loss: %.4f\n",
@@ -71,6 +86,8 @@ void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array
                 e, opts.numepochs,
                 cnn->L[n]
             );
+
+            destroy_matrix_data(&input);
         }
     }
 }
@@ -82,16 +99,14 @@ float mnist_cnn_test(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array
     int incorrectnum = 0;
     for (n = 0; n < testNum; n++)
     {
-        matrix_t cnn_input;
-        cnn_input.height = inputData->images_f32[n].height;
-        cnn_input.width = inputData->images_f32[n].width;
-        cnn_input.data = inputData->images_f32[n].data;
+        matrix_t cnn_input = create_normalized_f32_matrix_from_u8_image(inputData, n);
         cnn_forward(cnn, &cnn_input);
         if (argmax(cnn->O5->y, cnn->O5->outputNum) != argmax(outputData->one_hot_label[n].data, cnn->O5->outputNum))
         {
             incorrectnum++;
         }
         cnn_clear(cnn);
+        destroy_matrix_data(&cnn_input);
     }
     return (float)incorrectnum / (float)testNum;
 }
@@ -114,7 +129,7 @@ int test_mnist_train_test()
     sprintf(test_image_pth, "%s/mnist/t10k-images.idx3-ubyte", project_dir);
     mnist_image_array_t* testImg= read_mnist_image(test_image_pth);
 
-    NcSize2D inputSize = px_create_size(testImg->images_f32[0].height, testImg->images_f32[0].width);
+    NcSize2D inputSize = px_create_size(testImg->images[0].height, testImg->images[0].width);
     int outSize = testLabel->one_hot_label[0].len;
 
     // CNN structure init
@@ -123,7 +138,7 @@ int test_mnist_train_test()
 
     // CNN training
 #if 1
-    CNNOpts opts;
+    CnnTrainOpts opts;
     opts.numepochs=1;
     opts.alpha=1.0;
     int trainNum=10;
@@ -762,7 +777,7 @@ void nc_cls_data_loader(NcClsDataConfig* cfg)
             sprintf(train_image_pth, "%s/mnist/train-images.idx3-ubyte", project_dir);
 
             mnist_image_array_t* image_array = read_mnist_image(train_image_pth);
-            cfg->images = &image_array->images_u8;
+            cfg->images = &image_array->images;
 
             int* labels;
             int label_num;

@@ -1,14 +1,11 @@
 #pragma once
 
-#include "cnn.h"
-
-typedef matrix_t mnist_image_t;
+#include "naive_cnn.h"
 
 typedef struct mnist_image_array_t
 {
     int size;
-    mnist_image_t* images_f32;
-    NcImage* images_u8;
+    NcImage* images;
     int n_cols;
     int n_rows;
 } mnist_image_array_t;

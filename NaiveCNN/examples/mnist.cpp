@@ -21,8 +21,7 @@ mnist_image_array_t* create_mnist_image_array(int number_of_images)
 {
     mnist_image_array_t* imgarr = (mnist_image_array_t*)malloc(sizeof(mnist_image_array_t));
     imgarr->size = number_of_images;
-    imgarr->images_f32 = (mnist_image_t*)malloc(number_of_images * sizeof(mnist_image_t));
-    imgarr->images_u8 = (NcImage*)malloc(number_of_images * sizeof(NcImage));
+    imgarr->images = (NcImage*)malloc(number_of_images * sizeof(NcImage));
     return imgarr;
 }
 
@@ -80,16 +79,8 @@ int get_mnist_image_width(FILE* fin)
 static
 void read_mnist_single_image(const int n_rows, const int n_cols, mnist_image_array_t* imgarr, FILE* fin, int index)
 {
-    uint8_t* u8_data = imgarr->images_u8[index].data;
-    matrix_t f32_data = imgarr->images_f32[index];
+    uint8_t* u8_data = imgarr->images[index].data;
     fread(u8_data, n_rows * n_cols, 1, fin);
-    for(int i = 0; i < n_rows; i++)
-    {
-        for(int j = 0; j < n_cols; j++)
-        {
-            f32_data.data[i][j] = u8_data[i * n_cols + j] / 255.0f;
-        }
-    }
 }
 
 mnist_image_array_t* read_mnist_image(const char* filename)
@@ -108,11 +99,10 @@ mnist_image_array_t* read_mnist_image(const char* filename)
 
     for(int i = 0; i < number_of_images; i++)
     {
-        imgarr->images_f32[i] = create_matrix(n_rows, n_cols);
-        imgarr->images_u8[i].height = n_rows;
-        imgarr->images_u8[i].width = n_cols;
-        imgarr->images_u8[i].channel = 1;
-        imgarr->images_u8[i].data = (uint8_t*)malloc(n_rows * n_cols * sizeof(uint8_t));
+        imgarr->images[i].height = n_rows;
+        imgarr->images[i].width = n_cols;
+        imgarr->images[i].channel = 1;
+        imgarr->images[i].data = (uint8_t*)malloc(n_rows * n_cols * sizeof(uint8_t));
         read_mnist_single_image(n_rows, n_cols, imgarr, fin, i);
     }
 
@@ -180,7 +170,7 @@ void extract_mnist_image_and_save(const char* mnist_data_dir)
     {
         char save_pth[NC_MAX_PATH];
         sprintf(save_pth, "%s/testImgs/%d.bmp", mnist_data_dir, i);
-        NcImage image = image_array->images_u8[i];
+        NcImage image = image_array->images[i];
         cv::Size size;
         size.height = image.height;
         size.width = image.width;
@@ -197,11 +187,9 @@ void destroy_mnist_image_array(mnist_image_array_t* image_array)
 {
     for (int i = 0; i < image_array->size; i++)
     {
-        destroy_matrix_data(&image_array->images_f32[i]);
-        free(image_array->images_u8[i].data);
+        free(image_array->images[i].data);
     }
-    free(image_array->images_f32);
-    free(image_array->images_u8);
+    free(image_array->images);
     free(image_array);
 }
 
