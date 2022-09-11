@@ -14,20 +14,20 @@ void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, 
 #endif
 
     int input_idx, kernel_idx, output_idx;
-    for (int h = 0; h < input->h - kernel->h + 1; h += stride->height, out_h += 1) {
+    for (int h = 0; h < input->height - kernel->height + 1; h += stride->height, out_h += 1) {
         out_w = 0;
-        for (int w = 0; w < input->w - kernel->w + 1; w += stride->width, out_w += 1) {
+        for (int w = 0; w < input->width - kernel->width + 1; w += stride->width, out_w += 1) {
             float sum = 0.f;
 
 #ifdef DEBUG_CONV2D
             fprintf(fout, "output[%d,%d]=sigma(", out_h, out_w);
 #endif
 
-            for (int kh = 0; kh < kernel->h; kh++) {
-                for (int kw = 0; kw < kernel->w; kw++) {
+            for (int kh = 0; kh < kernel->height; kh++) {
+                for (int kw = 0; kw < kernel->width; kw++) {
                     //sum += input[h + kh, w + kw] * kernel[kh, kw];
-                    input_idx = (h + kh)*input->w + (w + kw);
-                    kernel_idx = kh * kernel->w + kw;
+                    input_idx = (h + kh)*input->width + (w + kw);
+                    kernel_idx = kh * kernel->width + kw;
                     sum += input->data[input_idx] * kernel->data[kernel_idx];
 
 #ifdef DEBUG_CONV2D
@@ -41,7 +41,7 @@ void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, 
 #endif
 
             //output[out_h, out_w] = sum;
-            output_idx = out_h * output->w + out_w;
+            output_idx = out_h * output->width + out_w;
             output->data[output_idx] = sum;
         }
     }
@@ -61,8 +61,8 @@ void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, 
 
 static void nc_conv2d_example() {
     NcBlob2D* input = (NcBlob2D*)malloc(sizeof(NcBlob2D));
-    input->h = 5;
-    input->w = 5;
+    input->height = 5;
+    input->width = 5;
     input->data = (float[]) {
         1, 1, 1, 1, 1,
         1, 1, 1, 1, 1,
@@ -72,8 +72,8 @@ static void nc_conv2d_example() {
     };
 
     NcBlob2D* kernel = (NcBlob2D*)malloc(sizeof(NcBlob2D));
-    kernel->h = 2;
-    kernel->w = 2;
+    kernel->height = 2;
+    kernel->width = 2;
     kernel->data = (float[]) {
         1, 1,
         1, 1
@@ -82,9 +82,9 @@ static void nc_conv2d_example() {
     NcStride stride = px_create_stride(1, 1);
 
     NcBlob2D* output = (NcBlob2D*)malloc(sizeof(NcBlob2D));
-    output->h = (input->h - kernel->h) / stride.height + 1;
-    output->w = (input->w - kernel->w) / stride.width + 1;
-    output->data = (float*)malloc(sizeof(output->h*output->w));
+    output->height = (input->height - kernel->height) / stride.height + 1;
+    output->width = (input->width - kernel->width) / stride.width + 1;
+    output->data = (float*)malloc(sizeof(output->height*output->width));
 
     nc_conv2d(input, kernel, output, &stride);
 }
