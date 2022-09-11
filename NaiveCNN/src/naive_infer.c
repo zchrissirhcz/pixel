@@ -5,14 +5,14 @@
 #include <stdio.h>
 
 // make convolution param for inference
-NcConvolutionParam* nc_infer_make_convolution_param(int map_size, int in_channels, int out_channels, NcPaddingType pad_type){
+NcConvolutionParam* nc_infer_create_convolution_param(int map_size, int in_channels, int out_channels, NcPaddingType pad_type){
     NcConvolutionParam* param = (NcConvolutionParam*)malloc(sizeof(NcConvolutionParam));
     param->map_size = map_size;
     param->in_channels = in_channels;
     param->out_channels = out_channels;
     param->stride = px_create_stride(1, 1); //now only use (1,1) stride
-    param->weight = nc_blob_make_random(out_channels, map_size, map_size, in_channels, -1.0f, 1.0f);
-    param->bias = nc_blob_make(out_channels, 1, 1, 1);
+    param->weight = nc_create_blob_random(out_channels, map_size, map_size, in_channels, -1.0f, 1.0f);
+    param->bias = nc_create_blob(out_channels, 1, 1, 1);
 
     param->padding_type = pad_type;
 
@@ -32,7 +32,7 @@ NcConvolutionParam* nc_infer_make_convolution_param(int map_size, int in_channel
     return param;
 }
 
-NcPoolingParam* nc_infer_make_pooling_param(int map_size, int in_channels, NcPoolingType pool_type, NcPaddingType pad_type) {
+NcPoolingParam* nc_infer_create_pooling_param(int map_size, int in_channels, NcPoolingType pool_type, NcPaddingType pad_type) {
     NcPoolingParam* param = (NcPoolingParam*)malloc(sizeof(NcPoolingParam));
     param->in_channels = in_channels;
     param->out_channels = in_channels;
@@ -54,7 +54,7 @@ NcPoolingParam* nc_infer_make_pooling_param(int map_size, int in_channels, NcPoo
     return param;
 }
 
-NcInnerproductParam* nc_infer_make_innerproduct_param(int in_num, int out_num) {
+NcInnerproductParam* nc_infer_create_innerproduct_param(int in_num, int out_num) {
     NcInnerproductParam* param = (NcInnerproductParam*)malloc(sizeof(NcInnerproductParam));
 
     param->in_num = in_num;
@@ -65,10 +65,10 @@ NcInnerproductParam* nc_infer_make_innerproduct_param(int in_num, int out_num) {
     param->out_width = out_num;
     param->out_channels = 1;
 
-    param->bias = nc_blob_make_same(out_num, 1, 1, 1, 0.0f);
+    param->bias = nc_create_blob_same(out_num, 1, 1, 1, 0.0f);
 
     float q = sqrtf(6.0f / (in_num + out_num));
-    param->weight = nc_blob_make_same(out_num, 1, 1, in_num, q);
+    param->weight = nc_create_blob_same(out_num, 1, 1, in_num, q);
     param->is_full_connect = true;
 
     // the following are not used during inference, make them 0/null/false
@@ -83,7 +83,7 @@ NcInnerproductParam* nc_infer_make_innerproduct_param(int in_num, int out_num) {
 
 // allocate each layer's input blobs
 // pointing each input blob to network's blob according to blob id
-NcLayerInput* nc_infer_make_layer_input(int n, const int* blob_ids, NcNet* net) {
+NcLayerInput* nc_infer_create_layer_input(int n, const int* blob_ids, NcNet* net) {
     NcLayerInput* input = (NcLayerInput*)malloc(sizeof(NcLayerInput));
     input->blob_num = n;
     input->blobs = (NcBlob**)malloc(sizeof(NcBlob*)*n);
@@ -98,7 +98,7 @@ NcLayerInput* nc_infer_make_layer_input(int n, const int* blob_ids, NcNet* net) 
 
 // allocate each layer's output blobs
 // each output blob is pointed by network's blob according to blob id
-NcLayerOutput* nc_infer_make_layer_output(int n, const int* blob_ids, NcNet* net) {
+NcLayerOutput* nc_infer_create_layer_output(int n, const int* blob_ids, NcNet* net) {
     NcLayerOutput* output = (NcLayerOutput*)malloc(sizeof(NcLayerOutput));
     output->blob_num = n;
     output->blobs = (NcBlob**)malloc(sizeof(NcBlob*)*n);

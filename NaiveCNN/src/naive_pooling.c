@@ -121,7 +121,7 @@ void nc_pooling_forward_nchw(NcPoolingParam* param, NcBlob* bottom, NcBlob* top)
 
 
 void nc_pooling_test_nchw() {
-    NcBlob* input = nc_blob_make_empty(1, 5, 5, 2);
+    NcBlob* input = nc_create_empty_blob(1, 5, 5, 2);
     input->order = NCHW;
     input->data = (float[]) {
         //C1
@@ -140,25 +140,25 @@ void nc_pooling_test_nchw() {
 
     };
 
-    NcBlob* kernel = nc_blob_make_empty(1, 3, 3, 2);
+    NcBlob* kernel = nc_create_empty_blob(1, 3, 3, 2);
 
     int map_size = kernel->height;
     int in_channels = input->channel;
     NcPoolingType pool_type = NC_POOLING_AVERAGE;
     NcPaddingType pad_type = NC_PADDING_POOL_CAFFE;
-    NcPoolingParam* param = nc_infer_make_pooling_param(map_size, in_channels, pool_type, pad_type);
+    NcPoolingParam* param = nc_infer_create_pooling_param(map_size, in_channels, pool_type, pad_type);
 
     param->out_height = (input->height-kernel->height)/param->stride.height+1;
     param->out_width = (input->width-kernel->width)/param->stride.width+1;
     
-    NcBlob* top = nc_blob_make(1, param->out_height, param->out_width, input->channel);
+    NcBlob* top = nc_create_blob(1, param->out_height, param->out_width, input->channel);
 
     nc_pooling_forward_nchw(param, input, top);
 }
 
 
 void nc_pooling_test_nhwc() {
-    NcBlob* input = nc_blob_make_empty(1, 5, 5, 2);
+    NcBlob* input = nc_create_empty_blob(1, 5, 5, 2);
     input->order = NHWC;
     input->data = (float[]) {
         //C1
@@ -169,18 +169,18 @@ void nc_pooling_test_nhwc() {
         1, 2, 1, 2, 1, 2, 1, 2, 1, 2,
     };
 
-    NcBlob* kernel = nc_blob_make_empty(1, 3, 3, input->channel);
+    NcBlob* kernel = nc_create_empty_blob(1, 3, 3, input->channel);
 
     int map_size = kernel->height;
     int in_channels = input->channel;
     NcPoolingType pool_type = NC_POOLING_AVERAGE;
     NcPaddingType pad_type = NC_PADDING_POOL_CAFFE;
-    NcPoolingParam* param = nc_infer_make_pooling_param(map_size, in_channels, pool_type, pad_type);
+    NcPoolingParam* param = nc_infer_create_pooling_param(map_size, in_channels, pool_type, pad_type);
 
     param->out_height = (input->height-kernel->height)/param->stride.height+1;
     param->out_width = (input->width-kernel->width)/param->stride.width+1;
     
-    NcBlob* top = nc_blob_make(1, param->out_height, param->out_width, input->channel);
+    NcBlob* top = nc_create_blob(1, param->out_height, param->out_width, input->channel);
 
     nc_pooling_forward_nhwc(param, input, top);
 

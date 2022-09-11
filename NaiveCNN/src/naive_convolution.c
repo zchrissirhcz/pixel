@@ -90,7 +90,7 @@ static void nc_conv2d_example() {
 }
 
 void nc_convolution_test_nchw() {
-    NcBlob* input = nc_blob_make_empty(1, 5, 5, 2);
+    NcBlob* input = nc_create_empty_blob(1, 5, 5, 2);
     input->order = NCHW;
     input->data = (float[]) {
         //C1
@@ -109,7 +109,7 @@ void nc_convolution_test_nchw() {
 
     };
 
-    NcBlob* kernel = nc_blob_make_empty(2, 2, 2, 2);
+    NcBlob* kernel = nc_create_empty_blob(2, 2, 2, 2);
     kernel->data = (float[]) {
         //C1
         1, 1,
@@ -133,13 +133,13 @@ void nc_convolution_test_nchw() {
 
     int output_h = (input->height - kernel->height) / stride.height + 1;
     int output_w = (input->width - kernel->width) / stride.width + 1;
-    NcBlob* output = nc_blob_make(1, output_h, output_w, kernel->batch);
+    NcBlob* output = nc_create_blob(1, output_h, output_w, kernel->batch);
     
     int map_size = kernel->height;
     int in_channels = input->channel;
     int out_channels = kernel->batch;
     NcPaddingType pad_type = NC_PADDING_CONV_CAFFE;
-    NcConvolutionParam* param = nc_infer_make_convolution_param(map_size, in_channels, out_channels, pad_type);
+    NcConvolutionParam* param = nc_infer_create_convolution_param(map_size, in_channels, out_channels, pad_type);
     free(param->weight);
     param->weight = kernel;
     
@@ -147,7 +147,7 @@ void nc_convolution_test_nchw() {
 }
 
 void nc_convolution_test_nhwc(){
-    NcBlob* input = nc_blob_make_empty(1, 5, 5, 2);
+    NcBlob* input = nc_create_empty_blob(1, 5, 5, 2);
     input->order = NHWC;
     input->data = (float[]) {
         ////C1
@@ -171,7 +171,7 @@ void nc_convolution_test_nhwc(){
         1, 2, 1, 2, 1, 2, 1, 2, 1, 2,
     };
 
-    NcBlob* kernel = nc_blob_make_empty(2, 2, 2, 2);
+    NcBlob* kernel = nc_create_empty_blob(2, 2, 2, 2);
     kernel->data = (float[]) {
         ////C1
         //1, 1,
@@ -198,13 +198,13 @@ void nc_convolution_test_nhwc(){
     int in_channels = input->channel;
     int out_channels = kernel->batch;
     NcPaddingType pad_type = NC_PADDING_CONV_CAFFE;
-    NcConvolutionParam* param = nc_infer_make_convolution_param(map_size, in_channels, out_channels, pad_type);
+    NcConvolutionParam* param = nc_infer_create_convolution_param(map_size, in_channels, out_channels, pad_type);
     free(param->weight);
     param->weight = kernel;
 
     int output_h = (input->height - kernel->height) / stride.height + 1;
     int output_w = (input->width - kernel->width) / stride.width + 1;
-    NcBlob* output = nc_blob_make(1, output_h, output_w, kernel->batch);
+    NcBlob* output = nc_create_blob(1, output_h, output_w, kernel->batch);
 
     nc_convolution_forward_nhwc(param, input, output);
 }
@@ -296,7 +296,7 @@ void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBl
     const NcStride stride = param->stride;
 
     //kernel: n=1, 3d blob
-    //NcBlob* kernel = nc_blob_make_empty(1, param->weight->h, param->weight->w, param->weight->c);
+    //NcBlob* kernel = nc_create_empty_blob(1, param->weight->h, param->weight->w, param->weight->c);
     NcBlob* kernel = param->weight;
 
 #ifdef LOCAL_DEBUG

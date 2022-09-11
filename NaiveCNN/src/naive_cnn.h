@@ -215,36 +215,33 @@ NcImage* nc_create_image(int height, int width, int channel, unsigned char* data
 NcImage* nc_create_empty_image(int height, int width, int channel);
 
 float nc_get_random_float(float s, float t);
-NcBlob* nc_blob_make_empty(int n, int h, int w, int c);
-NcBlob* nc_blob_make(int n, int h, int w, int c);
-NcBlob* nc_blob_make3d(int h, int w, int c);
-NcBlob* nc_blob_make2d(int h, int w);
-NcBlob* nc_blob_make_random(int n, int h, int w, int c, float s, float t);
-NcBlob* nc_blob_make_same(int n, int h, int w, int c, float v);
-NcBlob* nc_blob_make2d_empty(int h, int w);
+NcBlob* nc_create_empty_blob(int n, int h, int w, int c);
+NcBlob* nc_create_blob(int n, int h, int w, int c);
+NcBlob* nc_create_blob3d(int h, int w, int c);
+NcBlob* nc_create_blob2d(int h, int w);
+NcBlob* nc_create_blob_random(int n, int h, int w, int c, float s, float t);
+NcBlob* nc_create_blob_same(int n, int h, int w, int c, float v);
+NcBlob* nc_create_blob2d_empty(int h, int w);
 void nc_blob_data_realloc(NcBlob* blob, int n, int h, int w, int c);
 void nc_blob_data_realloc3d(NcBlob* blob, int h, int w, int c);
 
-NcStride* nc_create_stride(int h, int w);
-
-
 // ! infer related
-NcConvolutionParam* nc_infer_make_convolution_param(int map_size, int in_channels, int out_channels, NcPaddingType pad_type);
-NcPoolingParam* nc_infer_make_pooling_param(int map_size, int in_channels, NcPoolingType pool_type, NcPaddingType pad_type);
-NcInnerproductParam* nc_infer_make_innerproduct_param(int in_num, int out_num);
-NcLayerInput* nc_infer_make_layer_input(int n, const int* blob_ids, NcNet* net);
-NcLayerOutput* nc_infer_make_layer_output(int n, const int* blob_ids, NcNet* net);
+NcConvolutionParam* nc_infer_create_convolution_param(int map_size, int in_channels, int out_channels, NcPaddingType pad_type);
+NcPoolingParam* nc_infer_create_pooling_param(int map_size, int in_channels, NcPoolingType pool_type, NcPaddingType pad_type);
+NcInnerproductParam* nc_infer_create_innerproduct_param(int in_num, int out_num);
+NcLayerInput* nc_infer_create_layer_input(int n, const int* blob_ids, NcNet* net);
+NcLayerOutput* nc_infer_create_layer_output(int n, const int* blob_ids, NcNet* net);
 void nc_infer_convolution(void* param_, NcLayerInput* input, NcLayerOutput* output);
 void nc_infer_pooling(void* param_, NcLayerInput* input, NcLayerOutput* output);
 void nc_infer_innerproduct(void* param_, NcLayerInput* input, NcLayerOutput* output);
 
 
 // ! train related
-NcConvolutionParam* nc_train_make_convolution_param(int in_height, int in_width, int map_size, int in_channels, int out_channels);
-NcPoolingParam* nc_train_make_pooling_param(int in_height, int in_width, int map_size, int in_channels, int out_channels, int pool_type);
-NcInnerproductParam* nc_train_make_innerproduct_param(int in_num, int out_num);
-NcLayerInput* nc_train_make_layer_input(int n, const int* blob_ids, const NcNet* net);
-NcLayerOutput* nc_train_make_layer_output(int n, const int* blob_ids, const NcNet* net, NcBlob** output_blobs);
+NcConvolutionParam* nc_train_create_convolution_param(int in_height, int in_width, int map_size, int in_channels, int out_channels);
+NcPoolingParam* nc_train_create_pooling_param(int in_height, int in_width, int map_size, int in_channels, int out_channels, int pool_type);
+NcInnerproductParam* nc_train_create_innerproduct_param(int in_num, int out_num);
+NcLayerInput* nc_train_create_layer_input(int n, const int* blob_ids, const NcNet* net);
+NcLayerOutput* nc_train_create_layer_output(int n, const int* blob_ids, const NcNet* net, NcBlob** output_blobs);
 void nc_train_forward_convolution(void* param_, NcLayerInput* input, NcLayerOutput* output);
 void nc_train_forward_pooling(void* param_, NcLayerInput* input, NcLayerOutput* output);
 void nc_train_forward_innerproduct(void* param_, NcLayerInput* input, NcLayerOutput* output);
@@ -252,7 +249,7 @@ void nc_train_backward_convolution(void* param_, NcLayerInput* input, NcLayerOut
 void nc_train_backward_pooling(void* param_, NcLayerInput* input, NcLayerOutput* output);
 void nc_train_backward_innerproduct(void* param_, NcLayerInput* input, NcLayerOutput* output);
 
-void nc_free_layer(NcLayer* layer);
+void nc_destroy_layer(NcLayer* layer);
 
 // very straight forward and naive implementation of 2D convolution
 void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, NcStride* stride);
@@ -265,7 +262,7 @@ void nc_read_mnist_image(const char* filename, NcImage*** _images, int* _image_n
 void nc_read_mnist_label(const char* filename, int** _labels, int* _label_num);
 
 
-NcLayer* nc_make_layer();
+NcLayer* nc_create_layer();
 
 void nc_relu_forward(NcBlob* bottom);
 

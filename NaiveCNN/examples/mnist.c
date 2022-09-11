@@ -385,7 +385,7 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     //------------------------
 
     // allocate network's input blobs
-    net->blobs[0] = nc_blob_make3d(28, 28, 1);
+    net->blobs[0] = nc_create_blob3d(28, 28, 1);
 
     NcSize2D in_size;
     int map_size;
@@ -412,10 +412,10 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     in_size.height = input_size.height;
     in_channels = 1;
     out_channels = 6;
-    NcConvolutionParam* C1 = nc_train_make_convolution_param(in_size.height, in_size.width, map_size, in_channels, out_channels);
+    NcConvolutionParam* C1 = nc_train_create_convolution_param(in_size.height, in_size.width, map_size, in_channels, out_channels);
 
     // create layer
-    layer = nc_make_layer();
+    layer = nc_create_layer();
     layer->type = NC_LAYER_CONVOLUTION;
     layer->param = C1;
     layer->forward = nc_train_forward_convolution;
@@ -430,7 +430,7 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     // so, we don't need to re-calculate or re-assign each layer's input blobs' dimensions
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 0 };
-    layer->input = nc_train_make_layer_input(input_blobs_num, input_blob_ids, net);
+    layer->input = nc_train_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     // for each layer's output blobs, some may be allocated (in-place operation, like relu)
@@ -438,8 +438,8 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     // it's each type of layer's reponsibility to calculate and allocate the un-allocated blob
     output_blobs_num = 1;
     output_blob_ids = (int[]) { 1 };
-    output_blobs[0] = nc_blob_make3d(C1->out_height, C1->out_width, C1->out_channels);
-    layer->output = nc_train_make_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
+    output_blobs[0] = nc_create_blob3d(C1->out_height, C1->out_width, C1->out_channels);
+    layer->output = nc_train_create_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
 
     //----------------------------------------------------------------
     // S2 layer
@@ -451,10 +451,10 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     in_channels = C1->out_channels;
     out_channels = 6;
     pool_type = AvePool;
-    NcPoolingParam* S2 = nc_train_make_pooling_param(in_size.height, in_size.width, map_size, in_channels, out_channels, pool_type);
+    NcPoolingParam* S2 = nc_train_create_pooling_param(in_size.height, in_size.width, map_size, in_channels, out_channels, pool_type);
 
     // create layer
-    layer = nc_make_layer();
+    layer = nc_create_layer();
     layer->type = NC_LAYER_POOLING;
     layer->param = S2;
     layer->forward = nc_train_forward_pooling;
@@ -464,13 +464,13 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     // setup layer input
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 1 };
-    layer->input = nc_train_make_layer_input(input_blobs_num, input_blob_ids, net);
+    layer->input = nc_train_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
     output_blob_ids = (int[]) { 2 };
-    output_blobs[0] = nc_blob_make3d(S2->out_height, S2->out_width, S2->out_channels);
-    layer->output = nc_train_make_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
+    output_blobs[0] = nc_create_blob3d(S2->out_height, S2->out_width, S2->out_channels);
+    layer->output = nc_train_create_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
 
     //----------------------------------------------------------------
     // C3 layer
@@ -481,10 +481,10 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     map_size = 5;
     in_channels = S2->out_channels;
     out_channels = 12;
-    NcConvolutionParam* C3 = nc_train_make_convolution_param(in_size.height, in_size.width, map_size, in_channels, out_channels);
+    NcConvolutionParam* C3 = nc_train_create_convolution_param(in_size.height, in_size.width, map_size, in_channels, out_channels);
 
     // create layer
-    layer = nc_make_layer();
+    layer = nc_create_layer();
     layer->type = NC_LAYER_CONVOLUTION;
     layer->param = C3;
     layer->forward = nc_train_forward_convolution;
@@ -494,13 +494,13 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     // setup layer input
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 2 };
-    layer->input = nc_train_make_layer_input(input_blobs_num, input_blob_ids, net);
+    layer->input = nc_train_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
     output_blob_ids = (int[]) { 3 };
-    output_blobs[0] = nc_blob_make3d(C3->out_height, C3->out_width, C3->out_channels);
-    layer->output = nc_train_make_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
+    output_blobs[0] = nc_create_blob3d(C3->out_height, C3->out_width, C3->out_channels);
+    layer->output = nc_train_create_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
 
     //----------------------------------------------------------------
     // S4 layer
@@ -512,10 +512,10 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     in_channels = C3->out_channels;
     out_channels = 12;
     pool_type = AvePool;
-    NcPoolingParam* S4 = nc_train_make_pooling_param(in_size.height, in_size.width, map_size, in_channels, out_channels, pool_type);
+    NcPoolingParam* S4 = nc_train_create_pooling_param(in_size.height, in_size.width, map_size, in_channels, out_channels, pool_type);
 
     // create layer
-    layer = nc_make_layer();
+    layer = nc_create_layer();
     layer->type = NC_LAYER_POOLING;
     layer->param = S4;
     layer->forward = nc_train_forward_pooling;
@@ -525,13 +525,13 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     // setup layer input
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 3 };
-    layer->input = nc_train_make_layer_input(input_blobs_num, input_blob_ids, net);
+    layer->input = nc_train_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
     output_blob_ids = (int[]) { 4 };
-    output_blobs[0] = nc_blob_make3d(S4->out_height, S4->out_width, S4->out_channels);
-    layer->output = nc_train_make_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
+    output_blobs[0] = nc_create_blob3d(S4->out_height, S4->out_width, S4->out_channels);
+    layer->output = nc_train_create_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
 
     //----------------------------------------------------------------
     // O5 layer
@@ -541,10 +541,10 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     in_size.height = S4->out_height;
     int in_num = in_size.height * in_size.width * S4->out_channels;
     int out_num = output_size;
-    NcInnerproductParam* O5 = nc_train_make_innerproduct_param(in_num, out_num);
+    NcInnerproductParam* O5 = nc_train_create_innerproduct_param(in_num, out_num);
 
     // create layer
-    layer = nc_make_layer();
+    layer = nc_create_layer();
     layer->type = NC_LAYER_INNERPRODUCT;
     layer->param = O5;
     layer->forward = nc_train_forward_innerproduct;
@@ -554,13 +554,13 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     // setup layer input
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 4 };
-    layer->input = nc_train_make_layer_input(input_blobs_num, input_blob_ids, net);
+    layer->input = nc_train_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
     output_blob_ids = (int[]) { 5 };
-    output_blobs[0] = nc_blob_make3d(O5->out_height, O5->out_width, O5->out_channels);
-    layer->output = nc_train_make_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
+    output_blobs[0] = nc_create_blob3d(O5->out_height, O5->out_width, O5->out_channels);
+    layer->output = nc_train_create_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
 
     // --- Loss
     net->e = (float*)calloc(out_num,sizeof(float));
@@ -649,7 +649,7 @@ void nc_train_trial()
     NcLayer* layer;
     for(int i=0; i<net->layers_num; i++) {
         layer = net->layers[i];
-        nc_free_layer(layer);
+        nc_destroy_layer(layer);
     }
     printf("=== free layers OK\n");
     free(net->layers);
@@ -661,13 +661,13 @@ void nc_lenet5_infer_setup(NcNet* net) {
     net->layers_num = 5;
     net->layers = (NcLayer**)malloc(sizeof(NcLayer*)*net->layers_num);
     for (int i = 0; i < net->layers_num; i++) {
-        net->layers[i] = nc_make_layer();
+        net->layers[i] = nc_create_layer();
     }
 
     net->blobs_num = 6;
     net->blobs = (NcBlob**)malloc(sizeof(NcBlob*)*net->blobs_num);
     for (int i = 0; i < net->blobs_num; i++) {
-        net->blobs[i] = nc_blob_make_empty(0, 0, 0, 0);
+        net->blobs[i] = nc_create_empty_blob(0, 0, 0, 0);
     }
 
     int map_size;
@@ -694,18 +694,18 @@ void nc_lenet5_infer_setup(NcNet* net) {
     // setup layer input
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 0 };
-    layer->input = nc_infer_make_layer_input(input_blobs_num, input_blob_ids, net);
+    layer->input = nc_infer_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
     output_blob_ids = (int[]) { 1 };
-    layer->output = nc_infer_make_layer_output(output_blobs_num, output_blob_ids, net);
+    layer->output = nc_infer_create_layer_output(output_blobs_num, output_blob_ids, net);
 
     // create layer param
     map_size = 5;
     in_channels = 1;
     out_channels = 6;
-    NcConvolutionParam* C1 = nc_infer_make_convolution_param(map_size, in_channels, out_channels, NC_PADDING_CONV_CAFFE);
+    NcConvolutionParam* C1 = nc_infer_create_convolution_param(map_size, in_channels, out_channels, NC_PADDING_CONV_CAFFE);
     layer->param = C1;
 
     //----------------------------------------------------------------
@@ -721,19 +721,19 @@ void nc_lenet5_infer_setup(NcNet* net) {
     // setup layer input
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 1 };
-    layer->input = nc_infer_make_layer_input(input_blobs_num, input_blob_ids, net);
+    layer->input = nc_infer_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
     output_blob_ids = (int[]) { 2 };
-    layer->output = nc_infer_make_layer_output(output_blobs_num, output_blob_ids, net);
+    layer->output = nc_infer_create_layer_output(output_blobs_num, output_blob_ids, net);
 
     // create layer param
     map_size = 2;
     in_channels = C1->out_channels;
     out_channels = C1->out_channels;
     pool_type = AvePool;
-    NcPoolingParam* S2 = nc_infer_make_pooling_param(map_size, in_channels, out_channels, pool_type);
+    NcPoolingParam* S2 = nc_infer_create_pooling_param(map_size, in_channels, out_channels, pool_type);
     layer->param = S2;
 
     //----------------------------------------------------------------
@@ -749,18 +749,18 @@ void nc_lenet5_infer_setup(NcNet* net) {
     // setup layer input
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 2 };
-    layer->input = nc_infer_make_layer_input(input_blobs_num, input_blob_ids, net);
+    layer->input = nc_infer_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
     output_blob_ids = (int[]) { 3 };
-    layer->output = nc_infer_make_layer_output(output_blobs_num, output_blob_ids, net);
+    layer->output = nc_infer_create_layer_output(output_blobs_num, output_blob_ids, net);
 
     // create layer param
     map_size = 5;
     in_channels = S2->out_channels;
     out_channels = 12;
-    NcConvolutionParam* C3 = nc_infer_make_convolution_param(map_size, in_channels, out_channels, NC_PADDING_CONV_CAFFE);
+    NcConvolutionParam* C3 = nc_infer_create_convolution_param(map_size, in_channels, out_channels, NC_PADDING_CONV_CAFFE);
     layer->param = C3;
 
     //----------------------------------------------------------------
@@ -776,19 +776,19 @@ void nc_lenet5_infer_setup(NcNet* net) {
     // setup layer input
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 3 };
-    layer->input = nc_infer_make_layer_input(input_blobs_num, input_blob_ids, net);
+    layer->input = nc_infer_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
     output_blob_ids = (int[]) { 4 };
-    layer->output = nc_infer_make_layer_output(output_blobs_num, output_blob_ids, net);
+    layer->output = nc_infer_create_layer_output(output_blobs_num, output_blob_ids, net);
 
     // create layer param
     map_size = 2;
     in_channels = C3->out_channels;
     out_channels = 12;
     pool_type = AvePool;
-    NcPoolingParam* S4 = nc_infer_make_pooling_param(map_size, in_channels, out_channels, pool_type);
+    NcPoolingParam* S4 = nc_infer_create_pooling_param(map_size, in_channels, out_channels, pool_type);
     layer->param = S4;
 
     //----------------------------------------------------------------
@@ -804,17 +804,17 @@ void nc_lenet5_infer_setup(NcNet* net) {
     // setup layer input
     input_blobs_num = 1;
     input_blob_ids = (int[]) { 4 };
-    layer->input = nc_infer_make_layer_input(input_blobs_num, input_blob_ids, net);
+    layer->input = nc_infer_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
     output_blob_ids = (int[]) { 5 };
-    layer->output = nc_infer_make_layer_output(output_blobs_num, output_blob_ids, net);
+    layer->output = nc_infer_create_layer_output(output_blobs_num, output_blob_ids, net);
 
     // setup layer param
     int in_num = layer->input->blobs[0]->nstep;
     int out_num = 10; // num classes
-    NcInnerproductParam* O5 = nc_infer_make_innerproduct_param(in_num, out_num);
+    NcInnerproductParam* O5 = nc_infer_create_innerproduct_param(in_num, out_num);
     layer->param = O5;
 
     // --- Loss
@@ -831,7 +831,7 @@ void nc_lenet5_infer_setup(NcNet* net) {
 void nc_infer(NcNet* net, NcImage* image)
 {
     // allocate network's input blobs
-    //net->blobs[0] = nc_make_blob3d(image->h, image->w, image->c);
+    //net->blobs[0] = nc_create_blob3d(image->h, image->w, image->c);
     nc_blob_data_realloc3d(net->blobs[0], image->height, image->width, image->channel);
 
     // assign each blobs' rely cnt
@@ -874,7 +874,7 @@ void nc_infer_trial() {
     //for (int i = 0; i < net->layers_num; i++) {
     //	layer = net->layers[i];
     //	printf("free %d-th layer\n", i);
-    //	nc_free_layer(layer);
+    //	nc_destroy_layer(layer);
     //}
     //printf("=== free layers OK\n");
     //free(net->layers);

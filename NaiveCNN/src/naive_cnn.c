@@ -14,7 +14,7 @@ float nc_get_random_float(float min, float max)
     return v;
 }
 
-NcBlob* nc_blob_make_empty(int batch, int height, int width, int channel)
+NcBlob* nc_create_empty_blob(int batch, int height, int width, int channel)
 {
     NcBlob* blob = (NcBlob*)malloc(sizeof(NcBlob));
     blob->batch = batch;
@@ -30,26 +30,26 @@ NcBlob* nc_blob_make_empty(int batch, int height, int width, int channel)
     return blob;
 }
 
-NcBlob* nc_blob_make(int n, int h, int w, int c)
+NcBlob* nc_create_blob(int n, int h, int w, int c)
 {
-    NcBlob* blob = nc_blob_make_empty(n, h, w, c);
+    NcBlob* blob = nc_create_empty_blob(n, h, w, c);
     blob->data = (float*)calloc(blob->mass, sizeof(float));
     return blob;
 }
 
-NcBlob* nc_blob_make3d(int h, int w, int c)
+NcBlob* nc_create_blob3d(int h, int w, int c)
 {
-    return nc_blob_make(1, h, w, c);
+    return nc_create_blob(1, h, w, c);
 }
 
-NcBlob* nc_blob_make2d(int h, int w)
+NcBlob* nc_create_blob2d(int h, int w)
 {
-    return nc_blob_make(1, h, w, 1);
+    return nc_create_blob(1, h, w, 1);
 }
 
-NcBlob* nc_blob_make_random(int batch, int height, int width, int channel, float s, float t)
+NcBlob* nc_create_blob_random(int batch, int height, int width, int channel, float s, float t)
 {
-    NcBlob* blob = nc_blob_make(batch, height, width, channel);
+    NcBlob* blob = nc_create_blob(batch, height, width, channel);
 
     srand((unsigned)time(NULL));
     for (int i = 0; i < blob->mass; i++)
@@ -59,9 +59,9 @@ NcBlob* nc_blob_make_random(int batch, int height, int width, int channel, float
     return blob;
 }
 
-NcBlob* nc_blob_make_same(int batch, int height, int width, int channel, float value)
+NcBlob* nc_create_blob_same(int batch, int height, int width, int channel, float value)
 {
-    NcBlob* blob = nc_blob_make(batch, height, width, channel);
+    NcBlob* blob = nc_create_blob(batch, height, width, channel);
 
     srand((unsigned)time(NULL));
     for (int i = 0; i < blob->mass; i++)
@@ -71,9 +71,9 @@ NcBlob* nc_blob_make_same(int batch, int height, int width, int channel, float v
     return blob;
 }
 
-NcBlob* nc_blob_make2d_empty(int h, int w)
+NcBlob* nc_create_blob2d_empty(int h, int w)
 {
-    NcBlob* blob = nc_blob_make_empty(1, h, w, 1);
+    NcBlob* blob = nc_create_empty_blob(1, h, w, 1);
     return blob;
 }
 
@@ -102,7 +102,7 @@ void nc_blob_data_realloc3d(NcBlob* blob, int h, int w, int c)
     nc_blob_data_realloc(blob, 1, h, w, c);
 }
 
-void nc_free_layer(NcLayer* layer) {
+void nc_destroy_layer(NcLayer* layer) {
     NcLayerType layer_type = layer->type;
     switch (layer_type) {
         case NC_LAYER_CONVOLUTION: {
@@ -339,7 +339,7 @@ void nc_read_mnist_label(const char* filename, int** _labels, int* _label_num)
     *_label_num = number_of_labels;
 }
 
-NcLayer* nc_make_layer() {
+NcLayer* nc_create_layer() {
     NcLayer* layer = (NcLayer*)malloc(sizeof(NcLayer));
     layer->backward = NULL;
     layer->forward = NULL;
