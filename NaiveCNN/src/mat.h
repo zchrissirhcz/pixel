@@ -32,7 +32,7 @@ void addmat(matrix_t* src1, matrix_t* src2, matrix_t* dst);
 
 matrix_t* correlation(matrix_t* map, matrix_t* input, int type);
 
-matrix_t* conv(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize, int type); // 卷积操作
+matrix_t* conv(matrix_t* map, matrix_t* input, int type);
 
 // 这个是矩阵的上采样（等值内插），upc及upr是内插倍数
 matrix_t* up_sample(matrix_t* input, int upc, int upr);

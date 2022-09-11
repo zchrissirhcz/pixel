@@ -258,7 +258,7 @@ void cnn_forward(CNN* cnn, matrix_t* input)
             map.height = mapSize.height;
             map.width = mapSize.width;
             map.data = cnn->C1->mapData[j][i];
-            matrix_t* mapout = conv(&map, mapSize, input, inSize, valid);
+            matrix_t* mapout = conv(&map, input, valid);
 
             matrix_t res;
             res.height = mapSize.height;
@@ -315,7 +315,7 @@ void cnn_forward(CNN* cnn, matrix_t* input)
             tmp_input.height = inSize.height;
             tmp_input.width = inSize.height;
             tmp_input.data = cnn->S2->y[j];
-            matrix_t* mapout = conv(&map, mapSize, &tmp_input, inSize, valid);
+            matrix_t* mapout = conv(&map, &tmp_input, valid);
 
             matrix_t res;
             res.height = mapSize.height;
@@ -573,7 +573,7 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
             map.height = dSize.height;
             map.width = dSize.width;
             map.data = cnn->C1->d[i];
-            matrix_t* C1dk = conv(&map, dSize, flipinput, ySize, valid);
+            matrix_t* C1dk = conv(&map, flipinput, valid);
             multifactor(C1dk, C1dk, -1*opts.alpha);
 
             matrix_t res;
@@ -618,7 +618,7 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
             map.height = dSize.height;
             map.width = dSize.width;
             map.data = cnn->C3->d[i];
-            matrix_t* C3dk = conv(&map, dSize, flipinput, ySize, valid);
+            matrix_t* C3dk = conv(&map, flipinput, valid);
             multifactor(C3dk, C3dk, -1.0*opts.alpha);
 
             matrix_t res;

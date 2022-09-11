@@ -160,7 +160,7 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
 }
 
 // 卷积操作
-matrix_t* conv(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize, int type)
+matrix_t* conv(matrix_t* map, matrix_t* input, int type)
 {
     // 卷积操作可以用旋转180度的特征模板相关来求
     matrix_t* flipmap = get_rotate180_matrix(map); //旋转180度的特征模板
