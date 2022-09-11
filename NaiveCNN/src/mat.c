@@ -62,16 +62,16 @@ void destroy_matrix(matrix_t* matrix)
 // A   B         D   C
 //   O      =>     O
 // C   D         B   A
-matrix_t* get_rotate180_matrix(matrix_t* input, NcSize2D matSize)
+matrix_t* get_rotate180_matrix(matrix_t* input)
 {
-    int outSizeW = matSize.width;
-    int outSizeH = matSize.height;
-    matrix_t* output = create_matrix(outSizeH, outSizeW);
-    for (int i = 0; i < outSizeH; i++)
+    const int h = input->height;
+    const int w = input->width;
+    matrix_t* output = create_matrix(h, w);
+    for (int i = 0; i < h; i++)
     {
-        for (int j = 0; j < outSizeW; j++)
+        for (int j = 0; j < w; j++)
         {
-            output->data[i][j] = input->data[outSizeH - i - 1][outSizeW - j - 1];
+            output->data[i][j] = input->data[h - i - 1][w - j - 1];
         }
     }
 
@@ -163,7 +163,7 @@ matrix_t* correlation(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D
 matrix_t* conv(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize, int type)
 {
     // 卷积操作可以用旋转180度的特征模板相关来求
-    matrix_t* flipmap = get_rotate180_matrix(map,mapSize); //旋转180度的特征模板
+    matrix_t* flipmap = get_rotate180_matrix(map); //旋转180度的特征模板
     matrix_t* res = correlation(flipmap, mapSize, input, inSize, type);
     destroy_matrix(flipmap);
     return res;

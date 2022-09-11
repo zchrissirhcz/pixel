@@ -568,7 +568,7 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
     {
         for(j = 0; j < cnn->C1->in_channels; j++)
         {
-            matrix_t* flipinput = get_rotate180_matrix(input, ySize);
+            matrix_t* flipinput = get_rotate180_matrix(input);
             matrix_t map;
             map.height = dSize.height;
             map.width = dSize.width;
@@ -612,7 +612,7 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
             tmp_input.height = ySize.height;
             tmp_input.width = ySize.width;
             tmp_input.data = cnn->S2->y[j];
-            matrix_t* flipinput = get_rotate180_matrix(&tmp_input, ySize);
+            matrix_t* flipinput = get_rotate180_matrix(&tmp_input);
 
             matrix_t map;
             map.height = dSize.height;

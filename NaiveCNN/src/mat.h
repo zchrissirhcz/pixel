@@ -26,7 +26,7 @@ typedef struct matrix_t
 
 matrix_t* create_matrix(int height, int width);
 void destroy_matrix(matrix_t* matrix);
-matrix_t* get_rotate180_matrix(matrix_t* input, NcSize2D matSize);
+matrix_t* get_rotate180_matrix(matrix_t* input);
 
 void addmat(matrix_t* src1, matrix_t* src2, matrix_t* dst);
 
