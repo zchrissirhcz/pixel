@@ -91,8 +91,8 @@ void nc_blob_data_realloc3d(NcBlob* blob, int h, int w, int c) {
 
 NcStride* nc_stride_make(int h, int w) {
     NcStride* stride = (NcStride*)malloc(sizeof(NcStride));
-    stride->h = h;
-    stride->w = w;
+    stride->height = h;
+    stride->width = w;
     return stride;
 }
 

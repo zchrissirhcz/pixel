@@ -16,9 +16,9 @@ void nc_pooling_forward_nhwc(NcPoolingParam* param, NcBlob* bottom, NcBlob* top)
     int kernel_w = param->map_size;
 
     int out_h = 0;
-    for (int h = 0; h < bottom->h-kernel_h+1; h+=stride->h, out_h++) {
+    for (int h = 0; h < bottom->h-kernel_h+1; h+=stride->height, out_h++) {
         int out_w = 0;
-        for (int w = 0; w < bottom->w-kernel_w+1; w+=stride->w, out_w++) {
+        for (int w = 0; w < bottom->w-kernel_w+1; w+=stride->width, out_w++) {
             for (int c = 0; c < bottom->c; c++) {
                 float sum = 0.f;
                 for (int kh = 0; kh < kernel_h; kh++) {
@@ -67,9 +67,9 @@ void nc_pooling_forward_nchw(NcPoolingParam* param, NcBlob* bottom, NcBlob* top)
 
     for (int c = 0; c < bottom->c; c++) {
         int out_h = 0;
-        for (int h = 0; h < bottom->h-kernel_h+1; h+=stride->h, out_h++) {
+        for (int h = 0; h < bottom->h-kernel_h+1; h+=stride->height, out_h++) {
             int out_w = 0;
-            for (int w = 0; w < bottom->w-kernel_w+1; w+=stride->w, out_w++) {
+            for (int w = 0; w < bottom->w-kernel_w+1; w+=stride->width, out_w++) {
                 int top_idx = c * top->h*top->w + h * top->w + w;
 
                 //sum += bottom[n,c,h+kh, w+kw]
@@ -138,8 +138,8 @@ void nc_pooling_test_nchw() {
     NcPaddingType pad_type = NC_PADDING_POOL_CAFFE;
     NcPoolingParam* param = nc_infer_make_pooling_param(map_size, in_channels, pool_type, pad_type);
 
-    param->out_height = (input->h-kernel->h)/param->stride->h+1;
-    param->out_width = (input->w-kernel->w)/param->stride->w+1;
+    param->out_height = (input->h-kernel->h)/param->stride->height+1;
+    param->out_width = (input->w-kernel->w)/param->stride->width+1;
     
     NcBlob* top = nc_blob_make(1, param->out_height, param->out_width, input->c);
 
@@ -167,8 +167,8 @@ void nc_pooling_test_nhwc() {
     NcPaddingType pad_type = NC_PADDING_POOL_CAFFE;
     NcPoolingParam* param = nc_infer_make_pooling_param(map_size, in_channels, pool_type, pad_type);
 
-    param->out_height = (input->h-kernel->h)/param->stride->h+1;
-    param->out_width = (input->w-kernel->w)/param->stride->w+1;
+    param->out_height = (input->h-kernel->h)/param->stride->height+1;
+    param->out_width = (input->w-kernel->w)/param->stride->width+1;
     
     NcBlob* top = nc_blob_make(1, param->out_height, param->out_width, input->c);
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "naive_cnn.h"
+#include "px_cnn.h"
 #include <stdlib.h>
 
 void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, NcStride* stride) {
@@ -13,9 +14,9 @@ void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, 
 #endif
 
     int input_idx, kernel_idx, output_idx;
-    for (int h = 0; h < input->h - kernel->h + 1; h += stride->h, out_h += 1) {
+    for (int h = 0; h < input->h - kernel->h + 1; h += stride->height, out_h += 1) {
         out_w = 0;
-        for (int w = 0; w < input->w - kernel->w + 1; w += stride->w, out_w += 1) {
+        for (int w = 0; w < input->w - kernel->w + 1; w += stride->width, out_w += 1) {
             float sum = 0.f;
 
 #ifdef DEBUG_CONV2D
@@ -78,11 +79,11 @@ static void nc_conv2d_example() {
         1, 1
     };
 
-    NcStride stride = { .h = 1,.w = 1 };
+    NcStride stride = px_create_stride(1, 1);
 
     NcBlob2D* output = (NcBlob2D*)malloc(sizeof(NcBlob2D));
-    output->h = (input->h - kernel->h) / stride.h + 1;
-    output->w = (input->w - kernel->w) / stride.w + 1;
+    output->h = (input->h - kernel->h) / stride.height + 1;
+    output->w = (input->w - kernel->w) / stride.width + 1;
     output->data = (float*)malloc(sizeof(output->h*output->w));
 
     nc_conv2d(input, kernel, output, &stride);
@@ -128,10 +129,10 @@ void nc_convolution_test_nchw() {
         0.5, 0.5,
     };
 
-    NcStride stride = { .h = 1,.w = 1 };
+    NcStride stride = px_create_stride(1, 1);
 
-    int output_h = (input->h - kernel->h) / stride.h + 1;
-    int output_w = (input->w - kernel->w) / stride.w + 1;
+    int output_h = (input->h - kernel->h) / stride.height + 1;
+    int output_w = (input->w - kernel->w) / stride.width + 1;
     NcBlob* output = nc_blob_make(1, output_h, output_w, kernel->n);
     
     int map_size = kernel->h;
@@ -191,7 +192,7 @@ void nc_convolution_test_nhwc(){
         1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5,
     };
 
-    NcStride stride = { .h = 1,.w = 1 };
+    NcStride stride = px_create_stride(1, 1);
 
     int map_size = kernel->h;
     int in_channels = input->c;
@@ -201,8 +202,8 @@ void nc_convolution_test_nhwc(){
     free(param->weight);
     param->weight = kernel;
 
-    int output_h = (input->h - kernel->h) / stride.h + 1;
-    int output_w = (input->w - kernel->w) / stride.w + 1;
+    int output_h = (input->h - kernel->h) / stride.height + 1;
+    int output_w = (input->w - kernel->w) / stride.width + 1;
     NcBlob* output = nc_blob_make(1, output_h, output_w, kernel->n);
 
     nc_convolution_forward_nhwc(param, input, output);
@@ -228,9 +229,9 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
     for (int n = 0; n < kernel->n; n++) {
         for (int c = 0; c < bottom->c; c++) {
             int out_h = 0;
-            for (int h = 0; h < bottom->h - kernel->h + 1; h += stride->h, out_h++) {
+            for (int h = 0; h < bottom->h - kernel->h + 1; h += stride->height, out_h++) {
                 int out_w = 0;
-                for (int w = 0; w < bottom->w - kernel->w + 1; w += stride->w, out_w++) {
+                for (int w = 0; w < bottom->w - kernel->w + 1; w += stride->width, out_w++) {
                     float sum = 0.f;
                     int top_idx = n * top->h*top->w + out_h*top->w + out_w;
                     //top->data[0, n, out_h, out_w] += sum;
@@ -308,9 +309,9 @@ void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBl
         int out_w = 0;
 
         int bottom_idx, kernel_idx, top_idx;
-        for (int h = 0; h < bottom->h - kernel->h + 1; h += stride->h, out_h += 1) {
+        for (int h = 0; h < bottom->h - kernel->h + 1; h += stride->height, out_h += 1) {
             out_w = 0;
-            for (int w = 0; w < bottom->w - kernel->w + 1; w += stride->w, out_w += 1) {
+            for (int w = 0; w < bottom->w - kernel->w + 1; w += stride->width, out_w += 1) {
                 float sum = 0.f;
 #ifdef LOCAL_DEBUG
                 fprintf(fout, "output[%d,%d]=sigma(", out_h, out_w);

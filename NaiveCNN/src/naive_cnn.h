@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include "naive_config.h"
+#include "px_typebase.h"
 
 typedef enum NcPaddingType {
     NC_PADDING_CONV_CAFFE = 0,
@@ -46,11 +47,9 @@ typedef struct NcBlob2D {
     float* data;
 } NcBlob2D;
 
-typedef struct NcDim2D {
-    int h, w;
-} NcDim2D;
+typedef px_size_t NcDim2D;
 
-typedef NcDim2D NcStride;
+typedef px_size_t NcStride;
 
 
 typedef struct NcConvolutionParam {

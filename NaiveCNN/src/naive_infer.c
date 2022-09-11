@@ -156,8 +156,8 @@ void nc_infer_pooling(void* param_, NcLayerInput* input, NcLayerOutput* output) 
 
     param->in_height = bottom->h;
     param->in_width = bottom->w;
-    param->out_height = (param->in_height - param->map_size) / param->stride->h + 1;
-    param->out_width = (param->in_width - param->map_size) / param->stride->w + 1;
+    param->out_height = (param->in_height - param->map_size) / param->stride->height + 1;
+    param->out_width = (param->in_width - param->map_size) / param->stride->width + 1;
 
     nc_blob_data_realloc3d(top, param->out_height, param->out_width, param->out_channels);
 
