@@ -291,7 +291,18 @@ void cnn_forward(CNN* cnn, matrix_t* input)
     {
         if (cnn->S2->pool_type == AvePool)
         {
-            avg_pooling(cnn->S2->y[i], outSize, cnn->C1->y[i], inSize, cnn->S2->map_size);
+            matrix_t pool_input;
+            pool_input.height = inSize.height;
+            pool_input.width = inSize.width;
+            pool_input.data = cnn->C1->y[i];
+
+            matrix_t pool_output;
+            pool_output.height = outSize.height;
+            pool_output.width = outSize.width;
+            pool_output.data = cnn->S2->y[i];
+            
+            px_size_t kernel_size = px_create_size(cnn->S2->map_size, cnn->S2->map_size);
+            avg_pooling(&pool_input, &pool_output, kernel_size);
         }
     }
 
@@ -348,7 +359,18 @@ void cnn_forward(CNN* cnn, matrix_t* input)
     {
         if (cnn->S4->pool_type == AvePool)
         {
-            avg_pooling(cnn->S4->y[i], outSize, cnn->C3->y[i], inSize, cnn->S4->map_size);
+            matrix_t pool_input;
+            pool_input.height = inSize.height;
+            pool_input.width = inSize.width;
+            pool_input.data = cnn->C3->y[i];
+
+            matrix_t pool_output;
+            pool_output.height = outSize.height;
+            pool_output.width = outSize.width;
+            pool_output.data = cnn->S4->y[i];
+
+            px_size_t kernel_size = px_create_size(cnn->S4->map_size, cnn->S4->map_size);
+            avg_pooling(&pool_input, &pool_output, kernel_size);
         }
     }
 
@@ -379,50 +401,49 @@ float activation_sigma(float input,float bias) // sigma激活函数
     return (float)1.0/((float)(1.0+exp(-temp)));
 }
 
-void avg_pooling(float** output, NcSize2D outputSize,float** input, NcSize2D inputSize,int mapSize)
+void avg_pooling(matrix_t* input, matrix_t* output, px_size_t kernel_size)
 {
-    int outputW = inputSize.width / mapSize;
-    int outputH = inputSize.height / mapSize;
-    if (outputSize.width != outputW || outputSize.height != outputH)
+    int outputW = input->width / kernel_size.width;
+    int outputH = input->height / kernel_size.height;
+    if (output->width != outputW || output->height != outputH)
     {
         PX_LOGE("ERROR: output size is wrong!!");
+        return;
     }
 
-    int i,j,m,n;
-    for (i = 0; i < outputH; i++)
+    for (int i = 0; i < outputH; i++)
     {
-        for (j = 0; j < outputW; j++)
+        for (int j = 0; j < outputW; j++)
         {
-            float sum = 0.0;
-            for (m = i * mapSize; m < i * mapSize + mapSize; m++)
+            float sum = 0.0f;
+            for (int m = i * kernel_size.height; m < (i + 1) * kernel_size.height; m++)
             {
-                for (n = j * mapSize; n < j * mapSize + mapSize; n++)
+                for (int n = j * kernel_size.width; n < (j + 1 ) * kernel_size.width; n++)
                 {
-                    sum = sum + input[m][n];
+                    sum = sum + input->data[m][n];
                 }
             }
-            output[i][j] = sum / (float)(mapSize*mapSize);
+            output->data[i][j] = sum / (float)(kernel_size.height * kernel_size.width);
         }
     }
 }
 
-// dot production for two vector
-float dot_product(float* vec1,float* vec2,int vecL)
+float dot_product(float* vec1, float* vec2, int vec_length)
 {
-    float m=0;
-    for (int i = 0; i < vecL; i++) {
-        m += vec1[i] * vec2[i];
+    float res = 0.f;
+    for (int i = 0; i < vec_length; i++)
+    {
+        res += vec1[i] * vec2[i];
     }
-    return m;
+    return res;
 }
 
-void nnff(float* output,float* input,float** wdata,float* bas, NcSize2D nnSize)
+void nnff(float* output, float* input, float** wdata, float* bas, NcSize2D nnSize)
 {
     const int w = nnSize.width;
     const int h = nnSize.height;
 
-    int i;
-    for (i = 0; i < h; i++)
+    for (int i = 0; i < h; i++)
     {
         output[i] = dot_product(input, wdata[i], w) + bas[i];
     }
