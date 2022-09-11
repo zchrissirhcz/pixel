@@ -8,9 +8,9 @@
 #include <stdbool.h>
 #include "mat.h"
 
-#define AvePool 0
-#define MaxPool 1
-#define MinPool 2
+#define NC_AvePool 0
+#define NC_MaxPool 1
+#define NC_MinPool 2
 
 
 // 卷积层

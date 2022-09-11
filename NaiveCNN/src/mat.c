@@ -147,15 +147,15 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
 
     NcSize2D outSize = px_create_size(outSizeH, outSizeW);
     switch(type){ // 根据不同的情况，返回不同的结果
-    case full: // 完全大小的情况
+    case NC_FULL: // 完全大小的情况
         return output;
-    case same:{
+    case NC_SAME:{
         px_pad_t cut_pad = px_create_pad(halfmapsizeh, halfmapsizeh, halfmapsizew, halfmapsizew);
         matrix_t* sameres = matrix_cut_make_border(output, cut_pad);
         destroy_matrix_ptr(output);
         return sameres;
     }
-    case valid:{
+    case NC_VALID:{
         matrix_t* validres;
         if (map->height % 2 == 0 && map->width % 2 == 0)
         {

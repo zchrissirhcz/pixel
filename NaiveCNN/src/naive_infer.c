@@ -32,7 +32,8 @@ NcConvolutionParam* nc_infer_create_convolution_param(int map_size, int in_chann
     return param;
 }
 
-NcPoolingParam* nc_infer_create_pooling_param(int map_size, int in_channels, NcPoolingType pool_type, NcPaddingType pad_type) {
+NcPoolingParam* nc_infer_create_pooling_param(int map_size, int in_channels, NcPoolingType pool_type, NcPaddingType pad_type)
+{
     NcPoolingParam* param = (NcPoolingParam*)malloc(sizeof(NcPoolingParam));
     param->in_channels = in_channels;
     param->out_channels = in_channels;

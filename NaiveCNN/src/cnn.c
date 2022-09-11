@@ -260,7 +260,7 @@ void cnn_forward(CNN* cnn, matrix_t* input)
             map.height = mapSize.height;
             map.width = mapSize.width;
             map.data = cnn->C1->mapData[j][i];
-            matrix_t* mapout = conv(&map, input, valid);
+            matrix_t* mapout = conv(&map, input, NC_VALID);
 
             matrix_t res;
             res.height = mapSize.height;
@@ -291,7 +291,7 @@ void cnn_forward(CNN* cnn, matrix_t* input)
     inSize.height = cnn->S2->in_height;
     for(i = 0; i < cnn->S2->out_channels; i++)
     {
-        if (cnn->S2->pool_type == AvePool)
+        if (cnn->S2->pool_type == NC_AvePool)
         {
             matrix_t pool_input;
             pool_input.height = inSize.height;
@@ -328,7 +328,7 @@ void cnn_forward(CNN* cnn, matrix_t* input)
             tmp_input.height = inSize.height;
             tmp_input.width = inSize.height;
             tmp_input.data = cnn->S2->y[j];
-            matrix_t* mapout = conv(&map, &tmp_input, valid);
+            matrix_t* mapout = conv(&map, &tmp_input, NC_VALID);
 
             matrix_t res;
             res.height = mapSize.height;
@@ -359,7 +359,7 @@ void cnn_forward(CNN* cnn, matrix_t* input)
     outSize.height = inSize.height / cnn->S4->map_size;
     for(i = 0; i < (cnn->S4->out_channels); i++)
     {
-        if (cnn->S4->pool_type == AvePool)
+        if (cnn->S4->pool_type == NC_AvePool)
         {
             matrix_t pool_input;
             pool_input.height = inSize.height;
@@ -532,7 +532,7 @@ void cnn_backward(CNN* cnn,float* outputData)
             input.width = inSize.width;
             input.data = cnn->C3->d[j];
 
-            matrix_t* corr = correlation(&map, &input, full);
+            matrix_t* corr = correlation(&map, &input, NC_FULL);
 
             matrix_t res;
             res.height = mapSize.height;
@@ -596,7 +596,7 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
             map.height = dSize.height;
             map.width = dSize.width;
             map.data = cnn->C1->d[i];
-            matrix_t* C1dk = conv(&map, flipinput, valid);
+            matrix_t* C1dk = conv(&map, flipinput, NC_VALID);
             multifactor(C1dk, C1dk, -1*opts.alpha);
 
             matrix_t res;
@@ -641,7 +641,7 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
             map.height = dSize.height;
             map.width = dSize.width;
             map.data = cnn->C3->d[i];
-            matrix_t* C3dk = conv(&map, flipinput, valid);
+            matrix_t* C3dk = conv(&map, flipinput, NC_VALID);
             multifactor(C3dk, C3dk, -1.0*opts.alpha);
 
             matrix_t res;

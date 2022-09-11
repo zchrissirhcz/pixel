@@ -1,5 +1,6 @@
 #include "lenet.h"
 
+#include <opencv2/imgcodecs.hpp>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -10,10 +11,9 @@
 #include "mnist.h"
 #include "cnn.h"
 
-#define LOADBMP_IMPLEMENTATION
-#include "loadbmp.h"
-
 #include "naive_cnn.h"
+
+#include <opencv2/opencv.hpp>
 
 #if __ANDROID__
     const char* project_dir = "/data/local/tmp";
@@ -203,7 +203,7 @@ void lenet5_setup(CNN* cnn, NcSize2D inputSize,int outputSize)
 
     inSize.width = inSize.width - mapSize + 1;
     inSize.height = inSize.height - mapSize + 1;
-    cnn->S2 = init_pooling_layer(inSize.width, inSize.height, 2, 6, 6, AvePool);
+    cnn->S2 = init_pooling_layer(inSize.width, inSize.height, 2, 6, 6, NC_AvePool);
 
     inSize.width = inSize.width / 2;
     inSize.height = inSize.height / 2;
@@ -211,7 +211,7 @@ void lenet5_setup(CNN* cnn, NcSize2D inputSize,int outputSize)
 
     inSize.width = inSize.width - mapSize + 1;
     inSize.height = inSize.height - mapSize + 1;
-    cnn->S4 = init_pooling_layer(inSize.width, inSize.height, 2, 12, 12, AvePool);
+    cnn->S4 = init_pooling_layer(inSize.width, inSize.height, 2, 12, 12, NC_AvePool);
 
     inSize.width = inSize.width / 2;
     inSize.height = inSize.height / 2;
@@ -344,7 +344,7 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     map_size = 2;
     in_channels = C1->out_channels;
     out_channels = 6;
-    pool_type = AvePool;
+    pool_type = NC_AvePool;
     NcPoolingParam* S2 = nc_train_create_pooling_param(in_size.height, in_size.width, map_size, in_channels, out_channels, pool_type);
 
     // create layer
@@ -405,7 +405,7 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     map_size = 2;
     in_channels = C3->out_channels;
     out_channels = 12;
-    pool_type = AvePool;
+    pool_type = NC_AvePool;
     NcPoolingParam* S4 = nc_train_create_pooling_param(in_size.height, in_size.width, map_size, in_channels, out_channels, pool_type);
 
     // create layer
@@ -570,7 +570,7 @@ void nc_lenet5_infer_setup(NcNet* net)
     int map_size;
     int in_channels;
     int out_channels;
-    int pool_type;
+    NcPoolingType pool_type;
     int input_blobs_num;
     int output_blobs_num;
     int* input_blob_ids;
@@ -629,8 +629,9 @@ void nc_lenet5_infer_setup(NcNet* net)
     map_size = 2;
     in_channels = C1->out_channels;
     out_channels = C1->out_channels;
-    pool_type = AvePool;
-    NcPoolingParam* S2 = nc_infer_create_pooling_param(map_size, in_channels, out_channels, pool_type);
+    pool_type = NC_POOLING_AVERAGE;
+    NcPaddingType pad_type = NC_PADDING_CONV_CAFFE; // TODO: fix this
+    NcPoolingParam* S2 = nc_infer_create_pooling_param(map_size, in_channels, pool_type, pad_type);
     layer->param = S2;
 
     //----------------------------------------------------------------
@@ -684,8 +685,8 @@ void nc_lenet5_infer_setup(NcNet* net)
     map_size = 2;
     in_channels = C3->out_channels;
     out_channels = 12;
-    pool_type = AvePool;
-    NcPoolingParam* S4 = nc_infer_create_pooling_param(map_size, in_channels, out_channels, pool_type);
+    pool_type = NC_POOLING_AVERAGE;
+    NcPoolingParam* S4 = nc_infer_create_pooling_param(map_size, in_channels, pool_type, pad_type);
     layer->param = S4;
 
     //----------------------------------------------------------------
@@ -832,6 +833,7 @@ int main()
     char mnist_data_dir[256] = {0};
     sprintf(mnist_data_dir, "%s/mnist", project_dir);
     extract_mnist_image_and_save(mnist_data_dir);
+
     //test_mnist_train_test();
     //nc_train_trial();
     //nc_infer_trial();

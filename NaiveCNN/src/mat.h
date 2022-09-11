@@ -9,9 +9,9 @@
 
 #include "naive_cnn.h"
 
-#define full 0
-#define same 1
-#define valid 2
+#define NC_FULL 0
+#define NC_SAME 1
+#define NC_VALID 2
 
 #ifdef __cplusplus
 extern "C" {

@@ -65,3 +65,5 @@ mnist/t10k-images.idx3-ubyte
 mnist/t10k-labels.idx1-ubyte
 mnist/train-images.idx3-ubyte
 mnist/train-labels.idx1-ubyte
+
+mnist/testImgs/*

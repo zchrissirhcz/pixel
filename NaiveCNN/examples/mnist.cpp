@@ -1,9 +1,11 @@
 #include "mnist.h"
-#include "loadbmp.h"
+#include "naive_cnn.h"
+
+#include <opencv2/opencv.hpp>
 
 // 英特尔处理器和其他低端机用户必须翻转头字节。
 static
-int reverse_int(int i)
+int mnist_reverse_int(int i)
 {
     unsigned char ch1, ch2, ch3, ch4;
     ch1 = i & 255;
@@ -28,7 +30,7 @@ int read_number_from_mnist_file(FILE* fin)
 {
     int number = 0;
     fread((char*)&number, sizeof(number), 1, fin);
-    number = reverse_int(number);
+    number = mnist_reverse_int(number);
     return number;
 }
 
@@ -59,7 +61,7 @@ int get_mnist_image_height(FILE* fin)
 {
     int n_rows = 0;
     fread((char*)&n_rows,sizeof(n_rows), 1, fin);
-    n_rows = reverse_int(n_rows);
+    n_rows = mnist_reverse_int(n_rows);
     return n_rows;
 }
 
@@ -69,7 +71,7 @@ int get_mnist_image_width(FILE* fin)
 {
     int n_cols = 0;
     fread((char*)&n_cols,sizeof(n_cols), 1, fin);
-    n_cols = reverse_int(n_cols);
+    n_cols = mnist_reverse_int(n_cols);
     return n_cols;
 }
 
@@ -100,10 +102,16 @@ mnist_image_array_t* read_mnist_image(const char* filename)
     int n_cols = get_mnist_image_width(fin);
     
     mnist_image_array_t* imgarr = create_mnist_image_array(number_of_images);
+    imgarr->n_cols = n_cols;
+    imgarr->n_rows = n_rows;
 
     for(int i = 0; i < number_of_images; i++)
     {
         imgarr->images_f32[i] = create_matrix(n_rows, n_cols);
+        imgarr->images_u8[i].height = n_rows;
+        imgarr->images_u8[i].width = n_cols;
+        imgarr->images_u8[i].channel = 1;
+        imgarr->images_u8[i].data = (uint8_t*)malloc(n_rows * n_cols * sizeof(uint8_t));
         read_mnist_single_image(n_rows, n_cols, imgarr, fin, i);
     }
 
@@ -169,15 +177,14 @@ void extract_mnist_image_and_save(const char* mnist_data_dir)
     {
         char save_pth[NC_MAX_PATH];
         sprintf(save_pth, "%s/testImgs/%d.bmp", mnist_data_dir, i);
-        FILE* fp = fopen(save_pth, "wb");
         NcImage image = image_array->images_u8[i];
-        unsigned int err = loadbmp_encode_file(save_pth, image.data, image.width, image.height, 1);
+        cv::Size size;
+        size.height = image.height;
+        size.width = image.width;
 
-        if (err)
-        {
-            printf("LoadBMP Load Error: %u\n", err);
-        }
-        fclose(fp);
+        cv::Mat mat(size, CV_8UC1, image.data);
+        cv::imwrite(save_pth, mat);
+        //printf("save_pth is %s\n", save_pth);
     }
 
     destroy_mnist_image_array(image_array);
@@ -185,5 +192,5 @@ void extract_mnist_image_and_save(const char* mnist_data_dir)
 
 void destroy_mnist_image_array(mnist_image_array_t* image_array)
 {
-    
+
 }

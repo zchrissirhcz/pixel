@@ -9,6 +9,8 @@ typedef struct mnist_image_array_t
     int size;
     mnist_image_t* images_f32;
     NcImage* images_u8;
+    int n_cols;
+    int n_rows;
 } mnist_image_array_t;
 
 typedef px_array_t mnist_label_t;
