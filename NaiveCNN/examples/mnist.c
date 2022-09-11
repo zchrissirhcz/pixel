@@ -173,7 +173,8 @@ float mnist_cnn_test(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData
 // extract images from original mnist data
 // save each image to file
 // for simplicity, only do it on test images
-void extract_mnist_image_and_save(){
+void extract_mnist_image_and_save()
+{
     char test_image_pth[NC_MAX_PATH];
     sprintf(test_image_pth, "%s/mnist/t10k-images.idx3-ubyte", project_dir);
 
@@ -182,11 +183,12 @@ void extract_mnist_image_and_save(){
     nc_read_mnist_image(test_image_pth, &images, &image_num);
     printf("=== got %d test images\n", image_num);
 
-    for(int i=0; i<image_num; i++) {
+    for(int i=0; i < image_num; i++)
+    {
         char save_pth[NC_MAX_PATH];
         sprintf(save_pth, "%s/mnist/testImgs/%d.bmp", project_dir, i);
         FILE* fp = fopen(save_pth, "wb");
-        unsigned int err = loadbmp_encode_file(save_pth, images[i]->data, images[i]->w, images[i]->h, 1);
+        unsigned int err = loadbmp_encode_file(save_pth, images[i]->data, images[i]->width, images[i]->height, 1);
 
         if (err){
             printf("LoadBMP Load Error: %u\n", err);
@@ -194,7 +196,8 @@ void extract_mnist_image_and_save(){
         fclose(fp);
     }
 
-    for(int i=0; i<image_num; i++) {
+    for(int i = 0; i < image_num; i++)
+    {
         free(images[i]->data);
         free(images[i]);
     }
@@ -825,18 +828,21 @@ void nc_lenet5_infer_setup(NcNet* net) {
     }
 }
 
-void nc_infer(NcNet* net, NcImage* image) {
+void nc_infer(NcNet* net, NcImage* image)
+{
     // allocate network's input blobs
     //net->blobs[0] = nc_make_blob3d(image->h, image->w, image->c);
-    nc_blob_data_realloc3d(net->blobs[0], image->h, image->w, image->c);
+    nc_blob_data_realloc3d(net->blobs[0], image->height, image->width, image->channel);
 
     // assign each blobs' rely cnt
-    for (int i = 0; i < net->blobs_num; i++) {
+    for (int i = 0; i < net->blobs_num; i++)
+    {
         net->blobs[i]->rely_cnt = net->blobs[i]->rely_cnt_total;
     }
 
     NcLayer* layer = NULL;
-    for (int i = 0; i < net->layers_num; i++) {
+    for (int i = 0; i < net->layers_num; i++)
+    {
         layer = net->layers[i];
         layer->infer(layer->param, layer->input, layer->output);
     }

@@ -7,25 +7,26 @@
 #include "naive_config.h"
 #include "px_arithm.h"
 
-
-NcImage* nc_create_image(int h, int w, int c, unsigned char* data){
+NcImage* nc_create_image(int height, int width, int channel, unsigned char* data)
+{
     NcImage* im = (NcImage*)malloc(sizeof(NcImage));
-    im->h = h;
-    im->w = w;
-    im->c = c;
-    im->linebytes = px_align_up(h*w, NC_IMAGE_ALIGN);
-    im->elem_num = im->linebytes * c;
+    im->height = height;
+    im->width = width;
+    im->channel = channel;
+    im->cstep = px_align_up(height * width, NC_IMAGE_ALIGN);
+    im->elem_num = im->cstep * channel;
     im->data = data;
     return im;
 }
 
-NcImage* nc_create_empty_image(int h, int w, int c){
+NcImage* nc_create_empty_image(int height, int width, int channel)
+{
     NcImage* im = (NcImage*)malloc(sizeof(NcImage));
-    im->h = h;
-    im->w = w;
-    im->c = c;
-    im->linebytes = px_align_up(h*w, NC_IMAGE_ALIGN);
-    im->elem_num = im->linebytes * c;
+    im->height = height;
+    im->width = width;
+    im->channel = channel;
+    im->cstep = px_align_up(height * width, NC_IMAGE_ALIGN);
+    im->elem_num = im->cstep * channel;
     im->data = (unsigned char*)malloc(sizeof(unsigned char)*im->elem_num);
     return im;
 }
