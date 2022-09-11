@@ -113,7 +113,8 @@ matrix_t* correlation(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D
     matrix_t* output = create_matrix(outSizeH, outSizeW);
 
     // 为了方便计算，将inputData扩大一圈
-    matrix_t* expaned_input = mat_edge_expand(input, mapSize.width-1, mapSize.height-1);
+    px_pad_t pad = px_create_pad(mapSize.height-1, mapSize.height-1, mapSize.width-1, mapSize.width-1);
+    matrix_t* expaned_input = mat_edge_expand(input, pad);
 
     for (j = 0; j < outSizeH; j++)
     {
@@ -169,59 +170,54 @@ matrix_t* conv(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize
 }
 
 // 这个是矩阵的上采样（等值内插），upc及upr是内插倍数
-float** up_sample(float** mat, NcSize2D matSize, int upc,int upr)
+matrix_t* up_sample(matrix_t* input, int upc, int upr)
 {
-    int i, j, m, n;
-    int c = matSize.width;
-    int r = matSize.height;
-    float** res=(float**)malloc((r*upr)*sizeof(float*)); // 结果的初始化
-    for (i = 0; i < (r*upr); i++)
-    {
-        res[i] = (float*)malloc((c*upc) * sizeof(float));
-    }
+    const int out_height = input->height * upr;
+    const int out_width = input->width * upc;
+    matrix_t* output = create_matrix(out_height, out_width);
 
-    for(j = 0; j < r * upr; j = j+upr)
+    for(int j = 0; j < output->height; j = j + upr)
     {
         // 宽的扩充
-        for (i = 0; i < c*upc; i = i + upc)
+        for (int i = 0; i < output->width; i = i + upc)
         {
-            for (m = 0; m < upc; m++)
+            for (int m = 0; m < upc; m++)
             {
-                res[j][i + m] = mat[j / upr][i / upc];
+                output->data[j][i + m] = input->data[j / upr][i / upc];
             }
         }
 
         // 高的扩充
-        for (n = 1; n < upr; n++)
+        for (int n = 1; n < upr; n++)
         {
-            for (i = 0; i < c*upc; i++)
+            for (int i = 0; i < output->width; i++)
             {
-                res[j + n][i] = res[j][i];
+                output->data[j + n][i] = output->data[j][i];
             }
         }
     }
-    return res;
+    return output;
 }
 
 // 给二维矩阵边缘扩大，增加addw大小的0值边
-matrix_t* mat_edge_expand(matrix_t* input, int addc, int addr)
+matrix_t* mat_edge_expand(matrix_t* input, px_pad_t pad)
 {   
     // 向量边缘扩大
-    const int out_height = input->height + 2 * addr;
-    const int out_width = input->width + 2 * addc;
+    const int out_height = input->height + pad.top + pad.bottom;
+    const int out_width = input->width + pad.left + pad.right;
     matrix_t* output = create_matrix(out_height, out_width);
 
     for(int j = 0; j < out_height; j++)
     {
         for(int i = 0; i < out_width; i++)
         {
-            if (j < addr || i < addc || j >= (input->height + addr) || i >= (input->width + addc))
+            if (j < pad.top || i < pad.left || j >= (input->height + pad.top) || i >= (input->width + pad.left))
             {
-                output->data[j][i] = (float)0.0;
+                output->data[j][i] = 0.0f;
             }
             else
             {
-                output->data[j][i] = input->data[j - addr][i - addc]; // 复制原向量的数据
+                output->data[j][i] = input->data[j - pad.top][i - pad.left]; // 复制原向量的数据
             }
         }
     }

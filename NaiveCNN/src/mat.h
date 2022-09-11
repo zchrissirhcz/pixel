@@ -35,10 +35,10 @@ matrix_t* correlation(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D
 matrix_t* conv(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize, int type); // 卷积操作
 
 // 这个是矩阵的上采样（等值内插），upc及upr是内插倍数
-float** up_sample(float** mat, NcSize2D matSize, int upc, int upr);
+matrix_t* up_sample(matrix_t* input, int upc, int upr);
 
 // 给二维矩阵边缘扩大，增加addw大小的0值边
-matrix_t* mat_edge_expand(matrix_t* input, int addc, int addr);
+matrix_t* mat_edge_expand(matrix_t* input, px_pad_t pad);
 
 // 给二维矩阵边缘缩小，擦除shrinkc大小的边
 matrix_t* mat_edge_shrink(matrix_t* input, int shrinkc, int shrinkr);

@@ -474,19 +474,19 @@ void cnn_backward(CNN* cnn,float* outputData)
     // 这里的Pooling是求平均，所以反向传递到下一神经元的误差梯度没有变化
     for(i = 0; i < cnn->C3->out_channels; i++)
     {
-        float** C3e = up_sample(cnn->S4->d[i],S4dSize,cnn->S4->map_size,cnn->S4->map_size);
+        matrix_t input;
+        input.height = S4dSize.height;
+        input.width = S4dSize.width;
+        input.data = cnn->S4->d[i];
+        matrix_t* C3e = up_sample(&input, cnn->S4->map_size, cnn->S4->map_size);
         for (r = 0; r < cnn->S4->in_height; r++)
         {
             for (c = 0; c < cnn->S4->in_width; c++)
             {
-                cnn->C3->d[i][r][c] = C3e[r][c] * sigma_derivation(cnn->C3->y[i][r][c]) / (float)(cnn->S4->map_size*cnn->S4->map_size);
+                cnn->C3->d[i][r][c] = C3e->data[r][c] * sigma_derivation(cnn->C3->y[i][r][c]) / (float)(cnn->S4->map_size*cnn->S4->map_size);
             }
         }
-        for (r = 0; r < cnn->S4->in_height; r++)
-        {
-            free(C3e[r]);
-        }
-        free(C3e);
+        destroy_matrix(C3e);
     }
 
     // S2层，S2层没有激活函数，这里只有卷积层有激活函数部分
@@ -537,19 +537,19 @@ void cnn_backward(CNN* cnn,float* outputData)
     // 这里的Pooling是求平均，所以反向传递到下一神经元的误差梯度没有变化
     for(i = 0; i < cnn->C1->out_channels; i++)
     {
-        float** C1e = up_sample(cnn->S2->d[i],S2dSize,cnn->S2->map_size,cnn->S2->map_size);
+        matrix_t input;
+        input.height = S2dSize.height;
+        input.width = S2dSize.width;
+        input.data = cnn->S2->d[i];
+        matrix_t* C1e = up_sample(&input, cnn->S2->map_size, cnn->S2->map_size);
         for (r = 0; r < cnn->S2->in_height; r++)
         {
             for (c = 0; c < cnn->S2->in_width; c++)
             {
-                cnn->C1->d[i][r][c] = C1e[r][c] * sigma_derivation(cnn->C1->y[i][r][c]) / (float)(cnn->S2->map_size*cnn->S2->map_size);
+                cnn->C1->d[i][r][c] = C1e->data[r][c] * sigma_derivation(cnn->C1->y[i][r][c]) / (float)(cnn->S2->map_size*cnn->S2->map_size);
             }
         }
-        for (r = 0; r < cnn->S2->in_height; r++)
-        {
-            free(C1e[r]);
-        }
-        free(C1e);
+        destroy_matrix(C1e);
     }
 }
 

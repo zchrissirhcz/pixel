@@ -152,33 +152,33 @@ int px_get_cube_volume(const px_cube_t* cube)
     return cube->height * cube->width * cube->channel;
 }
 
-px_matrix_t* px_copy_make_border_for_matrix(const px_matrix_t* matrix, const px_pad_t pad)
+px_matrix_t* px_copy_make_border_for_matrix(const px_matrix_t* input, const px_pad_t pad)
 {
     if (pad.top < 0 || pad.bottom < 0 || pad.left < 0 || pad.right < 0)
     {
         PX_LOGE("invalid padding\n");
         return NULL;
     }
-    if (matrix == NULL || matrix->data == NULL || matrix->height < 0 || matrix->width < 0)
+    if (input == NULL || input->data == NULL || input->height < 0 || input->width < 0)
     {
         PX_LOGE("invalid matrix\n");
         return NULL;
     }
 
-    const int padded_h = matrix->height + pad.top + pad.bottom;
-    const int padded_w = matrix->width + pad.left + pad.right;
+    const int padded_h = input->height + pad.top + pad.bottom;
+    const int padded_w = input->width + pad.left + pad.right;
     px_matrix_dim_t padded_dim = {0};
     padded_dim.height = padded_h;
     padded_dim.width = padded_w;
     px_matrix_t* padded_matrix = px_create_matrix(padded_dim);
 
-    const int pad_value = 0;
+    const float pad_value = 0.f;
     for (int i = 0; i < padded_h; i++)
     {
         for (int j = 0; j < padded_w; j++)
         {
-            if (i < pad.top || i >= matrix->height + pad.top
-             || j < pad.left || j >= matrix->width + pad.left)
+            if (i < pad.top || i >= input->height + pad.top
+             || j < pad.left || j >= input->width + pad.left)
             {
                 px_set_matrix_value(padded_matrix, i, j, pad_value);
             }
@@ -186,7 +186,7 @@ px_matrix_t* px_copy_make_border_for_matrix(const px_matrix_t* matrix, const px_
             {
                 const int si = i - pad.top;
                 const int sj = j - pad.left;
-                const float value = px_get_matrix_value(matrix, si, sj);
+                const float value = px_get_matrix_value(input, si, sj);
                 px_set_matrix_value(padded_matrix, i, j, value);
             }
         }
