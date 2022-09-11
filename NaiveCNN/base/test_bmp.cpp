@@ -4,7 +4,7 @@
 #include "nc_image.h"
 
 int main__(){
-    NcImage* im = nc_make_empty_image();
+    NcImage* im = nc_create_empty_image();
     const char* im_pth = "/Users/chris/work/gitee/naiveimg/hh/src/image.bmp";
     nc_image_load_bmp(im_pth, &im->data, &im->h, &im->w, 3, false);
     printf("im->h=%d, im->w=%d\n", im->h, im->w);
@@ -20,7 +20,7 @@ int main__(){
 }
 
 int main(){
-    NcImage* im = nc_make_image_zero(1024, 1024, 3);
+    NcImage* im = nc_create_image_zero(1024, 1024, 3);
     printf("im->h=%d, im->w=%d\n", im->h, im->w);
     uchar* buf = im->data;
     for(int h=0; h<im->h; h++){

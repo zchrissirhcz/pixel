@@ -289,7 +289,7 @@ void nc_read_mnist_image(const char* filename, NcImage*** _images, int* _image_n
     NcImage** images = (NcImage**)malloc(sizeof(NcImage*)*number_of_images);
 
     for (i = 0; i < number_of_images; ++i) {
-        images[i] = nc_make_empty_image(n_rows, n_cols, 1);
+        images[i] = nc_create_empty_image(n_rows, n_cols, 1);
         fread(images[i]->data, images[i]->elem_num, 1, fp);
     }
 

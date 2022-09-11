@@ -8,8 +8,7 @@
 #include "px_arithm.h"
 
 
-// create image
-NcImage* nc_make_image(int h, int w, int c, unsigned char* data){
+NcImage* nc_create_image(int h, int w, int c, unsigned char* data){
     NcImage* im = (NcImage*)malloc(sizeof(NcImage));
     im->h = h;
     im->w = w;
@@ -20,8 +19,7 @@ NcImage* nc_make_image(int h, int w, int c, unsigned char* data){
     return im;
 }
 
-// create empty image
-NcImage* nc_make_empty_image(int h, int w, int c){
+NcImage* nc_create_empty_image(int h, int w, int c){
     NcImage* im = (NcImage*)malloc(sizeof(NcImage));
     im->h = h;
     im->w = w;

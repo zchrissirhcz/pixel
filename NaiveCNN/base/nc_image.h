@@ -15,16 +15,16 @@ extern "C" {
 #endif
 
 // make an empty image, i.e. height/width/channel/data==0
-NcImage* nc_make_empty_image();
+NcImage* nc_create_empty_image();
 
 // make an image header, i.e. data will be NULL
-NcImage* nc_make_image_header(uint h, uint w, uint c);
+NcImage* nc_create_image_header(uint h, uint w, uint c);
 
 // make an image, whose data will be filled with 0s
-NcImage* nc_make_image_zero(uint h, uint w, uint c);
+NcImage* nc_create_image_zero(uint h, uint w, uint c);
 
 // make an image, whose data will point to specified data
-NcImage* nc_make_image(uint h, uint w, uint c, unsigned char* data);
+NcImage* nc_create_image(uint h, uint w, uint c, unsigned char* data);
 
 // load an bmp image (BGR order)
 void nc_image_load_bmp(const char* filename, uchar** _buf, uint* _h, uint* _w, uint c, bool line_align);

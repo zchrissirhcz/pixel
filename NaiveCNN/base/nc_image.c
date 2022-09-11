@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-NcImage* nc_make_empty_image() {
+NcImage* nc_create_empty_image() {
     NcImage* im = (NcImage*)malloc(sizeof(NcImage));
     im->h = 0; im->w = 0; im->c = 0;
     im->linebytes = 0;
@@ -12,7 +12,7 @@ NcImage* nc_make_empty_image() {
     return im;
 }
 
-NcImage* nc_make_image_header(uint h, uint w, uint c) {
+NcImage* nc_create_image_header(uint h, uint w, uint c) {
     NcImage* im = (NcImage*)malloc(sizeof(NcImage));
     im->h = h; im->w = w; im->c = c;
     im->linebytes = w * c; //TODO: align here
@@ -21,14 +21,14 @@ NcImage* nc_make_image_header(uint h, uint w, uint c) {
     return im;
 }
 
-NcImage* nc_make_image_zero(uint h, uint w, uint c) {
-    NcImage* im = nc_make_image_header(h, w, c);
+NcImage* nc_create_image_zero(uint h, uint w, uint c) {
+    NcImage* im = nc_create_image_header(h, w, c);
     im->data = (unsigned char*)calloc(im->mass, 1);
     return im;
 }
 
-NcImage* nc_make_image(uint h, uint w, uint c, uchar* data) {
-    NcImage* im = nc_make_image_header(h, w, c);
+NcImage* nc_create_image(uint h, uint w, uint c, uchar* data) {
+    NcImage* im = nc_create_image_header(h, w, c);
     im->data = data;
     return im;
 }

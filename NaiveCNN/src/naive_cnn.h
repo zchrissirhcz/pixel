@@ -194,10 +194,10 @@ extern "C" {
 #endif
 
 // create image
-NcImage* nc_make_image(int h, int w, int c, unsigned char* data);
+NcImage* nc_create_image(int h, int w, int c, unsigned char* data);
 
 // create empty image
-NcImage* nc_make_empty_image(int h, int w, int c);
+NcImage* nc_create_empty_image(int h, int w, int c);
 
 float nc_get_random_float(float s, float t);
 NcBlob* nc_blob_make_empty(int n, int h, int w, int c);
