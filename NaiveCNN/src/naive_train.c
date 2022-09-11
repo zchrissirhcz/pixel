@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
-#include "naive_convolution.h"
 
 NcConvolutionParam* nc_train_make_convolution_param(int in_height, int in_width, int map_size, int in_channels, int out_channels){
     NcConvolutionParam* param = (NcConvolutionParam*)malloc(sizeof(NcConvolutionParam));

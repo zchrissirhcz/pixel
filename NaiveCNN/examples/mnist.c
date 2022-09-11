@@ -13,7 +13,6 @@
 #include "loadbmp.h"
 
 #include "naive_cnn.h"
-#include "naive_convolution.h"
 
 //英特尔处理器和其他低端机用户必须翻转头字节。
 int reverse_int(int i)

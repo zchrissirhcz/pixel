@@ -1,10 +1,6 @@
-#include "naive_convolution.h"
-
 #include <stdio.h>
 #include "naive_cnn.h"
 #include <stdlib.h>
-
-
 
 void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, NcStride* stride) {
     int out_h = 0;

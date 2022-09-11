@@ -7,8 +7,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include "naive_convolution.h"
-
 float nc_get_random_float(float s, float t){
     float v = (float)(rand()) / RAND_MAX;
     v = v * (t - s) + s;
