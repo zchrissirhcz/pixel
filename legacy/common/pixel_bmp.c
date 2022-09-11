@@ -375,7 +375,7 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
 
 void pxl_encode_bmp(const char* fn, int ht, int wt, int cn, const unsigned char* buf, int read_linebytes, bool swap_bgr)
 {
-    //void nc_image_save_bmp(const uchar* buf, uint read_linebytes) {
+    //void nc_save_bmp(const uchar* buf, uint read_linebytes) {
     int height = ht;
     int width = wt;
     int channels = cn;

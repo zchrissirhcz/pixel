@@ -20,7 +20,7 @@
     printf("=== NcError! Reason: %s. Position: line %d, file %s\n\n", #ret_code, __LINE__, __FILE__); \
     exit(ret_code)
 
-void nc_image_load_bmp(const char* filename, uchar** _buf, uint* _height, uint* _width, uint channel, bool line_align)
+void nc_image_load_bmp(const char* filename, uint8_t** _buf, uint32_t* _height, uint32_t* _width, uint32_t channel, bool line_align)
 {
     FILE* fp = fopen(filename, "rb");
 
@@ -51,28 +51,28 @@ void nc_image_load_bmp(const char* filename, uchar** _buf, uint* _height, uint* 
         nc_bark_exit(NC_LOADBMP_INVALID_BITS_PER_PIXEL);
     }
 
-    uint width = (uint)hd[18] << 0 | (uint)hd[19] << 8 | (uint)hd[20] << 16 | (uint)hd[21] << 24;
-    uint height = (uint)hd[22] << 0 | (uint)hd[23] << 8 | (uint)hd[24] << 16 | (uint)hd[25] << 24;
+    uint32_t width = (uint32_t)hd[18] << 0 | (uint32_t)hd[19] << 8 | (uint32_t)hd[20] << 16 | (uint32_t)hd[21] << 24;
+    uint32_t height = (uint32_t)hd[22] << 0 | (uint32_t)hd[23] << 8 | (uint32_t)hd[24] << 16 | (uint32_t)hd[25] << 24;
 
     unsigned char* buf = NULL;
     if (width > 0 && height > 0)
     {
         // w*3: we only need to store BGR instead of BGRA image
-        uint line_bytes = line_align ? px_align_up(width * 3, 4) : width * 3;
-        uint line_pad = line_bytes - width * 3; // for store
-        buf = (uchar*)malloc(line_bytes * channel);
+        uint32_t line_bytes = line_align ? px_align_up(width * 3, 4) : width * 3;
+        uint32_t line_pad = line_bytes - width * 3; // for store
+        buf = (uint8_t*)malloc(line_bytes * channel);
         if (!buf)
         {
             fclose(fp);
             nc_bark_exit(NC_LOADBMP_OUT_OF_MEMORY);
         }
 
-        uint padding = px_align_up(width * 3, 4) - width * 3; // for read
+        uint32_t padding = px_align_up(width * 3, 4) - width * 3; // for read
         unsigned char bmp_pad[3];
         unsigned char* cur = buf;
-        for (uint h = height - 1; h > 0; h--)
+        for (uint32_t h = height - 1; h > 0; h--)
         {
-            for (uint w = 0; w < width; w++)
+            for (uint32_t w = 0; w < width; w++)
             {
                 // get pixel with BGR order
                 if (0 == fread(cur, 3, 1, fp))
@@ -105,7 +105,7 @@ void nc_image_load_bmp(const char* filename, uchar** _buf, uint* _height, uint* 
     fclose(fp);
 }
 
-void nc_image_save_bmp(const char* filename, const uchar* buf, uint height, uint width, uint channel)
+void nc_image_save_bmp(const char* filename, const uint8_t* buf, uint32_t height, uint32_t width, uint32_t channel)
 {
     FILE* fp = fopen(filename, "wb");
     if (!fp)
@@ -120,20 +120,20 @@ void nc_image_save_bmp(const char* filename, const uchar* buf, uint height, uint
     };
     const unsigned int size = 54 + width * height * 3; //3channel
 
-    hd[2] = (uchar)(size);
-    hd[3] = (uchar)(size >> 8);
-    hd[4] = (uchar)(size >> 16);
-    hd[5] = (uchar)(size >> 24);
+    hd[2] = (uint8_t)(size);
+    hd[3] = (uint8_t)(size >> 8);
+    hd[4] = (uint8_t)(size >> 16);
+    hd[5] = (uint8_t)(size >> 24);
 
-    hd[18] = (uchar)(width);
-    hd[19] = (uchar)(width >> 8);
-    hd[20] = (uchar)(width >> 16);
-    hd[21] = (uchar)(width >> 24);
+    hd[18] = (uint8_t)(width);
+    hd[19] = (uint8_t)(width >> 8);
+    hd[20] = (uint8_t)(width >> 16);
+    hd[21] = (uint8_t)(width >> 24);
 
-    hd[22] = (uchar)(height);
-    hd[23] = (uchar)(height >> 8);
-    hd[24] = (uchar)(height >> 16);
-    hd[25] = (uchar)(height >> 24);
+    hd[22] = (uint8_t)(height);
+    hd[23] = (uint8_t)(height >> 8);
+    hd[24] = (uint8_t)(height >> 16);
+    hd[25] = (uint8_t)(height >> 24);
 
     if (1 != fwrite(hd, 54, 1, fp))
     {
@@ -142,11 +142,11 @@ void nc_image_save_bmp(const char* filename, const uchar* buf, uint height, uint
     }
 
     char bmp_pad[3] = {0, 0, 0};
-    uint pixel_bytes = width * 3;
-    uint line_bytes = px_align_up(width * 3, 4);
-    uint line_pad = line_bytes - pixel_bytes;
+    uint32_t pixel_bytes = width * 3;
+    uint32_t line_bytes = px_align_up(width * 3, 4);
+    uint32_t line_pad = line_bytes - pixel_bytes;
     buf += line_bytes * (height - 1);
-    for (uint h = height - 1; h != -1; h--)
+    for (uint32_t h = height - 1; h != -1; h--)
     {
         if (fwrite(buf, pixel_bytes, 1, fp) == 1 && fwrite(bmp_pad, 1, line_pad, fp) == line_pad)
         {

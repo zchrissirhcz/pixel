@@ -13,6 +13,9 @@ add_library(cnn STATIC
   src/naive_convolution.c
   src/naive_pooling.c
   src/naive_relu.c
+
+  src/nc_bmp.c
+  src/nc_image.h
 )
 target_link_libraries(cnn PUBLIC pixel)
 

@@ -281,6 +281,9 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
 void nc_convolution_test_nchw();
 void nc_convolution_test_nhwc();
 
+void nc_image_rgb_to_bgr_inplace(NcImage* im);
+void nc_image_bgr_to_rgb_inplace(NcImage* im);
+
 #ifdef __cplusplus
 }
 #endif

@@ -6,6 +6,7 @@
 #include "mat.h"
 #include "px_arithm.h"
 #include "naive_cnn.h"
+#include "px_assert.h"
 
 static NcImage* nc_create_image_header(int height, int width, int channel)
 {
@@ -322,4 +323,23 @@ float summat(matrix_t* mat)
         }
     }
     return sum;
+}
+
+
+void nc_swap_rgb_and_bgr_inplace(NcImage* im)
+{
+    PX_ASSERT(im->channel == 3);
+
+    const int cn = im->channel;
+    for (int i = 0; i < im->height; i++)
+    {
+        uint8_t* ptr = im->data + i * im->width * im->channel;
+        for (int j = 0; j < im->width; j++)
+        {
+            uint8_t t = ptr[0];
+            ptr[0] = ptr[2];
+            ptr[2] = t;
+            ptr += cn;
+        }
+    }
 }
