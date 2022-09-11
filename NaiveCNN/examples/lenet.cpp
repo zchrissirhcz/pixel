@@ -835,11 +835,11 @@ void nc_infer_trial()
 
 int main()
 {
-    char mnist_data_dir[256] = {0};
-    sprintf(mnist_data_dir, "%s/mnist", project_dir);
-    extract_mnist_image_and_save(mnist_data_dir);
+    // char mnist_data_dir[256] = {0};
+    // sprintf(mnist_data_dir, "%s/mnist", project_dir);
+    // extract_mnist_image_and_save(mnist_data_dir);
 
-    //test_mnist_train_test();
+    test_mnist_train_test();
     //nc_train_trial();
     //nc_infer_trial();
 

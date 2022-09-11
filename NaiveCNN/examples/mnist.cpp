@@ -123,10 +123,12 @@ mnist_image_array_t* read_mnist_image(const char* filename)
 static
 mnist_label_array_t* create_mnist_label_array_t(int number_of_labels)
 {
-    mnist_label_array_t* labarr = (mnist_label_array_t*)malloc(sizeof(mnist_label_array_t));
-    labarr->size = number_of_labels;
-    labarr->one_hot_label = (mnist_label_t*)malloc(number_of_labels*sizeof(mnist_label_t));
-    return labarr;
+    mnist_label_array_t* label_array = (mnist_label_array_t*)malloc(sizeof(mnist_label_array_t));
+    memset(label_array, 0, sizeof(mnist_label_array_t));
+    label_array->size = number_of_labels;
+    label_array->label = (int*)malloc(number_of_labels * sizeof(int));
+    label_array->one_hot_label = (mnist_label_t*)malloc(number_of_labels*sizeof(mnist_label_t));
+    return label_array;
 }
 
 static
@@ -207,7 +209,7 @@ void destroy_mnist_label_array(mnist_label_array_t* label_array)
 {
     for (int i = 0; i < label_array->size; i++)
     {
-        px_destroy_array(&label_array->one_hot_label[i]);
+        free(label_array->one_hot_label[i].data);
     }
     free(label_array->one_hot_label);
     free(label_array->label);

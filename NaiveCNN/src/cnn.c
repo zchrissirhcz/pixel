@@ -268,8 +268,8 @@ void cnn_forward(CNN* cnn, matrix_t* input)
             res.data = cnn->C1->v[i];
 
             matrix_t mat1;
-            mat1.height = mapSize.height;
-            mat1.width = mapSize.width;
+            mat1.height = outSize.height;
+            mat1.width = outSize.width;
             mat1.data = cnn->C1->v[i];
 
             addmat(&mat1, mapout, &res);
@@ -336,8 +336,8 @@ void cnn_forward(CNN* cnn, matrix_t* input)
             res.data = cnn->C3->v[i];
 
             matrix_t mat1;
-            mat1.height = mapSize.height;
-            mat1.width = mapSize.width;
+            mat1.height = outSize.height;
+            mat1.width = outSize.width;
             mat1.data = cnn->C3->v[i];
 
             addmat(&mat1, mapout, &res);
@@ -379,9 +379,12 @@ void cnn_forward(CNN* cnn, matrix_t* input)
     // 输出层O5的处理
     // 首先需要将前面的多维输出展开成一维向量
     float* O5inData=(float*)malloc((cnn->O5->inputNum)*sizeof(float));
-    for (i = 0; i < (cnn->S4->out_channels); i++) {
-        for (r = 0; r < outSize.height; r++) {
-            for (c = 0; c < outSize.width; c++) {
+    for (i = 0; i < (cnn->S4->out_channels); i++)
+    {
+        for (r = 0; r < outSize.height; r++)
+        {
+            for (c = 0; c < outSize.width; c++)
+            {
                 O5inData[i*outSize.height*outSize.width + r * outSize.width + c] = cnn->S4->y[i][r][c];
             }
         }
@@ -535,13 +538,13 @@ void cnn_backward(CNN* cnn,float* outputData)
             matrix_t* corr = correlation(&map, &input, NC_FULL);
 
             matrix_t res;
-            res.height = mapSize.height;
-            res.width = mapSize.width;
+            res.height = outSize.height;
+            res.width = outSize.width;
             res.data = cnn->S2->d[i];
 
             matrix_t mat1;
-            mat1.height = mapSize.height;
-            mat1.width = mapSize.width;
+            mat1.height = outSize.height;
+            mat1.width = outSize.width;
             mat1.data = cnn->S2->d[i];
 
             addmat(&mat1, corr, &res);
