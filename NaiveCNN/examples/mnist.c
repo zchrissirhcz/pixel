@@ -110,16 +110,16 @@ MnistLabelArr* read_mnist_label(const char* filename)
 
     // 图像标记数组的初始化
     MnistLabelArr* labarr = (MnistLabelArr*)malloc(sizeof(MnistLabelArr));
-    labarr->LabelNum=number_of_labels;
-    labarr->LabelPtr=(MnistLabel*)malloc(number_of_labels*sizeof(MnistLabel));
+    labarr->LabelNum = number_of_labels;
+    labarr->LabelPtr = (mnist_label_t*)malloc(number_of_labels*sizeof(mnist_label_t));
 
     for(i = 0; i < number_of_labels; ++i)
     {
-        labarr->LabelPtr[i].l=10;
-        labarr->LabelPtr[i].LabelData=(float*)calloc(label_long,sizeof(float));
+        labarr->LabelPtr[i].len = 10;
+        labarr->LabelPtr[i].data = (float*)calloc(label_long,sizeof(float));
         unsigned char temp = 0;
-        fread((char*) &temp, sizeof(temp),1,fp);
-        labarr->LabelPtr[i].LabelData[(int)temp]=1.0;
+        fread((char*) &temp, sizeof(temp), 1, fp);
+        labarr->LabelPtr[i].data[(int)temp] = 1.0f;
     }
 
     fclose(fp);
@@ -141,7 +141,7 @@ void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, MnistLabelArr* ou
             input.width = inputData->images[n].width;
             input.data = inputData->images[n].data;
             cnn_forward(cnn, &input);  // 前向传播，这里主要计算各
-            cnn_backward(cnn, outputData->LabelPtr[n].LabelData); // 后向传播，这里主要计算各神经元的误差梯度
+            cnn_backward(cnn, outputData->LabelPtr[n].data); // 后向传播，这里主要计算各神经元的误差梯度
 
 
             //char* filedir="E:\\Code\\debug\\CNNData\\";
@@ -183,7 +183,7 @@ float mnist_cnn_test(CNN* cnn, mnist_image_array_t* inputData, MnistLabelArr* ou
         cnn_input.width = inputData->images[n].width;
         cnn_input.data = inputData->images[n].data;
         cnn_forward(cnn, &cnn_input);
-        if (argmax(cnn->O5->y, cnn->O5->outputNum) != argmax(outputData->LabelPtr[n].LabelData, cnn->O5->outputNum))
+        if (argmax(cnn->O5->y, cnn->O5->outputNum) != argmax(outputData->LabelPtr[n].data, cnn->O5->outputNum))
         {
             incorrectnum++;
         }
@@ -246,7 +246,7 @@ int test_mnist_train_test()
     mnist_image_array_t* testImg= read_mnist_image(test_image_pth);
 
     NcSize2D inputSize = px_create_size(testImg->images[0].height, testImg->images[0].width);
-    int outSize=testLabel->LabelPtr[0].l;
+    int outSize = testLabel->LabelPtr[0].len;
 
     // CNN structure init
     CNN* cnn=(CNN*)malloc(sizeof(CNN));

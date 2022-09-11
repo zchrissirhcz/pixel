@@ -9,19 +9,18 @@
 
 typedef matrix_t mnist_image_t;
 
-typedef struct mnist_image_array_t {
+typedef struct mnist_image_array_t
+{
     int size;
     mnist_image_t* images;
 } mnist_image_array_t;
 
-typedef struct MnistLabel{
-    int l;            // 输出标记的长
-    float* LabelData; // 输出标记数据
-} MnistLabel;
+typedef px_array_t mnist_label_t;
 
-typedef struct MnistLabelArr{
+typedef struct MnistLabelArr
+{
     int LabelNum;
-    MnistLabel* LabelPtr;
+    mnist_label_t* LabelPtr;
 } MnistLabelArr;  // 存储图像标记的数组
 
 #ifdef __cplusplus
