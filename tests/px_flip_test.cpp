@@ -59,7 +59,6 @@ TEST(flip_gray, naive)
         // printf("debug:\n");
         // printf("%c, %c\n%c, %c\n", actual->data[0], actual->data[1], actual->data[2], actual->data[3]);
 
-
         EXPECT_TRUE(px_image_almost_equal(expected, actual, 0));
     }
 
@@ -67,7 +66,6 @@ TEST(flip_gray, naive)
     px_destroy_image(actual);
     px_destroy_image(expected);
 }
-
 
 TEST(flip_rgb, naive)
 {
@@ -77,7 +75,7 @@ TEST(flip_rgb, naive)
     src->data[0] = 'A';
     src->data[1] = 'B';
     src->data[2] = 'C';
-    
+
     src->data[3] = 'B';
     src->data[4] = 'C';
     src->data[5] = 'D';
@@ -170,7 +168,6 @@ TEST(flip_rgb, naive)
 
         // printf("debug:\n");
         // printf("%c, %c\n%c, %c\n", actual->data[0], actual->data[1], actual->data[2], actual->data[3]);
-
 
         EXPECT_TRUE(px_image_almost_equal(expected, actual, 0));
     }

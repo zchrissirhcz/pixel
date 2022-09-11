@@ -3,7 +3,7 @@
 
 static float relu(float x)
 {
-    return (x > 0) ? x: 0;
+    return (x > 0) ? x : 0;
 }
 
 static float relu6(float x)

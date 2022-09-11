@@ -5,7 +5,8 @@
 #include "px_log.h"
 
 // make convolution param for inference
-NcConvolutionParam* nc_infer_create_convolution_param(int map_size, int in_channels, int out_channels, NcPaddingType pad_type){
+NcConvolutionParam* nc_infer_create_convolution_param(int map_size, int in_channels, int out_channels, NcPaddingType pad_type)
+{
     NcConvolutionParam* param = (NcConvolutionParam*)malloc(sizeof(NcConvolutionParam));
     param->map_size = map_size;
     param->in_channels = in_channels;
@@ -41,7 +42,7 @@ NcPoolingParam* nc_infer_create_pooling_param(int map_size, int in_channels, NcP
     param->map_size = map_size;
     param->pooling_type = pool_type;
     param->padding_type = pad_type;
-    
+
     // the following are not set but will used during infernce, make them -233
     param->in_height = -233;
     param->in_width = -233;
@@ -55,7 +56,8 @@ NcPoolingParam* nc_infer_create_pooling_param(int map_size, int in_channels, NcP
     return param;
 }
 
-NcInnerproductParam* nc_infer_create_innerproduct_param(int in_num, int out_num) {
+NcInnerproductParam* nc_infer_create_innerproduct_param(int in_num, int out_num)
+{
     NcInnerproductParam* param = (NcInnerproductParam*)malloc(sizeof(NcInnerproductParam));
 
     param->in_num = in_num;
@@ -80,16 +82,16 @@ NcInnerproductParam* nc_infer_create_innerproduct_param(int in_num, int out_num)
     return param;
 }
 
-
-
 // allocate each layer's input blobs
 // pointing each input blob to network's blob according to blob id
-NcLayerInput* nc_infer_create_layer_input(int n, const int* blob_ids, NcNet* net) {
+NcLayerInput* nc_infer_create_layer_input(int n, const int* blob_ids, NcNet* net)
+{
     NcLayerInput* input = (NcLayerInput*)malloc(sizeof(NcLayerInput));
     input->blob_num = n;
-    input->blobs = (NcBlob**)malloc(sizeof(NcBlob*)*n);
-    input->blob_ids = (int*)malloc(sizeof(int)*n);
-    for (int i = 0; i < n; i++) {
+    input->blobs = (NcBlob**)malloc(sizeof(NcBlob*) * n);
+    input->blob_ids = (int*)malloc(sizeof(int) * n);
+    for (int i = 0; i < n; i++)
+    {
         input->blob_ids[i] = blob_ids[i];
         input->blobs[i] = net->blobs[blob_ids[i]];
         net->blobs[blob_ids[i]]->rely_cnt_total++; //mark as relied
@@ -99,12 +101,14 @@ NcLayerInput* nc_infer_create_layer_input(int n, const int* blob_ids, NcNet* net
 
 // allocate each layer's output blobs
 // each output blob is pointed by network's blob according to blob id
-NcLayerOutput* nc_infer_create_layer_output(int n, const int* blob_ids, NcNet* net) {
+NcLayerOutput* nc_infer_create_layer_output(int n, const int* blob_ids, NcNet* net)
+{
     NcLayerOutput* output = (NcLayerOutput*)malloc(sizeof(NcLayerOutput));
     output->blob_num = n;
-    output->blobs = (NcBlob**)malloc(sizeof(NcBlob*)*n);
-    output->blob_ids = (int*)malloc(sizeof(int)*n);
-    for (int i = 0; i < n; i++) {
+    output->blobs = (NcBlob**)malloc(sizeof(NcBlob*) * n);
+    output->blob_ids = (int*)malloc(sizeof(int) * n);
+    for (int i = 0; i < n; i++)
+    {
         output->blob_ids[i] = blob_ids[i];
         output->blobs[i] = net->blobs[blob_ids[i]];
     }
@@ -136,7 +140,7 @@ void nc_infer_convolution(void* param_, NcLayerInput* input, NcLayerOutput* outp
     {
         nc_convolution_forward_nhwc(param, bottom, top);
     }
-    else if(bottom->order==NCHW)
+    else if (bottom->order == NCHW)
     {
         nc_convolution_forward_nchw(param, bottom, top);
     }

@@ -23,7 +23,7 @@ void px_forward_eltwise_layer_for_matrix(const px_matrix_t* input, px_matrix_t* 
     px_array_t input_array;
     input_array.data = input->data;
     input_array.len = px_get_matrix_area(input);
-    
+
     px_array_t output_array;
     output_array.data = output->data;
     output_array.len = px_get_matrix_area(output);
@@ -41,7 +41,7 @@ void px_forward_eltwise_layer_for_cube(const px_cube_t* input, px_cube_t* output
     px_array_t input_array;
     input_array.data = input->data;
     input_array.len = px_get_cube_volume(input);
-    
+
     px_array_t output_array;
     output_array.data = output->data;
     output_array.len = px_get_cube_volume(output);

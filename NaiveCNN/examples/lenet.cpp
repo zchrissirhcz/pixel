@@ -17,15 +17,15 @@
 #include <opencv2/opencv.hpp>
 
 #if __ANDROID__
-    const char* project_dir = "/data/local/tmp";
+const char* project_dir = "/data/local/tmp";
 #elif __linux__
-    static const char* project_dir = "/home/zz/work/NaiveCNN/";
+static const char* project_dir = "/home/zz/work/NaiveCNN/";
 #elif _MSC_VER
-    static const char* project_dir = "F:/zhangzhuo/dev/NaiveCNN/";
+static const char* project_dir = "F:/zhangzhuo/dev/NaiveCNN/";
 #elif __APPLE__ && !(__ARM_NEON)
-    static const char* project_dir = "/Users/chris/work/gitee/NaiveCNN/";
+static const char* project_dir = "/Users/chris/work/gitee/NaiveCNN/";
 #elif __APPLE__ && __ARM_NEON
-    static const char* project_dir = "/Users/zz/work/pixel/NaiveCNN/";
+static const char* project_dir = "/Users/zz/work/pixel/NaiveCNN/";
 #else
 #pragma error
 #endif
@@ -57,7 +57,7 @@ void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array
         {
             matrix_t input = create_normalized_f32_matrix_from_u8_image(inputData, n);
 
-            cnn_forward(cnn, &input);  // 前向传播，这里主要计算各
+            cnn_forward(cnn, &input);                             // 前向传播，这里主要计算各
             cnn_backward(cnn, outputData->one_hot_label[n].data); // 后向传播，这里主要计算各神经元的误差梯度
 
             //char* filedir="E:\\Code\\debug\\CNNData\\";
@@ -79,13 +79,12 @@ void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array
             }
             else
             {
-                cnn->L[n] = cnn->L[n - 1] * 0.99f + 0.01f*l / 2.0f;
+                cnn->L[n] = cnn->L[n - 1] * 0.99f + 0.01f * l / 2.0f;
             }
             fprintf(fout, "-- [train] sample: %5d/%d, epoch: %d/%d, loss: %.4f\n",
-                n, trainNum,
-                e, opts.numepochs,
-                cnn->L[n]
-            );
+                    n, trainNum,
+                    e, opts.numepochs,
+                    cnn->L[n]);
 
             destroy_matrix_data(&input);
         }
@@ -123,32 +122,32 @@ int test_mnist_train_test()
 
     char test_label_pth[NC_MAX_PATH];
     sprintf(test_label_pth, "%s/mnist/t10k-labels.idx1-ubyte", project_dir);
-    mnist_label_array_t* testLabel= read_mnist_label(test_label_pth);
+    mnist_label_array_t* testLabel = read_mnist_label(test_label_pth);
 
     char test_image_pth[NC_MAX_PATH];
     sprintf(test_image_pth, "%s/mnist/t10k-images.idx3-ubyte", project_dir);
-    mnist_image_array_t* testImg= read_mnist_image(test_image_pth);
+    mnist_image_array_t* testImg = read_mnist_image(test_image_pth);
 
     NcSize2D inputSize = px_create_size(testImg->images[0].height, testImg->images[0].width);
     int outSize = testLabel->one_hot_label[0].len;
 
     // CNN structure init
-    CNN* cnn=(CNN*)malloc(sizeof(CNN));
-    lenet5_setup(cnn,inputSize,outSize);
+    CNN* cnn = (CNN*)malloc(sizeof(CNN));
+    lenet5_setup(cnn, inputSize, outSize);
 
     // CNN training
 #if 1
     CnnTrainOpts opts;
-    opts.numepochs=1;
-    opts.alpha=1.0;
-    int trainNum=10;
+    opts.numepochs = 1;
+    opts.alpha = 1.0;
+    int trainNum = 10;
     //int trainNum=55000;
     char train_log_pth[NC_MAX_PATH];
     sprintf(train_log_pth, "%s/debug/train-log.txt", project_dir);
     FILE* fout = fopen(train_log_pth, "w"); // log file
     CHECK_WRITE_FILE(fout, train_log_pth);
 
-    mnist_cnn_train(cnn,trainImg,trainLabel,opts,trainNum, fout);
+    mnist_cnn_train(cnn, trainImg, trainLabel, opts, trainNum, fout);
 
     fclose(fout);
 
@@ -159,12 +158,11 @@ int test_mnist_train_test()
     // save training error
     char train_err_pth[NC_MAX_PATH];
     sprintf(train_err_pth, "%s/debug/cnnL.ma", project_dir);
-    FILE* fp=fopen(train_err_pth,"wb");
+    FILE* fp = fopen(train_err_pth, "wb");
     CHECK_WRITE_FILE(fp, train_err_pth);
-    fwrite(cnn->L,sizeof(float),trainNum,fp);
+    fwrite(cnn->L, sizeof(float), trainNum, fp);
     fclose(fp);
 #endif
-
 
     // CNN test
     printf("--- mnist test start\n");
@@ -174,8 +172,8 @@ int test_mnist_train_test()
     load_cnn(cnn, test_model_pth);
     //int testNum=10000; // too slow
     int testNum = 10;
-    float incorrectRatio=0.0;
-    incorrectRatio=mnist_cnn_test(cnn,testImg,testLabel,testNum);
+    float incorrectRatio = 0.0;
+    incorrectRatio = mnist_cnn_test(cnn, testImg, testLabel, testNum);
     float accuracy = 1 - incorrectRatio;
     printf("--- accuracy: %f\n", accuracy);
     printf("test finished!!\n");
@@ -190,10 +188,9 @@ int test_mnist_train_test()
     return 0;
 }
 
-
 const char* layer_type_to_str(NcLayerType type)
 {
-    switch(type)
+    switch (type)
     {
     case NC_LAYER_DATA:
         return "NC_DATA";
@@ -211,7 +208,7 @@ const char* layer_type_to_str(NcLayerType type)
 }
 
 // setup lenet5
-void lenet5_setup(CNN* cnn, NcSize2D inputSize,int outputSize)
+void lenet5_setup(CNN* cnn, NcSize2D inputSize, int outputSize)
 {
     cnn->layerNum = 5;
 
@@ -237,7 +234,7 @@ void lenet5_setup(CNN* cnn, NcSize2D inputSize,int outputSize)
     inSize.height = inSize.height / 2;
     cnn->O5 = init_innerproduct_layer(inSize.width * inSize.height * 12, outputSize);
 
-    cnn->e = (float*)calloc(cnn->O5->outputNum,sizeof(float));
+    cnn->e = (float*)calloc(cnn->O5->outputNum, sizeof(float));
 }
 
 //
@@ -265,32 +262,36 @@ void lenet5_setup(CNN* cnn, NcSize2D inputSize,int outputSize)
 //    }
 //}
 
-
-void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
+void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size)
+{
     //NcSize2D input_size;
     //input_size.h = 28; input_size.w = 28;
     //int output_size = 10;
     //NcNet* net = (NcNet*)malloc(sizeof(NcNet));
 
     net->layers_num = 5;
-    net->layers = (NcLayer**)malloc(sizeof(NcLayer*)*net->layers_num);
-    for (int i = 0; i < net->layers_num; i++) {
+    net->layers = (NcLayer**)malloc(sizeof(NcLayer*) * net->layers_num);
+    for (int i = 0; i < net->layers_num; i++)
+    {
         net->layers[i] = NULL;
     }
 
     net->blobs_num = 6;
-    net->blobs = (NcBlob**)malloc(sizeof(NcBlob*)*net->blobs_num);
-    for (int i = 0; i < net->blobs_num; i++) {
+    net->blobs = (NcBlob**)malloc(sizeof(NcBlob*) * net->blobs_num);
+    for (int i = 0; i < net->blobs_num; i++)
+    {
         net->blobs[i] = NULL;
     }
 
     char fout_pth[NC_MAX_PATH];
     sprintf(fout_pth, "%s/debug/xxx.txt", project_dir);
     FILE* fout = fopen(fout_pth, "w");
-    if (net->blobs[1] == NULL) {
+    if (net->blobs[1] == NULL)
+    {
         fprintf(fout, "-- NULL\n");
     }
-    else {
+    else
+    {
         puts("-- Not NULL\n");
     }
     fclose(fout);
@@ -311,11 +312,12 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     int* input_blob_ids;
     int* output_blob_ids;
     NcBlob* output_blobs[NC_MAX_BLOB_PER_LAYER];
-    for (int i = 0; i < NC_MAX_BLOB_PER_LAYER; i++) {
+    for (int i = 0; i < NC_MAX_BLOB_PER_LAYER; i++)
+    {
         output_blobs[i] = NULL;
     }
 
-    NcLayer* layer=NULL;
+    NcLayer* layer = NULL;
 
     //----------------------------------------------------------------
     // C1 layer
@@ -343,7 +345,7 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     // we always assume that each layer's input blobs are already allocated
     // so, we don't need to re-calculate or re-assign each layer's input blobs' dimensions
     input_blobs_num = 1;
-    input_blob_ids = (int[]) { 0 };
+    input_blob_ids = (int[]){0};
     layer->input = nc_train_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
@@ -351,7 +353,7 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     // however, some are not allocated, such as convolution, pooling
     // it's each type of layer's reponsibility to calculate and allocate the un-allocated blob
     output_blobs_num = 1;
-    output_blob_ids = (int[]) { 1 };
+    output_blob_ids = (int[]){1};
     output_blobs[0] = nc_create_blob3d(C1->out_height, C1->out_width, C1->out_channels);
     layer->output = nc_train_create_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
 
@@ -377,12 +379,12 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
 
     // setup layer input
     input_blobs_num = 1;
-    input_blob_ids = (int[]) { 1 };
+    input_blob_ids = (int[]){1};
     layer->input = nc_train_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
-    output_blob_ids = (int[]) { 2 };
+    output_blob_ids = (int[]){2};
     output_blobs[0] = nc_create_blob3d(S2->out_height, S2->out_width, S2->out_channels);
     layer->output = nc_train_create_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
 
@@ -407,12 +409,12 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
 
     // setup layer input
     input_blobs_num = 1;
-    input_blob_ids = (int[]) { 2 };
+    input_blob_ids = (int[]){2};
     layer->input = nc_train_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
-    output_blob_ids = (int[]) { 3 };
+    output_blob_ids = (int[]){3};
     output_blobs[0] = nc_create_blob3d(C3->out_height, C3->out_width, C3->out_channels);
     layer->output = nc_train_create_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
 
@@ -438,12 +440,12 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
 
     // setup layer input
     input_blobs_num = 1;
-    input_blob_ids = (int[]) { 3 };
+    input_blob_ids = (int[]){3};
     layer->input = nc_train_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
-    output_blob_ids = (int[]) { 4 };
+    output_blob_ids = (int[]){4};
     output_blobs[0] = nc_create_blob3d(S4->out_height, S4->out_width, S4->out_channels);
     layer->output = nc_train_create_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
 
@@ -467,17 +469,17 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
 
     // setup layer input
     input_blobs_num = 1;
-    input_blob_ids = (int[]) { 4 };
+    input_blob_ids = (int[]){4};
     layer->input = nc_train_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
-    output_blob_ids = (int[]) { 5 };
+    output_blob_ids = (int[]){5};
     output_blobs[0] = nc_create_blob3d(O5->out_height, O5->out_width, O5->out_channels);
     layer->output = nc_train_create_layer_output(output_blobs_num, output_blob_ids, net, output_blobs);
 
     // --- Loss
-    net->e = (float*)calloc(out_num,sizeof(float));
+    net->e = (float*)calloc(out_num, sizeof(float));
 
     // pointing each layer's input&output blobs to network's blobs
     // this can be optimized, i.e. reuse memory during each inference
@@ -495,7 +497,7 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     //}
 
     // --- print each layer's type
-    for(int i=0; i<net->layers_num; i++)
+    for (int i = 0; i < net->layers_num; i++)
     {
         layer = net->layers[i];
         PX_LOGE("-- layer[%d]'s type: %s\n", i, layer_type_to_str(layer->type));
@@ -530,38 +532,37 @@ void nc_train_trial()
     // ---! train
     nc_train_cls_net(net, &train_cfg, &data_cfg);
 
-//    CNNOpts opts;
-//    opts.numepochs=1;
-//    opts.alpha=1.0;
-//    int trainNum=55000;
-//    //int trainNum=100;
-//    char train_log_pth[NC_MAX_PATH];
-//    sprintf(train_log_pth, "%s/debug/train-log.txt", project_dir);
-//    FILE* fout = fopen(train_log_pth, "w"); // log file
-//    CHECK_WRITE_FILE(fout, train_log_pth);
-//
-//    mnist_cnn_train(cnn,trainImg,trainLabel,opts,trainNum, fout);
-//
-//    fclose(fout);
-//
-//    printf("train finished!!\n");
-//    char train_model_pth[NC_MAX_PATH];
-//    sprintf(train_model_pth, "%s/model/mnist-train.cnn", project_dir);
-//    save_cnn(cnn, train_model_pth);
-//    // save training error
-//    char train_err_pth[NC_MAX_PATH];
-//    sprintf(train_err_pth, "%s/debug/cnnL.ma", project_dir);
-//    FILE* fp=fopen(train_err_pth,"wb");
-//    CHECK_WRITE_FILE(fp, train_err_pth);
-//    fwrite(cnn->L,sizeof(float),trainNum,fp);
-//    fclose(fp);
-
-
+    //    CNNOpts opts;
+    //    opts.numepochs=1;
+    //    opts.alpha=1.0;
+    //    int trainNum=55000;
+    //    //int trainNum=100;
+    //    char train_log_pth[NC_MAX_PATH];
+    //    sprintf(train_log_pth, "%s/debug/train-log.txt", project_dir);
+    //    FILE* fout = fopen(train_log_pth, "w"); // log file
+    //    CHECK_WRITE_FILE(fout, train_log_pth);
+    //
+    //    mnist_cnn_train(cnn,trainImg,trainLabel,opts,trainNum, fout);
+    //
+    //    fclose(fout);
+    //
+    //    printf("train finished!!\n");
+    //    char train_model_pth[NC_MAX_PATH];
+    //    sprintf(train_model_pth, "%s/model/mnist-train.cnn", project_dir);
+    //    save_cnn(cnn, train_model_pth);
+    //    // save training error
+    //    char train_err_pth[NC_MAX_PATH];
+    //    sprintf(train_err_pth, "%s/debug/cnnL.ma", project_dir);
+    //    FILE* fp=fopen(train_err_pth,"wb");
+    //    CHECK_WRITE_FILE(fp, train_err_pth);
+    //    fwrite(cnn->L,sizeof(float),trainNum,fp);
+    //    fclose(fp);
 
     // free the network related memory
     printf("=== free layers begin\n");
     NcLayer* layer;
-    for(int i=0; i<net->layers_num; i++) {
+    for (int i = 0; i < net->layers_num; i++)
+    {
         layer = net->layers[i];
         nc_destroy_layer(layer);
     }
@@ -574,14 +575,14 @@ void nc_train_trial()
 void nc_lenet5_infer_setup(NcNet* net)
 {
     net->layers_num = 5;
-    net->layers = (NcLayer**)malloc(sizeof(NcLayer*)*net->layers_num);
+    net->layers = (NcLayer**)malloc(sizeof(NcLayer*) * net->layers_num);
     for (int i = 0; i < net->layers_num; i++)
     {
         net->layers[i] = nc_create_layer();
     }
 
     net->blobs_num = 6;
-    net->blobs = (NcBlob**)malloc(sizeof(NcBlob*)*net->blobs_num);
+    net->blobs = (NcBlob**)malloc(sizeof(NcBlob*) * net->blobs_num);
     for (int i = 0; i < net->blobs_num; i++)
     {
         net->blobs[i] = nc_create_empty_blob(0, 0, 0, 0);
@@ -610,12 +611,12 @@ void nc_lenet5_infer_setup(NcNet* net)
 
     // setup layer input
     input_blobs_num = 1;
-    input_blob_ids = (int[]) { 0 };
+    input_blob_ids = (int[]){0};
     layer->input = nc_infer_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
-    output_blob_ids = (int[]) { 1 };
+    output_blob_ids = (int[]){1};
     layer->output = nc_infer_create_layer_output(output_blobs_num, output_blob_ids, net);
 
     // create layer param
@@ -637,12 +638,12 @@ void nc_lenet5_infer_setup(NcNet* net)
 
     // setup layer input
     input_blobs_num = 1;
-    input_blob_ids = (int[]) { 1 };
+    input_blob_ids = (int[]){1};
     layer->input = nc_infer_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
-    output_blob_ids = (int[]) { 2 };
+    output_blob_ids = (int[]){2};
     layer->output = nc_infer_create_layer_output(output_blobs_num, output_blob_ids, net);
 
     // create layer param
@@ -666,12 +667,12 @@ void nc_lenet5_infer_setup(NcNet* net)
 
     // setup layer input
     input_blobs_num = 1;
-    input_blob_ids = (int[]) { 2 };
+    input_blob_ids = (int[]){2};
     layer->input = nc_infer_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
-    output_blob_ids = (int[]) { 3 };
+    output_blob_ids = (int[]){3};
     layer->output = nc_infer_create_layer_output(output_blobs_num, output_blob_ids, net);
 
     // create layer param
@@ -693,12 +694,12 @@ void nc_lenet5_infer_setup(NcNet* net)
 
     // setup layer input
     input_blobs_num = 1;
-    input_blob_ids = (int[]) { 3 };
+    input_blob_ids = (int[]){3};
     layer->input = nc_infer_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
-    output_blob_ids = (int[]) { 4 };
+    output_blob_ids = (int[]){4};
     layer->output = nc_infer_create_layer_output(output_blobs_num, output_blob_ids, net);
 
     // create layer param
@@ -721,12 +722,12 @@ void nc_lenet5_infer_setup(NcNet* net)
 
     // setup layer input
     input_blobs_num = 1;
-    input_blob_ids = (int[]) { 4 };
+    input_blob_ids = (int[]){4};
     layer->input = nc_infer_create_layer_input(input_blobs_num, input_blob_ids, net);
 
     // setup layer output
     output_blobs_num = 1;
-    output_blob_ids = (int[]) { 5 };
+    output_blob_ids = (int[]){5};
     layer->output = nc_infer_create_layer_output(output_blobs_num, output_blob_ids, net);
 
     // setup layer param
@@ -794,14 +795,16 @@ void nc_cls_data_loader(NcClsDataConfig* cfg)
             // the result is correct
 #ifdef DUMP_MNIST_TRAIN
             char save_pth[NC_MAX_PATH];
-            for (int i = 0; i < image_num; i++) {
+            for (int i = 0; i < image_num; i++)
+            {
                 memset(save_pth, 0, NC_MAX_PATH);
                 sprintf(save_pth, "%s/debug/mnist_train/%d_%d.bmp", project_dir, i, labels[i]);
 
                 FILE* fp = fopen(save_pth, "wb");
                 unsigned int err = loadbmp_encode_file(save_pth, images[i]->data, images[i]->w, images[i]->h, 1);
 
-                if (err) {
+                if (err)
+                {
                     PX_LOGE("LoadBMP Load Error: %u\n", err);
                 }
                 fclose(fp);
@@ -827,7 +830,7 @@ void nc_infer_trial()
 
     // ---! infer
     //for (int i = 0; i < data_cfg.num; i++) {
-    for (int i = 0; i <1; i++)
+    for (int i = 0; i < 1; i++)
     {
         NcImage* image = data_cfg.images[i];
         nc_infer(net, image);
@@ -866,4 +869,3 @@ int main()
 
     return 0;
 }
-

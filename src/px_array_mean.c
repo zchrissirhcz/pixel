@@ -8,5 +8,5 @@ float px_array_mean_u8(unsigned char* data, int len)
     {
         sum += data[i];
     }
-    return sum*1.0f / len;
+    return sum * 1.0f / len;
 }

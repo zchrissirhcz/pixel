@@ -3,7 +3,8 @@
 #include <opencv2/opencv.hpp>
 #include "nc_image.h"
 
-int main__(){
+int main__()
+{
     NcImage* im = nc_create_empty_image();
     const char* im_pth = "/Users/chris/work/gitee/naiveimg/hh/src/image.bmp";
     nc_image_load_bmp(im_pth, &im->data, &im->h, &im->w, 3, false);
@@ -19,15 +20,18 @@ int main__(){
     return 0;
 }
 
-int main(){
+int main()
+{
     NcImage* im = nc_create_image_zero(1024, 1024, 3);
     printf("im->h=%d, im->w=%d\n", im->h, im->w);
     uchar* buf = im->data;
-    for(int h=0; h<im->h; h++){
-        for(int w=0; w<im->w; w++) {
+    for (int h = 0; h < im->h; h++)
+    {
+        for (int w = 0; w < im->w; w++)
+        {
             *buf++ = 255;
-            *buf++ = (uchar)(w*1.0/im->w*255);
-            *buf++ = (uchar)(h*1.0/im->h*255);
+            *buf++ = (uchar)(w * 1.0 / im->w * 255);
+            *buf++ = (uchar)(h * 1.0 / im->h * 255);
         }
     }
 

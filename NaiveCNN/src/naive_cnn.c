@@ -102,86 +102,99 @@ void nc_blob_data_realloc3d(NcBlob* blob, int h, int w, int c)
     nc_blob_data_realloc(blob, 1, h, w, c);
 }
 
-void nc_destroy_layer(NcLayer* layer) {
+void nc_destroy_layer(NcLayer* layer)
+{
     NcLayerType layer_type = layer->type;
-    switch (layer_type) {
-        case NC_LAYER_CONVOLUTION: {
-            //PX_LOGE("-- free convolution layer\n");
-            NcConvolutionParam* param = (NcConvolutionParam*)layer->param;
-            free(param->bias);
-            //puts("\t free bias ok");
+    switch (layer_type)
+    {
+    case NC_LAYER_CONVOLUTION:
+    {
+        //PX_LOGE("-- free convolution layer\n");
+        NcConvolutionParam* param = (NcConvolutionParam*)layer->param;
+        free(param->bias);
+        //puts("\t free bias ok");
 
-            free(param->weight);
-            //puts("\t free weight ok");
+        free(param->weight);
+        //puts("\t free weight ok");
 
-            if(param->d)free(param->d);
-            //puts("\t free d ok");
+        if (param->d) free(param->d);
+        //puts("\t free d ok");
 
-            if(param->d_weight)free(param->d_weight);
-            //puts("\t free d_weight ok");
+        if (param->d_weight) free(param->d_weight);
+        //puts("\t free d_weight ok");
 
-            if(param->v)free(param->v);
-            //puts("\t free v ok");
+        if (param->v) free(param->v);
+        //puts("\t free v ok");
 
-            if(param->y)free(param->y);
-            //puts("\t free y ok");
+        if (param->y) free(param->y);
+        //puts("\t free y ok");
 
-            free(param);
-            //puts("\t free param ok");
-        }break;
-        case NC_LAYER_POOLING: {
-            //PX_LOGE("-- free poolingg layer\n");
-            NcPoolingParam* param = (NcPoolingParam*)layer->param;
+        free(param);
+        //puts("\t free param ok");
+    }
+    break;
+    case NC_LAYER_POOLING:
+    {
+        //PX_LOGE("-- free poolingg layer\n");
+        NcPoolingParam* param = (NcPoolingParam*)layer->param;
 
-            if(param->d)free(param->d);
-            //puts("\t free d ok");
+        if (param->d) free(param->d);
+        //puts("\t free d ok");
 
-            if(param->y)free(param->y);
-            //puts("\t free y ok");
+        if (param->y) free(param->y);
+        //puts("\t free y ok");
 
-            free(param);
-            //puts("\t free param ok");
-        }break;
-        case NC_LAYER_INNERPRODUCT: {
-            //PX_LOGE("-- free innerproduct layer\n");
-            NcInnerproductParam* param = (NcInnerproductParam*)layer->param;
-            //puts("\t-- try to free bias");
-            free(param->bias);
-            //puts("\t free bias ok");
+        free(param);
+        //puts("\t free param ok");
+    }
+    break;
+    case NC_LAYER_INNERPRODUCT:
+    {
+        //PX_LOGE("-- free innerproduct layer\n");
+        NcInnerproductParam* param = (NcInnerproductParam*)layer->param;
+        //puts("\t-- try to free bias");
+        free(param->bias);
+        //puts("\t free bias ok");
 
-            free(param->weight);
-            //puts("\t free weight ok");
+        free(param->weight);
+        //puts("\t free weight ok");
 
-            if(param->d)free(param->d);
-            //puts("\t free d ok");
+        if (param->d) free(param->d);
+        //puts("\t free d ok");
 
-            if(param->v)free(param->v);
-            //puts("\t free v ok");
+        if (param->v) free(param->v);
+        //puts("\t free v ok");
 
-            if(param->y)free(param->y);
-            //puts("\t free y ok");
+        if (param->y) free(param->y);
+        //puts("\t free y ok");
 
-            free(param);
-            //puts("\t free param ok");
-        }break;
-        default: {
-            fprintf(stderr, "Error! Not supported layer param code %d\n", layer_type);
-        }
+        free(param);
+        //puts("\t free param ok");
+    }
+    break;
+    default:
+    {
+        fprintf(stderr, "Error! Not supported layer param code %d\n", layer_type);
+    }
     }
 }
 
-void nc_net_forward(NcNet* net, NcImage* image, int label) {
+void nc_net_forward(NcNet* net, NcImage* image, int label)
+{
     NcLayer* layer = NULL;
-    for (int i = 0; i < net->layers_num; i++) {
+    for (int i = 0; i < net->layers_num; i++)
+    {
         layer = net->layers[i];
         PX_LOGE("\t-> layer: %d/%d ", i, net->layers_num);
         layer->forward(layer->param, layer->input, layer->output);
     }
 }
 
-void nc_net_backward(NcNet* net) {
+void nc_net_backward(NcNet* net)
+{
     NcLayer* layer = NULL;
-    for (int i = 0; i < net->layers_num; i++) {
+    for (int i = 0; i < net->layers_num; i++)
+    {
         layer = net->layers[i];
         PX_LOGE("\t<= layer: %d/%d ", i, net->layers_num);
         layer->backward(layer->param, layer->input, layer->output);
@@ -189,15 +202,18 @@ void nc_net_backward(NcNet* net) {
 }
 
 // train a classification network
-void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* data_cfg) {
+void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* data_cfg)
+{
     // setup log
     FILE* fout = fopen(train_cfg->log_pth, "w");
     CHECK_WRITE_FILE(fout, train_cfg->log_pth);
 
     NcImage* image = NULL;
     int label = 0;
-    for (int i = 0; i < train_cfg->num_epoch; i++) {
-        for (int j = 0; j < train_cfg->train_num; j++) {
+    for (int i = 0; i < train_cfg->num_epoch; i++)
+    {
+        for (int j = 0; j < train_cfg->train_num; j++)
+        {
             image = data_cfg->images[i];
             label = data_cfg->labels[i];
             PX_LOGE("Iteration %d/%d\n", j, train_cfg->train_num);
@@ -222,11 +238,12 @@ NcLayer* nc_create_layer()
     return layer;
 }
 
-
-void nc_blob_nchw_to_nhwc() {
+void nc_blob_nchw_to_nhwc()
+{
     //TODO
 }
 
-void nc_blob_nhwc_to_nchw() {
+void nc_blob_nhwc_to_nchw()
+{
     //TODO
 }

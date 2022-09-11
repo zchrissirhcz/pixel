@@ -21,7 +21,7 @@ void px_histogram_rgb(px_image_t* src, px_image_t* hist, PX_HISTOGRAM_MODE mode)
             uint8_t* ptr = src->data + i * src->stride;
             for (int j = 0; j < width; j++)
             {
-                int gray = (ptr[0] + ptr[1] + ptr[2])/3;
+                int gray = (ptr[0] + ptr[1] + ptr[2]) / 3;
                 hist->data[gray]++;
                 ptr += cn;
             }

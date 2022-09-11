@@ -32,7 +32,7 @@ public:
 class RgbToYuv_Converter_v2
 {
 public:
-    static int get_y(int r, int g, int b, bool require_shift_right=true)
+    static int get_y(int r, int g, int b, bool require_shift_right = true)
     {
         int y = (19 * r + 38 * g + 7 * b);
         if (require_shift_right)
@@ -41,7 +41,7 @@ public:
         }
         return y;
     }
-    
+
     static int get_u(int r, int g, int b)
     {
         int y = get_y(r, g, b);
@@ -75,13 +75,13 @@ void px_rgb_to_nv21(px_image_t* rgb, px_image_t* y_plane, px_image_t* uv_plane)
     int y, u, v;
 
     RgbToYuv_Converter_v2 converter;
-    for(int i = 0; i < height; i++)
+    for (int i = 0; i < height; i++)
     {
         uint8_t* ypt = y_plane->data + i * y_plane->stride;
         uint8_t* uvpt = uv_plane->data + (i / 2) * uv_plane->stride;
         const uint8_t* src = rgb->data + i * rgb->stride;
 
-        for(int j = 0; j < width; j++)
+        for (int j = 0; j < width; j++)
         {
             r = src[2 - bIdx];
             g = src[1];
@@ -89,8 +89,9 @@ void px_rgb_to_nv21(px_image_t* rgb, px_image_t* y_plane, px_image_t* uv_plane)
             src += cn;
 
             y = converter.get_y(r, g, b);
-            *(ypt++) = px_clamp(y, 0, 255);;
-            if (i%2 == 0 && j%2 == 0)
+            *(ypt++) = px_clamp(y, 0, 255);
+            ;
+            if (i % 2 == 0 && j % 2 == 0)
             {
                 u = converter.get_u(r, g, b);
                 v = converter.get_v(r, g, b);

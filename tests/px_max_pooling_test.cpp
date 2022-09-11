@@ -9,7 +9,7 @@ TEST(max_pooling_layer, forward)
     {
         for (int j = 0; j < input->width; j++)
         {
-            px_set_matrix_value(input, i, j, i*10 + j);
+            px_set_matrix_value(input, i, j, i * 10 + j);
         }
     }
 

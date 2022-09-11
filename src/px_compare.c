@@ -12,7 +12,7 @@ bool px_image_almost_equal(px_image_t* expected, px_image_t* actual, int eps)
     {
         return true;
     }
-    else if ( (expected == NULL && actual != NULL) || (expected != NULL && actual == NULL) )
+    else if ((expected == NULL && actual != NULL) || (expected != NULL && actual == NULL))
     {
         return false;
     }
@@ -46,10 +46,9 @@ bool px_image_almost_equal(px_image_t* expected, px_image_t* actual, int eps)
                 const int x = i / cn;
                 const int c = i % cn;
                 PX_LOGE("actual[%d,%d,%d] (%d) != expected[%d,%d,%d] (%d), diff = %d, EPS = %d\n",
-                    i, x, c, dp[j],
-                    i, x, c, sp[j],
-                    diff, eps
-                );
+                        i, x, c, dp[j],
+                        i, x, c, sp[j],
+                        diff, eps);
 
                 return false;
             }
@@ -64,7 +63,7 @@ bool px_array_almost_equal(px_array_t* expected, px_array_t* actual, float eps)
     {
         return true;
     }
-    else if ( (expected == NULL && actual != NULL) || (expected != NULL && actual == NULL) )
+    else if ((expected == NULL && actual != NULL) || (expected != NULL && actual == NULL))
     {
         return false;
     }
@@ -80,10 +79,9 @@ bool px_array_almost_equal(px_array_t* expected, px_array_t* actual, float eps)
         if (diff > eps)
         {
             PX_LOGE("actual[%d] (%f) != expected[%d] (%f), diff = %f, EPS = %f\n",
-                i, actual->data[i],
-                i, expected->data[i],
-                diff, eps
-            );
+                    i, actual->data[i],
+                    i, expected->data[i],
+                    diff, eps);
 
             return false;
         }
@@ -92,14 +90,13 @@ bool px_array_almost_equal(px_array_t* expected, px_array_t* actual, float eps)
     return true;
 }
 
-
 bool px_matrix_almost_equal(px_matrix_t* expected, px_matrix_t* actual, float eps)
 {
     if (expected == NULL && actual == NULL)
     {
         return true;
     }
-    else if ( (expected == NULL && actual != NULL) || (expected != NULL && actual == NULL) )
+    else if ((expected == NULL && actual != NULL) || (expected != NULL && actual == NULL))
     {
         return false;
     }
@@ -126,10 +123,9 @@ bool px_matrix_almost_equal(px_matrix_t* expected, px_matrix_t* actual, float ep
             if (diff > eps)
             {
                 PX_LOGE("actual[%d,%d] (%f) != expected[%d,%d] (%f), diff = %f, EPS = %f\n",
-                    i, j, dp[j],
-                    i, j, sp[j],
-                    diff, eps
-                );
+                        i, j, dp[j],
+                        i, j, sp[j],
+                        diff, eps);
 
                 return false;
             }
@@ -137,7 +133,6 @@ bool px_matrix_almost_equal(px_matrix_t* expected, px_matrix_t* actual, float ep
     }
     return true;
 }
-
 
 void px_dump_matrix(const px_matrix_t* matrix)
 {
@@ -219,8 +214,7 @@ void px_dump_image_meta(const px_image_t* image, const char* msg)
         PX_LOGE("%s:", msg);
     }
     PX_LOGE("width=%d, height=%d, channel=%d, data=%p, stride=%d",
-        image->width, image->height, image->channel, image->data, image->stride
-    );
+            image->width, image->height, image->channel, image->data, image->stride);
 }
 
 bool px_image_equal_in_size(px_image_t* expected, px_image_t* actual)

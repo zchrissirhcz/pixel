@@ -6,9 +6,9 @@
 
 px_array_t* px_create_array(int len)
 {
-    px_array_t* array = (px_array_t*) malloc(sizeof(px_array_t));
+    px_array_t* array = (px_array_t*)malloc(sizeof(px_array_t));
     memset(array, 0, sizeof(px_array_t));
-    array->data = (float*) malloc(sizeof(float) * len);
+    array->data = (float*)malloc(sizeof(float) * len);
     array->len = len;
 
     return array;
@@ -71,7 +71,7 @@ float px_get_matrix_value(const px_matrix_t* matrix, int i, int j)
 {
     PX_ASSERT(matrix != NULL && matrix->data != NULL);
     PX_ASSERT(i >= 0 && j >= 0 && i < matrix->height && j < matrix->width);
-    
+
     int idx = i * matrix->width + j;
     return matrix->data[idx];
 }
@@ -81,7 +81,7 @@ int px_matrix_add_matrix(px_matrix_t* input, const px_matrix_t* plus)
     PX_ASSERT(input != NULL && plus != NULL);
     PX_ASSERT(input->height == plus->height && input->width == plus->width);
     PX_ASSERT(input->data != NULL && plus->data != NULL);
-    
+
     for (int i = 0; i < input->height; i++)
     {
         for (int j = 0; j < input->width; j++)
@@ -97,7 +97,7 @@ int px_matrix_add_scalar(px_matrix_t* input, const float bias)
 {
     PX_ASSERT(input != NULL && input->data != NULL);
     PX_ASSERT(input->height > 0 && input->width > 0);
-    
+
     const int size = input->height * input->width;
     for (int i = 0; i < size; i++)
     {
@@ -140,7 +140,7 @@ px_cube_t* px_create_cube(const px_cube_dim_t dim)
     const int w = dim.width;
     px_cube_t* cube = (px_cube_t*)malloc(sizeof(px_cube_t));
     const size_t buf_size = c * h * w * sizeof(float);
-    cube->data = (float*) malloc(buf_size);
+    cube->data = (float*)malloc(buf_size);
     cube->channel = c;
     cube->height = h;
     cube->width = w;
@@ -178,7 +178,7 @@ px_matrix_t* px_copy_make_border_for_matrix(const px_matrix_t* input, const px_p
         for (int j = 0; j < padded_w; j++)
         {
             if (i < pad.top || i >= input->height + pad.top
-             || j < pad.left || j >= input->width + pad.left)
+                || j < pad.left || j >= input->width + pad.left)
             {
                 px_set_matrix_value(padded_matrix, i, j, pad_value);
             }

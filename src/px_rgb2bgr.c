@@ -25,4 +25,3 @@ void px_rgb2bgr(px_image_t* src, px_image_t* dst)
         }
     }
 }
-

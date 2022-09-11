@@ -5,18 +5,17 @@
 #include "px_log.h"
 
 #define CHECK_WRITE_FILE(fp, filename) \
-    if (fp==NULL) \
+    if (fp == NULL)                    \
         PX_LOGE("write file %s failed in line %d, file %s\n", filename, __LINE__, __FILE__);
 
 #define CHECK_READ_FILE(fp, filename) \
-    if (fp==NULL) \
+    if (fp == NULL)                   \
         PX_LOGE("read file %s failed in line %d, file %s\n", filename, __LINE__, __FILE__);
 
-#define NC_MAX_PATH 256
-#define NC_IMAGE_ALIGN 1 // for simplicity, we don't align now
-#define NC_CHANNEL_ALIGN 1 // for simplicity, we don't align now
+#define NC_MAX_PATH           256
+#define NC_IMAGE_ALIGN        1 // for simplicity, we don't align now
+#define NC_CHANNEL_ALIGN      1 // for simplicity, we don't align now
 #define NC_MAX_BLOB_PER_LAYER 100
-
 
 typedef enum NcPaddingType
 {
@@ -56,10 +55,10 @@ typedef struct NcBlob
     int height;
     int width;
     int channel;
-    int nstep; //h*w*c
-    int mass; //n*nstep=n*h*w*c
+    int nstep;          //h*w*c
+    int mass;           //n*nstep=n*h*w*c
     int rely_cnt_total; //how many blobs rely on this blob, before the inference run
-    int rely_cnt; //for the current inference layer, how many blobs still rely on this blob
+    int rely_cnt;       //for the current inference layer, how many blobs still rely on this blob
     NcBlobDimOrder order;
     float* data;
 } NcBlob;
@@ -158,7 +157,7 @@ typedef struct NcLayerBottomTop
 typedef void (*NcLayerForward)(void* param, NcLayerInput* input, NcLayerOutput* output);
 typedef void (*NcLayerBackward)(void* param, NcLayerInput* input, NcLayerOutput* output);
 // infer: for inference
-typedef void(*NcLayerInfer)(void* param, NcLayerInput* input, NcLayerOutput* output);
+typedef void (*NcLayerInfer)(void* param, NcLayerInput* input, NcLayerOutput* output);
 
 typedef struct NcLayer
 {
@@ -244,7 +243,6 @@ void nc_infer_convolution(void* param_, NcLayerInput* input, NcLayerOutput* outp
 void nc_infer_pooling(void* param_, NcLayerInput* input, NcLayerOutput* output);
 void nc_infer_innerproduct(void* param_, NcLayerInput* input, NcLayerOutput* output);
 
-
 // ! train related
 NcConvolutionParam* nc_train_create_convolution_param(int in_height, int in_width, int map_size, int in_channels, int out_channels);
 NcPoolingParam* nc_train_create_pooling_param(int in_height, int in_width, int map_size, int in_channels, int out_channels, int pool_type);
@@ -266,7 +264,6 @@ void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, 
 void nc_net_forward(NcNet* net, NcImage* image, int label);
 void nc_net_backward(NcNet* net);
 void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* data_cfg);
-
 
 NcLayer* nc_create_layer();
 

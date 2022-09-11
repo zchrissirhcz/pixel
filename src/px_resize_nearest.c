@@ -27,7 +27,7 @@ void px_resize_nearest(px_image_t* src, px_image_t* dst, px_size_t dsize)
 
             si = px_clamp(si, 0, src->height - 1);
             sj = px_clamp(sj, 0, src->width - 1);
-            
+
             // dst[i, j, k] = src[si, sj, k]
             for (int k = 0; k < channel; k++)
             {

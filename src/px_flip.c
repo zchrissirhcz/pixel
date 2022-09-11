@@ -9,7 +9,7 @@ void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE mode)
 {
     PX_ASSERT(src != NULL && dst != NULL);
     PX_ASSERT(px_image_equal_in_shape(src, dst, false));
-    
+
     const int h = src->height;
     const int w = src->width;
     const int cn = src->channel;
@@ -17,7 +17,7 @@ void px_flip(px_image_t* src, px_image_t* dst, PX_FLIP_MODE mode)
     if (mode == PX_FLIP_VERTICAL)
     {
         const int bufsize = sizeof(uint8_t) * rowlen;
-        uint8_t* bufline = (uint8_t*) malloc(bufsize);
+        uint8_t* bufline = (uint8_t*)malloc(bufsize);
         for (int i = 0; i < h; i++)
         {
             uint8_t* sp = src->data + i * src->stride;

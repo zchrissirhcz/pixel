@@ -31,7 +31,7 @@ void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, 
                 for (int kw = 0; kw < kernel->width; kw++)
                 {
                     //sum += input[h + kh, w + kw] * kernel[kh, kw];
-                    input_idx = (h + kh)*input->width + (w + kw);
+                    input_idx = (h + kh) * input->width + (w + kw);
                     kernel_idx = kh * kernel->width + kw;
                     sum += input->data[input_idx] * kernel->data[kernel_idx];
 
@@ -52,8 +52,10 @@ void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, 
     }
 
 #ifdef DEBUG_CONV2D
-    for (int h = 0; h < output->h; h++) {
-        for (int w = 0; w < output->w; w++) {
+    for (int h = 0; h < output->h; h++)
+    {
+        for (int w = 0; w < output->w; w++)
+        {
             output_idx = h * output->w + w;
             fprintf(fout, "%6f, ", output->data[output_idx]);
         }
@@ -63,76 +65,121 @@ void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, 
 #endif
 }
 
-
 static void nc_conv2d_example()
 {
     NcBlob2D* input = (NcBlob2D*)malloc(sizeof(NcBlob2D));
     input->height = 5;
     input->width = 5;
-    input->data = (float[]) {
+    input->data = (float[]){
         1, 1, 1, 1, 1,
         1, 1, 1, 1, 1,
         1, 1, 1, 1, 1,
         1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1
-    };
+        1, 1, 1, 1, 1};
 
     NcBlob2D* kernel = (NcBlob2D*)malloc(sizeof(NcBlob2D));
     kernel->height = 2;
     kernel->width = 2;
-    kernel->data = (float[]) {
+    kernel->data = (float[]){
         1, 1,
-        1, 1
-    };
+        1, 1};
 
     px_stride_t stride = px_create_stride(1, 1);
 
     NcBlob2D* output = (NcBlob2D*)malloc(sizeof(NcBlob2D));
     output->height = (input->height - kernel->height) / stride.height + 1;
     output->width = (input->width - kernel->width) / stride.width + 1;
-    output->data = (float*)malloc(sizeof(output->height*output->width));
+    output->data = (float*)malloc(sizeof(output->height * output->width));
 
     nc_conv2d(input, kernel, output, &stride);
 }
 
-void nc_convolution_test_nchw() {
+void nc_convolution_test_nchw()
+{
     NcBlob* input = nc_create_empty_blob(1, 5, 5, 2);
     input->order = NCHW;
-    input->data = (float[]) {
+    input->data = (float[]){
         //C1
-        1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
 
         //C2
-        2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
 
     };
 
     NcBlob* kernel = nc_create_empty_blob(2, 2, 2, 2);
-    kernel->data = (float[]) {
+    kernel->data = (float[]){
         //C1
-        1, 1,
-        1, 1,
+        1,
+        1,
+        1,
+        1,
 
         //C2
-        0.5, 0.5,
-        0.5, 0.5,
-        
-        
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+
         //C1
-        1, 1,
-        1, 1,
-        
+        1,
+        1,
+        1,
+        1,
+
         //C2
-        0.5, 0.5,
-        0.5, 0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
     };
 
     px_stride_t stride = px_create_stride(1, 1);
@@ -140,7 +187,7 @@ void nc_convolution_test_nchw() {
     int output_h = (input->height - kernel->height) / stride.height + 1;
     int output_w = (input->width - kernel->width) / stride.width + 1;
     NcBlob* output = nc_create_blob(1, output_h, output_w, kernel->batch);
-    
+
     int map_size = kernel->height;
     int in_channels = input->channel;
     int out_channels = kernel->batch;
@@ -148,14 +195,15 @@ void nc_convolution_test_nchw() {
     NcConvolutionParam* param = nc_infer_create_convolution_param(map_size, in_channels, out_channels, pad_type);
     free(param->weight);
     param->weight = kernel;
-    
+
     nc_convolution_forward_nchw(param, input, output);
 }
 
-void nc_convolution_test_nhwc(){
+void nc_convolution_test_nhwc()
+{
     NcBlob* input = nc_create_empty_blob(1, 5, 5, 2);
     input->order = NHWC;
-    input->data = (float[]) {
+    input->data = (float[]){
         ////C1
         //1, 1, 1, 1, 1,
         //1, 1, 1, 1, 1,
@@ -170,15 +218,60 @@ void nc_convolution_test_nhwc(){
         //2, 2, 2, 2, 2,
         //2, 2, 2, 2, 2,
 
-        1, 2, 1, 2, 1, 2, 1, 2, 1, 2,
-        1, 2, 1, 2, 1, 2, 1, 2, 1, 2,
-        1, 2, 1, 2, 1, 2, 1, 2, 1, 2,
-        1, 2, 1, 2, 1, 2, 1, 2, 1, 2,
-        1, 2, 1, 2, 1, 2, 1, 2, 1, 2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
     };
 
     NcBlob* kernel = nc_create_empty_blob(2, 2, 2, 2);
-    kernel->data = (float[]) {
+    kernel->data = (float[]){
         ////C1
         //1, 1,
         //1, 1,
@@ -187,15 +280,71 @@ void nc_convolution_test_nhwc(){
         //0.5, 0.5,
         //0.5, 0.5,
 
-        1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5,
-        1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5,
-        1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5,
-        1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5,
-        
-        1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5,
-        1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5,
-        1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5,
-        1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
     };
 
     px_stride_t stride = px_create_stride(1, 1);
@@ -215,11 +364,10 @@ void nc_convolution_test_nhwc(){
     nc_convolution_forward_nhwc(param, input, output);
 }
 
-
-
 //#define LOCAL_DEBUG
 //NCHW convolution
-void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBlob* top) {
+void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBlob* top)
+{
 #ifdef LOCAL_DEBUG
     char fout_pth[NC_MAX_PATH];
     sprintf(fout_pth, "%s/debug/conv_out_nchw.txt", project_dir);
@@ -227,10 +375,9 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
     fprintf(fout, "\n--- nc_convolution_forward_nhwc\n");
 #endif
 
-
     const px_stride_t stride = param->stride;
     NcBlob* kernel = param->weight;
-    
+
     //per kernel
     for (int n = 0; n < kernel->batch; n++)
     {
@@ -243,7 +390,7 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
                 for (int w = 0; w < bottom->width - kernel->width + 1; w += stride.width, out_w++)
                 {
                     float sum = 0.f;
-                    int top_idx = n * top->height*top->width + out_h*top->width + out_w;
+                    int top_idx = n * top->height * top->width + out_h * top->width + out_w;
                     //top->data[0, n, out_h, out_w] += sum;
 #ifdef LOCAL_DEBUG
                     fprintf(fout, "top(%d,%d,%d,%d)=top[%d]=sigma(", n, c, out_h, out_w, top_idx);
@@ -253,13 +400,13 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
                         for (int kw = 0; kw < kernel->width; kw++)
                         {
                             //sum+=bottom->data[c, h+kh, w+kw] * kernel->data[n, c, kh, kw];
-                            int bottom_idx = c * bottom->height*bottom->width + (h + kh)*bottom->width + w + kw;
-                            int kernel_idx = n * kernel->nstep + c * kernel->height*kernel->width + kh * kernel->width + kw;
+                            int bottom_idx = c * bottom->height * bottom->width + (h + kh) * bottom->width + w + kw;
+                            int kernel_idx = n * kernel->nstep + c * kernel->height * kernel->width + kh * kernel->width + kw;
                             sum += bottom->data[bottom_idx] * kernel->data[kernel_idx];
 #ifdef LOCAL_DEBUG
                             fprintf(fout, "I(%d,%d,%d,%d)*K(%d,%d,%d,%d)+",
-                                n, c, h + kh, w + kw,
-                                n, c, kh, kw);
+                                    n, c, h + kh, w + kw,
+                                    n, c, kh, kw);
 #endif
                         }
                     }
@@ -273,11 +420,14 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
     }
 
 #ifdef LOCAL_DEBUG
-    for (int c = 0; c < top->c; c++) {
-        for (int h = 0; h < top->h; h++) {
-            for (int w = 0; w < top->w; w++) {
+    for (int c = 0; c < top->c; c++)
+    {
+        for (int h = 0; h < top->h; h++)
+        {
+            for (int w = 0; w < top->w; w++)
+            {
                 //int top_idx = h * top->w*top->c + w * top->c + c;
-                int top_idx = c * top->h*top->w + h * top->w + w;
+                int top_idx = c * top->h * top->w + h * top->w + w;
                 fprintf(fout, "%6f, ", top->data[top_idx]);
             }
             fprintf(fout, "\n");
@@ -291,7 +441,6 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
 #undef LOCAL_DEBUG
 #endif
 }
-
 
 //#define LOCAL_DEBUG
 //NHWC convolution forward
@@ -314,7 +463,8 @@ void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBl
 
     //per kernel
     //PX_LOGE("top->n=%d\n", top->n);
-    for (int n = 0; n < kernel->batch; n++) {
+    for (int n = 0; n < kernel->batch; n++)
+    {
         //PX_LOGE("\t\t%d-th kernel\n", n);
         //fprintf(fout, "NHWC mode\n");
 
@@ -322,25 +472,30 @@ void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBl
         int out_w = 0;
 
         int bottom_idx, kernel_idx, top_idx;
-        for (int h = 0; h < bottom->height - kernel->height + 1; h += stride.height, out_h += 1) {
+        for (int h = 0; h < bottom->height - kernel->height + 1; h += stride.height, out_h += 1)
+        {
             out_w = 0;
-            for (int w = 0; w < bottom->width - kernel->width + 1; w += stride.width, out_w += 1) {
+            for (int w = 0; w < bottom->width - kernel->width + 1; w += stride.width, out_w += 1)
+            {
                 float sum = 0.f;
 #ifdef LOCAL_DEBUG
                 fprintf(fout, "output[%d,%d]=sigma(", out_h, out_w);
 #endif
-                for (int kh = 0; kh < kernel->height; kh++) {
-                    for (int kw = 0; kw < kernel->width; kw++) {
-                        for (int c = 0; c < bottom->channel; c++) {
+                for (int kh = 0; kh < kernel->height; kh++)
+                {
+                    for (int kw = 0; kw < kernel->width; kw++)
+                    {
+                        for (int c = 0; c < bottom->channel; c++)
+                        {
                             //sum += bottom[h + kh, w + kw, c] * kernel[kh, kw, c];
-                            bottom_idx = (h + kh)*bottom->width*bottom->channel + (w + kw)*bottom->channel + c;
-                            kernel_idx = kh * kernel->width*kernel->channel + kw * kernel->channel + c;
+                            bottom_idx = (h + kh) * bottom->width * bottom->channel + (w + kw) * bottom->channel + c;
+                            kernel_idx = kh * kernel->width * kernel->channel + kw * kernel->channel + c;
                             sum += bottom->data[bottom_idx] * kernel->data[kernel_idx];
 
 #ifdef LOCAL_DEBUG
                             fprintf(fout, "I[%d,%d,%d]*K[%d,%d,%d]+",
-                                h + kh, w + kw, c,
-                                kh, kw, c);
+                                    h + kh, w + kw, c,
+                                    kh, kw, c);
 #endif
                         }
                     }
@@ -356,18 +511,21 @@ void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBl
             }
         }
     }
-    
+
 #ifdef LOCAL_DEBUG
     PX_LOGE("top's dimension: h=%d, w=%d, c=%d\n", top->h, top->w, top->c);
-        for (int h = 0; h < top->h; h++) {
-            for (int w = 0; w < top->w; w++) {
-                for (int c = 0; c < top->c; c++) {
-                    int top_idx =  h * top->w*top->c + w * top->c + c;
-                    fprintf(fout, "%6f, ", top->data[top_idx]);
-                }
+    for (int h = 0; h < top->h; h++)
+    {
+        for (int w = 0; w < top->w; w++)
+        {
+            for (int c = 0; c < top->c; c++)
+            {
+                int top_idx = h * top->w * top->c + w * top->c + c;
+                fprintf(fout, "%6f, ", top->data[top_idx]);
             }
-            fprintf(fout, "\n");
         }
+        fprintf(fout, "\n");
+    }
 #endif
 
 #ifdef LOCAL_DEBUG

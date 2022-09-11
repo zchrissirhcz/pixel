@@ -28,7 +28,7 @@ public:
 #else
         struct timespec ts;
         clock_gettime(CLOCK_MONOTONIC, &ts);
-        return ts.tv_sec * 1000.0 + ts.tv_nsec/1000000.0;
+        return ts.tv_sec * 1000.0 + ts.tv_nsec / 1000000.0;
 #endif // _WIN32
     }
 
@@ -37,8 +37,8 @@ public:
     double mStartTime;
 };
 
-AutoTimer::AutoTimer(const std::string& name):
-    mImpl(new AutoTimer::Impl())
+AutoTimer::AutoTimer(const std::string& name)
+    : mImpl(new AutoTimer::Impl())
 {
     mImpl->mName = name;
     mImpl->mStartTime = AutoTimer::Impl::getCurrentTime();

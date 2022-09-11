@@ -9,8 +9,8 @@
 
 #include "naive_cnn.h"
 
-#define NC_FULL 0
-#define NC_SAME 1
+#define NC_FULL  0
+#define NC_SAME  1
 #define NC_VALID 2
 
 #ifdef __cplusplus
@@ -54,4 +54,3 @@ float summat(matrix_t* mat);
 #ifdef __cplusplus
 }
 #endif
-

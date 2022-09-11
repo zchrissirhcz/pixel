@@ -3,10 +3,11 @@
 #include <stdbool.h>
 #include "nc_types.h"
 
-typedef struct NcImage {
+typedef struct NcImage
+{
     uint h, w, c;
     uint linebytes; // w*c, or alignUp(w*c, 4)
-    uint mass; //linebytes * h
+    uint mass;      //linebytes * h
     uchar* data;
 } NcImage;
 

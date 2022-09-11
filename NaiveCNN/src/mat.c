@@ -7,8 +7,7 @@
 #include "px_arithm.h"
 #include "naive_cnn.h"
 
-static
-NcImage* nc_create_image_header(int height, int width, int channel)
+static NcImage* nc_create_image_header(int height, int width, int channel)
 {
     NcImage* im = (NcImage*)malloc(sizeof(NcImage));
     im->height = height;
@@ -30,17 +29,16 @@ NcImage* nc_create_image(int height, int width, int channel, unsigned char* data
 NcImage* nc_create_empty_image(int height, int width, int channel)
 {
     NcImage* im = nc_create_image_header(height, width, channel);
-    im->data = (unsigned char*)malloc(sizeof(unsigned char)*im->elem_num);
+    im->data = (unsigned char*)malloc(sizeof(unsigned char) * im->elem_num);
     return im;
 }
 
-static
-void init_matrix(matrix_t* matrix, int height, int width)
+static void init_matrix(matrix_t* matrix, int height, int width)
 {
     matrix->height = height;
     matrix->width = width;
 
-    matrix->data = (float**) malloc(height*sizeof(float*));
+    matrix->data = (float**)malloc(height * sizeof(float*));
     for (int i = 0; i < height; i++)
     {
         matrix->data[i] = (float*)malloc(width * sizeof(float));
@@ -58,7 +56,7 @@ void destroy_matrix_data(matrix_t* matrix)
 
 matrix_t* create_matrix_ptr(int height, int width)
 {
-    matrix_t* matrix = (matrix_t*) malloc(sizeof(matrix_t));
+    matrix_t* matrix = (matrix_t*)malloc(sizeof(matrix_t));
     init_matrix(matrix, height, width);
     return matrix;
 }
@@ -112,7 +110,7 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
     int halfmapsizeh;
 
     // 模板大小为偶数
-    if (map->height % 2 == 0 && map->width %2 == 0)
+    if (map->height % 2 == 0 && map->width % 2 == 0)
     {
         halfmapsizew = (map->width) / 2; // 卷积模块的半瓣大小
         halfmapsizeh = (map->height) / 2;
@@ -131,7 +129,7 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
     matrix_t* output = create_matrix_ptr(outSizeH, outSizeW);
 
     // 为了方便计算，将inputData扩大一圈
-    px_pad_t pad = px_create_pad(map->height-1, map->height-1, map->width-1, map->width-1);
+    px_pad_t pad = px_create_pad(map->height - 1, map->height - 1, map->width - 1, map->width - 1);
     matrix_t* expaned_input = matrix_copy_make_border(input, pad);
 
     for (j = 0; j < outSizeH; j++)
@@ -151,16 +149,19 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
     destroy_matrix_ptr(expaned_input);
 
     NcSize2D outSize = px_create_size(outSizeH, outSizeW);
-    switch(type){ // 根据不同的情况，返回不同的结果
+    switch (type)
+    {             // 根据不同的情况，返回不同的结果
     case NC_FULL: // 完全大小的情况
         return output;
-    case NC_SAME:{
+    case NC_SAME:
+    {
         px_pad_t cut_pad = px_create_pad(halfmapsizeh, halfmapsizeh, halfmapsizew, halfmapsizew);
         matrix_t* sameres = matrix_cut_make_border(output, cut_pad);
         destroy_matrix_ptr(output);
         return sameres;
     }
-    case NC_VALID:{
+    case NC_VALID:
+    {
         matrix_t* validres;
         if (map->height % 2 == 0 && map->width % 2 == 0)
         {
@@ -200,7 +201,7 @@ matrix_t* matrix_upsample(matrix_t* input, int width_multiplier, int height_mult
     const int out_width = input->width * upc;
     matrix_t* output = create_matrix_ptr(out_height, out_width);
 
-    for(int j = 0; j < output->height; j = j + upr)
+    for (int j = 0; j < output->height; j = j + upr)
     {
         // 宽的扩充
         for (int i = 0; i < output->width; i = i + upc)
@@ -224,15 +225,15 @@ matrix_t* matrix_upsample(matrix_t* input, int width_multiplier, int height_mult
 }
 
 matrix_t* matrix_copy_make_border(matrix_t* input, px_pad_t pad)
-{   
+{
     // 向量边缘扩大
     const int out_height = input->height + pad.top + pad.bottom;
     const int out_width = input->width + pad.left + pad.right;
     matrix_t* output = create_matrix_ptr(out_height, out_width);
 
-    for(int j = 0; j < out_height; j++)
+    for (int j = 0; j < out_height; j++)
     {
-        for(int i = 0; i < out_width; i++)
+        for (int i = 0; i < out_width; i++)
         {
             if (j < pad.top || i < pad.left || j >= (input->height + pad.top) || i >= (input->width + pad.left))
             {
@@ -254,9 +255,9 @@ matrix_t* matrix_cut_make_border(matrix_t* input, px_pad_t pad)
     const int out_width = input->width - pad.left - pad.right;
     matrix_t* output = create_matrix_ptr(out_height, out_width);
 
-    for(int j = 0; j < input->height; j++)
+    for (int j = 0; j < input->height; j++)
     {
-        for(int i = 0; i < input->width; i++)
+        for (int i = 0; i < input->width; i++)
         {
             if (j >= pad.top && i >= pad.left && j < (input->height - pad.top) && i < (input->width - pad.left))
             {

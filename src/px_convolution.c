@@ -12,7 +12,7 @@ px_matrix_dim_t px_get_conv_output_matrix_dim(const px_matrix_dim_t input_dim, c
 
     const int stride_h = conv_param.stride_h;
     const int stride_w = conv_param.stride_w;
-    
+
     const int output_h = (input_h - kernel_h) / stride_h + 1;
     const int output_w = (input_w - kernel_w) / stride_w + 1;
 
@@ -82,7 +82,7 @@ px_matrix_t* px_forward_convolution_layer_for_cube_with_one_kernel(const px_cube
     const int input_w = input->width;
 
     px_matrix_t* output = px_create_matrix(output_channel_dim);
-    memset(output->data, 0, output_h*output_w*sizeof(float));
+    memset(output->data, 0, output_h * output_w * sizeof(float));
 
     const int input_c = input->channel;
     for (int k = 0; k < input_c; k++)
@@ -140,11 +140,15 @@ px_matrix_t* px_forward_convolution_layer_for_matrix(const px_matrix_t* input, c
     //         input_h, kernel_h, stride_h, output_h);
     px_matrix_t* output = px_create_matrix(output_dim);
 
-    for (int i=0; i+kernel_h-1<input_h; i+=stride_h) {
-        for (int j=0; j+kernel_w-1<input_w; j+=stride_w) {
+    for (int i = 0; i + kernel_h - 1 < input_h; i += stride_h)
+    {
+        for (int j = 0; j + kernel_w - 1 < input_w; j += stride_w)
+        {
             float sum = bias;
-            for (int ki=0; ki<kernel_h; ki++) {
-                for (int kj=0; kj<kernel_w; kj++) {
+            for (int ki = 0; ki < kernel_h; ki++)
+            {
+                for (int kj = 0; kj < kernel_w; kj++)
+                {
                     const int ri = i + ki;
                     const int rj = j + kj;
                     float input_value = px_get_matrix_value(padded_input, ri, rj);

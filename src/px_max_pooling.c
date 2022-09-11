@@ -11,7 +11,7 @@ px_matrix_dim_t px_get_pooling_output_matrix_dim(const px_matrix_dim_t input_dim
 
     const int stride_h = pooling_param.stride_h;
     const int stride_w = pooling_param.stride_w;
-    
+
     const int output_h = (input_h - kernel_h) / stride_h + 1;
     const int output_w = (input_w - kernel_w) / stride_w + 1;
 
@@ -26,7 +26,7 @@ px_matrix_t* px_forward_max_pooling_layer_for_matrix(const px_matrix_t* input, c
 {
     px_matrix_dim_t input_dim = px_get_matrix_dim(input);
     px_matrix_dim_t output_dim = px_get_pooling_output_matrix_dim(input_dim, pooling_param);
-    
+
     const int kernel_h = pooling_param.kernel_h;
     const int kernel_w = pooling_param.kernel_w;
 
@@ -37,14 +37,14 @@ px_matrix_t* px_forward_max_pooling_layer_for_matrix(const px_matrix_t* input, c
     const int stride_w = pooling_param.stride_w;
 
     px_matrix_t* output = px_create_matrix(output_dim);
-    for (int i = 0; i+kernel_h-1 < input_h; i+=stride_h)
+    for (int i = 0; i + kernel_h - 1 < input_h; i += stride_h)
     {
-        for (int j = 0; j+kernel_w-1 < input_w; j+=stride_w)
+        for (int j = 0; j + kernel_w - 1 < input_w; j += stride_w)
         {
             float max_value = FLT_MIN;
-            for (int ki=0; ki<kernel_h; ki++)
+            for (int ki = 0; ki < kernel_h; ki++)
             {
-                for (int kj=0; kj<kernel_w; kj++)
+                for (int kj = 0; kj < kernel_w; kj++)
                 {
                     const int ri = i + ki;
                     const int rj = j + kj;

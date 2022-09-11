@@ -68,7 +68,7 @@ void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize)
                 double coeffC = (1 - x) * y;
                 double coeffD = x * y;
                 double M = coeffA * A + coeffB * B + coeffC * C + coeffD * D;
-                
+
                 const int dst_idx = di * dst->stride + dj * channel + k;
                 dst->data[dst_idx] = (uint8_t)(M + 0.5); // rounding
             }

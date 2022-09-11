@@ -23,7 +23,7 @@ public:
         u = u - 128;
         v = v - 128;
 
-        int gdif = ((u * 11) >> 5) +((v * 23) >> 5);
+        int gdif = ((u * 11) >> 5) + ((v * 23) >> 5);
         int g = y - gdif;
         return px_clamp(g, 0, 255);
     }
@@ -79,7 +79,7 @@ void px_nv21_to_rgb(px_image_t* y_plane, px_image_t* uv_plane, px_image_t* rgb)
     const int cn = 3;
 
     YuvToRgb_Converter_v2 converter;
-    for (int i = 0; i <= height - 2; i+=2)
+    for (int i = 0; i <= height - 2; i += 2)
     {
         const unsigned char* y_ptr0 = y_plane->data + i * y_plane->stride;
         const unsigned char* y_ptr1 = y_plane->data + (i + 1) * y_plane->stride;
@@ -89,7 +89,7 @@ void px_nv21_to_rgb(px_image_t* y_plane, px_image_t* uv_plane, px_image_t* rgb)
 
         const unsigned char* uv_ptr = uv_plane->data + (i / 2) * uv_plane->stride;
 
-        for (int j = 0; j <= width - 2; j+=2)
+        for (int j = 0; j <= width - 2; j += 2)
         {
             int y;
             int u = uv_ptr[uIdx];
