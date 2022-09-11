@@ -10,7 +10,7 @@ void nc_pooling_forward_nhwc(NcPoolingParam* param, NcBlob* bottom, NcBlob* top)
     FILE* fout = fopen(fout_pth, "w");
 #endif
 
-    NcStride stride = param->stride;
+    px_stride_t stride = param->stride;
 
     int kernel_h = param->map_size;
     int kernel_w = param->map_size;
@@ -66,7 +66,7 @@ void nc_pooling_forward_nchw(NcPoolingParam* param, NcBlob* bottom, NcBlob* top)
     FILE* fout = fopen(fout_pth, "w");
 #endif
 
-    NcStride stride = param->stride;
+    px_stride_t stride = param->stride;
     int kernel_h = param->map_size;
     int kernel_w = param->map_size;
 

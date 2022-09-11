@@ -52,11 +52,6 @@ typedef struct NcBlob
 
 typedef px_matrix_t NcBlob2D;
 
-typedef px_size_t NcDim2D;
-
-typedef px_size_t NcStride;
-
-
 typedef struct NcConvolutionParam
 {
     int in_height;
@@ -69,7 +64,7 @@ typedef struct NcConvolutionParam
     NcPaddingType padding_type;
 
     int map_size;
-    NcStride stride;
+    px_stride_t stride;
 
     bool is_full_connect;
 
@@ -100,7 +95,7 @@ typedef struct NcPoolingParam
     NcPoolingType pooling_type;
     NcPaddingType padding_type;
 
-    NcStride stride;
+    px_stride_t stride;
 
     NcBlob* d;
     NcBlob* y;
@@ -252,12 +247,12 @@ void nc_train_backward_innerproduct(void* param_, NcLayerInput* input, NcLayerOu
 void nc_destroy_layer(NcLayer* layer);
 
 // very straight forward and naive implementation of 2D convolution
-void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, NcStride* stride);
+void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, px_stride_t* stride);
 
 void nc_net_forward(NcNet* net, NcImage* image, int label);
 void nc_net_backward(NcNet* net);
 void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* data_cfg);
-void nc_cls_data_loader(NcClsDataConfig* cfg);
+void nc_cls_data_loader(NcClsDataConfig* cfg, const char* project_dir);
 void nc_read_mnist_image(const char* filename, NcImage*** _images, int* _image_num);
 void nc_read_mnist_label(const char* filename, int** _labels, int* _label_num);
 
@@ -271,7 +266,7 @@ void nc_pooling_forward_nchw(NcPoolingParam* param, NcBlob* bottom, NcBlob* top)
 void nc_pooling_test_nchw();
 void nc_pooling_test_nhwc();
 
-void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, NcStride* stride);
+void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, px_stride_t* stride);
 void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBlob* top);
 void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBlob* top);
 // unit test functions

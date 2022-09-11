@@ -210,7 +210,8 @@ void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* dat
 }
 
 // load data here
-void nc_cls_data_loader(NcClsDataConfig* cfg) {
+void nc_cls_data_loader(NcClsDataConfig* cfg, const char* project_dir)
+{
     if (strcmp(cfg->dataset, "MNIST") == 0) {
         if (strcmp(cfg->splitset, "train") == 0) {
             char train_image_pth[NC_MAX_PATH];

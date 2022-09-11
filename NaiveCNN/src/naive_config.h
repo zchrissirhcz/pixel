@@ -15,19 +15,6 @@
 #define NC_CHANNEL_ALIGN 1 // for simplicity, we don't align now
 #define NC_MAX_BLOB_PER_LAYER 100
 
-#if __ANDROID__
-    const char* project_dir = "/data/local/tmp";
-#elif __linux__
-    static const char* project_dir = "/home/zz/work/NaiveCNN/";
-#elif _MSC_VER
-    static const char* project_dir = "F:/zhangzhuo/dev/NaiveCNN/";
-#elif __APPLE__ && !(__ARM_NEON)
-    static const char* project_dir = "/Users/chris/work/gitee/NaiveCNN/";
-#elif __APPLE__ && __ARM_NEON
-    static const char* project_dir = "/Users/zz/work/pixel/NaiveCNN/";
-#else
-#pragma error
-#endif
 
 
 

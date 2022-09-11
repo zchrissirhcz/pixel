@@ -14,6 +14,21 @@
 
 #include "naive_cnn.h"
 
+#if __ANDROID__
+    const char* project_dir = "/data/local/tmp";
+#elif __linux__
+    static const char* project_dir = "/home/zz/work/NaiveCNN/";
+#elif _MSC_VER
+    static const char* project_dir = "F:/zhangzhuo/dev/NaiveCNN/";
+#elif __APPLE__ && !(__ARM_NEON)
+    static const char* project_dir = "/Users/chris/work/gitee/NaiveCNN/";
+#elif __APPLE__ && __ARM_NEON
+    static const char* project_dir = "/Users/zz/work/pixel/NaiveCNN/";
+#else
+#pragma error
+#endif
+
+
 //英特尔处理器和其他低端机用户必须翻转头字节。
 int reverse_int(int i)
 {
@@ -611,7 +626,7 @@ void nc_train_trial()
     NcClsDataConfig data_cfg;
     sprintf(data_cfg.dataset, "%s", "MNIST");
     sprintf(data_cfg.splitset, "%s", "train");
-    nc_cls_data_loader(&data_cfg);
+    nc_cls_data_loader(&data_cfg, project_dir);
 
     // ---! train
     nc_train_cls_net(net, &train_cfg, &data_cfg);
@@ -851,7 +866,8 @@ void nc_infer(NcNet* net, NcImage* image)
 // only do inference
 // this will consider arbitrary input
 // and consider memory saving
-void nc_infer_trial() {
+void nc_infer_trial()
+{
     NcNet* net = (NcNet*)malloc(sizeof(NcNet));
     nc_lenet5_infer_setup(net);
 
@@ -859,7 +875,7 @@ void nc_infer_trial() {
     NcClsDataConfig data_cfg;
     sprintf(data_cfg.dataset, "%s", "MNIST");
     sprintf(data_cfg.splitset, "%s", "train");
-    nc_cls_data_loader(&data_cfg);
+    nc_cls_data_loader(&data_cfg, project_dir);
 
     // ---! infer
     //for (int i = 0; i < data_cfg.num; i++) {

@@ -3,7 +3,7 @@
 #include "px_cnn.h"
 #include <stdlib.h>
 
-void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, NcStride* stride) {
+void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, px_stride_t* stride) {
     int out_h = 0;
     int out_w = 0;
 
@@ -79,7 +79,7 @@ static void nc_conv2d_example() {
         1, 1
     };
 
-    NcStride stride = px_create_stride(1, 1);
+    px_stride_t stride = px_create_stride(1, 1);
 
     NcBlob2D* output = (NcBlob2D*)malloc(sizeof(NcBlob2D));
     output->height = (input->height - kernel->height) / stride.height + 1;
@@ -129,7 +129,7 @@ void nc_convolution_test_nchw() {
         0.5, 0.5,
     };
 
-    NcStride stride = px_create_stride(1, 1);
+    px_stride_t stride = px_create_stride(1, 1);
 
     int output_h = (input->height - kernel->height) / stride.height + 1;
     int output_w = (input->width - kernel->width) / stride.width + 1;
@@ -192,7 +192,7 @@ void nc_convolution_test_nhwc(){
         1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5,
     };
 
-    NcStride stride = px_create_stride(1, 1);
+    px_stride_t stride = px_create_stride(1, 1);
 
     int map_size = kernel->height;
     int in_channels = input->channel;
@@ -222,7 +222,7 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
 #endif
 
 
-    const NcStride stride = param->stride;
+    const px_stride_t stride = param->stride;
     NcBlob* kernel = param->weight;
     
     //per kernel
@@ -293,7 +293,7 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
 //@param top: n=1,3d blob
 void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBlob* top)
 {
-    const NcStride stride = param->stride;
+    const px_stride_t stride = param->stride;
 
     //kernel: n=1, 3d blob
     //NcBlob* kernel = nc_create_empty_blob(1, param->weight->h, param->weight->w, param->weight->c);
