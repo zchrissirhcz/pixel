@@ -39,3 +39,6 @@ __pycache__/
 
 # 2.4MB, too big
 neon_ref/arm_neon.h 
+
+# macOSX
+.DS_Store

@@ -34,9 +34,9 @@ NcImage* nc_create_empty_image(int height, int width, int channel)
     return im;
 }
 
-matrix_t* create_matrix_ptr(int height, int width)
+static
+void init_matrix(matrix_t* matrix, int height, int width)
 {
-    matrix_t* matrix = (matrix_t*) malloc(sizeof(matrix_t));
     matrix->height = height;
     matrix->width = width;
 
@@ -45,6 +45,12 @@ matrix_t* create_matrix_ptr(int height, int width)
     {
         matrix->data[i] = (float*)malloc(width * sizeof(float));
     }
+}
+
+matrix_t* create_matrix_ptr(int height, int width)
+{
+    matrix_t* matrix = (matrix_t*) malloc(sizeof(matrix_t));
+    init_matrix(matrix, height, width);
     return matrix;
 }
 
@@ -56,6 +62,13 @@ void destroy_matrix_ptr(matrix_t* matrix)
     }
     free(matrix->data);
     free(matrix);
+}
+
+matrix_t create_matrix(int height, int width)
+{
+    matrix_t matrix;
+    init_matrix(&matrix, height, width);
+    return matrix;
 }
 
 // 每个点变换到矩阵中心点的对称点上
