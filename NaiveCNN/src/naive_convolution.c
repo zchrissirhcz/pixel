@@ -222,16 +222,16 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
 #endif
 
 
-    NcStride* stride = param->stride;
+    const NcStride stride = param->stride;
     NcBlob* kernel = param->weight;
     
     //per kernel
     for (int n = 0; n < kernel->n; n++) {
         for (int c = 0; c < bottom->c; c++) {
             int out_h = 0;
-            for (int h = 0; h < bottom->h - kernel->h + 1; h += stride->height, out_h++) {
+            for (int h = 0; h < bottom->h - kernel->h + 1; h += stride.height, out_h++) {
                 int out_w = 0;
-                for (int w = 0; w < bottom->w - kernel->w + 1; w += stride->width, out_w++) {
+                for (int w = 0; w < bottom->w - kernel->w + 1; w += stride.width, out_w++) {
                     float sum = 0.f;
                     int top_idx = n * top->h*top->w + out_h*top->w + out_w;
                     //top->data[0, n, out_h, out_w] += sum;
@@ -286,7 +286,7 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
 //@param bottom: n=1,3d blob
 //@param top: n=1,3d blob
 void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBlob* top) {
-    NcStride* stride = param->stride;
+    const NcStride stride = param->stride;
 
     //kernel: n=1, 3d blob
     //NcBlob* kernel = nc_blob_make_empty(1, param->weight->h, param->weight->w, param->weight->c);
@@ -309,9 +309,9 @@ void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBl
         int out_w = 0;
 
         int bottom_idx, kernel_idx, top_idx;
-        for (int h = 0; h < bottom->h - kernel->h + 1; h += stride->height, out_h += 1) {
+        for (int h = 0; h < bottom->h - kernel->h + 1; h += stride.height, out_h += 1) {
             out_w = 0;
-            for (int w = 0; w < bottom->w - kernel->w + 1; w += stride->width, out_w += 1) {
+            for (int w = 0; w < bottom->w - kernel->w + 1; w += stride.width, out_w += 1) {
                 float sum = 0.f;
 #ifdef LOCAL_DEBUG
                 fprintf(fout, "output[%d,%d]=sigma(", out_h, out_w);

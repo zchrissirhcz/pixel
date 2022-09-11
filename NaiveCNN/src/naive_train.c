@@ -12,7 +12,7 @@ NcConvolutionParam* nc_train_make_convolution_param(int in_height, int in_width,
     param->out_channels = out_channels;
     param->is_full_connect = true; //we use fully connect on default
 
-    param->stride = nc_stride_make(1, 1);
+    param->stride = px_create_stride(1, 1);
     
     // 权重空间初始化
     param->weight = nc_blob_make_random(out_channels, map_size, map_size, in_channels, -1.0f, 1.0f);

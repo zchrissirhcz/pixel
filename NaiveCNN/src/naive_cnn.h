@@ -60,7 +60,7 @@ typedef struct NcConvolutionParam {
     NcPaddingType padding_type;
 
     int map_size;
-    NcStride* stride;
+    NcStride stride;
 
     bool is_full_connect;
 
@@ -210,7 +210,7 @@ NcBlob* nc_blob_make2d_empty(int h, int w);
 void nc_blob_data_realloc(NcBlob* blob, int n, int h, int w, int c);
 void nc_blob_data_realloc3d(NcBlob* blob, int h, int w, int c);
 
-NcStride* nc_stride_make(int h, int w);
+NcStride* nc_create_stride(int h, int w);
 
 
 // ! infer related

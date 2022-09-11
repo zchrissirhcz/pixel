@@ -10,7 +10,7 @@ NcConvolutionParam* nc_infer_make_convolution_param(int map_size, int in_channel
     param->map_size = map_size;
     param->in_channels = in_channels;
     param->out_channels = out_channels;
-    param->stride = nc_stride_make(1, 1); //now only use (1,1) stride
+    param->stride = px_create_stride(1, 1); //now only use (1,1) stride
     param->weight = nc_blob_make_random(out_channels, map_size, map_size, in_channels, -1.0f, 1.0f);
     param->bias = nc_blob_make(out_channels, 1, 1, 1);
 
@@ -36,7 +36,7 @@ NcPoolingParam* nc_infer_make_pooling_param(int map_size, int in_channels, NcPoo
     NcPoolingParam* param = (NcPoolingParam*)malloc(sizeof(NcPoolingParam));
     param->in_channels = in_channels;
     param->out_channels = in_channels;
-    param->stride = nc_stride_make(1, 1); //now only use (1,1) stride
+    param->stride = nc_create_stride(1, 1); //now only use (1,1) stride
     param->map_size = map_size;
     param->pooling_type = pool_type;
     param->padding_type = pad_type;
