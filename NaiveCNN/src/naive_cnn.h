@@ -22,23 +22,26 @@ typedef enum NcPoolingType
 
 typedef enum NcLayerType
 {
-    NC_LAYER_DATA=0,
-    NC_LAYER_CONVOLUTION=1,
-    NC_LAYER_POOLING=2,
-    NC_LAYER_INNERPRODUCT=3,
-    NC_LAYER_LOSS=4,
-    NC_LAYER_UNKNOWN=404
+    NC_LAYER_DATA = 0,
+    NC_LAYER_CONVOLUTION = 1,
+    NC_LAYER_POOLING = 2,
+    NC_LAYER_INNERPRODUCT = 3,
+    NC_LAYER_LOSS = 4,
+    NC_LAYER_UNKNOWN = 404
 } NcLayerType;
 
 typedef enum NcBlobDimOrder
 {
-    NCHW=0,
-    NHWC=1
+    NCHW = 0,
+    NHWC = 1
 } NcBlobDimOrder;
 
 typedef struct NcBlob
 {
-    int n, h, w, c;
+    int batch;
+    int height;
+    int width;
+    int channel;
     int nstep; //h*w*c
     int mass; //n*nstep=n*h*w*c
     int rely_cnt_total; //how many blobs rely on this blob, before the inference run
@@ -97,7 +100,7 @@ typedef struct NcPoolingParam
     NcPoolingType pooling_type;
     NcPaddingType padding_type;
 
-    NcStride* stride;
+    NcStride stride;
 
     NcBlob* d;
     NcBlob* y;

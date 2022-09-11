@@ -10,26 +10,31 @@ void nc_pooling_forward_nhwc(NcPoolingParam* param, NcBlob* bottom, NcBlob* top)
     FILE* fout = fopen(fout_pth, "w");
 #endif
 
-    NcStride* stride = param->stride;
+    NcStride stride = param->stride;
 
     int kernel_h = param->map_size;
     int kernel_w = param->map_size;
 
     int out_h = 0;
-    for (int h = 0; h < bottom->h-kernel_h+1; h+=stride->height, out_h++) {
+    for (int h = 0; h < bottom->height-kernel_h+1; h += stride.height, out_h++)
+    {
         int out_w = 0;
-        for (int w = 0; w < bottom->w-kernel_w+1; w+=stride->width, out_w++) {
-            for (int c = 0; c < bottom->c; c++) {
+        for (int w = 0; w < bottom->width-kernel_w+1; w += stride.width, out_w++)
+        {
+            for (int c = 0; c < bottom->channel; c++)
+            {
                 float sum = 0.f;
-                for (int kh = 0; kh < kernel_h; kh++) {
-                    for (int kw = 0; kw < kernel_w; kw++) {
+                for (int kh = 0; kh < kernel_h; kh++)
+                {
+                    for (int kw = 0; kw < kernel_w; kw++)
+                    {
                         //sum += bottom[n, h+kh, w+kw, c]
-                        int bottom_idx = (h + kh)*bottom->w*top->c + (w + kw)*bottom->c + c;
+                        int bottom_idx = (h + kh)*bottom->width*top->channel + (w + kw)*bottom->channel + c;
                         sum += bottom->data[bottom_idx];
                     }
                 }
                 //top->data[out_h, out_w, c] = sum/(kernel_h*kernel_w)
-                int top_idx = out_h * top->w*top->c + out_w * top->c + c;
+                int top_idx = out_h * top->width*top->channel + out_w * top->channel + c;
                 top->data[top_idx] = sum / (kernel_h*kernel_w);
             }
         }
@@ -61,24 +66,29 @@ void nc_pooling_forward_nchw(NcPoolingParam* param, NcBlob* bottom, NcBlob* top)
     FILE* fout = fopen(fout_pth, "w");
 #endif
 
-    NcStride* stride = param->stride;
+    NcStride stride = param->stride;
     int kernel_h = param->map_size;
     int kernel_w = param->map_size;
 
-    for (int c = 0; c < bottom->c; c++) {
+    for (int c = 0; c < bottom->channel; c++)
+    {
         int out_h = 0;
-        for (int h = 0; h < bottom->h-kernel_h+1; h+=stride->height, out_h++) {
+        for (int h = 0; h < bottom->height-kernel_h+1; h += stride.height, out_h++)
+        {
             int out_w = 0;
-            for (int w = 0; w < bottom->w-kernel_w+1; w+=stride->width, out_w++) {
-                int top_idx = c * top->h*top->w + h * top->w + w;
+            for (int w = 0; w < bottom->width-kernel_w+1; w += stride.width, out_w++)
+            {
+                int top_idx = c * top->height*top->width + h * top->width + w;
 
                 //sum += bottom[n,c,h+kh, w+kw]
                 //fprintf(fout, "top[%d,%d,%d]=sigma(", c, out_h, out_w);
                 //fprintf(fout, "top[%d,%d,%d]=top[%d]=sigma(", c, h, w, top_idx);
                 float sum = 0.f;
-                for (int kh = 0; kh < kernel_h; kh++) {
-                    for (int kw = 0; kw < kernel_w; kw++) {
-                        int bottom_idx = c * bottom->h*bottom->w + (h + kh)*bottom->w + (w + kw);
+                for (int kh = 0; kh < kernel_h; kh++)
+                {
+                    for (int kw = 0; kw < kernel_w; kw++)
+                    {
+                        int bottom_idx = c * bottom->height*bottom->width + (h + kh)*bottom->width + (w + kw);
                         sum += bottom->data[bottom_idx];
                         //fprintf(fout, "I[%d,%d,%d]+", c, h + kh, w + kw);
                         //fprintf(fout, "%f+", bottom->data[bottom_idx]);
@@ -132,16 +142,16 @@ void nc_pooling_test_nchw() {
 
     NcBlob* kernel = nc_blob_make_empty(1, 3, 3, 2);
 
-    int map_size = kernel->h;
-    int in_channels = input->c;
+    int map_size = kernel->height;
+    int in_channels = input->channel;
     NcPoolingType pool_type = NC_POOLING_AVERAGE;
     NcPaddingType pad_type = NC_PADDING_POOL_CAFFE;
     NcPoolingParam* param = nc_infer_make_pooling_param(map_size, in_channels, pool_type, pad_type);
 
-    param->out_height = (input->h-kernel->h)/param->stride->height+1;
-    param->out_width = (input->w-kernel->w)/param->stride->width+1;
+    param->out_height = (input->height-kernel->height)/param->stride.height+1;
+    param->out_width = (input->width-kernel->width)/param->stride.width+1;
     
-    NcBlob* top = nc_blob_make(1, param->out_height, param->out_width, input->c);
+    NcBlob* top = nc_blob_make(1, param->out_height, param->out_width, input->channel);
 
     nc_pooling_forward_nchw(param, input, top);
 }
@@ -159,18 +169,18 @@ void nc_pooling_test_nhwc() {
         1, 2, 1, 2, 1, 2, 1, 2, 1, 2,
     };
 
-    NcBlob* kernel = nc_blob_make_empty(1, 3, 3, input->c);
+    NcBlob* kernel = nc_blob_make_empty(1, 3, 3, input->channel);
 
-    int map_size = kernel->h;
-    int in_channels = input->c;
+    int map_size = kernel->height;
+    int in_channels = input->channel;
     NcPoolingType pool_type = NC_POOLING_AVERAGE;
     NcPaddingType pad_type = NC_PADDING_POOL_CAFFE;
     NcPoolingParam* param = nc_infer_make_pooling_param(map_size, in_channels, pool_type, pad_type);
 
-    param->out_height = (input->h-kernel->h)/param->stride->height+1;
-    param->out_width = (input->w-kernel->w)/param->stride->width+1;
+    param->out_height = (input->height-kernel->height)/param->stride.height+1;
+    param->out_width = (input->width-kernel->width)/param->stride.width+1;
     
-    NcBlob* top = nc_blob_make(1, param->out_height, param->out_width, input->c);
+    NcBlob* top = nc_blob_make(1, param->out_height, param->out_width, input->channel);
 
     nc_pooling_forward_nhwc(param, input, top);
 

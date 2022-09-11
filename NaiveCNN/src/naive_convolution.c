@@ -131,13 +131,13 @@ void nc_convolution_test_nchw() {
 
     NcStride stride = px_create_stride(1, 1);
 
-    int output_h = (input->h - kernel->h) / stride.height + 1;
-    int output_w = (input->w - kernel->w) / stride.width + 1;
-    NcBlob* output = nc_blob_make(1, output_h, output_w, kernel->n);
+    int output_h = (input->height - kernel->height) / stride.height + 1;
+    int output_w = (input->width - kernel->width) / stride.width + 1;
+    NcBlob* output = nc_blob_make(1, output_h, output_w, kernel->batch);
     
-    int map_size = kernel->h;
-    int in_channels = input->c;
-    int out_channels = kernel->n;
+    int map_size = kernel->height;
+    int in_channels = input->channel;
+    int out_channels = kernel->batch;
     NcPaddingType pad_type = NC_PADDING_CONV_CAFFE;
     NcConvolutionParam* param = nc_infer_make_convolution_param(map_size, in_channels, out_channels, pad_type);
     free(param->weight);
@@ -194,17 +194,17 @@ void nc_convolution_test_nhwc(){
 
     NcStride stride = px_create_stride(1, 1);
 
-    int map_size = kernel->h;
-    int in_channels = input->c;
-    int out_channels = kernel->n;
+    int map_size = kernel->height;
+    int in_channels = input->channel;
+    int out_channels = kernel->batch;
     NcPaddingType pad_type = NC_PADDING_CONV_CAFFE;
     NcConvolutionParam* param = nc_infer_make_convolution_param(map_size, in_channels, out_channels, pad_type);
     free(param->weight);
     param->weight = kernel;
 
-    int output_h = (input->h - kernel->h) / stride.height + 1;
-    int output_w = (input->w - kernel->w) / stride.width + 1;
-    NcBlob* output = nc_blob_make(1, output_h, output_w, kernel->n);
+    int output_h = (input->height - kernel->height) / stride.height + 1;
+    int output_w = (input->width - kernel->width) / stride.width + 1;
+    NcBlob* output = nc_blob_make(1, output_h, output_w, kernel->batch);
 
     nc_convolution_forward_nhwc(param, input, output);
 }
@@ -226,23 +226,29 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
     NcBlob* kernel = param->weight;
     
     //per kernel
-    for (int n = 0; n < kernel->n; n++) {
-        for (int c = 0; c < bottom->c; c++) {
+    for (int n = 0; n < kernel->batch; n++)
+    {
+        for (int c = 0; c < bottom->channel; c++)
+        {
             int out_h = 0;
-            for (int h = 0; h < bottom->h - kernel->h + 1; h += stride.height, out_h++) {
+            for (int h = 0; h < bottom->height - kernel->height + 1; h += stride.height, out_h++)
+            {
                 int out_w = 0;
-                for (int w = 0; w < bottom->w - kernel->w + 1; w += stride.width, out_w++) {
+                for (int w = 0; w < bottom->width - kernel->width + 1; w += stride.width, out_w++)
+                {
                     float sum = 0.f;
-                    int top_idx = n * top->h*top->w + out_h*top->w + out_w;
+                    int top_idx = n * top->height*top->width + out_h*top->width + out_w;
                     //top->data[0, n, out_h, out_w] += sum;
 #ifdef LOCAL_DEBUG
                     fprintf(fout, "top(%d,%d,%d,%d)=top[%d]=sigma(", n, c, out_h, out_w, top_idx);
 #endif
-                    for (int kh = 0; kh < kernel->h; kh++) {
-                        for (int kw = 0; kw < kernel->w; kw++) {
+                    for (int kh = 0; kh < kernel->height; kh++)
+                    {
+                        for (int kw = 0; kw < kernel->width; kw++)
+                        {
                             //sum+=bottom->data[c, h+kh, w+kw] * kernel->data[n, c, kh, kw];
-                            int bottom_idx = c * bottom->h*bottom->w + (h + kh)*bottom->w + w + kw;
-                            int kernel_idx = n * kernel->nstep + c * kernel->h*kernel->w + kh * kernel->w + kw;
+                            int bottom_idx = c * bottom->height*bottom->width + (h + kh)*bottom->width + w + kw;
+                            int kernel_idx = n * kernel->nstep + c * kernel->height*kernel->width + kh * kernel->width + kw;
                             sum += bottom->data[bottom_idx] * kernel->data[kernel_idx];
 #ifdef LOCAL_DEBUG
                             fprintf(fout, "I(%d,%d,%d,%d)*K(%d,%d,%d,%d)+",
@@ -285,7 +291,8 @@ void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBl
 //NHWC convolution forward
 //@param bottom: n=1,3d blob
 //@param top: n=1,3d blob
-void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBlob* top) {
+void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBlob* top)
+{
     const NcStride stride = param->stride;
 
     //kernel: n=1, 3d blob
@@ -301,7 +308,7 @@ void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBl
 
     //per kernel
     //printf("top->n=%d\n", top->n);
-    for (int n = 0; n < kernel->n; n++) {
+    for (int n = 0; n < kernel->batch; n++) {
         //printf("\t\t%d-th kernel\n", n);
         //fprintf(fout, "NHWC mode\n");
 
@@ -309,19 +316,19 @@ void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBl
         int out_w = 0;
 
         int bottom_idx, kernel_idx, top_idx;
-        for (int h = 0; h < bottom->h - kernel->h + 1; h += stride.height, out_h += 1) {
+        for (int h = 0; h < bottom->height - kernel->height + 1; h += stride.height, out_h += 1) {
             out_w = 0;
-            for (int w = 0; w < bottom->w - kernel->w + 1; w += stride.width, out_w += 1) {
+            for (int w = 0; w < bottom->width - kernel->width + 1; w += stride.width, out_w += 1) {
                 float sum = 0.f;
 #ifdef LOCAL_DEBUG
                 fprintf(fout, "output[%d,%d]=sigma(", out_h, out_w);
 #endif
-                for (int kh = 0; kh < kernel->h; kh++) {
-                    for (int kw = 0; kw < kernel->w; kw++) {
-                        for (int c = 0; c < bottom->c; c++) {
+                for (int kh = 0; kh < kernel->height; kh++) {
+                    for (int kw = 0; kw < kernel->width; kw++) {
+                        for (int c = 0; c < bottom->channel; c++) {
                             //sum += bottom[h + kh, w + kw, c] * kernel[kh, kw, c];
-                            bottom_idx = (h + kh)*bottom->w*bottom->c + (w + kw)*bottom->c + c;
-                            kernel_idx = kh * kernel->w*kernel->c + kw * kernel->c + c;
+                            bottom_idx = (h + kh)*bottom->width*bottom->channel + (w + kw)*bottom->channel + c;
+                            kernel_idx = kh * kernel->width*kernel->channel + kw * kernel->channel + c;
                             sum += bottom->data[bottom_idx] * kernel->data[kernel_idx];
 
 #ifdef LOCAL_DEBUG
@@ -338,7 +345,7 @@ void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBl
 #endif
 
                 //output[out_h, out_w, n] = sum;
-                top_idx = out_h * top->w * top->c + out_w * top->c + n;
+                top_idx = out_h * top->width * top->channel + out_w * top->channel + n;
                 top->data[top_idx] = sum;
             }
         }

@@ -36,7 +36,7 @@ NcPoolingParam* nc_infer_make_pooling_param(int map_size, int in_channels, NcPoo
     NcPoolingParam* param = (NcPoolingParam*)malloc(sizeof(NcPoolingParam));
     param->in_channels = in_channels;
     param->out_channels = in_channels;
-    param->stride = nc_create_stride(1, 1); //now only use (1,1) stride
+    param->stride = px_create_stride(1, 1); //now only use (1,1) stride
     param->map_size = map_size;
     param->pooling_type = pool_type;
     param->padding_type = pad_type;
@@ -115,31 +115,35 @@ NcLayerOutput* nc_infer_make_layer_output(int n, const int* blob_ids, NcNet* net
 // 2. do computation
 // 3. decrease input blob's rely count, and release blob if rely count==0
 // note! for in-place operation, needn't considering the rely_cnt
-void nc_infer_convolution(void* param_, NcLayerInput* input, NcLayerOutput* output) {
+void nc_infer_convolution(void* param_, NcLayerInput* input, NcLayerOutput* output)
+{
     printf("===> into NaiveCNN infer convolution\n");
     // step1
     NcConvolutionParam* param = (NcConvolutionParam*)param_;
     NcBlob* bottom = input->blobs[0];
     NcBlob* top = output->blobs[0];
 
-    param->in_height = bottom->h;
-    param->in_width = bottom->w;
+    param->in_height = bottom->height;
+    param->in_width = bottom->width;
     param->out_height = param->in_height - param->map_size + 1;
     param->out_width = param->in_width - param->map_size + 1;
 
     nc_blob_data_realloc3d(top, param->out_height, param->out_width, param->out_channels);
 
     // step2
-    if (bottom->order == NHWC) {
+    if (bottom->order == NHWC)
+    {
         nc_convolution_forward_nhwc(param, bottom, top);
     }
-    else if(bottom->order==NCHW) {
+    else if(bottom->order==NCHW)
+    {
         nc_convolution_forward_nchw(param, bottom, top);
     }
 
     // step3
     bottom->rely_cnt--;
-    if (bottom->rely_cnt == 0) {
+    if (bottom->rely_cnt == 0)
+    {
         free(bottom->data);
         bottom->data = NULL;
     }
@@ -147,31 +151,35 @@ void nc_infer_convolution(void* param_, NcLayerInput* input, NcLayerOutput* outp
     printf("-- leave NaiveCNN infer convolution\n");
 }
 
-void nc_infer_pooling(void* param_, NcLayerInput* input, NcLayerOutput* output) {
+void nc_infer_pooling(void* param_, NcLayerInput* input, NcLayerOutput* output)
+{
     printf("===> into NaiveCNN infer pooling\n");
     // step1
     NcPoolingParam* param = (NcPoolingParam*)param_;
     NcBlob* bottom = input->blobs[0];
     NcBlob* top = output->blobs[0];
 
-    param->in_height = bottom->h;
-    param->in_width = bottom->w;
-    param->out_height = (param->in_height - param->map_size) / param->stride->height + 1;
-    param->out_width = (param->in_width - param->map_size) / param->stride->width + 1;
+    param->in_height = bottom->height;
+    param->in_width = bottom->width;
+    param->out_height = (param->in_height - param->map_size) / param->stride.height + 1;
+    param->out_width = (param->in_width - param->map_size) / param->stride.width + 1;
 
     nc_blob_data_realloc3d(top, param->out_height, param->out_width, param->out_channels);
 
     // step2
-    if (bottom->order == NHWC) {
+    if (bottom->order == NHWC)
+    {
         nc_pooling_forward_nhwc(param, bottom, top);
     }
-    else if (bottom->order == NCHW) {
+    else if (bottom->order == NCHW)
+    {
         nc_pooling_forward_nchw(param, bottom, top);
     }
 
     // step3
     bottom->rely_cnt--;
-    if (bottom->rely_cnt == 0) {
+    if (bottom->rely_cnt == 0)
+    {
         free(bottom->data);
         bottom->data = NULL;
     }
@@ -179,7 +187,8 @@ void nc_infer_pooling(void* param_, NcLayerInput* input, NcLayerOutput* output) 
     printf("-- leave NaiveCNN infer pooling\n");
 }
 
-void nc_infer_innerproduct(void* param_, NcLayerInput* input, NcLayerOutput* output) {
+void nc_infer_innerproduct(void* param_, NcLayerInput* input, NcLayerOutput* output)
+{
     printf("===> into NaiveCNN infer innerproduct\n");
     NcInnerproductParam* param = (NcInnerproductParam*)param_;
 

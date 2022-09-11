@@ -7,20 +7,22 @@
 #include <string.h>
 #include <assert.h>
 
-float nc_get_random_float(float s, float t){
+float nc_get_random_float(float min, float max)
+{
     float v = (float)(rand()) / RAND_MAX;
-    v = v * (t - s) + s;
+    v = v * (max - min) + min;
     return v;
 }
 
-NcBlob* nc_blob_make_empty(int n, int h, int w, int c) {
+NcBlob* nc_blob_make_empty(int batch, int height, int width, int channel)
+{
     NcBlob* blob = (NcBlob*)malloc(sizeof(NcBlob));
-    blob->n = n;
-    blob->h = h;
-    blob->w = w;
-    blob->c = c;
-    blob->nstep = h * w * c; //TODO: do align here
-    blob->mass = blob->nstep * n;
+    blob->batch = batch;
+    blob->height = height;
+    blob->width = width;
+    blob->channel = channel;
+    blob->nstep = height * width * channel; //TODO: do align here
+    blob->mass = blob->nstep * batch;
     blob->order = NHWC; //TODO:
     blob->data = NULL;
     blob->rely_cnt_total = 0;
@@ -28,41 +30,49 @@ NcBlob* nc_blob_make_empty(int n, int h, int w, int c) {
     return blob;
 }
 
-NcBlob* nc_blob_make(int n, int h, int w, int c) {
+NcBlob* nc_blob_make(int n, int h, int w, int c)
+{
     NcBlob* blob = nc_blob_make_empty(n, h, w, c);
     blob->data = (float*)calloc(blob->mass, sizeof(float));
     return blob;
 }
 
-NcBlob* nc_blob_make3d(int h, int w, int c) {
+NcBlob* nc_blob_make3d(int h, int w, int c)
+{
     return nc_blob_make(1, h, w, c);
 }
 
-NcBlob* nc_blob_make2d(int h, int w) {
+NcBlob* nc_blob_make2d(int h, int w)
+{
     return nc_blob_make(1, h, w, 1);
 }
 
-NcBlob* nc_blob_make_random(int n, int h, int w, int c, float s, float t) {
-    NcBlob* blob = nc_blob_make(n, h, w, c);
+NcBlob* nc_blob_make_random(int batch, int height, int width, int channel, float s, float t)
+{
+    NcBlob* blob = nc_blob_make(batch, height, width, channel);
 
     srand((unsigned)time(NULL));
-    for (int i = 0; i < blob->mass; i++) {
+    for (int i = 0; i < blob->mass; i++)
+    {
         blob->data[i] = nc_get_random_float(s, t);
     }
     return blob;
 }
 
-NcBlob* nc_blob_make_same(int n, int h, int w, int c, float v) {
-    NcBlob* blob = nc_blob_make(n, h, w, c);
+NcBlob* nc_blob_make_same(int batch, int height, int width, int channel, float value)
+{
+    NcBlob* blob = nc_blob_make(batch, height, width, channel);
 
     srand((unsigned)time(NULL));
-    for (int i = 0; i < blob->mass; i++) {
-        blob->data[i] = v;
+    for (int i = 0; i < blob->mass; i++)
+    {
+        blob->data[i] = value;
     }
     return blob;
 }
 
-NcBlob* nc_blob_make2d_empty(int h, int w) {
+NcBlob* nc_blob_make2d_empty(int h, int w)
+{
     NcBlob* blob = nc_blob_make_empty(1, h, w, 1);
     return blob;
 }
@@ -71,29 +81,25 @@ NcBlob* nc_blob_make2d_empty(int h, int w) {
 // free a blob's already allocated data buffer,
 // and re-assigne a different dimenssions, then re-allocated data buffer
 // the blob's logical properties such as rely_cnt_total
-void nc_blob_data_realloc(NcBlob* blob, int n, int h, int w, int c){
-    if (blob->data) {
+void nc_blob_data_realloc(NcBlob* blob, int batch, int height, int width, int channel)
+{
+    if (blob->data)
+    {
         free(blob->data);
         blob->data = NULL;
     }
-    blob->n = n;
-    blob->h = h;
-    blob->w = w;
-    blob->c = c;
-    blob->nstep = h * w * c; //TODO: consider align here
-    blob->mass = blob->nstep*n;
+    blob->batch = batch;
+    blob->height = height;
+    blob->width = width;
+    blob->channel = channel;
+    blob->nstep = height * width * channel; //TODO: consider align here
+    blob->mass = blob->nstep * batch;
     blob->data = (float*)calloc(blob->mass, sizeof(float));
 }
 
-void nc_blob_data_realloc3d(NcBlob* blob, int h, int w, int c) {
+void nc_blob_data_realloc3d(NcBlob* blob, int h, int w, int c)
+{
     nc_blob_data_realloc(blob, 1, h, w, c);
-}
-
-NcStride* nc_create_stride(int h, int w) {
-    NcStride* stride = (NcStride*)malloc(sizeof(NcStride));
-    stride->height = h;
-    stride->width = w;
-    return stride;
 }
 
 void nc_free_layer(NcLayer* layer) {
