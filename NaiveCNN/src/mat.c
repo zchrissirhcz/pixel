@@ -34,23 +34,39 @@ NcImage* nc_create_empty_image(int height, int width, int channel)
     return im;
 }
 
-// 矩阵翻转180度
-float** rotate180(float** mat, NcSize2D matSize)
+float** create_matrix(int height, int width)
 {
-    int i, c, r;
+    float** matrix = (float**)malloc(height*sizeof(float*));
+    for (int i = 0; i < height; i++)
+    {
+        matrix[i] = (float*)malloc(width * sizeof(float));
+    }
+    return matrix;
+}
+
+void destroy_matrix(float** matrix, int height)
+{
+    for (int i = 0; i < height; i++)
+    {
+        free(matrix[i]);
+    }
+    free(matrix);
+}
+
+// 每个点变换到矩阵中心点的对称点上
+// A   B         D   C
+//   O      =>     O
+// C   D         B   A
+float** get_rotate180_matrix(float** mat, NcSize2D matSize)
+{
     int outSizeW = matSize.width;
     int outSizeH = matSize.height;
-    float** outputData=(float**)malloc(outSizeH*sizeof(float*));
-    for (i = 0; i < outSizeH; i++)
+    float** outputData = create_matrix(outSizeH, outSizeW);
+    for (int i = 0; i < outSizeH; i++)
     {
-        outputData[i] = (float*)malloc(outSizeW * sizeof(float));
-    }
-
-    for (r = 0; r < outSizeH; r++)
-    {
-        for (c = 0; c < outSizeW; c++)
+        for (int j = 0; j < outSizeW; j++)
         {
-            outputData[r][c] = mat[outSizeH - r - 1][outSizeW - c - 1];
+            outputData[i][j] = mat[outSizeH - i - 1][outSizeW - j - 1];
         }
     }
 
@@ -153,8 +169,8 @@ float** correlation(float** map, NcSize2D mapSize,float** inputData, NcSize2D in
 float** conv(float** map, NcSize2D mapSize,float** inputData, NcSize2D inSize,int type) // 卷积操作
 {
     // 卷积操作可以用旋转180度的特征模板相关来求
-    float** flipmap=rotate180(map,mapSize); //旋转180度的特征模板
-    float** res=correlation(flipmap,mapSize,inputData,inSize,type);
+    float** flipmap = get_rotate180_matrix(map,mapSize); //旋转180度的特征模板
+    float** res = correlation(flipmap,mapSize,inputData,inSize,type);
     int i;
     for (i = 0; i < mapSize.height; i++)
     {
@@ -165,7 +181,7 @@ float** conv(float** map, NcSize2D mapSize,float** inputData, NcSize2D inSize,in
 }
 
 // 这个是矩阵的上采样（等值内插），upc及upr是内插倍数
-float** up_sample(float** mat, NcSize2D matSize,int upc,int upr)
+float** up_sample(float** mat, NcSize2D matSize, int upc,int upr)
 {
     int i, j, m, n;
     int c = matSize.width;

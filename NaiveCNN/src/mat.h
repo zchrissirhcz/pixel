@@ -17,7 +17,10 @@
 extern "C" {
 #endif
 
-float** rotate180(float** mat, NcSize2D matSize);// 矩阵翻转180度
+float** create_matrix(int height, int width);
+void destroy_matrix(float** matrix, int height);
+
+float** get_rotate180_matrix(float** mat, NcSize2D matSize);
 
 void addmat(float** res, float** mat1, NcSize2D matSize1, float** mat2, NcSize2D matSize2);// 矩阵相加
 

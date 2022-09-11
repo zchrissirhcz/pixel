@@ -524,7 +524,7 @@ void cnn_applygrads(CNN* cnn,CNNOpts opts,float** inputData) // 更新权重
     {
         for(j = 0; j < cnn->C1->in_channels; j++)
         {
-            float** flipinputData = rotate180(inputData,ySize);
+            float** flipinputData = get_rotate180_matrix(inputData,ySize);
             float** C1dk = conv(cnn->C1->d[i],dSize,flipinputData,ySize,valid);
             multifactor(C1dk,C1dk,mapSize,-1*opts.alpha);
             addmat(cnn->C1->mapData[j][i],cnn->C1->mapData[j][i],mapSize,C1dk,mapSize);
@@ -533,11 +533,7 @@ void cnn_applygrads(CNN* cnn,CNNOpts opts,float** inputData) // 更新权重
                 free(C1dk[r]);
             }
             free(C1dk);
-            for (r = 0; r < ySize.height; r++)
-            {
-                free(flipinputData[r]);
-            }
-            free(flipinputData);
+            destroy_matrix(flipinputData, ySize.height);
         }
         cnn->C1->biasData[i] = cnn->C1->biasData[i]-opts.alpha*summat(cnn->C1->d[i],dSize);
     }
@@ -553,8 +549,8 @@ void cnn_applygrads(CNN* cnn,CNNOpts opts,float** inputData) // 更新权重
     {
         for(j = 0; j<cnn->C3->in_channels; j++)
         {
-            float** flipinputData=rotate180(cnn->S2->y[j],ySize);
-            float** C3dk= conv(cnn->C3->d[i],dSize,flipinputData,ySize,valid);
+            float** flipinputData = get_rotate180_matrix(cnn->S2->y[j],ySize);
+            float** C3dk = conv(cnn->C3->d[i],dSize,flipinputData,ySize,valid);
             multifactor(C3dk,C3dk,mapSize,-1.0*opts.alpha);
             addmat(cnn->C3->mapData[j][i],cnn->C3->mapData[j][i],mapSize,C3dk,mapSize);
             for (r = 0; r < (dSize.height - (ySize.height - 1)); r++)
@@ -562,11 +558,7 @@ void cnn_applygrads(CNN* cnn,CNNOpts opts,float** inputData) // 更新权重
                 free(C3dk[r]);
             }
             free(C3dk);
-            for (r = 0; r < ySize.height; r++)
-            {
-                free(flipinputData[r]);
-            }
-            free(flipinputData);
+            destroy_matrix(flipinputData, ySize.height);
         }
         cnn->C3->biasData[i]=cnn->C3->biasData[i]-opts.alpha*summat(cnn->C3->d[i],dSize);
     }
