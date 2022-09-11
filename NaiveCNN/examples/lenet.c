@@ -206,20 +206,22 @@ int test_mnist_train_test()
 }
 
 
-char* layer_type_str(NcLayerType type) {
-    switch(type) {
-        case NC_LAYER_DATA:
-            return "NC_DATA";
-        case NC_LAYER_CONVOLUTION:
-            return "NC_CONVOLUTION";
-        case NC_LAYER_POOLING:
-            return "NC_POOLING";
-        case NC_LAYER_INNERPRODUCT:
-            return "NC_INNERPRODUCT";
-        case NC_LAYER_LOSS:
-            return "NC_LOSS";
-        default:
-            return "UNKNOWN";
+const char* layer_type_to_str(NcLayerType type)
+{
+    switch(type)
+    {
+    case NC_LAYER_DATA:
+        return "NC_DATA";
+    case NC_LAYER_CONVOLUTION:
+        return "NC_CONVOLUTION";
+    case NC_LAYER_POOLING:
+        return "NC_POOLING";
+    case NC_LAYER_INNERPRODUCT:
+        return "NC_INNERPRODUCT";
+    case NC_LAYER_LOSS:
+        return "NC_LOSS";
+    default:
+        return "UNKNOWN";
     }
 }
 
@@ -508,10 +510,10 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size){
     //}
 
     // --- print each layer's type
-    for(int i=0; i<net->layers_num; i++) {
+    for(int i=0; i<net->layers_num; i++)
+    {
         layer = net->layers[i];
-        printf("-- layer[%d]'s type: %s\n", i,
-            layer_type_str(layer->type));
+        PX_LOGE("-- layer[%d]'s type: %s\n", i, layer_type_to_str(layer->type));
     }
 }
 
@@ -748,10 +750,10 @@ void nc_lenet5_infer_setup(NcNet* net) {
     net->e = NULL;
 
     // --- print each layer's type
-    for (int i = 0; i < net->layers_num; i++) {
+    for (int i = 0; i < net->layers_num; i++)
+    {
         layer = net->layers[i];
-        printf("-- layer[%d]'s type: %s\n", i,
-            layer_type_str(layer->type));
+        PX_LOGE("-- layer[%d]'s type: %s\n", i, layer_type_to_str(layer->type));
     }
 }
 

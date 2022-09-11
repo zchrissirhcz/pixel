@@ -20,6 +20,8 @@ void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array
 
 float mnist_cnn_test(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array_t* outputData, int testNum);
 
+const char* layer_type_to_str(NcLayerType type);
+
 #ifdef __cplusplus
 }
 #endif
