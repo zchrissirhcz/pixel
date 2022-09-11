@@ -270,7 +270,7 @@ void cnn_forward(CNN* cnn, matrix_t* input)
             mat1.width = mapSize.width;
             mat1.data = cnn->C1->v[i];
 
-            addmat(&res, &mat1, outSize, mapout, outSize);
+            addmat(&mat1, mapout, &res);
             destroy_matrix(mapout);
         }
         for (r = 0; r < outSize.height; r++)
@@ -327,7 +327,7 @@ void cnn_forward(CNN* cnn, matrix_t* input)
             mat1.width = mapSize.width;
             mat1.data = cnn->C3->v[i];
 
-            addmat(&res, &mat1, outSize, mapout, outSize);
+            addmat(&mat1, mapout, &res);
             destroy_matrix(mapout);
         }
         for (r = 0; r < outSize.height; r++)
@@ -521,7 +521,7 @@ void cnn_backward(CNN* cnn,float* outputData)
             mat1.width = mapSize.width;
             mat1.data = cnn->S2->d[i];
 
-            addmat(&res, &mat1,outSize,corr,outSize);
+            addmat(&mat1, corr, &res);
             destroy_matrix(corr);
         }
         /*
@@ -586,7 +586,7 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
             mat1.width = mapSize.width;
             mat1.data = cnn->C1->mapData[j][i];
             
-            addmat(&res, &mat1, mapSize, C1dk, mapSize);
+            addmat(&mat1, C1dk, &res);
             destroy_matrix(C1dk);
             destroy_matrix(flipinput);
         }
@@ -631,7 +631,7 @@ void cnn_applygrads(CNN* cnn, CNNOpts opts, matrix_t* input) // 更新权重
             mat1.width = mapSize.width;
             mat1.data = cnn->C3->mapData[j][i];
 
-            addmat(&res, &mat1, mapSize,C3dk,mapSize);
+            addmat(&mat1, C3dk, &res);
             destroy_matrix(C3dk);
             destroy_matrix(flipinput);
         }

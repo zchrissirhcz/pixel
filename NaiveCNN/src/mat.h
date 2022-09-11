@@ -28,7 +28,7 @@ matrix_t* create_matrix(int height, int width);
 void destroy_matrix(matrix_t* matrix);
 matrix_t* get_rotate180_matrix(matrix_t* input, NcSize2D matSize);
 
-void addmat(matrix_t* res, matrix_t* mat1, NcSize2D matSize1, matrix_t* mat2, NcSize2D matSize2);// 矩阵相加
+void addmat(matrix_t* src1, matrix_t* src2, matrix_t* dst);
 
 matrix_t* correlation(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize, int type);// 互相关
 

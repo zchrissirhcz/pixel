@@ -257,18 +257,19 @@ void save_mat_to_file(matrix_t* mat, const char* filename)
 }
 
 // 矩阵相加
-void addmat(matrix_t* res, matrix_t* mat1, NcSize2D matSize1, matrix_t* mat2, NcSize2D matSize2)
+void addmat(matrix_t* src1, matrix_t* src2, matrix_t* dst)
 {
-    if (matSize1.width != matSize2.width || matSize1.height != matSize2.height)
+    if (src1->width != src2->width || src1->height != src2->height)
     {
         PX_LOGE("ERROR: Size is not same!");
+        return;
     }
 
-    for (int i = 0; i < matSize1.height; i++)
+    for (int i = 0; i < src1->height; i++)
     {
-        for (int j = 0; j < matSize1.width; j++)
+        for (int j = 0; j < src1->width; j++)
         {
-            res->data[i][j] = mat1->data[i][j] + mat2->data[i][j];
+            dst->data[i][j] = src1->data[i][j] + src2->data[i][j];
         }
     }
 }
