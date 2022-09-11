@@ -509,7 +509,7 @@ void cnn_backward(CNN* cnn,float* outputData)
             input.width = inSize.width;
             input.data = cnn->C3->d[j];
 
-            matrix_t* corr = correlation(&map, mapSize, &input, inSize, full);
+            matrix_t* corr = correlation(&map, &input, full);
 
             matrix_t res;
             res.height = mapSize.height;

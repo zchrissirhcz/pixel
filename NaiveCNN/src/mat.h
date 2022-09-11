@@ -30,7 +30,7 @@ matrix_t* get_rotate180_matrix(matrix_t* input);
 
 void addmat(matrix_t* src1, matrix_t* src2, matrix_t* dst);
 
-matrix_t* correlation(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize, int type);// 互相关
+matrix_t* correlation(matrix_t* map, matrix_t* input, int type);
 
 matrix_t* conv(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize, int type); // 卷积操作
 

@@ -84,7 +84,7 @@ matrix_t* get_rotate180_matrix(matrix_t* input)
 // same指同输入相同大小
 // valid指完全操作后的大小，一般为inSize-(mapSize-1)大小，其不需要将输入添0扩大。
 
-matrix_t* correlation(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize, int type)
+matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
 {
     // 这里的互相关是在后向传播时调用，类似于将Map反转180度再卷积
     // 为了方便计算，这里先将图像扩充一圈
@@ -94,35 +94,35 @@ matrix_t* correlation(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D
     int halfmapsizeh;
 
     // 模板大小为偶数
-    if (mapSize.height % 2 == 0 && mapSize.width %2 == 0)
+    if (map->height % 2 == 0 && map->width %2 == 0)
     {
-        halfmapsizew = (mapSize.width) / 2; // 卷积模块的半瓣大小
-        halfmapsizeh = (mapSize.height) / 2;
+        halfmapsizew = (map->width) / 2; // 卷积模块的半瓣大小
+        halfmapsizeh = (map->height) / 2;
     }
     else
     {
-        halfmapsizew = (mapSize.width - 1) / 2; // 卷积模块的半瓣大小
-        halfmapsizeh = (mapSize.height - 1) / 2;
+        halfmapsizew = (map->width - 1) / 2; // 卷积模块的半瓣大小
+        halfmapsizeh = (map->height - 1) / 2;
     }
 
     // 这里先默认进行full模式的操作，full模式的输出大小为inSize+(mapSize-1)
-    int outSizeW = inSize.width + (mapSize.width - 1); // 这里的输出扩大一部分
-    int outSizeH = inSize.height + (mapSize.height - 1);
+    int outSizeW = input->width + (map->width - 1); // 这里的输出扩大一部分
+    int outSizeH = input->height + (map->height - 1);
 
     // 互相关的结果扩大了
     matrix_t* output = create_matrix(outSizeH, outSizeW);
 
     // 为了方便计算，将inputData扩大一圈
-    px_pad_t pad = px_create_pad(mapSize.height-1, mapSize.height-1, mapSize.width-1, mapSize.width-1);
+    px_pad_t pad = px_create_pad(map->height-1, map->height-1, map->width-1, map->width-1);
     matrix_t* expaned_input = mat_edge_expand(input, pad);
 
     for (j = 0; j < outSizeH; j++)
     {
         for (i = 0; i < outSizeW; i++)
         {
-            for (r = 0; r < mapSize.height; r++)
+            for (r = 0; r < map->height; r++)
             {
-                for (c = 0; c < mapSize.width; c++)
+                for (c = 0; c < map->width; c++)
                 {
                     output->data[j][i] = output->data[j][i] + map->data[r][c] * expaned_input->data[j + r][i + c];
                 }
@@ -143,7 +143,7 @@ matrix_t* correlation(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D
     }
     case valid:{
         matrix_t* validres;
-        if (mapSize.height % 2 == 0 && mapSize.width % 2 == 0)
+        if (map->height % 2 == 0 && map->width % 2 == 0)
         {
             validres = mat_edge_shrink(output, halfmapsizew * 2 - 1, halfmapsizeh * 2 - 1);
         }
@@ -164,7 +164,7 @@ matrix_t* conv(matrix_t* map, NcSize2D mapSize, matrix_t* input, NcSize2D inSize
 {
     // 卷积操作可以用旋转180度的特征模板相关来求
     matrix_t* flipmap = get_rotate180_matrix(map); //旋转180度的特征模板
-    matrix_t* res = correlation(flipmap, mapSize, input, inSize, type);
+    matrix_t* res = correlation(flipmap, input, type);
     destroy_matrix(flipmap);
     return res;
 }
