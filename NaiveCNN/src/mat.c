@@ -127,7 +127,7 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
 
     // 为了方便计算，将inputData扩大一圈
     px_pad_t pad = px_create_pad(map->height-1, map->height-1, map->width-1, map->width-1);
-    matrix_t* expaned_input = mat_edge_expand(input, pad);
+    matrix_t* expaned_input = matrix_copy_make_border(input, pad);
 
     for (j = 0; j < outSizeH; j++)
     {
@@ -150,7 +150,8 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
     case full: // 完全大小的情况
         return output;
     case same:{
-        matrix_t* sameres = mat_edge_shrink(output, halfmapsizew, halfmapsizeh);
+        px_pad_t cut_pad = px_create_pad(halfmapsizeh, halfmapsizeh, halfmapsizew, halfmapsizew);
+        matrix_t* sameres = matrix_cut_make_border(output, cut_pad);
         destroy_matrix_ptr(output);
         return sameres;
     }
@@ -158,11 +159,13 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
         matrix_t* validres;
         if (map->height % 2 == 0 && map->width % 2 == 0)
         {
-            validres = mat_edge_shrink(output, halfmapsizew * 2 - 1, halfmapsizeh * 2 - 1);
+            px_pad_t cut_pad = px_create_pad(halfmapsizeh * 2 - 1, halfmapsizeh * 2 - 1, halfmapsizew * 2 - 1, halfmapsizew * 2 - 1);
+            validres = matrix_cut_make_border(output, cut_pad);
         }
         else
         {
-            validres = mat_edge_shrink(output, halfmapsizew * 2, halfmapsizeh * 2);
+            px_pad_t cut_pad = px_create_pad(halfmapsizeh * 2, halfmapsizeh * 2, halfmapsizew * 2, halfmapsizew * 2);
+            validres = matrix_cut_make_border(output, cut_pad);
         }
         destroy_matrix_ptr(output);
         return validres;
@@ -183,8 +186,11 @@ matrix_t* conv(matrix_t* map, matrix_t* input, int type)
 }
 
 // 这个是矩阵的上采样（等值内插），upc及upr是内插倍数
-matrix_t* up_sample(matrix_t* input, int upc, int upr)
+matrix_t* matrix_upsample(matrix_t* input, int width_multiplier, int height_multiplier)
 {
+    const int upr = height_multiplier;
+    const int upc = width_multiplier;
+
     const int out_height = input->height * upr;
     const int out_width = input->width * upc;
     matrix_t* output = create_matrix_ptr(out_height, out_width);
@@ -212,8 +218,7 @@ matrix_t* up_sample(matrix_t* input, int upc, int upr)
     return output;
 }
 
-// 给二维矩阵边缘扩大，增加addw大小的0值边
-matrix_t* mat_edge_expand(matrix_t* input, px_pad_t pad)
+matrix_t* matrix_copy_make_border(matrix_t* input, px_pad_t pad)
 {   
     // 向量边缘扩大
     const int out_height = input->height + pad.top + pad.bottom;
@@ -238,19 +243,19 @@ matrix_t* mat_edge_expand(matrix_t* input, px_pad_t pad)
 }
 
 // 给二维矩阵边缘缩小，擦除shrinkc大小的边
-matrix_t* mat_edge_shrink(matrix_t* input, int shrinkc, int shrinkr)
+matrix_t* matrix_cut_make_border(matrix_t* input, px_pad_t pad)
 {
-    const int out_height = input->height - 2 * shrinkr;
-    const int out_width = input->width - 2 * shrinkc;
+    const int out_height = input->height - pad.top - pad.bottom;
+    const int out_width = input->width - pad.left - pad.right;
     matrix_t* output = create_matrix_ptr(out_height, out_width);
 
     for(int j = 0; j < input->height; j++)
     {
         for(int i = 0; i < input->width; i++)
         {
-            if (j >= shrinkr && i >= shrinkc && j < (input->height - shrinkr) && i < (input->width - shrinkc))
+            if (j >= pad.top && i >= pad.left && j < (input->height - pad.top) && i < (input->width - pad.left))
             {
-                output->data[j - shrinkr][i - shrinkc] = input->data[j][i]; // 复制原向量的数据
+                output->data[j - pad.top][i - pad.left] = input->data[j][i]; // 复制原向量的数据
             }
         }
     }

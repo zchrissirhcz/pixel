@@ -501,7 +501,7 @@ void cnn_backward(CNN* cnn,float* outputData)
         input.height = S4dSize.height;
         input.width = S4dSize.width;
         input.data = cnn->S4->d[i];
-        matrix_t* C3e = up_sample(&input, cnn->S4->map_size, cnn->S4->map_size);
+        matrix_t* C3e = matrix_upsample(&input, cnn->S4->map_size, cnn->S4->map_size);
         for (r = 0; r < cnn->S4->in_height; r++)
         {
             for (c = 0; c < cnn->S4->in_width; c++)
@@ -564,7 +564,7 @@ void cnn_backward(CNN* cnn,float* outputData)
         input.height = S2dSize.height;
         input.width = S2dSize.width;
         input.data = cnn->S2->d[i];
-        matrix_t* C1e = up_sample(&input, cnn->S2->map_size, cnn->S2->map_size);
+        matrix_t* C1e = matrix_upsample(&input, cnn->S2->map_size, cnn->S2->map_size);
         for (r = 0; r < cnn->S2->in_height; r++)
         {
             for (c = 0; c < cnn->S2->in_width; c++)

@@ -37,13 +37,12 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type);
 matrix_t* conv(matrix_t* map, matrix_t* input, int type);
 
 // 这个是矩阵的上采样（等值内插），upc及upr是内插倍数
-matrix_t* up_sample(matrix_t* input, int upc, int upr);
+matrix_t* matrix_upsample(matrix_t* input, int width_multiplier, int height_multiplier);
 
-// 给二维矩阵边缘扩大，增加addw大小的0值边
-matrix_t* mat_edge_expand(matrix_t* input, px_pad_t pad);
+// expaded regions filled with 0
+matrix_t* matrix_copy_make_border(matrix_t* input, px_pad_t pad);
 
-// 给二维矩阵边缘缩小，擦除shrinkc大小的边
-matrix_t* mat_edge_shrink(matrix_t* input, int shrinkc, int shrinkr);
+matrix_t* matrix_cut_make_border(matrix_t* input, px_pad_t pad);
 
 void save_mat_to_file(matrix_t* mat, const char* filename);
 
