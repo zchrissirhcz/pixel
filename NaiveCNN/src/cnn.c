@@ -4,9 +4,9 @@
 #include <math.h>
 #include <time.h>
 #include <stdbool.h>
+#include "px_log.h"
 #include "cnn.h"
 #include "mat.h"
-#include "naive_config.h"
 
 
 ConvLayer* init_conv_layer(int in_width,int in_height,int map_size,int in_channels,int out_channels)

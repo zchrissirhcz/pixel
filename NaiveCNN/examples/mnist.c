@@ -7,7 +7,6 @@
 
 #include "mnist.h"
 #include "cnn.h"
-#include "naive_config.h"
 
 #define LOADBMP_IMPLEMENTATION
 #include "loadbmp.h"

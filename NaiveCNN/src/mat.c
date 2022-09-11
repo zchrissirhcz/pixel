@@ -4,10 +4,11 @@
 #include <math.h>
 #include <time.h>
 #include "mat.h"
-#include "naive_config.h"
 #include "px_arithm.h"
+#include "naive_cnn.h"
 
-NcImage* nc_create_image(int height, int width, int channel, unsigned char* data)
+static
+NcImage* nc_create_image_header(int height, int width, int channel)
 {
     NcImage* im = (NcImage*)malloc(sizeof(NcImage));
     im->height = height;
@@ -15,18 +16,20 @@ NcImage* nc_create_image(int height, int width, int channel, unsigned char* data
     im->channel = channel;
     im->cstep = px_align_up(height * width, NC_IMAGE_ALIGN);
     im->elem_num = im->cstep * channel;
+    im->data = NULL;
+    return im;
+}
+
+NcImage* nc_create_image(int height, int width, int channel, unsigned char* data)
+{
+    NcImage* im = nc_create_image_header(height, width, channel);
     im->data = data;
     return im;
 }
 
 NcImage* nc_create_empty_image(int height, int width, int channel)
 {
-    NcImage* im = (NcImage*)malloc(sizeof(NcImage));
-    im->height = height;
-    im->width = width;
-    im->channel = channel;
-    im->cstep = px_align_up(height * width, NC_IMAGE_ALIGN);
-    im->elem_num = im->cstep * channel;
+    NcImage* im = nc_create_image_header(height, width, channel);
     im->data = (unsigned char*)malloc(sizeof(unsigned char)*im->elem_num);
     return im;
 }
