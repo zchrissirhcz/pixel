@@ -39,7 +39,7 @@ int reverse_int(int i)
     return((int) ch1 << 24) + ((int)ch2 << 16) + ((int)ch3 << 8) + ch4;
 }
 
-MnistImgArr* read_mnist_image(const char* filename) // 读入图像
+mnist_image_array_t* read_mnist_image(const char* filename)
 {
     FILE* fp = fopen(filename, "rb");
     CHECK_READ_FILE(fp, filename);
@@ -64,23 +64,23 @@ MnistImgArr* read_mnist_image(const char* filename) // 读入图像
     int i,r,c;
 
     // 图像数组的初始化
-    MnistImgArr* imgarr = (MnistImgArr*)malloc(sizeof(MnistImgArr));
-    imgarr->ImgNum = number_of_images;
-    imgarr->ImgPtr = (mnist_img_t*)malloc(number_of_images*sizeof(mnist_img_t));
+    mnist_image_array_t* imgarr = (mnist_image_array_t*)malloc(sizeof(mnist_image_array_t));
+    imgarr->size = number_of_images;
+    imgarr->images = (mnist_image_t*)malloc(number_of_images*sizeof(mnist_image_t));
 
     for(i = 0; i < number_of_images; i++)
     {
-        imgarr->ImgPtr[i].height = n_rows;
-        imgarr->ImgPtr[i].width = n_cols;
-        imgarr->ImgPtr[i].data = (float**)malloc(n_rows*sizeof(float*));
+        imgarr->images[i].height = n_rows;
+        imgarr->images[i].width = n_cols;
+        imgarr->images[i].data = (float**)malloc(n_rows*sizeof(float*));
         for(r = 0; r < n_rows; r++)
         {
-            imgarr->ImgPtr[i].data[r] = (float*)malloc(n_cols*sizeof(float));
+            imgarr->images[i].data[r] = (float*)malloc(n_cols*sizeof(float));
             for(c = 0; c < n_cols; c++)
             {
                 unsigned char temp = 0;
                 fread((char*) &temp, sizeof(temp),1,fp);
-                imgarr->ImgPtr[i].data[r][c] = (float)temp/255.0f;
+                imgarr->images[i].data[r][c] = (float)temp/255.0f;
             }
         }
     }
@@ -109,7 +109,7 @@ MnistLabelArr* read_mnist_label(const char* filename)
     int i;
 
     // 图像标记数组的初始化
-    MnistLabelArr* labarr=(MnistLabelArr*)malloc(sizeof(MnistLabelArr));
+    MnistLabelArr* labarr = (MnistLabelArr*)malloc(sizeof(MnistLabelArr));
     labarr->LabelNum=number_of_labels;
     labarr->LabelPtr=(MnistLabel*)malloc(number_of_labels*sizeof(MnistLabel));
 
@@ -126,7 +126,7 @@ MnistLabelArr* read_mnist_label(const char* filename)
     return labarr;
 }
 
-void mnist_cnn_train(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData, CNNOpts opts, int trainNum, FILE* fout)
+void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, MnistLabelArr* outputData, CNNOpts opts, int trainNum, FILE* fout)
 {
     // 学习训练误差曲线
     cnn->L = (float*)malloc(trainNum * sizeof(float));
@@ -137,9 +137,9 @@ void mnist_cnn_train(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData
         for (n = 0; n < trainNum; n++)
         {
             matrix_t input;
-            input.height = inputData->ImgPtr[n].height;
-            input.width = inputData->ImgPtr[n].width;
-            input.data = inputData->ImgPtr[n].data;
+            input.height = inputData->images[n].height;
+            input.width = inputData->images[n].width;
+            input.data = inputData->images[n].data;
             cnn_forward(cnn, &input);  // 前向传播，这里主要计算各
             cnn_backward(cnn, outputData->LabelPtr[n].LabelData); // 后向传播，这里主要计算各神经元的误差梯度
 
@@ -172,18 +172,19 @@ void mnist_cnn_train(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData
 }
 
 // do inference
-float mnist_cnn_test(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData, int testNum)
+float mnist_cnn_test(CNN* cnn, mnist_image_array_t* inputData, MnistLabelArr* outputData, int testNum)
 {
     int n = 0;
     int incorrectnum = 0;
     for (n = 0; n < testNum; n++)
     {
-        matrix_t input;
-        input.height = inputData->ImgPtr[n].height;
-        input.width = inputData->ImgPtr[n].width;
-        input.data = inputData->ImgPtr[n].data;
-        cnn_forward(cnn, &input);
-        if (argmax(cnn->O5->y, cnn->O5->outputNum) != argmax(outputData->LabelPtr[n].LabelData, cnn->O5->outputNum)) {
+        matrix_t cnn_input;
+        cnn_input.height = inputData->images[n].height;
+        cnn_input.width = inputData->images[n].width;
+        cnn_input.data = inputData->images[n].data;
+        cnn_forward(cnn, &cnn_input);
+        if (argmax(cnn->O5->y, cnn->O5->outputNum) != argmax(outputData->LabelPtr[n].LabelData, cnn->O5->outputNum))
+        {
             incorrectnum++;
         }
         cnn_clear(cnn);
@@ -230,11 +231,11 @@ int test_mnist_train_test()
 {
     char train_label_pth[NC_MAX_PATH];
     sprintf(train_label_pth, "%s/mnist/train-labels.idx1-ubyte", project_dir);
-    MnistLabelArr* trainLabel=read_mnist_label(train_label_pth);
+    MnistLabelArr* trainLabel = read_mnist_label(train_label_pth);
 
     char train_image_pth[NC_MAX_PATH];
     sprintf(train_image_pth, "%s/mnist/train-images.idx3-ubyte", project_dir);
-    MnistImgArr* trainImg=read_mnist_image(train_image_pth);
+    mnist_image_array_t* trainImg = read_mnist_image(train_image_pth);
 
     char test_label_pth[NC_MAX_PATH];
     sprintf(test_label_pth, "%s/mnist/t10k-labels.idx1-ubyte", project_dir);
@@ -242,9 +243,9 @@ int test_mnist_train_test()
 
     char test_image_pth[NC_MAX_PATH];
     sprintf(test_image_pth, "%s/mnist/t10k-images.idx3-ubyte", project_dir);
-    MnistImgArr* testImg= read_mnist_image(test_image_pth);
+    mnist_image_array_t* testImg= read_mnist_image(test_image_pth);
 
-    NcSize2D inputSize = px_create_size(testImg->ImgPtr[0].height, testImg->ImgPtr[0].width);
+    NcSize2D inputSize = px_create_size(testImg->images[0].height, testImg->images[0].width);
     int outSize=testLabel->LabelPtr[0].l;
 
     // CNN structure init

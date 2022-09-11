@@ -7,12 +7,12 @@
 #include <time.h>
 #include "cnn.h"
 
-typedef matrix_t mnist_img_t;
+typedef matrix_t mnist_image_t;
 
-typedef struct MnistImgArr{
-    int ImgNum;        // 存储图像的数目
-    mnist_img_t* ImgPtr;  // 存储图像数组指针
-} MnistImgArr;         // 存储图像数据的数组
+typedef struct mnist_image_array_t {
+    int size;
+    mnist_image_t* images;
+} mnist_image_array_t;
 
 typedef struct MnistLabel{
     int l;            // 输出标记的长
@@ -34,14 +34,14 @@ void nc_read_mnist_image(const char* filename, NcImage*** _images, int* _image_n
 MnistLabelArr* read_mnist_label(const char* filename);
 
 // 读入图像
-MnistImgArr* read_mnist_image(const char* filename);
+mnist_image_array_t* read_mnist_image(const char* filename);
 
 void lenet5_setup(CNN* cnn, NcSize2D inputSize,int outputSize);
 
-void mnist_cnn_train(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData, CNNOpts opts, int trainNum, FILE* fout);
+void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, MnistLabelArr* outputData, CNNOpts opts, int trainNum, FILE* fout);
 
 // 测试cnn函数
-float mnist_cnn_test(CNN* cnn, MnistImgArr* inputData, MnistLabelArr* outputData, int testNum);
+float mnist_cnn_test(CNN* cnn, mnist_image_array_t* inputData, MnistLabelArr* outputData, int testNum);
 
 #ifdef __cplusplus
 }
