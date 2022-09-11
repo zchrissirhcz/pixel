@@ -265,47 +265,6 @@ static int reverse_int(int i)
     return((int)ch1 << 24) + ((int)ch2 << 16) + ((int)ch3 << 8) + ch4;
 }
 
-// 读入图像
-void nc_read_mnist_image(const char* filename, NcImage*** _images, int* _image_num)
-{
-    FILE* fp = fopen(filename, "rb");
-    CHECK_READ_FILE(fp, filename);
-
-    int magic_number = 0;
-    int number_of_images = 0;
-    int n_rows = 0;
-    int n_cols = 0;
-    //从文件中读取sizeof(magic_number) 个字符到 &magic_number
-    fread(&magic_number, sizeof(magic_number), 1, fp);
-    magic_number = reverse_int(magic_number);
-    //获取训练或测试image的个数number_of_images
-    fread(&number_of_images, sizeof(number_of_images), 1, fp);
-    number_of_images = reverse_int(number_of_images);
-    //获取训练或测试图像的高度Height
-    fread((char*)&n_rows, sizeof(n_rows), 1, fp);
-    n_rows = reverse_int(n_rows);
-    //获取训练或测试图像的宽度Width
-    fread((char*)&n_cols, sizeof(n_cols), 1, fp);
-    n_cols = reverse_int(n_cols);
-
-    //PX_LOGE("--- n_rows=%d, n_cols=%d\n", n_rows, n_cols);
-    //获取第i幅图像，保存到vec中
-    int i;
-
-    // 图像数组的初始化
-    NcImage** images = (NcImage**)malloc(sizeof(NcImage*)*number_of_images);
-
-    for (i = 0; i < number_of_images; ++i) {
-        images[i] = nc_create_empty_image(n_rows, n_cols, 1);
-        fread(images[i]->data, images[i]->elem_num, 1, fp);
-    }
-
-    fclose(fp);
-
-    *_images = images;
-    *_image_num = number_of_images;
-}
-
 
 // 读入标签
 void nc_read_mnist_label(const char* filename, int** _labels, int* _label_num)

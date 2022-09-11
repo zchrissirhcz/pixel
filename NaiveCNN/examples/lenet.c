@@ -96,41 +96,6 @@ float mnist_cnn_test(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array
     return (float)incorrectnum / (float)testNum;
 }
 
-
-// extract images from original mnist data
-// save each image to file
-// for simplicity, only do it on test images
-void extract_mnist_image_and_save()
-{
-    char test_image_pth[NC_MAX_PATH];
-    sprintf(test_image_pth, "%s/mnist/t10k-images.idx3-ubyte", project_dir);
-
-    NcImage** images;
-    int image_num;
-    nc_read_mnist_image(test_image_pth, &images, &image_num);
-    printf("=== got %d test images\n", image_num);
-
-    for(int i=0; i < image_num; i++)
-    {
-        char save_pth[NC_MAX_PATH];
-        sprintf(save_pth, "%s/mnist/testImgs/%d.bmp", project_dir, i);
-        FILE* fp = fopen(save_pth, "wb");
-        unsigned int err = loadbmp_encode_file(save_pth, images[i]->data, images[i]->width, images[i]->height, 1);
-
-        if (err){
-            printf("LoadBMP Load Error: %u\n", err);
-        }
-        fclose(fp);
-    }
-
-    for(int i = 0; i < image_num; i++)
-    {
-        free(images[i]->data);
-        free(images[i]);
-    }
-    free(images);
-}
-
 int test_mnist_train_test()
 {
     char train_label_pth[NC_MAX_PATH];
@@ -813,7 +778,8 @@ void nc_infer_trial()
     //free(net);
 }
 
-int main() {
+int main()
+{
     //extract_mnist_image_and_save();
     //test_mnist_train_test();
     //nc_train_trial();

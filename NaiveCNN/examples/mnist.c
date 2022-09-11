@@ -1,4 +1,5 @@
 #include "mnist.h"
+#include "loadbmp.h"
 
 // 英特尔处理器和其他低端机用户必须翻转头字节。
 static
@@ -146,4 +147,78 @@ mnist_label_array_t* read_mnist_label(const char* filename)
 
     fclose(fin);
     return labarr;
+}
+
+
+// extract images from original mnist data
+// save each image to file
+// for simplicity, only do it on test images
+void extract_mnist_image_and_save(const char* mnist_data_dir)
+{
+    char test_image_pth[NC_MAX_PATH];
+    sprintf(test_image_pth, "%s/t10k-images.idx3-ubyte", mnist_data_dir);
+
+    NcImage** images;
+    int image_num;
+    nc_read_mnist_image(test_image_pth, &images, &image_num);
+    PX_LOGE("=== got %d test images\n", image_num);
+
+    for(int i=0; i < image_num; i++)
+    {
+        char save_pth[NC_MAX_PATH];
+        sprintf(save_pth, "%s/testImgs/%d.bmp", mnist_data_dir, i);
+        FILE* fp = fopen(save_pth, "wb");
+        unsigned int err = loadbmp_encode_file(save_pth, images[i]->data, images[i]->width, images[i]->height, 1);
+
+        if (err)
+        {
+            printf("LoadBMP Load Error: %u\n", err);
+        }
+        fclose(fp);
+    }
+
+    for(int i = 0; i < image_num; i++)
+    {
+        free(images[i]->data);
+        free(images[i]);
+    }
+    free(images);
+}
+
+// 读入图像
+void nc_read_mnist_image(const char* filename, NcImage*** _images, int* _image_num)
+{
+    FILE* fp = fopen(filename, "rb");
+    CHECK_READ_FILE(fp, filename);
+
+    int magic_number = 0;
+    int number_of_images = 0;
+    int n_rows = 0;
+    int n_cols = 0;
+    //从文件中读取sizeof(magic_number) 个字符到 &magic_number
+    fread(&magic_number, sizeof(magic_number), 1, fp);
+    magic_number = reverse_int(magic_number);
+    //获取训练或测试image的个数number_of_images
+    fread(&number_of_images, sizeof(number_of_images), 1, fp);
+    number_of_images = reverse_int(number_of_images);
+    //获取训练或测试图像的高度Height
+    fread((char*)&n_rows, sizeof(n_rows), 1, fp);
+    n_rows = reverse_int(n_rows);
+    //获取训练或测试图像的宽度Width
+    fread((char*)&n_cols, sizeof(n_cols), 1, fp);
+    n_cols = reverse_int(n_cols);
+
+    // 图像数组的初始化
+    NcImage** images = (NcImage**)malloc(sizeof(NcImage*)*number_of_images);
+
+    for (int i = 0; i < number_of_images; ++i)
+    {
+        images[i] = nc_create_empty_image(n_rows, n_cols, 1);
+        fread(images[i]->data, images[i]->elem_num, 1, fp);
+    }
+
+    fclose(fp);
+
+    *_images = images;
+    *_image_num = number_of_images;
 }

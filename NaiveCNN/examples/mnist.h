@@ -24,6 +24,8 @@ extern "C" {
 
 mnist_label_array_t* read_mnist_label(const char* filename);
 mnist_image_array_t* read_mnist_image(const char* filename);
+void extract_mnist_image_and_save();
+void nc_read_mnist_image(const char* filename, NcImage*** _images, int* _image_num);
 
 #ifdef __cplusplus
 }
