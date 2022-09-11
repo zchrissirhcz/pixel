@@ -47,6 +47,15 @@ void init_matrix(matrix_t* matrix, int height, int width)
     }
 }
 
+void destroy_matrix_data(matrix_t* matrix)
+{
+    for (int i = 0; i < matrix->height; i++)
+    {
+        free(matrix->data[i]);
+    }
+    free(matrix->data);
+}
+
 matrix_t* create_matrix_ptr(int height, int width)
 {
     matrix_t* matrix = (matrix_t*) malloc(sizeof(matrix_t));
@@ -56,11 +65,7 @@ matrix_t* create_matrix_ptr(int height, int width)
 
 void destroy_matrix_ptr(matrix_t* matrix)
 {
-    for (int i = 0; i < matrix->height; i++)
-    {
-        free(matrix->data[i]);
-    }
-    free(matrix->data);
+    destroy_matrix_data(matrix);
     free(matrix);
 }
 

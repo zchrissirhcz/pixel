@@ -167,6 +167,11 @@ int test_mnist_train_test()
 
     free(cnn);
 
+    destroy_mnist_image_array(trainImg);
+    destroy_mnist_image_array(testImg);
+    destroy_mnist_label_array(trainLabel);
+    destroy_mnist_label_array(testLabel);
+
     return 0;
 }
 

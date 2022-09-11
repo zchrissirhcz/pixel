@@ -1,5 +1,6 @@
 #include "mnist.h"
 #include "naive_cnn.h"
+#include "px_cnn.h"
 
 #include <opencv2/opencv.hpp>
 
@@ -146,19 +147,19 @@ mnist_label_array_t* read_mnist_label(const char* filename)
     int magic_number = get_mnist_magic_number(fin);
     int number_of_labels = get_mnist_number_of_labels(fin);
 
-    mnist_label_array_t* labarr = create_mnist_label_array_t(number_of_labels);
+    mnist_label_array_t* label_array = create_mnist_label_array_t(number_of_labels);
 
     for(int i = 0; i < number_of_labels; ++i)
     {
-        labarr->one_hot_label[i].len = 10;
-        labarr->one_hot_label[i].data = (float*)calloc(label_long, sizeof(float));
+        label_array->one_hot_label[i].len = 10;
+        label_array->one_hot_label[i].data = (float*)calloc(label_long, sizeof(float));
         
         uint8_t label = read_mnist_single_label(fin);
-        labarr->one_hot_label[i].data[label] = 1.0f;
+        label_array->one_hot_label[i].data[label] = 1.0f;
     }
 
     fclose(fin);
-    return labarr;
+    return label_array;
 }
 
 
@@ -192,5 +193,23 @@ void extract_mnist_image_and_save(const char* mnist_data_dir)
 
 void destroy_mnist_image_array(mnist_image_array_t* image_array)
 {
+    for (int i = 0; i < image_array->size; i++)
+    {
+        destroy_matrix_data(&image_array->images_f32[i]);
+        free(image_array->images_u8[i].data);
+    }
+    free(image_array->images_f32);
+    free(image_array->images_u8);
+    free(image_array);
+}
 
+void destroy_mnist_label_array(mnist_label_array_t* label_array)
+{
+    for (int i = 0; i < label_array->size; i++)
+    {
+        px_destroy_array(&label_array->one_hot_label[i]);
+    }
+    free(label_array->one_hot_label);
+    free(label_array->label);
+    free(label_array);
 }

@@ -3,7 +3,8 @@
 #include "px_cnn.h"
 #include <stdlib.h>
 
-void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, px_stride_t* stride) {
+void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, px_stride_t* stride)
+{
     int out_h = 0;
     int out_w = 0;
 
@@ -14,17 +15,21 @@ void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, 
 #endif
 
     int input_idx, kernel_idx, output_idx;
-    for (int h = 0; h < input->height - kernel->height + 1; h += stride->height, out_h += 1) {
+    for (int h = 0; h < input->height - kernel->height + 1; h += stride->height, out_h += 1)
+    {
         out_w = 0;
-        for (int w = 0; w < input->width - kernel->width + 1; w += stride->width, out_w += 1) {
+        for (int w = 0; w < input->width - kernel->width + 1; w += stride->width, out_w += 1)
+        {
             float sum = 0.f;
 
 #ifdef DEBUG_CONV2D
             fprintf(fout, "output[%d,%d]=sigma(", out_h, out_w);
 #endif
 
-            for (int kh = 0; kh < kernel->height; kh++) {
-                for (int kw = 0; kw < kernel->width; kw++) {
+            for (int kh = 0; kh < kernel->height; kh++)
+            {
+                for (int kw = 0; kw < kernel->width; kw++)
+                {
                     //sum += input[h + kh, w + kw] * kernel[kh, kw];
                     input_idx = (h + kh)*input->width + (w + kw);
                     kernel_idx = kh * kernel->width + kw;
@@ -59,7 +64,8 @@ void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, 
 }
 
 
-static void nc_conv2d_example() {
+static void nc_conv2d_example()
+{
     NcBlob2D* input = (NcBlob2D*)malloc(sizeof(NcBlob2D));
     input->height = 5;
     input->width = 5;

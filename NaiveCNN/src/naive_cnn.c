@@ -209,7 +209,8 @@ void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* dat
     fclose(fout);
 }
 
-NcLayer* nc_create_layer() {
+NcLayer* nc_create_layer()
+{
     NcLayer* layer = (NcLayer*)malloc(sizeof(NcLayer));
     layer->backward = NULL;
     layer->forward = NULL;

@@ -30,6 +30,7 @@ mnist_label_array_t* read_mnist_label(const char* filename);
 mnist_image_array_t* read_mnist_image(const char* filename);
 void extract_mnist_image_and_save(const char* mnist_data_dir);
 void destroy_mnist_image_array(mnist_image_array_t* image_array);
+void destroy_mnist_label_array(mnist_label_array_t* label_array);
 
 #ifdef __cplusplus
 }
