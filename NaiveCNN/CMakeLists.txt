@@ -15,7 +15,7 @@ add_library(cnn STATIC
   src/naive_relu.c
 
   src/nc_bmp.c
-  src/nc_image.h
+  src/nc_bmp.h
 )
 target_link_libraries(cnn PUBLIC pixel)
 

@@ -162,7 +162,6 @@ int argmax(float* data, int len)
     return max_index;
 }
 
-// 保存cnn
 void save_cnn(CNN* cnn, const char* filename)
 {
     FILE* fp = fopen(filename, "wb");
@@ -206,7 +205,7 @@ void save_cnn(CNN* cnn, const char* filename)
 
     fclose(fp);
 }
-// 导入cnn的数据
+
 void load_cnn(CNN* cnn, const char* filename)
 {
     FILE* fp = fopen(filename, "rb");

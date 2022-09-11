@@ -229,7 +229,6 @@ NcBlob* nc_create_blob3d(int h, int w, int c);
 NcBlob* nc_create_blob2d(int h, int w);
 NcBlob* nc_create_blob_random(int n, int h, int w, int c, float s, float t);
 NcBlob* nc_create_blob_same(int n, int h, int w, int c, float v);
-NcBlob* nc_create_blob2d_empty(int h, int w);
 void nc_blob_data_realloc(NcBlob* blob, int n, int h, int w, int c);
 void nc_blob_data_realloc3d(NcBlob* blob, int h, int w, int c);
 
@@ -258,9 +257,6 @@ void nc_train_backward_innerproduct(void* param_, NcLayerInput* input, NcLayerOu
 
 void nc_destroy_layer(NcLayer* layer);
 
-// very straight forward and naive implementation of 2D convolution
-void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, px_stride_t* stride);
-
 void nc_net_forward(NcNet* net, NcImage* image, int label);
 void nc_net_backward(NcNet* net);
 void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* data_cfg);
@@ -274,15 +270,15 @@ void nc_pooling_forward_nchw(NcPoolingParam* param, NcBlob* bottom, NcBlob* top)
 void nc_pooling_test_nchw();
 void nc_pooling_test_nhwc();
 
-void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, px_stride_t* stride);
 void nc_convolution_forward_nhwc(NcConvolutionParam* param, NcBlob* bottom, NcBlob* top);
 void nc_convolution_forward_nchw(NcConvolutionParam* param, NcBlob* bottom, NcBlob* top);
 // unit test functions
 void nc_convolution_test_nchw();
 void nc_convolution_test_nhwc();
 
-void nc_image_rgb_to_bgr_inplace(NcImage* im);
-void nc_image_bgr_to_rgb_inplace(NcImage* im);
+px_size_t nc_get_conv_output_size(px_size_t input_size, px_size_t kernel_size, px_size_t stride);
+
+void nc_swap_rgb_and_bgr_inplace(NcImage* im);
 
 #ifdef __cplusplus
 }

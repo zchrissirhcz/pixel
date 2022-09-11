@@ -1,8 +1,9 @@
+#include "nc_bmp.h"
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include "nc_image.h"
 
 #include "px_arithm.h"
 
@@ -20,7 +21,7 @@
     printf("=== NcError! Reason: %s. Position: line %d, file %s\n\n", #ret_code, __LINE__, __FILE__); \
     exit(ret_code)
 
-void nc_image_load_bmp(const char* filename, uint8_t** _buf, uint32_t* _height, uint32_t* _width, uint32_t channel, bool line_align)
+void nc_load_bmp(const char* filename, uint8_t** _buf, int* _height, int* _width, int channel, bool line_align)
 {
     FILE* fp = fopen(filename, "rb");
 
@@ -105,7 +106,7 @@ void nc_image_load_bmp(const char* filename, uint8_t** _buf, uint32_t* _height, 
     fclose(fp);
 }
 
-void nc_image_save_bmp(const char* filename, const uint8_t* buf, uint32_t height, uint32_t width, uint32_t channel)
+void nc_save_bmp(const char* filename, const uint8_t* buf, int height, int width, int channel)
 {
     FILE* fp = fopen(filename, "wb");
     if (!fp)
@@ -146,7 +147,7 @@ void nc_image_save_bmp(const char* filename, const uint8_t* buf, uint32_t height
     uint32_t line_bytes = px_align_up(width * 3, 4);
     uint32_t line_pad = line_bytes - pixel_bytes;
     buf += line_bytes * (height - 1);
-    for (uint32_t h = height - 1; h != -1; h--)
+    for (int h = height - 1; h > 0; h--)
     {
         if (fwrite(buf, pixel_bytes, 1, fp) == 1 && fwrite(bmp_pad, 1, line_pad, fp) == line_pad)
         {

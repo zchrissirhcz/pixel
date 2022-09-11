@@ -3,96 +3,14 @@
 #include "px_cnn.h"
 #include <stdlib.h>
 
-void nc_conv2d(const NcBlob2D* input, const NcBlob2D* kernel, NcBlob2D* output, px_stride_t* stride)
+px_size_t nc_get_conv_output_size(px_size_t input_size, px_size_t kernel_size, px_size_t stride)
 {
-    int out_h = 0;
-    int out_w = 0;
-
-#ifdef DEBUG_CONV2D
-    char fout_pth[NC_MAX_PATH];
-    sprintf(fout_pth, "%s/debug/out.txt", project_dir);
-    FILE* fout = fopen(fout_pth, "w");
-#endif
-
-    int input_idx, kernel_idx, output_idx;
-    for (int h = 0; h < input->height - kernel->height + 1; h += stride->height, out_h += 1)
-    {
-        out_w = 0;
-        for (int w = 0; w < input->width - kernel->width + 1; w += stride->width, out_w += 1)
-        {
-            float sum = 0.f;
-
-#ifdef DEBUG_CONV2D
-            fprintf(fout, "output[%d,%d]=sigma(", out_h, out_w);
-#endif
-
-            for (int kh = 0; kh < kernel->height; kh++)
-            {
-                for (int kw = 0; kw < kernel->width; kw++)
-                {
-                    //sum += input[h + kh, w + kw] * kernel[kh, kw];
-                    input_idx = (h + kh) * input->width + (w + kw);
-                    kernel_idx = kh * kernel->width + kw;
-                    sum += input->data[input_idx] * kernel->data[kernel_idx];
-
-#ifdef DEBUG_CONV2D
-                    fprintf(fout, "input[%d,%d]*kernel[%d,%d]+", h + kh, w + kw, kh, kw);
-#endif
-                }
-            }
-
-#ifdef DEBUG_CONV2D
-            fprintf(fout, "\n");
-#endif
-
-            //output[out_h, out_w] = sum;
-            output_idx = out_h * output->width + out_w;
-            output->data[output_idx] = sum;
-        }
-    }
-
-#ifdef DEBUG_CONV2D
-    for (int h = 0; h < output->h; h++)
-    {
-        for (int w = 0; w < output->w; w++)
-        {
-            output_idx = h * output->w + w;
-            fprintf(fout, "%6f, ", output->data[output_idx]);
-        }
-        fprintf(fout, "\n");
-    }
-    fclose(fout);
-#endif
+    px_size_t output_size;
+    output_size.height = (input_size.height - kernel_size.height) / stride.height + 1;
+    output_size.width = (input_size.width - kernel_size.width) / stride.width + 1;
+    return output_size;
 }
 
-static void nc_conv2d_example()
-{
-    NcBlob2D* input = (NcBlob2D*)malloc(sizeof(NcBlob2D));
-    input->height = 5;
-    input->width = 5;
-    input->data = (float[]){
-        1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1};
-
-    NcBlob2D* kernel = (NcBlob2D*)malloc(sizeof(NcBlob2D));
-    kernel->height = 2;
-    kernel->width = 2;
-    kernel->data = (float[]){
-        1, 1,
-        1, 1};
-
-    px_stride_t stride = px_create_stride(1, 1);
-
-    NcBlob2D* output = (NcBlob2D*)malloc(sizeof(NcBlob2D));
-    output->height = (input->height - kernel->height) / stride.height + 1;
-    output->width = (input->width - kernel->width) / stride.width + 1;
-    output->data = (float*)malloc(sizeof(output->height * output->width));
-
-    nc_conv2d(input, kernel, output, &stride);
-}
 
 void nc_convolution_test_nchw()
 {
@@ -100,86 +18,37 @@ void nc_convolution_test_nchw()
     input->order = NCHW;
     input->data = (float[]){
         //C1
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
+        1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1,
 
         //C2
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-
+        2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2,
+        2, 2, 2, 2, 2,
     };
 
     NcBlob* kernel = nc_create_empty_blob(2, 2, 2, 2);
     kernel->data = (float[]){
         //C1
-        1,
-        1,
-        1,
-        1,
+        1, 1,
+        1, 1,
 
         //C2
-        0.5,
-        0.5,
-        0.5,
-        0.5,
+        0.5, 0.5,
+        0.5, 0.5,
 
         //C1
-        1,
-        1,
-        1,
-        1,
+        1, 1,
+        1, 1,
 
         //C2
-        0.5,
-        0.5,
-        0.5,
-        0.5,
+        0.5, 0.5,
+        0.5, 0.5,
     };
 
     px_stride_t stride = px_create_stride(1, 1);
@@ -218,56 +87,17 @@ void nc_convolution_test_nhwc()
         //2, 2, 2, 2, 2,
         //2, 2, 2, 2, 2,
 
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
+        1, 2, 1, 2, 1,
+        2, 1, 2, 1, 2,
+        1, 2, 1, 2, 1,
+        2, 1, 2, 1, 2,
+        1, 2, 1, 2, 1,
+
+        2, 1, 2, 1, 2,
+        1, 2, 1, 2, 1,
+        2, 1, 2, 1, 2,
+        1, 2, 1, 2, 1,
+        2, 1, 2, 1, 2,
     };
 
     NcBlob* kernel = nc_create_empty_blob(2, 2, 2, 2);
@@ -280,71 +110,53 @@ void nc_convolution_test_nhwc()
         //0.5, 0.5,
         //0.5, 0.5,
 
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
+        1, 0.5,
+        1, 0.5,
 
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
-        1,
-        0.5,
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
+
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
+        
+        1, 0.5,
+        1, 0.5,
     };
 
     px_stride_t stride = px_create_stride(1, 1);
