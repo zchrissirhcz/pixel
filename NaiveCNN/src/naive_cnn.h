@@ -4,7 +4,8 @@
 #include "naive_config.h"
 #include "px_cnn.h"
 
-typedef enum NcPaddingType {
+typedef enum NcPaddingType
+{
     NC_PADDING_CONV_CAFFE = 0,
     NC_PADDING_CONV_TF_SAME = 1,
     NC_PADDING_CONV_TF_VALID = 2,
@@ -13,12 +14,14 @@ typedef enum NcPaddingType {
     NC_PADDING_POOL_TF_VALID = 5
 } NcPaddingType;
 
-typedef enum NcPoolingType {
+typedef enum NcPoolingType
+{
     NC_POOLING_AVERAGE = 0,
     NC_POOLING_MAX = 1
 } NcPoolingType;
 
-typedef enum NcLayerType {
+typedef enum NcLayerType
+{
     NC_LAYER_DATA=0,
     NC_LAYER_CONVOLUTION=1,
     NC_LAYER_POOLING=2,
@@ -27,12 +30,14 @@ typedef enum NcLayerType {
     NC_LAYER_UNKNOWN=404
 } NcLayerType;
 
-typedef enum NcBlobDimOrder {
+typedef enum NcBlobDimOrder
+{
     NCHW=0,
     NHWC=1
 } NcBlobDimOrder;
 
-typedef struct NcBlob {
+typedef struct NcBlob
+{
     int n, h, w, c;
     int nstep; //h*w*c
     int mass; //n*nstep=n*h*w*c
@@ -49,7 +54,8 @@ typedef px_size_t NcDim2D;
 typedef px_size_t NcStride;
 
 
-typedef struct NcConvolutionParam {
+typedef struct NcConvolutionParam
+{
     int in_height;
     int in_width;
     int in_channels;
@@ -76,7 +82,8 @@ typedef struct NcConvolutionParam {
     NcBlob* d; // 网络的局部梯度,δ值
 } NcConvolutionParam;
 
-typedef struct NcPoolingParam {
+typedef struct NcPoolingParam
+{
     int bottom_blobs_num;
     int top_blobs_num;
 
@@ -96,7 +103,8 @@ typedef struct NcPoolingParam {
     NcBlob* y;
 } NcPoolingParam;
 
-typedef struct NcInnerproductParam {
+typedef struct NcInnerproductParam
+{
     int in_num;
     int out_num;
 
@@ -116,16 +124,19 @@ typedef struct NcInnerproductParam {
     bool is_full_connect;
 } NcInnerproductParam;
 
-typedef enum NC_RELU_TYPE {
-    RELU=0,
-    RELU6=1
+typedef enum NC_RELU_TYPE
+{
+    RELU = 0,
+    RELU6 = 1
 } NC_RELU_TYPE;
 
-typedef struct NcReluParam {
+typedef struct NcReluParam
+{
     NC_RELU_TYPE type;
 } NcReluParam;
 
-typedef struct NcLayerBottomTop {
+typedef struct NcLayerBottomTop
+{
     int blob_num;
     NcBlob** blobs;
     int* blob_ids;
@@ -137,7 +148,8 @@ typedef void (*NcLayerBackward)(void* param, NcLayerInput* input, NcLayerOutput*
 // infer: for inference
 typedef void(*NcLayerInfer)(void* param, NcLayerInput* input, NcLayerOutput* output);
 
-typedef struct NcLayer {
+typedef struct NcLayer
+{
     NcLayerType type;
     void* param;
 
@@ -149,7 +161,8 @@ typedef struct NcLayer {
     NcLayerOutput* output;
 } NcLayer;
 
-typedef struct NcNet{
+typedef struct NcNet
+{
     int layers_num;
     NcLayer** layers;
 
@@ -164,21 +177,24 @@ typedef struct NcNet{
 typedef px_size_t NcSize2D;
 
 //NaiveCNN's Image struct
-typedef struct NcImage {
+typedef struct NcImage
+{
     int w, h, c;
     int linebytes;
     int elem_num;
     unsigned char* data;
 } NcImage;
 
-typedef struct NcTrainConfig {
+typedef struct NcTrainConfig
+{
     int num_epoch;
     float alpha;
     int train_num;
     char log_pth[NC_MAX_PATH];
 } NcTrainConfig;
 
-typedef struct NcClsDataConfig {
+typedef struct NcClsDataConfig
+{
     int num; // how many (x,y) pairs do we have?
     NcImage** images;
     int* labels;

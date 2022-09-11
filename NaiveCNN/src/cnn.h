@@ -14,7 +14,8 @@
 
 
 // 卷积层
-typedef struct ConvLayer{
+typedef struct ConvLayer
+{
     int in_width;   //输入图像的宽
     int in_height;  //输入图像的长
     int map_size;      //特征模板的大小，模板一般都是正方形
@@ -42,7 +43,8 @@ typedef struct ConvLayer{
 } ConvLayer;
 
 // 池化层 pooling
-typedef struct PoolingLayer{
+typedef struct PoolingLayer
+{
     int in_width;   //输入图像的宽
     int in_height;  //输入图像的长
     int map_size;      //特征模板的大小
@@ -58,7 +60,8 @@ typedef struct PoolingLayer{
 } PoolingLayer;
 
 // 输出层 全连接的神经网络
-typedef struct InnerproductLayer{
+typedef struct InnerproductLayer
+{
     int inputNum;   //输入数据的数目
     int outputNum;  //输出数据的数目
 
@@ -73,7 +76,8 @@ typedef struct InnerproductLayer{
     bool isFullConnect; //是否为全连接
 } InnerproductLayer;
 
-typedef struct cnn_network{
+typedef struct cnn_network
+{
     int layerNum;
     ConvLayer* C1;
     PoolingLayer* S2;
@@ -85,7 +89,8 @@ typedef struct cnn_network{
     float* L; // 瞬时误差能量
 } CNN;
 
-typedef struct train_opts{
+typedef struct train_opts
+{
     int numepochs; // 训练的迭代次数
     float alpha; // 学习速率
 } CNNOpts;
