@@ -18,14 +18,14 @@ typedef struct Lenet
     PoolingLayer* S4;
     InnerproductLayer* O5;
 
-    float* e; // 训练误差
+    float* err; // training error
     float* L; // 瞬时误差能量
 } Lenet;
 
 typedef struct LenetTrainOpts
 {
     int num_epochs; // 训练的迭代次数
-    float alpha;   // 学习速率
+    float lr;   // learning rate
 } LenetTrainOpts;
 
 #ifdef __cplusplus
@@ -41,12 +41,11 @@ float test_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnis
 void save_lenet(Lenet* net, const char* filename);
 void load_lenet(Lenet* net, const char* filename);
 
-void forward_lenet(Lenet* net, matrix_t* input_data); // 网络的前向传播
-void backward_lenet(Lenet* net, float* output_data); // 网络的后向传播
+void forward_lenet(Lenet* net, matrix_t* input_data);
+void backward_lenet(Lenet* net, float* output_data);
 void apply_grads_on_lenet(Lenet* net, LenetTrainOpts opts, matrix_t* input);
 void clear_lenet(Lenet* net); // 将数据vyd清零
 
-// 保存CNN网络中的相关数据
 void save_lenet_data(Lenet* lenet, const char* filename, float** inputdata);
 
 #ifdef __cplusplus

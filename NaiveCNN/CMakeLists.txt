@@ -14,18 +14,17 @@ add_library(cnn STATIC
   src/naive_pooling.c
   src/naive_relu.c
 )
-target_link_libraries(cnn PUBLIC pixel)
+target_link_libraries(cnn PUBLIC pixel m)
 
-add_executable(example-mnist
+add_executable(testbed_lenet
   examples/lenet.cpp
   examples/lenet.h
 )
-target_include_directories(example-mnist PRIVATE "src")
+target_include_directories(testbed_lenet PRIVATE "src")
+target_link_libraries(testbed_lenet cnn ${OpenCV_LIBS})
 
-target_link_libraries(example-mnist cnn ${OpenCV_LIBS})
-
-if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  target_link_libraries(example-mnist m)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-  target_compile_definitions(cnn PRIVATE -D_CRT_SECURE_NO_WARNINGS)
-endif()
+add_executable(testbed_nc_lenet
+  examples/nc_lenet.cpp
+)
+target_include_directories(testbed_nc_lenet PRIVATE "src")
+target_link_libraries(testbed_nc_lenet cnn ${OpenCV_LIBS})
