@@ -8,32 +8,6 @@
 #include "naive_cnn.h"
 #include "px_assert.h"
 
-static NcImage* nc_create_image_header(int height, int width, int channel)
-{
-    NcImage* im = (NcImage*)malloc(sizeof(NcImage));
-    im->height = height;
-    im->width = width;
-    im->channel = channel;
-    im->cstep = px_align_up(height * width, NC_IMAGE_ALIGN);
-    im->elem_num = im->cstep * channel;
-    im->data = NULL;
-    return im;
-}
-
-NcImage* nc_create_image(int height, int width, int channel, unsigned char* data)
-{
-    NcImage* im = nc_create_image_header(height, width, channel);
-    im->data = data;
-    return im;
-}
-
-NcImage* nc_create_empty_image(int height, int width, int channel)
-{
-    NcImage* im = nc_create_image_header(height, width, channel);
-    im->data = (unsigned char*)malloc(sizeof(unsigned char) * im->elem_num);
-    return im;
-}
-
 static void init_matrix(matrix_t* matrix, int height, int width)
 {
     matrix->height = height;
@@ -326,7 +300,7 @@ float summat(matrix_t* mat)
 }
 
 
-void nc_swap_rgb_and_bgr_inplace(NcImage* im)
+void nc_swap_rgb_and_bgr_inplace(px_image_t* im)
 {
     PX_ASSERT(im->channel == 3);
 

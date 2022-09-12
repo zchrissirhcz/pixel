@@ -188,17 +188,6 @@ typedef struct NcNet
 
 typedef px_size_t NcSize2D;
 
-//NaiveCNN's Image struct
-typedef struct NcImage
-{
-    int width;
-    int height;
-    int channel;
-    int cstep;
-    int elem_num;
-    unsigned char* data;
-} NcImage;
-
 typedef struct NcTrainConfig
 {
     int num_epoch;
@@ -219,9 +208,6 @@ typedef struct NcClsDataConfig
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-NcImage* nc_create_image(int height, int width, int channel, unsigned char* data);
-NcImage* nc_create_empty_image(int height, int width, int channel);
 
 float nc_get_random_float(float s, float t);
 NcBlob* nc_create_empty_blob(int n, int h, int w, int c);
@@ -279,7 +265,7 @@ void nc_convolution_test_nhwc();
 
 px_size_t nc_get_conv_output_size(px_size_t input_size, px_size_t kernel_size, px_size_t stride);
 
-void nc_swap_rgb_and_bgr_inplace(NcImage* im);
+void nc_swap_rgb_and_bgr_inplace(px_image_t* im);
 
 #ifdef __cplusplus
 }
