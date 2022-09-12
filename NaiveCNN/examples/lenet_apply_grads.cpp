@@ -15,7 +15,7 @@ static void apply_grads_on_lenet_C1_layer(Lenet* net, LenetTrainOpts opts, matri
             matrix_t map;
             map.height = dSize.height;
             map.width = dSize.width;
-            map.data = net->C1->d[i];
+            map.data = net->C1->d->data[i];
             matrix_t* C1dk = conv(&map, flipinput, NC_VALID);
             multifactor(C1dk, C1dk, -1 * opts.lr);
 
@@ -36,7 +36,7 @@ static void apply_grads_on_lenet_C1_layer(Lenet* net, LenetTrainOpts opts, matri
         matrix_t mat2;
         mat2.height = dSize.height;
         mat2.width = dSize.width;
-        mat2.data = net->C1->d[i];
+        mat2.data = net->C1->d->data[i];
         net->C1->biasData->data[i] = net->C1->biasData->data[i] - opts.lr * summat(&mat2);
     }
 }
@@ -61,13 +61,13 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
             matrix_t tmp_input;
             tmp_input.height = ySize.height;
             tmp_input.width = ySize.width;
-            tmp_input.data = net->S2->y[j];
+            tmp_input.data = net->S2->y->data[j];
             matrix_t* flipinput = get_rotate180_matrix(&tmp_input);
 
             matrix_t map;
             map.height = dSize.height;
             map.width = dSize.width;
-            map.data = net->C3->d[i];
+            map.data = net->C3->d->data[i];
             matrix_t* C3dk = conv(&map, flipinput, NC_VALID);
             multifactor(C3dk, C3dk, -1.0 * opts.lr);
 
@@ -88,7 +88,7 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
         matrix_t mat3;
         mat3.height = dSize.height;
         mat3.width = dSize.width;
-        mat3.data = net->C3->d[i];
+        mat3.data = net->C3->d->data[i];
         net->C3->biasData->data[i] = net->C3->biasData->data[i] - opts.lr * summat(&mat3);
     }
 }
@@ -105,7 +105,7 @@ static void apply_grads_on_lenet_O5_layer(Lenet* net, LenetTrainOpts opts)
         {
             for (int c = 0; c < outSize.width; c++)
             {
-                O5inData[i * outSize.height * outSize.width + r * outSize.width + c] = net->S4->y[i][r][c];
+                O5inData[i * outSize.height * outSize.width + r * outSize.width + c] = net->S4->y->data[i][r][c];
             }
         }
     }

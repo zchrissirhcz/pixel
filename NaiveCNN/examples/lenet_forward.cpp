@@ -20,12 +20,12 @@ static void forward_lenet_C1_layer(Lenet* net, matrix_t* input)
             matrix_t res;
             res.height = mapSize.height;
             res.width = mapSize.width;
-            res.data = net->C1->v[i];
+            res.data = net->C1->v->data[i];
 
             matrix_t mat1;
             mat1.height = outSize.height;
             mat1.width = outSize.width;
-            mat1.data = net->C1->v[i];
+            mat1.data = net->C1->v->data[i];
 
             addmat(&mat1, mapout, &res);
             destroy_matrix_ptr(mapout);
@@ -34,7 +34,7 @@ static void forward_lenet_C1_layer(Lenet* net, matrix_t* input)
         {
             for (int c = 0; c < outSize.width; c++)
             {
-                net->C1->y[i][r][c] = activation_sigma(net->C1->v[i][r][c], net->C1->biasData->data[i]);
+                net->C1->y->data[i][r][c] = activation_sigma(net->C1->v->data[i][r][c], net->C1->biasData->data[i]);
             }
         }
     }
@@ -56,12 +56,12 @@ static void forward_lenet_S2_layer(Lenet* net)
             matrix_t pool_input;
             pool_input.height = inSize.height;
             pool_input.width = inSize.width;
-            pool_input.data = net->C1->y[i];
+            pool_input.data = net->C1->y->data[i];
 
             matrix_t pool_output;
             pool_output.height = outSize.height;
             pool_output.width = outSize.width;
-            pool_output.data = net->S2->y[i];
+            pool_output.data = net->S2->y->data[i];
 
             px_size_t kernel_size = px_create_size(net->S2->map_size, net->S2->map_size);
             forward_avg_pooling_for_matrix(&pool_input, &pool_output, kernel_size);
@@ -87,18 +87,18 @@ static void forward_lenet_C3_layer(Lenet* net)
             matrix_t tmp_input;
             tmp_input.height = inSize.height;
             tmp_input.width = inSize.height;
-            tmp_input.data = net->S2->y[j];
+            tmp_input.data = net->S2->y->data[j];
             matrix_t* mapout = conv(&map, &tmp_input, NC_VALID);
 
             matrix_t res;
             res.height = mapSize.height;
             res.width = mapSize.width;
-            res.data = net->C3->v[i];
+            res.data = net->C3->v->data[i];
 
             matrix_t mat1;
             mat1.height = outSize.height;
             mat1.width = outSize.width;
-            mat1.data = net->C3->v[i];
+            mat1.data = net->C3->v->data[i];
 
             addmat(&mat1, mapout, &res);
             destroy_matrix_ptr(mapout);
@@ -107,7 +107,7 @@ static void forward_lenet_C3_layer(Lenet* net)
         {
             for (int c = 0; c < outSize.width; c++)
             {
-                net->C3->y[i][r][c] = activation_sigma(net->C3->v[i][r][c], net->C3->biasData->data[i]);
+                net->C3->y->data[i][r][c] = activation_sigma(net->C3->v->data[i][r][c], net->C3->biasData->data[i]);
             }
         }
     }
@@ -129,12 +129,12 @@ static void forward_lenet_S4_layer(Lenet* net)
             matrix_t pool_input;
             pool_input.height = inSize.height;
             pool_input.width = inSize.width;
-            pool_input.data = net->C3->y[i];
+            pool_input.data = net->C3->y->data[i];
 
             matrix_t pool_output;
             pool_output.height = outSize.height;
             pool_output.width = outSize.width;
-            pool_output.data = net->S4->y[i];
+            pool_output.data = net->S4->y->data[i];
 
             px_size_t kernel_size = px_create_size(net->S4->map_size, net->S4->map_size);
             forward_avg_pooling_for_matrix(&pool_input, &pool_output, kernel_size);
@@ -159,7 +159,7 @@ static void forward_lenet_O5_layer(Lenet* net)
         {
             for (int c = 0; c < outSize.width; c++)
             {
-                O5inData[i * outSize.height * outSize.width + r * outSize.width + c] = net->S4->y[i][r][c];
+                O5inData[i * outSize.height * outSize.width + r * outSize.width + c] = net->S4->y->data[i][r][c];
             }
         }
     }

@@ -50,9 +50,9 @@ static void save_conv_layer_train_data(ConvLayer* conv_layer, px_size_t output_s
     const int height = output_size.height;
     const int width = output_size.width;
     px_cube_dim_t cube_dim = px_create_cube_dim(channel, height, width);
-    save_blob3d_to_file(conv_layer->v, cube_dim, fout);
-    save_blob3d_to_file(conv_layer->d, cube_dim, fout);
-    save_blob3d_to_file(conv_layer->y, cube_dim, fout);
+    save_cube_to_file(conv_layer->v, fout);
+    save_cube_to_file(conv_layer->d, fout);
+    save_cube_to_file(conv_layer->y, fout);
 }
 
 static void save_lenet_C1_layer_train_data(Lenet* net, FILE* fout)
@@ -77,8 +77,8 @@ static void save_pooling_layer_data(PoolingLayer* pool_layer, px_size_t output_s
     const int height = output_size.height;
     const int width = output_size.width;
     px_cube_dim_t cube_dim = px_create_cube_dim(channel, height, width);
-    save_blob3d_to_file(pool_layer->d, cube_dim, fout);
-    save_blob3d_to_file(pool_layer->y, cube_dim, fout);
+    save_cube_to_file(pool_layer->d, fout);
+    save_cube_to_file(pool_layer->y, fout);
 }
 
 static void save_lenet_S2_layer_train_data(Lenet* net, FILE* fout)

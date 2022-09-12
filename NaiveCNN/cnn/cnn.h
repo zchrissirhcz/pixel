@@ -33,11 +33,11 @@ typedef struct ConvLayer
     bool* connectModel; //连接模式（默认为全连接）
 
     // 下面三者的大小同输出的维度相同
-    float*** v; // 进入激活函数的输入值
-    float*** y; // 激活函数后神经元的输出
+    cube_t* v; // 进入激活函数的输入值
+    cube_t* y; // 激活函数后神经元的输出
 
     // 输出像素的局部梯度
-    float*** d; // 网络的局部梯度,δ值
+    cube_t* d; // 网络的局部梯度,δ值
 } ConvLayer;
 
 typedef struct PoolingLayer
@@ -52,8 +52,8 @@ typedef struct PoolingLayer
     int pool_type;   //Pooling的方法
     array_t* biasData; //偏置
 
-    float*** y; // 采样函数后神经元的输出,无激活函数
-    float*** d; // 网络的局部梯度,δ值
+    cube_t* y; // 采样函数后神经元的输出,无激活函数
+    cube_t* d; // 网络的局部梯度,δ值
 } PoolingLayer;
 
 typedef struct InnerproductLayer
@@ -117,6 +117,10 @@ void save_blob4d_to_file(float**** data, px_tensor_dim_t tensor_dim, FILE* fout)
 array_t* create_array(int len);
 void clear_array(array_t* array);
 void save_array_to_file(array_t* array, FILE* fout);
+
+cube_t* create_cube(px_cube_dim_t cube_dim);
+void clear_cube(cube_t* cube);
+void save_cube_to_file(cube_t* cube, FILE* fout);
 
 #ifdef __cplusplus
 }

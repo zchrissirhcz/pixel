@@ -26,7 +26,7 @@ static void backward_lenet_S4_layer(Lenet* net)
                 for (int j = 0; j < net->O5->outputNum; j++)
                 {
                     int wInt = i * outSize.width * outSize.height + r * outSize.width + c;
-                    net->S4->d[i][r][c] = net->S4->d[i][r][c] + net->O5->d->data[j] * net->O5->wData[j][wInt];
+                    net->S4->d->data[i][r][c] = net->S4->d->data[i][r][c] + net->O5->d->data[j] * net->O5->wData[j][wInt];
                 }
             }
         }
@@ -45,13 +45,13 @@ static void backward_lenet_C3_layer(Lenet* net)
         matrix_t input;
         input.height = S4dSize.height;
         input.width = S4dSize.width;
-        input.data = net->S4->d[i];
+        input.data = net->S4->d->data[i];
         matrix_t* C3e = matrix_upsample(&input, net->S4->map_size, net->S4->map_size);
         for (int r = 0; r < net->S4->in_height; r++)
         {
             for (int c = 0; c < net->S4->in_width; c++)
             {
-                net->C3->d[i][r][c] = C3e->data[r][c] * sigma_derivation(net->C3->y[i][r][c]) / (float)(net->S4->map_size * net->S4->map_size);
+                net->C3->d->data[i][r][c] = C3e->data[r][c] * sigma_derivation(net->C3->y->data[i][r][c]) / (float)(net->S4->map_size * net->S4->map_size);
             }
         }
         destroy_matrix_ptr(C3e);
@@ -79,19 +79,19 @@ static void backward_lenet_S2_layer(Lenet* net)
             matrix_t input;
             input.height = inSize.height;
             input.width = inSize.width;
-            input.data = net->C3->d[j];
+            input.data = net->C3->d->data[j];
 
             matrix_t* corr = correlation(&map, &input, NC_FULL);
 
             matrix_t res;
             res.height = outSize.height;
             res.width = outSize.width;
-            res.data = net->S2->d[i];
+            res.data = net->S2->d->data[i];
 
             matrix_t mat1;
             mat1.height = outSize.height;
             mat1.width = outSize.width;
-            mat1.data = net->S2->d[i];
+            mat1.data = net->S2->d->data[i];
 
             addmat(&mat1, corr, &res);
             destroy_matrix_ptr(corr);
@@ -115,13 +115,13 @@ static void backward_lenet_C1_layer(Lenet* net)
         matrix_t input;
         input.height = S2dSize.height;
         input.width = S2dSize.width;
-        input.data = net->S2->d[i];
+        input.data = net->S2->d->data[i];
         matrix_t* C1e = matrix_upsample(&input, net->S2->map_size, net->S2->map_size);
         for (int r = 0; r < net->S2->in_height; r++)
         {
             for (int c = 0; c < net->S2->in_width; c++)
             {
-                net->C1->d[i][r][c] = C1e->data[r][c] * sigma_derivation(net->C1->y[i][r][c]) / (float)(net->S2->map_size * net->S2->map_size);
+                net->C1->d->data[i][r][c] = C1e->data[r][c] * sigma_derivation(net->C1->y->data[i][r][c]) / (float)(net->S2->map_size * net->S2->map_size);
             }
         }
         destroy_matrix_ptr(C1e);

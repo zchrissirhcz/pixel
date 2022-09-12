@@ -4,6 +4,7 @@
 #include <math.h>
 #include <time.h>
 #include <stdbool.h>
+#include "px_cnn.h"
 #include "px_log.h"
 #include "cnn.h"
 #include "mat.h"
@@ -56,13 +57,13 @@ ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_cha
     int outH = in_height - map_size + 1;
 
     px_cube_dim_t cube_dim = px_create_cube_dim(out_channels, outH, outW);
-    conv_layer->d = create_blob3d(cube_dim);
-    conv_layer->v = create_blob3d(cube_dim);
-    conv_layer->y = create_blob3d(cube_dim);
+    conv_layer->d = create_cube(cube_dim);;
+    conv_layer->v = create_cube(cube_dim);
+    conv_layer->y = create_cube(cube_dim);
 
-    clear_blob3d(conv_layer->d, cube_dim);
-    clear_blob3d(conv_layer->v, cube_dim);
-    clear_blob3d(conv_layer->y, cube_dim);
+    clear_cube(conv_layer->d);
+    clear_cube(conv_layer->v);
+    clear_cube(conv_layer->y);
 
     return conv_layer;
 }
@@ -85,10 +86,10 @@ PoolingLayer* init_pooling_layer(int inputWidth, int inputHeight, int mapSize, i
 
     int j, r;
     px_cube_dim_t cube_dim = px_create_cube_dim(outChannels, outH, outW);
-    poolL->d = create_blob3d(cube_dim);
-    poolL->y = create_blob3d(cube_dim);
-    clear_blob3d(poolL->d, cube_dim);
-    clear_blob3d(poolL->y, cube_dim);
+    poolL->d = create_cube(cube_dim);
+    poolL->y = create_cube(cube_dim);
+    clear_cube(poolL->d);
+    clear_cube(poolL->y);
 
     return poolL;
 }
@@ -223,4 +224,27 @@ void clear_array(array_t* array)
 void save_array_to_file(array_t* array, FILE* fout)
 {
     save_blob1d_to_file(array->data, array->len, fout);
+}
+
+cube_t* create_cube(px_cube_dim_t cube_dim)
+{
+    float*** data = create_blob3d(cube_dim);
+    cube_t* cube = (cube_t*)malloc(sizeof(cube_t));
+    cube->data = data;
+    cube->channel = cube_dim.channel;
+    cube->height = cube_dim.height;
+    cube->width = cube_dim.width;
+    return cube;
+}
+
+void clear_cube(cube_t* cube)
+{
+    px_cube_dim_t cube_dim = px_create_cube_dim(cube->channel, cube->height, cube->width);
+    clear_blob3d(cube->data, cube_dim);
+}
+
+void save_cube_to_file(cube_t* cube, FILE* fout)
+{
+    px_cube_dim_t cube_dim = px_create_cube_dim(cube->channel, cube->height, cube->width);
+    save_blob3d_to_file(cube->data, cube_dim, fout);
 }

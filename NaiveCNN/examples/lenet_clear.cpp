@@ -9,9 +9,9 @@ static void clear_conv_layer(ConvLayer* conv_layer, px_size_t output_size)
     const int width = output_size.width;
     px_cube_dim_t cube_dim = px_create_cube_dim(channel, height, width);
     
-    clear_blob3d(conv_layer->d, cube_dim);
-    clear_blob3d(conv_layer->v, cube_dim);
-    clear_blob3d(conv_layer->y, cube_dim);
+    clear_cube(conv_layer->d);
+    clear_cube(conv_layer->v);
+    clear_cube(conv_layer->y);
 }
 
 static void clear_lenet_C1_layer(Lenet* net)
@@ -29,8 +29,8 @@ static void clear_pooling_layer(PoolingLayer* pool_layer, px_size_t output_size)
     const int width = output_size.width;
     px_cube_dim_t cube_dim = px_create_cube_dim(channel, height, width);
 
-    clear_blob3d(pool_layer->d, cube_dim);
-    clear_blob3d(pool_layer->y, cube_dim);
+    clear_cube(pool_layer->d);
+    clear_cube(pool_layer->y);
 }
 
 static void clear_lenet_S2_layer(Lenet* net)
