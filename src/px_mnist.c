@@ -36,31 +36,26 @@ static int read_integer_from_mnist_file(FILE* fin)
     return number;
 }
 
-// 从文件中读取sizeof(magic_number) 个字符到 &magic_number
 static int get_mnist_magic_number(FILE* fin)
 {
     return read_integer_from_mnist_file(fin);
 }
 
-// 获取训练或测试image的个数number_of_images
 static int get_mnist_number_of_images(FILE* fin)
 {
     return read_integer_from_mnist_file(fin);
 }
 
-//获取训练或测试image的个数number_of_images
 static int get_mnist_number_of_labels(FILE* fin)
 {
     return read_integer_from_mnist_file(fin);
 }
 
-// 获取训练或测试图像的高度Height
 static int get_mnist_image_height(FILE* fin)
 {
     return read_integer_from_mnist_file(fin);
 }
 
-// 获取训练或测试图像的宽度Width
 static int get_mnist_image_width(FILE* fin)
 {
     return read_integer_from_mnist_file(fin);
