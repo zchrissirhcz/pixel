@@ -22,6 +22,7 @@ add_executable(testbed_lenet
   examples/lenet_load.cpp
   examples/lenet_save.cpp
   examples/lenet_clear.cpp
+  examples/lenet_forward.cpp
 )
 target_include_directories(testbed_lenet PRIVATE "src")
 target_link_libraries(testbed_lenet cnn ${OpenCV_LIBS})

@@ -80,7 +80,7 @@ ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_cha
 PoolingLayer* init_pooling_layer(int in_width, int in_height, int map_size, int in_channels, int out_channels, int pool_type);
 InnerproductLayer* init_innerproduct_layer(int in_num, int out_num);
 
-void forward_avg_pooling(matrix_t* input, matrix_t* output, px_size_t kernel_size);
+void forward_avg_pooling_for_matrix(matrix_t* input, matrix_t* output, px_size_t kernel_size);
 
 // 激活函数 input是数据，inputNum说明数据数目，bas表明偏置
 float activation_sigma(float input, float bias); // sigma激活函数
