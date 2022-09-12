@@ -1,30 +1,6 @@
 
 #include "lenet.h"
-
-static void clear_blob1d(float* data, int len)
-{
-    for (int i = 0; i < len; i++)
-    {
-        data[i] = 0.0f;
-    }
-}
-
-static void clear_blob2d(float** data, px_size_t size)
-{
-    for (int i = 0; i < size.height; i++)
-    {
-        clear_blob1d(data[i], size.width);
-    }
-}
-
-static void clear_blob3d(float*** data, px_cube_dim_t cube_dim)
-{
-    px_size_t size = px_create_size(cube_dim.height, cube_dim.width);
-    for (int i = 0; i < cube_dim.channel; i++)
-    {
-        clear_blob2d(data[i], size);
-    }
-}
+#include "px_cnn.h"
 
 static void clear_conv_layer(ConvLayer* conv_layer, px_size_t output_size)
 {

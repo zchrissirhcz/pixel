@@ -64,10 +64,14 @@ void train_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnis
             {
                 net->L[n] = net->L[n - 1] * 0.99f + 0.01f * l / 2.0f;
             }
-            fprintf(stdout, "-- [train] sample: %5d/%d, epoch: %d/%d, loss: %.4f\n",
+
+            if (n % 100 == 0)
+            {
+                fprintf(stdout, "-- [train] sample: %5d/%d, epoch: %d/%d, loss: %.4f\n",
                     n, trainNum,
                     epoch_index, opts.num_epochs,
                     net->L[n]);
+            }
 
             destroy_matrix_data(&input);
         }
@@ -107,36 +111,35 @@ int test_mnist_train_test()
     setup_lenet(net, inputSize, outSize);
 
     // CNN training
-#if 0
+#if 1
     LenetTrainOpts opts;
     opts.num_epochs = 1;
-    opts.alpha = 1.0;
+    opts.lr = 0.1;
     //int trainNum = 10;
-    int trainNum = 1000;
-    //int trainNum=55000;
-    char train_log_pth[NC_MAX_PATH];
+    int trainNum = 10000;
+    //int trainNum = 55000;
+    char train_log_pth[PX_MAX_PATH];
     sprintf(train_log_pth, "%s/debug/train-log.txt", project_dir);
     FILE* fout = fopen(train_log_pth, "w"); // log file
-    CHECK_WRITE_FILE(fout, train_log_pth);
+    PX_CHECK_WRITE_FILE(fout, train_log_pth);
 
-    train_lenet_on_mnist(cnn, mnist_data->train_images, mnist_data->train_labels, opts, trainNum, fout);
+    train_lenet_on_mnist(net, mnist_data->train_images, mnist_data->train_labels, opts, trainNum, fout);
 
     fclose(fout);
 
     printf("train finished!!\n");
-    char train_model_pth[NC_MAX_PATH];
+    char train_model_pth[PX_MAX_PATH];
     sprintf(train_model_pth, "%s/model/mnist-train.cnn", project_dir);
-    save_cnn(cnn, train_model_pth);
+    save_lenet_inference_data(net, train_model_pth);
     // save training error
     char train_err_pth[PX_MAX_PATH];
     sprintf(train_err_pth, "%s/debug/cnnL.ma", project_dir);
     FILE* fp = fopen(train_err_pth, "wb");
-    CHECK_WRITE_FILE(fp, train_err_pth);
-    fwrite(cnn->L, sizeof(float), trainNum, fp);
+    PX_CHECK_WRITE_FILE(fp, train_err_pth);
+    fwrite(net->L, sizeof(float), trainNum, fp);
     fclose(fp);
 #endif
 
-    // CNN test
     printf("--- mnist test start\n");
     char test_model_pth[PX_MAX_PATH];
     sprintf(test_model_pth, "%s/model/mnist-train.cnn", project_dir);

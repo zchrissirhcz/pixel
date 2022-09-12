@@ -9,77 +9,62 @@
 #include "mat.h"
 #include <float.h>
 
+
+
 ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_channels, int out_channels)
 {
-    ConvLayer* covL = (ConvLayer*)malloc(sizeof(ConvLayer));
+    ConvLayer* conv_layer = (ConvLayer*)malloc(sizeof(ConvLayer));
 
-    covL->in_height = in_height;
-    covL->in_width = in_width;
-    covL->map_size = map_size;
+    conv_layer->in_height = in_height;
+    conv_layer->in_width = in_width;
+    conv_layer->map_size = map_size;
 
-    covL->in_channels = in_channels;
-    covL->out_channels = out_channels;
+    conv_layer->in_channels = in_channels;
+    conv_layer->out_channels = out_channels;
 
-    covL->isFullConnect = true; // 默认为全连接
+    conv_layer->isFullConnect = true; // 默认为全连接
 
     // 权重空间的初始化，先行再列调用，[r][c]
     int i, j, c, r;
+    
+    px_tensor_dim_t tensor_dim = px_create_tensor_dim(in_channels, out_channels, map_size, map_size);
+    conv_layer->mapData = create_blob4d(tensor_dim);
+
     srand((unsigned)time(NULL));
-    covL->mapData = (float****)malloc(in_channels * sizeof(float***));
     for (i = 0; i < in_channels; i++)
     {
-        covL->mapData[i] = (float***)malloc(out_channels * sizeof(float**));
         for (j = 0; j < out_channels; j++)
         {
-            covL->mapData[i][j] = (float**)malloc(map_size * sizeof(float*));
             for (r = 0; r < map_size; r++)
             {
-                covL->mapData[i][j][r] = (float*)malloc(map_size * sizeof(float));
                 for (c = 0; c < map_size; c++)
                 {
                     float randnum = (((float)rand() / (float)RAND_MAX) - 0.5) * 2;
-                    covL->mapData[i][j][r][c] = randnum * sqrt((float)6.0 / (float)(map_size * map_size * (in_channels + out_channels)));
+                    conv_layer->mapData[i][j][r][c] = randnum * sqrt((float)6.0 / (float)(map_size * map_size * (in_channels + out_channels)));
                 }
             }
         }
     }
-    // 权重梯度变化
-    covL->dmapData = (float****)malloc(in_channels * sizeof(float***));
-    for (i = 0; i < in_channels; i++)
-    {
-        covL->dmapData[i] = (float***)malloc(out_channels * sizeof(float**));
-        for (j = 0; j < out_channels; j++)
-        {
-            covL->dmapData[i][j] = (float**)malloc(map_size * sizeof(float*));
-            for (r = 0; r < map_size; r++)
-            {
-                covL->dmapData[i][j][r] = (float*)calloc(map_size, sizeof(float));
-            }
-        }
-    }
 
-    covL->biasData = (float*)calloc(out_channels, sizeof(float));
+    // 权重梯度变化
+    conv_layer->dmapData = create_blob4d(tensor_dim);
+    clear_blob4d(conv_layer->dmapData, tensor_dim);
+
+    conv_layer->biasData = create_blob1d(out_channels);
 
     int outW = in_width - map_size + 1;
     int outH = in_height - map_size + 1;
 
-    covL->d = (float***)malloc(out_channels * sizeof(float**));
-    covL->v = (float***)malloc(out_channels * sizeof(float**));
-    covL->y = (float***)malloc(out_channels * sizeof(float**));
-    for (j = 0; j < out_channels; j++)
-    {
-        covL->d[j] = (float**)malloc(outH * sizeof(float*));
-        covL->v[j] = (float**)malloc(outH * sizeof(float*));
-        covL->y[j] = (float**)malloc(outH * sizeof(float*));
-        for (r = 0; r < outH; r++)
-        {
-            covL->d[j][r] = (float*)calloc(outW, sizeof(float));
-            covL->v[j][r] = (float*)calloc(outW, sizeof(float));
-            covL->y[j][r] = (float*)calloc(outW, sizeof(float));
-        }
-    }
+    px_cube_dim_t cube_dim = px_create_cube_dim(out_channels, outH, outW);
+    conv_layer->d = create_blob3d(cube_dim);
+    conv_layer->v = create_blob3d(cube_dim);
+    conv_layer->y = create_blob3d(cube_dim);
 
-    return covL;
+    clear_blob3d(conv_layer->d, cube_dim);
+    clear_blob3d(conv_layer->v, cube_dim);
+    clear_blob3d(conv_layer->y, cube_dim);
+
+    return conv_layer;
 }
 
 PoolingLayer* init_pooling_layer(int inputWidth, int inputHeight, int mapSize, int inChannels, int outChannels, int pool_type)
@@ -99,52 +84,49 @@ PoolingLayer* init_pooling_layer(int inputWidth, int inputHeight, int mapSize, i
     int outH = inputHeight / mapSize;
 
     int j, r;
-    poolL->d = (float***)malloc(outChannels * sizeof(float**));
-    poolL->y = (float***)malloc(outChannels * sizeof(float**));
-    for (j = 0; j < outChannels; j++)
-    {
-        poolL->d[j] = (float**)malloc(outH * sizeof(float*));
-        poolL->y[j] = (float**)malloc(outH * sizeof(float*));
-        for (r = 0; r < outH; r++)
-        {
-            poolL->d[j][r] = (float*)calloc(outW, sizeof(float));
-            poolL->y[j][r] = (float*)calloc(outW, sizeof(float));
-        }
-    }
+    px_cube_dim_t cube_dim = px_create_cube_dim(outChannels, outH, outW);
+    poolL->d = create_blob3d(cube_dim);
+    poolL->y = create_blob3d(cube_dim);
+    clear_blob3d(poolL->d, cube_dim);
+    clear_blob3d(poolL->y, cube_dim);
 
     return poolL;
 }
 
 InnerproductLayer* init_innerproduct_layer(int inputNum, int outputNum)
 {
-    InnerproductLayer* outL = (InnerproductLayer*)malloc(sizeof(InnerproductLayer));
+    InnerproductLayer* ip_layer = (InnerproductLayer*)malloc(sizeof(InnerproductLayer));
 
-    outL->inputNum = inputNum;
-    outL->outputNum = outputNum;
+    ip_layer->inputNum = inputNum;
+    ip_layer->outputNum = outputNum;
 
-    outL->biasData = (float*)calloc(outputNum, sizeof(float));
+    ip_layer->biasData = create_blob1d(outputNum);
+    ip_layer->d = create_blob1d(outputNum);
+    ip_layer->v = create_blob1d(outputNum);
+    ip_layer->y = create_blob1d(outputNum);
 
-    outL->d = (float*)calloc(outputNum, sizeof(float));
-    outL->v = (float*)calloc(outputNum, sizeof(float));
-    outL->y = (float*)calloc(outputNum, sizeof(float));
+    clear_blob1d(ip_layer->biasData, outputNum);
+    clear_blob1d(ip_layer->d, outputNum);
+    clear_blob1d(ip_layer->v, outputNum);
+    clear_blob1d(ip_layer->y, outputNum);
 
     // 权重的初始化
-    outL->wData = (float**)malloc(outputNum * sizeof(float*)); // 输入行，输出列
-    int i, j;
+    px_size_t size = px_create_size(outputNum, inputNum);
+    ip_layer->wData = create_blob2d(size);
+
     srand((unsigned)time(NULL));
-    for (i = 0; i < outputNum; i++)
+    for (int i = 0; i < outputNum; i++)
     {
-        outL->wData[i] = (float*)malloc(inputNum * sizeof(float));
-        for (j = 0; j < inputNum; j++)
+        for (int j = 0; j < inputNum; j++)
         {
             float randnum = (((float)rand() / (float)RAND_MAX) - 0.5) * 2; // 产生一个-1到1的随机数
-            outL->wData[i][j] = randnum * sqrt((float)6.0 / (float)(inputNum + outputNum));
+            ip_layer->wData[i][j] = randnum * sqrt((float)6.0 / (float)(inputNum + outputNum));
         }
     }
 
-    outL->isFullConnect = true;
+    ip_layer->isFullConnect = true;
 
-    return outL;
+    return ip_layer;
 }
 
 int argmax(float* data, int len)
@@ -222,4 +204,5 @@ float sigma_derivation(float y)
 {
     return y * (1 - y); // 这里y是指经过激活函数的输出值，而不是自变量
 }
+
 

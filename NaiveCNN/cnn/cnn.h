@@ -93,6 +93,22 @@ int argmax(float* data, int len);
 
 float sigma_derivation(float y);
 
+
+void clear_blob1d(float* data, int len);
+void clear_blob2d(float** data, px_size_t size);
+void clear_blob3d(float*** data, px_cube_dim_t cube_dim);
+void clear_blob4d(float**** data, px_tensor_dim_t tensor_dim);
+
+float* create_blob1d(int len);
+float** create_blob2d(px_size_t size);
+float*** create_blob3d(px_cube_dim_t cube_dim);
+float**** create_blob4d(px_tensor_dim_t tensor_dim);
+
+void destroy_blob1d(float* data);
+void destroy_blob2d(float** data, px_size_t size);
+void destroy_blob3d(float*** data, px_cube_dim_t cube_dim);
+void destroy_blob4d(float**** data, px_tensor_dim_t tensor_dim);
+
 #ifdef __cplusplus
 }
 #endif

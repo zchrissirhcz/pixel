@@ -3,6 +3,7 @@ add_library(cnn STATIC
   cnn/cnn.h
   cnn/mat.c
   cnn/mat.h
+  cnn/blob.c
 )
 
 add_library(naivecnn STATIC
