@@ -10,7 +10,6 @@
 
 #include "px_mnist.h"
 #include "px_filesystem.h"
-#include "naive_cnn.h"
 
 #include <opencv2/opencv.hpp>
 #include "load_prefix.h"
@@ -777,115 +776,131 @@ void clear_lenet(Lenet* net)
     }
 }
 
+static void save_lenet_C1_layer_data(Lenet* net, FILE* fout)
+{
+    for (int i = 0; i < net->C1->in_height; i++)
+    {
+        fwrite(inputdata[i], sizeof(float), net->C1->in_width, fout);
+    }
+    for (int i = 0; i < net->C1->in_channels; i++)
+    {
+        for (int j = 0; j < net->C1->out_channels; j++)
+        {
+            for (int r = 0; r < net->C1->map_size; r++)
+            {
+                fwrite(net->C1->mapData[i][j][r], sizeof(float), net->C1->map_size, fout);
+            }
+        }
+    }
+
+    fwrite(net->C1->biasData, sizeof(float), net->C1->out_channels, fout);
+
+    for (int j = 0; j < net->C1->out_channels; j++)
+    {
+        for (int r = 0; r < net->S2->in_height; r++)
+        {
+            fwrite(net->C1->v[j][r], sizeof(float), net->S2->in_width, fout);
+        }
+        for (int r = 0; r < net->S2->in_height; r++)
+        {
+            fwrite(net->C1->d[j][r], sizeof(float), net->S2->in_width, fout);
+        }
+        for (int r = 0; r < net->S2->in_height; r++)
+        {
+            fwrite(net->C1->y[j][r], sizeof(float), net->S2->in_width, fout);
+        }
+    }
+}
+
+static void save_lenet_S2_layer_data(Lenet* net, FILE* fout)
+{
+    for (int j = 0; j < net->S2->out_channels; j++)
+    {
+        for (int r = 0; r < net->C3->in_height; r++)
+        {
+            fwrite(net->S2->d[j][r], sizeof(float), net->C3->in_width, fout);
+        }
+        for (int r = 0; r < net->C3->in_height; r++)
+        {
+            fwrite(net->S2->y[j][r], sizeof(float), net->C3->in_width, fout);
+        }
+    }
+}
+
+static void save_lenet_C3_layer_data(Lenet* net, FILE* fout)
+{
+    for (int i = 0; i < net->C3->in_channels; i++)
+    {
+        for (int j = 0; j < net->C3->out_channels; j++)
+        {
+            for (int r = 0; r < net->C3->map_size; r++)
+            {
+                fwrite(net->C3->mapData[i][j][r], sizeof(float), net->C3->map_size, fout);
+            }
+        }
+    }
+
+    fwrite(net->C3->biasData, sizeof(float), net->C3->out_channels, fout);
+
+    for (int j = 0; j < net->C3->out_channels; j++)
+    {
+        for (int r = 0; r < net->S4->in_height; r++)
+        {
+            fwrite(net->C3->v[j][r], sizeof(float), net->S4->in_width, fout);
+        }
+        for (int r = 0; r < net->S4->in_height; r++)
+        {
+            fwrite(net->C3->d[j][r], sizeof(float), net->S4->in_width, fout);
+        }
+        for (int r = 0; r < net->S4->in_height; r++)
+        {
+            fwrite(net->C3->y[j][r], sizeof(float), net->S4->in_width, fout);
+        }
+    }
+}
+
+static void save_lenet_S4_layer_data(Lenet* net, FILE* fout)
+{
+    // S4 layer
+    for (int j = 0; j < net->S4->out_channels; j++)
+    {
+        for (int r = 0; r < net->S4->in_height / net->S4->map_size; r++)
+        {
+            fwrite(net->S4->d[j][r], sizeof(float), net->S4->in_width / net->S4->map_size, fout);
+        }
+        for (int r = 0; r < net->S4->in_height / net->S4->map_size; r++)
+        {
+            fwrite(net->S4->y[j][r], sizeof(float), net->S4->in_width / net->S4->map_size, fout);
+        }
+    }
+}
+
+static void save_lenet_O5_layer_data(Lenet* net, FILE* fout)
+{
+    // O5 layer
+    for (int i = 0; i < net->O5->outputNum; i++)
+    {
+        fwrite(net->O5->wData[i], sizeof(float), net->O5->inputNum, fout);
+    }
+    fwrite(net->O5->biasData, sizeof(float), net->O5->outputNum, fout);
+    fwrite(net->O5->v, sizeof(float), net->O5->outputNum, fout);
+    fwrite(net->O5->d, sizeof(float), net->O5->outputNum, fout);
+    fwrite(net->O5->y, sizeof(float), net->O5->outputNum, fout);
+}
+
 // 这是用于测试的函数, 保存CNN网络中的相关数据
 void save_lenet_data(Lenet* net, const char* filename, float** inputdata)
 {
-    FILE* fp = fopen(filename, "wb");
-    CHECK_WRITE_FILE(fp, filename);
+    FILE* fout = fopen(filename, "wb");
+    CHECK_WRITE_FILE(fout, filename);
 
-    int i, j, r;
-    
-    // C1 layer
-    for (i = 0; i < net->C1->in_height; i++)
-    {
-        fwrite(inputdata[i], sizeof(float), net->C1->in_width, fp);
-    }
-    for (i = 0; i < net->C1->in_channels; i++)
-    {
-        for (j = 0; j < net->C1->out_channels; j++)
-        {
-            for (r = 0; r < net->C1->map_size; r++)
-            {
-                fwrite(net->C1->mapData[i][j][r], sizeof(float), net->C1->map_size, fp);
-            }
-        }
-    }
+    save_lenet_C1_layer_data(net, fout);
+    save_lenet_S2_layer_data(net, fout);
+    save_lenet_C3_layer_data(net, fout);
+    save_lenet_S4_layer_data(net, fout);
+    save_lenet_O5_layer_data(net, fout);
 
-    fwrite(net->C1->biasData, sizeof(float), net->C1->out_channels, fp);
-
-    for (j = 0; j < net->C1->out_channels; j++)
-    {
-        for (r = 0; r < net->S2->in_height; r++)
-        {
-            fwrite(net->C1->v[j][r], sizeof(float), net->S2->in_width, fp);
-        }
-        for (r = 0; r < net->S2->in_height; r++)
-        {
-            fwrite(net->C1->d[j][r], sizeof(float), net->S2->in_width, fp);
-        }
-        for (r = 0; r < net->S2->in_height; r++)
-        {
-            fwrite(net->C1->y[j][r], sizeof(float), net->S2->in_width, fp);
-        }
-    }
-
-    // S2 layer
-    for (j = 0; j < net->S2->out_channels; j++)
-    {
-        for (r = 0; r < net->C3->in_height; r++)
-        {
-            fwrite(net->S2->d[j][r], sizeof(float), net->C3->in_width, fp);
-        }
-        for (r = 0; r < net->C3->in_height; r++)
-        {
-            fwrite(net->S2->y[j][r], sizeof(float), net->C3->in_width, fp);
-        }
-    }
-
-    // C3 layer
-    for (i = 0; i < net->C3->in_channels; i++)
-    {
-        for (j = 0; j < net->C3->out_channels; j++)
-        {
-            for (r = 0; r < net->C3->map_size; r++)
-            {
-                fwrite(net->C3->mapData[i][j][r], sizeof(float), net->C3->map_size, fp);
-            }
-        }
-    }
-
-    fwrite(net->C3->biasData, sizeof(float), net->C3->out_channels, fp);
-
-    for (j = 0; j < net->C3->out_channels; j++)
-    {
-        for (r = 0; r < net->S4->in_height; r++)
-        {
-            fwrite(net->C3->v[j][r], sizeof(float), net->S4->in_width, fp);
-        }
-        for (r = 0; r < net->S4->in_height; r++)
-        {
-            fwrite(net->C3->d[j][r], sizeof(float), net->S4->in_width, fp);
-        }
-        for (r = 0; r < net->S4->in_height; r++)
-        {
-            fwrite(net->C3->y[j][r], sizeof(float), net->S4->in_width, fp);
-        }
-    }
-
-    // S4 layer
-    for (j = 0; j < net->S4->out_channels; j++)
-    {
-        for (r = 0; r < net->S4->in_height / net->S4->map_size; r++)
-        {
-            fwrite(net->S4->d[j][r], sizeof(float), net->S4->in_width / net->S4->map_size, fp);
-        }
-        for (r = 0; r < net->S4->in_height / net->S4->map_size; r++)
-        {
-            fwrite(net->S4->y[j][r], sizeof(float), net->S4->in_width / net->S4->map_size, fp);
-        }
-    }
-
-    // O5 layer
-    for (i = 0; i < net->O5->outputNum; i++)
-    {
-        fwrite(net->O5->wData[i], sizeof(float), net->O5->inputNum, fp);
-    }
-    fwrite(net->O5->biasData, sizeof(float), net->O5->outputNum, fp);
-    fwrite(net->O5->v, sizeof(float), net->O5->outputNum, fp);
-    fwrite(net->O5->d, sizeof(float), net->O5->outputNum, fp);
-    fwrite(net->O5->y, sizeof(float), net->O5->outputNum, fp);
-
-    fclose(fp);
+    fclose(fout);
 }
 
 int main()
