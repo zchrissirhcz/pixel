@@ -101,14 +101,14 @@ InnerproductLayer* init_innerproduct_layer(int inputNum, int outputNum)
     ip_layer->outputNum = outputNum;
 
     ip_layer->biasData = create_blob1d(outputNum);
-    ip_layer->d = create_blob1d(outputNum);
-    ip_layer->v = create_blob1d(outputNum);
-    ip_layer->y = create_blob1d(outputNum);
+    ip_layer->d = create_array(outputNum);
+    ip_layer->v = create_array(outputNum);
+    ip_layer->y = create_array(outputNum);
 
     clear_blob1d(ip_layer->biasData, outputNum);
-    clear_blob1d(ip_layer->d, outputNum);
-    clear_blob1d(ip_layer->v, outputNum);
-    clear_blob1d(ip_layer->y, outputNum);
+    clear_array(ip_layer->d);
+    clear_array(ip_layer->v);
+    clear_array(ip_layer->y);
 
     // 权重的初始化
     px_size_t size = px_create_size(outputNum, inputNum);
@@ -129,15 +129,15 @@ InnerproductLayer* init_innerproduct_layer(int inputNum, int outputNum)
     return ip_layer;
 }
 
-int argmax(float* data, int len)
+int argmax(array_t* array)
 {
     float max_value = FLT_MIN;
     int max_index = 0;
-    for (int i = 0; i < len; i++)
+    for (int i = 0; i < array->len; i++)
     {
-        if (max_value < data[i])
+        if (max_value < array->data[i])
         {
-            max_value = data[i];
+            max_value = array->data[i];
             max_index = i;
         }
     }
@@ -206,3 +206,21 @@ float sigma_derivation(float y)
 }
 
 
+array_t* create_array(int len)
+{
+    float* data = create_blob1d(len);
+    array_t* array = (array_t*)malloc(sizeof(array_t));
+    array->len = len;
+    array->data = data;
+    return array;
+}
+
+void clear_array(array_t* array)
+{
+    clear_blob1d(array->data, array->len);
+}
+
+void save_array_to_file(array_t* array, FILE* fout)
+{
+    save_blob1d_to_file(array->data, array->len, fout);
+}

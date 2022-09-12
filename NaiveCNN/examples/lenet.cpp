@@ -87,7 +87,10 @@ float test_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnis
     {
         matrix_t cnn_input = create_normalized_f32_matrix_from_u8_image(inputData, n);
         forward_lenet(net, &cnn_input);
-        if (argmax(net->O5->y, net->O5->outputNum) != argmax(outputData->one_hot_label[n].data, net->O5->outputNum))
+        array_t label_as_array;
+        label_as_array.data = outputData->one_hot_label[n].data;
+        label_as_array.len = net->O5->outputNum;
+        if (argmax(net->O5->y) != argmax(&label_as_array))
         {
             incorrectnum++;
         }

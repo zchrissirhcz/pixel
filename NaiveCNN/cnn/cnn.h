@@ -65,9 +65,9 @@ typedef struct InnerproductLayer
     float* biasData; //偏置，大小为outputNum大小
 
     // 下面三者的大小同输出的维度相同
-    float* v; // 进入激活函数的输入值
-    float* y; // 激活函数后神经元的输出
-    float* d; // 网络的局部梯度,δ值
+    array_t* v;  // 进入激活函数的输入值
+    array_t* y; // 激活函数后神经元的输出
+    array_t* d;  // 网络的局部梯度,δ值
 
     bool isFullConnect; //是否为全连接
 } InnerproductLayer;
@@ -89,7 +89,7 @@ float activation_sigma(float input, float bias); // sigma激活函数
 void nnff(float* output, float* input, float** wdata, float* bias, px_size_t nn_size);
 
 // 返回向量最大数的序号
-int argmax(float* data, int len);
+int argmax(array_t* array);
 
 float sigma_derivation(float y);
 
@@ -108,6 +108,15 @@ void destroy_blob1d(float* data);
 void destroy_blob2d(float** data, px_size_t size);
 void destroy_blob3d(float*** data, px_cube_dim_t cube_dim);
 void destroy_blob4d(float**** data, px_tensor_dim_t tensor_dim);
+
+void save_blob1d_to_file(float* data, int len, FILE* fout);
+void save_blob2d_to_file(float** data, px_size_t size, FILE* fout);
+void save_blob3d_to_file(float*** data, px_cube_dim_t cube_dim, FILE* fout);
+void save_blob4d_to_file(float**** data, px_tensor_dim_t tensor_dim, FILE* fout);
+
+array_t* create_array(int len);
+void clear_array(array_t* array);
+void save_array_to_file(array_t* array, FILE* fout);
 
 #ifdef __cplusplus
 }

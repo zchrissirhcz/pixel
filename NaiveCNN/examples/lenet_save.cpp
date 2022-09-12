@@ -4,36 +4,6 @@
 #include "px_typebase.h"
 #include "px_filesystem.h"
 
-static void save_blob1d_to_file(float* data, int len, FILE* fout)
-{
-    fwrite(data, sizeof(float), len, fout);
-}
-
-static void save_blob2d_to_file(float** data, px_size_t size, FILE* fout)
-{
-    for (int i = 0; i < size.height; i++)
-    {
-        save_blob1d_to_file(data[i], size.width, fout);
-    }
-}
-
-static void save_blob3d_to_file(float*** data, px_cube_dim_t cube_dim, FILE* fout)
-{
-    px_size_t size = px_create_size(cube_dim.height, cube_dim.width);
-    for (int i = 0; i < cube_dim.channel; i++)
-    {
-        save_blob2d_to_file(data[i], size, fout);
-    }
-}
-
-static void save_blob4d_to_file(float**** data, px_tensor_dim_t tensor_dim, FILE* fout)
-{
-    px_cube_dim_t cube_dim = px_create_cube_dim(tensor_dim.channel, tensor_dim.height, tensor_dim.width);
-    for (int i = 0; i < tensor_dim.batch; i++)
-    {
-        save_blob3d_to_file(data[i], cube_dim, fout);
-    }
-}
 
 static void save_lenet_input_data(Lenet* net, FILE* fout, float** inputdata)
 {
@@ -134,9 +104,9 @@ static void save_lenet_O5_layer_train_data(Lenet* net, FILE* fout)
     const int height = net->O5->outputNum;
     const int width = net->O5->inputNum;
     px_size_t size = px_create_size(height, width);
-    save_blob1d_to_file(net->O5->v, net->O5->outputNum, fout);
-    save_blob1d_to_file(net->O5->d, net->O5->outputNum, fout);
-    save_blob1d_to_file(net->O5->y, net->O5->outputNum, fout);
+    save_array_to_file(net->O5->v, fout);
+    save_array_to_file(net->O5->d, fout);
+    save_array_to_file(net->O5->y, fout);
 }
 
 // 这是用于测试的函数, 保存CNN网络中的相关数据

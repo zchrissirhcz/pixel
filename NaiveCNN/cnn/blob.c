@@ -106,3 +106,36 @@ void clear_blob4d(float**** data, px_tensor_dim_t tensor_dim)
         clear_blob3d(data[i], cube_dim);
     }
 }
+
+
+
+void save_blob1d_to_file(float* data, int len, FILE* fout)
+{
+    fwrite(data, sizeof(float), len, fout);
+}
+
+void save_blob2d_to_file(float** data, px_size_t size, FILE* fout)
+{
+    for (int i = 0; i < size.height; i++)
+    {
+        save_blob1d_to_file(data[i], size.width, fout);
+    }
+}
+
+void save_blob3d_to_file(float*** data, px_cube_dim_t cube_dim, FILE* fout)
+{
+    px_size_t size = px_create_size(cube_dim.height, cube_dim.width);
+    for (int i = 0; i < cube_dim.channel; i++)
+    {
+        save_blob2d_to_file(data[i], size, fout);
+    }
+}
+
+void save_blob4d_to_file(float**** data, px_tensor_dim_t tensor_dim, FILE* fout)
+{
+    px_cube_dim_t cube_dim = px_create_cube_dim(tensor_dim.channel, tensor_dim.height, tensor_dim.width);
+    for (int i = 0; i < tensor_dim.batch; i++)
+    {
+        save_blob3d_to_file(data[i], cube_dim, fout);
+    }
+}

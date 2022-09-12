@@ -60,9 +60,9 @@ static void clear_lenet_S4_layer(Lenet* net)
 static void clear_lenet_O5_layer(Lenet* net)
 {
     const int len = net->O5->outputNum;
-    clear_blob1d(net->O5->d, len);
-    clear_blob1d(net->O5->v, len);
-    clear_blob1d(net->O5->y, len);
+    clear_array(net->O5->d);
+    clear_array(net->O5->v);
+    clear_array(net->O5->y);
 }
 
 // 将神经元的部分数据清除
