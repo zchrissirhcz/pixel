@@ -179,7 +179,7 @@ void nc_destroy_layer(NcLayer* layer)
     }
 }
 
-void nc_net_forward(NcNet* net, NcImage* image, int label)
+void nc_net_forward(NcNet* net, px_image_t* image, int label)
 {
     NcLayer* layer = NULL;
     for (int i = 0; i < net->layers_num; i++)
@@ -208,7 +208,7 @@ void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* dat
     FILE* fout = fopen(train_cfg->log_pth, "w");
     CHECK_WRITE_FILE(fout, train_cfg->log_pth);
 
-    NcImage* image = NULL;
+    px_image_t* image = NULL;
     int label = 0;
     for (int i = 0; i < train_cfg->num_epoch; i++)
     {

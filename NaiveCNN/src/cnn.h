@@ -90,7 +90,7 @@ typedef struct cnn_network
 
 typedef struct CnnTrainOpts
 {
-    int numepochs; // 训练的迭代次数
+    int num_epochs; // 训练的迭代次数
     float alpha;   // 学习速率
 } CnnTrainOpts;
 

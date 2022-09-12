@@ -13,15 +13,10 @@ add_library(cnn STATIC
   src/naive_convolution.c
   src/naive_pooling.c
   src/naive_relu.c
-
-  src/nc_bmp.c
-  src/nc_bmp.h
 )
 target_link_libraries(cnn PUBLIC pixel)
 
 add_executable(example-mnist
-  examples/mnist.cpp
-  examples/mnist.h
   examples/lenet.cpp
   examples/lenet.h
 )

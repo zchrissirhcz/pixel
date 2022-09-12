@@ -1,6 +1,7 @@
-#include "pixel_bmp.h"
-#include "pixel_log.h"
-#include "pixel_benchmark.h"
+#include "px_bmp.h"
+#include "px_log.h"
+#include "px_arithm.h"
+#include "px_timer.h"
 #include <opencv2/opencv.hpp>
 
 void test_decode_bmp()
@@ -10,14 +11,13 @@ void test_decode_bmp()
     {
         const char* filename = "mingren.bmp";
 
-        _PxlImageFormat target_fmt = _PxlImage_BGR;
         unsigned char* buffer = NULL;
         int height;
         int width;
         int channel;
         int align = 1;
-        pxl_decode_bmp(filename, align, &height, &width, &channel, &buffer, false);
-        PIXEL_LOGD("height:%d, width:%d, channel:%d", height, width, channel);
+        px_read_bmp(filename, align, &height, &width, &channel, &buffer, false);
+        PX_LOGE("height:%d, width:%d, channel:%d", height, width, channel);
 
         cv::Size size;
         size.height = height;
@@ -35,19 +35,18 @@ void test_decode_bmp()
     {
         const char* filename = "mingren.bmp";
 
-        _PxlImageFormat target_fmt = _PxlImage_BGR;
         unsigned char* buffer = NULL;
         int height;
         int width;
         int channel;
         int align = 4;
-        pxl_decode_bmp(filename, align, &height, &width, &channel, &buffer, false);
-        PIXEL_LOGD("height:%d, width:%d, channel:%d", height, width, channel);
+        px_read_bmp(filename, align, &height, &width, &channel, &buffer, false);
+        PX_LOGE("height:%d, width:%d, channel:%d", height, width, channel);
 
         cv::Size size;
         size.height = height;
         size.width = width;
-        int step = pxl_align_up(width*channel, align); //!! important
+        int step = px_align_up(width*channel, align); //!! important
         cv::Mat mat(size, CV_8UC3, buffer, step);
 #ifdef SHOW_RESULT
         cv::imshow("image", mat);
@@ -61,14 +60,13 @@ void test_decode_bmp()
     {
         const char* filename = "ring.bmp";
 
-        _PxlImageFormat target_fmt = _PxlImage_BGR;
         unsigned char* buffer = NULL;
         int height;
         int width;
         int channel;
         int align = 1;
-        pxl_decode_bmp(filename, align, &height, &width, &channel, &buffer, false);
-        PIXEL_LOGD("height:%d, width:%d, channel:%d", height, width, channel);
+        px_read_bmp(filename, align, &height, &width, &channel, &buffer, false);
+        PX_LOGE("height:%d, width:%d, channel:%d", height, width, channel);
 
         cv::Size size;
         size.height = height;
@@ -85,21 +83,20 @@ void test_decode_bmp()
     {
         const char* filename = "mingren_gray.bmp";
 
-        _PxlImageFormat target_fmt = _PxlImage_BGR;
         unsigned char* buffer = NULL;
         int height;
         int width;
         int channel;
         int align = 4;
-        pxl_decode_bmp(filename, align, &height, &width, &channel, &buffer, false);
-        PIXEL_LOGD("height:%d, width:%d, channel:%d", height, width, channel);
+        px_read_bmp(filename, align, &height, &width, &channel, &buffer, false);
+        PX_LOGE("height:%d, width:%d, channel:%d", height, width, channel);
 
         cv::Size size;
         size.height = height;
         size.width = width;
-        int step = pxl_align_up(width*channel, align); //!! important
+        int step = px_align_up(width*channel, align); //!! important
         cv::Mat mat(size, CV_8UC1, buffer, step);
-        PIXEL_LOGD("outsize, buffer is %p", buffer);
+        PX_LOGE("outsize, buffer is %p", buffer);
 #ifdef SHOW_RESULT
         cv::imshow("image", mat);
         cv::waitKey(0);
@@ -122,7 +119,7 @@ void test_encode_bmp()
         int height = size.height;
         int width = size.width;
         int channels = mat.channels();
-        pxl_encode_bmp("result1.bmp", height, width, channels, buffer, linebytes, false);
+        px_write_bmp("result1.bmp", height, width, channels, buffer, linebytes, false);
     }
 
     if (1)
@@ -134,11 +131,11 @@ void test_encode_bmp()
         int width;
         int channel;
         int align = 4;
-        pxl_decode_bmp(filename, align, &height, &width, &channel, &buffer, false);
-        PIXEL_LOGD("height:%d, width:%d, channel:%d", height, width, channel);
+        px_read_bmp(filename, align, &height, &width, &channel, &buffer, false);
+        PX_LOGE("height:%d, width:%d, channel:%d", height, width, channel);
         
-        int linebytes = pxl_align_up(width*channel, align);
-        pxl_encode_bmp("result2.bmp", height, width, channel, buffer, linebytes, false);
+        int linebytes = px_align_up(width*channel, align);
+        px_write_bmp("result2.bmp", height, width, channel, buffer, linebytes, false);
     }
 
     if(1)
@@ -153,7 +150,7 @@ void test_encode_bmp()
         int height = size.height;
         int width = size.width;
         int channels = mat.channels();
-        pxl_encode_bmp("result3.bmp", height, width, channels, buffer, linebytes, true);
+        px_write_bmp("result3.bmp", height, width, channels, buffer, linebytes, true);
     }   
 
     if (1)
@@ -165,13 +162,13 @@ void test_encode_bmp()
         int width;
         int channel;
         int align = 4;
-        pxl_decode_bmp(filename, align, &height, &width, &channel, &buffer, false);
-        PIXEL_LOGD("height:%d, width:%d, channel:%d", height, width, channel);
+        px_read_bmp(filename, align, &height, &width, &channel, &buffer, false);
+        PX_LOGE("height:%d, width:%d, channel:%d", height, width, channel);
         
-        int linebytes = pxl_align_up(width*channel, align);
-        PIXEL_LOGD("width=%d, channel=%d, width*channel=%d, linebytes=%d",
+        int linebytes = px_align_up(width*channel, align);
+        PX_LOGE("width=%d, channel=%d, width*channel=%d, linebytes=%d",
             width, channel, width*channel, linebytes);
-        pxl_encode_bmp("result4.bmp", height, width, channel, buffer, linebytes, true);
+        px_write_bmp("result4.bmp", height, width, channel, buffer, linebytes, true);
     }
 
     if (1)
@@ -183,11 +180,11 @@ void test_encode_bmp()
         int width;
         int channel;
         int align = 1;
-        pxl_decode_bmp(filename, align, &height, &width, &channel, &buffer, false);
-        PIXEL_LOGD("height:%d, width:%d, channel:%d", height, width, channel);
+        px_read_bmp(filename, align, &height, &width, &channel, &buffer, false);
+        PX_LOGE("height:%d, width:%d, channel:%d", height, width, channel);
 
-        int linebytes = pxl_align_up(width*channel, align);
-        pxl_encode_bmp("result5.bmp", height, width, channel, buffer, linebytes, false);
+        int linebytes = px_align_up(width*channel, align);
+        px_write_bmp("result5.bmp", height, width, channel, buffer, linebytes, false);
     }
 
     if (1)
@@ -199,11 +196,11 @@ void test_encode_bmp()
         int width;
         int channel;
         int align = 4;
-        pxl_decode_bmp(filename, align, &height, &width, &channel, &buffer, false);
-        PIXEL_LOGD("height:%d, width:%d, channel:%d", height, width, channel);
+        px_read_bmp(filename, align, &height, &width, &channel, &buffer, false);
+        PX_LOGE("height:%d, width:%d, channel:%d", height, width, channel);
 
-        int linebytes = pxl_align_up(width*channel, align);
-        pxl_encode_bmp("result6.bmp", height, width, channel, buffer, linebytes, false);
+        int linebytes = px_align_up(width*channel, align);
+        px_write_bmp("result6.bmp", height, width, channel, buffer, linebytes, false);
     }
 }
 
@@ -220,10 +217,10 @@ void prepare_not_aligned_images()
 int main(){
     //prepare_not_aligned_images();
 
-    double t_start = pixel_get_current_time();
+    double t_start = px_get_current_time();
     test_decode_bmp();
-    double t_cost = pixel_get_current_time() - t_start;
-    PIXEL_LOGD("time cost: %lf ms", t_cost);
+    double t_cost = px_get_current_time() - t_start;
+    PX_LOGE("time cost: %lf ms", t_cost);
 
     //test_encode_bmp();
     

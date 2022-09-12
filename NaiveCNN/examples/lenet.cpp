@@ -9,7 +9,7 @@
 #include <assert.h>
 
 #include "mat.h"
-#include "mnist.h"
+#include "px_mnist.h"
 #include "cnn.h"
 
 #include "naive_cnn.h"
@@ -30,7 +30,7 @@ static const char* project_dir = "/Users/zz/work/pixel/NaiveCNN/";
 #pragma error
 #endif
 
-matrix_t create_normalized_f32_matrix_from_u8_image(mnist_image_array_t* inputData, int n)
+matrix_t create_normalized_f32_matrix_from_u8_image(px_mnist_image_array_t* inputData, int n)
 {
     const int height = inputData->images[n].height;
     const int width = inputData->images[n].width;
@@ -45,15 +45,13 @@ matrix_t create_normalized_f32_matrix_from_u8_image(mnist_image_array_t* inputDa
     return normalized_image;
 }
 
-void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array_t* outputData, CnnTrainOpts opts, int trainNum, FILE* fout)
+void mnist_cnn_train(CNN* cnn, px_mnist_image_array_t* inputData, px_mnist_label_array_t* outputData, CnnTrainOpts opts, int trainNum, FILE* fout)
 {
     // 学习训练误差曲线
     cnn->L = (float*)malloc(trainNum * sizeof(float));
-    int e;
-    for (e = 0; e < opts.numepochs; e++)
+    for (int epoch_index = 0; epoch_index < opts.num_epochs; epoch_index++)
     {
-        int n = 0;
-        for (n = 0; n < trainNum; n++)
+        for (int n = 0; n < trainNum; n++)
         {
             matrix_t input = create_normalized_f32_matrix_from_u8_image(inputData, n);
 
@@ -81,9 +79,9 @@ void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array
             {
                 cnn->L[n] = cnn->L[n - 1] * 0.99f + 0.01f * l / 2.0f;
             }
-            fprintf(fout, "-- [train] sample: %5d/%d, epoch: %d/%d, loss: %.4f\n",
+            fprintf(stdout, "-- [train] sample: %5d/%d, epoch: %d/%d, loss: %.4f\n",
                     n, trainNum,
-                    e, opts.numepochs,
+                    epoch_index, opts.num_epochs,
                     cnn->L[n]);
 
             destroy_matrix_data(&input);
@@ -92,7 +90,7 @@ void mnist_cnn_train(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array
 }
 
 // do inference
-float mnist_cnn_test(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array_t* outputData, int testNum)
+float mnist_cnn_test(CNN* cnn, px_mnist_image_array_t* inputData, px_mnist_label_array_t* outputData, int testNum)
 {
     int n = 0;
     int incorrectnum = 0;
@@ -112,42 +110,31 @@ float mnist_cnn_test(CNN* cnn, mnist_image_array_t* inputData, mnist_label_array
 
 int test_mnist_train_test()
 {
-    char train_label_pth[NC_MAX_PATH];
-    sprintf(train_label_pth, "%s/mnist/train-labels.idx1-ubyte", project_dir);
-    mnist_label_array_t* trainLabel = read_mnist_label(train_label_pth);
+    char mnist_data_dir[256];
+    sprintf(mnist_data_dir, "%s/mnist", project_dir);
+    px_mnist_data_t* mnist_data = px_read_mnist_data(mnist_data_dir);
 
-    char train_image_pth[NC_MAX_PATH];
-    sprintf(train_image_pth, "%s/mnist/train-images.idx3-ubyte", project_dir);
-    mnist_image_array_t* trainImg = read_mnist_image(train_image_pth);
-
-    char test_label_pth[NC_MAX_PATH];
-    sprintf(test_label_pth, "%s/mnist/t10k-labels.idx1-ubyte", project_dir);
-    mnist_label_array_t* testLabel = read_mnist_label(test_label_pth);
-
-    char test_image_pth[NC_MAX_PATH];
-    sprintf(test_image_pth, "%s/mnist/t10k-images.idx3-ubyte", project_dir);
-    mnist_image_array_t* testImg = read_mnist_image(test_image_pth);
-
-    NcSize2D inputSize = px_create_size(testImg->images[0].height, testImg->images[0].width);
-    int outSize = testLabel->one_hot_label[0].len;
+    NcSize2D inputSize = px_create_size(mnist_data->test_images->images[0].height, mnist_data->test_images->images[0].width);
+    int outSize = mnist_data->test_labels->one_hot_label[0].len;
 
     // CNN structure init
     CNN* cnn = (CNN*)malloc(sizeof(CNN));
     lenet5_setup(cnn, inputSize, outSize);
 
     // CNN training
-#if 1
+#if 0
     CnnTrainOpts opts;
-    opts.numepochs = 1;
+    opts.num_epochs = 1;
     opts.alpha = 1.0;
-    int trainNum = 10;
+    //int trainNum = 10;
+    int trainNum = 1000;
     //int trainNum=55000;
     char train_log_pth[NC_MAX_PATH];
     sprintf(train_log_pth, "%s/debug/train-log.txt", project_dir);
     FILE* fout = fopen(train_log_pth, "w"); // log file
     CHECK_WRITE_FILE(fout, train_log_pth);
 
-    mnist_cnn_train(cnn, trainImg, trainLabel, opts, trainNum, fout);
+    mnist_cnn_train(cnn, mnist_data->train_images, mnist_data->train_labels, opts, trainNum, fout);
 
     fclose(fout);
 
@@ -167,23 +154,19 @@ int test_mnist_train_test()
     // CNN test
     printf("--- mnist test start\n");
     char test_model_pth[NC_MAX_PATH];
-    //sprintf(test_model_pth, "%s/model/mnist-train.cnn", project_dir);
-    sprintf(test_model_pth, "%s/model/mnist.cnn", project_dir);
+    sprintf(test_model_pth, "%s/model/mnist-train.cnn", project_dir);
+    //sprintf(test_model_pth, "%s/model/mnist.cnn", project_dir);
     load_cnn(cnn, test_model_pth);
     //int testNum=10000; // too slow
-    int testNum = 10;
+    int testNum = 100;
     float incorrectRatio = 0.0;
-    incorrectRatio = mnist_cnn_test(cnn, testImg, testLabel, testNum);
+    incorrectRatio = mnist_cnn_test(cnn, mnist_data->test_images, mnist_data->test_labels, testNum);
     float accuracy = 1 - incorrectRatio;
     printf("--- accuracy: %f\n", accuracy);
     printf("test finished!!\n");
 
     free(cnn);
-
-    destroy_mnist_image_array(trainImg);
-    destroy_mnist_image_array(testImg);
-    destroy_mnist_label_array(trainLabel);
-    destroy_mnist_label_array(testLabel);
+    px_destroy_mnist_data(mnist_data);
 
     return 0;
 }
@@ -747,7 +730,7 @@ void nc_lenet5_infer_setup(NcNet* net)
     }
 }
 
-void nc_infer(NcNet* net, NcImage* image)
+void nc_infer(NcNet* net, px_image_t* image)
 {
     // allocate network's input blobs
     //net->blobs[0] = nc_create_blob3d(image->h, image->w, image->c);
@@ -777,14 +760,14 @@ void nc_cls_data_loader(NcClsDataConfig* cfg)
             char train_image_pth[NC_MAX_PATH];
             sprintf(train_image_pth, "%s/mnist/train-images.idx3-ubyte", project_dir);
 
-            mnist_image_array_t* image_array = read_mnist_image(train_image_pth);
+            px_mnist_image_array_t* image_array = px_read_mnist_image(train_image_pth);
             cfg->images = &image_array->images;
 
             int* labels;
             int label_num;
             char train_label_pth[NC_MAX_PATH];
             sprintf(train_label_pth, "%s/mnist/train-labels.idx1-ubyte", project_dir);
-            mnist_label_array_t* label_array = read_mnist_label(train_label_pth);
+            px_mnist_label_array_t* label_array = px_read_mnist_label(train_label_pth);
 
             assert(label_array->size == image_array->size);
 
@@ -832,7 +815,7 @@ void nc_infer_trial()
     //for (int i = 0; i < data_cfg.num; i++) {
     for (int i = 0; i < 1; i++)
     {
-        NcImage* image = data_cfg.images[i];
+        px_image_t* image = data_cfg.images[i];
         nc_infer(net, image);
     }
 
@@ -853,11 +836,11 @@ void nc_infer_trial()
 
 int main()
 {
-    // char mnist_data_dir[256] = {0};
-    // sprintf(mnist_data_dir, "%s/mnist", project_dir);
-    // extract_mnist_image_and_save(mnist_data_dir);
+    char mnist_data_dir[256] = {0};
+    sprintf(mnist_data_dir, "%s/mnist", project_dir);
+    px_extract_mnist_image_and_save(mnist_data_dir);
 
-    test_mnist_train_test();
+    //test_mnist_train_test();
     //nc_train_trial();
     //nc_infer_trial();
 

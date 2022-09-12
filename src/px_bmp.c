@@ -1,5 +1,7 @@
-#include "pixel_log.h"
-#include "pixel_bmp.h"
+#include "px_log.h"
+#include "px_bmp.h"
+#include "px_assert.h"
+#include "px_arithm.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +13,41 @@
 // 3. https://www.cnblogs.com/wainiwann/p/7086844.html
 // 4. https://github.com/vallentin/LoadBMP
 // 5. opencv/modules/imgcodecs/src/grfmt_bmp.hpp
+
+typedef enum _PxlImageFormat {
+    _PxlImage_BGR,
+    _PxlImage_RGB,
+    _PxlImage_GRAY,
+} _PxlImageFormat;
+
+
+// https://stackoverflow.com/a/2182581/2999096
+static void pxl_swap_bytes(void* pv, size_t n)
+{
+    PX_ASSERT(n>0);
+
+    char *p = (char*)pv;
+    size_t lo, hi;
+    for(lo=0, hi=n-1; hi>lo; lo++, hi--)
+    {
+        char tmp=p[lo];
+        p[lo] = p[hi];
+        p[hi] = tmp;
+    }
+}
+#define PXL_SWAP_BYTES(x) pxl_swap_bytes(&(x), sizeof(x));
+
+// https://stackoverflow.com/a/12792056/2999096
+static inline bool px_is_little_endian()
+{
+    volatile uint32_t data=0x01234567;
+    return (*((uint8_t*)(&data))) == 0x67;
+}
+
+static inline bool px_is_big_endian()
+{
+    return !px_is_little_endian();
+}
 
 
 typedef struct BMP_file_header
@@ -69,7 +106,7 @@ typedef struct BMP_image
 // @param line_align: when storing result buffer, line align. (only 1 and 4 are valid)
 // @param _buffer: result buffer, should be NULL when passing in, and should be free by user
 // @param swap_bgr: when the bmp is BGR (bpp=24) and swap_bgr is 1, then swap b and r, gain RGB buffer
-void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, unsigned char** _buffer, bool swap_bgr)
+void px_read_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, unsigned char** _buffer, bool swap_bgr)
 {
     FILE* fin = NULL;
     int height = 0;
@@ -82,19 +119,19 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
         // filename checking, may be ignored
         if (strlen(fn)<5)
         {
-            PIXEL_LOGE("filename too short");
+            PX_LOGE("filename too short");
             break;
         }
         // file extension checking, may be ignored
         const char* ext = fn + strlen(fn) - 4;
         if (strcmp(ext, ".bmp")!=0) 
         {
-            PIXEL_LOGE("filename not ends with .bmp");
+            PX_LOGE("filename not ends with .bmp");
             break;
         }
 
         if (line_align!=1 && line_align!=4) {
-            PIXEL_LOGE("line_align invalid, only 1 or 4 supported"); break;
+            PX_LOGE("line_align invalid, only 1 or 4 supported"); break;
         }
 
         // ----------------------------------------------------------------------
@@ -105,13 +142,13 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
 
         fin = fopen(fn, "rb");
         if (!fin) {
-            PIXEL_LOGE("failed to open file %s", fn); break;
+            PX_LOGE("failed to open file %s", fn); break;
         }
         if (fread(bmp_file_header_buf, sizeof(bmp_file_header_buf), 1, fin) == 0) {
-            PIXEL_LOGE("fread error"); break;
+            PX_LOGE("fread error"); break;
         }
         if (fread(bmp_info_header_buf, sizeof(bmp_info_header_buf), 1, fin) == 0) {
-            PIXEL_LOGE("fread error"); break;
+            PX_LOGE("fread error"); break;
         }
 
         // ----------------------------------------------------------------------
@@ -127,13 +164,13 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
         // parse and check magic (signature)
         const char* bmp_signature = "BM";
         if ( memcmp(bmp_file_header, bmp_signature, strlen(bmp_signature)) != 0) {
-            PIXEL_LOGE("invalid bmp signagure"); break;
+            PX_LOGE("invalid bmp signagure"); break;
         }
 
         // parse file_size
         bmp_file_header->file_size = (uint32_t)hd[2]<<0 | (uint32_t)hd[3]<<8 | (uint32_t)hd[4]<<16 | (uint32_t)hd[5]<<24;
         
-        int big_endian = pxl_is_big_endian();
+        int big_endian = px_is_big_endian();
         if (big_endian) {
             PXL_SWAP_BYTES(bmp_file_header->file_size);
         }
@@ -180,7 +217,7 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
             PXL_SWAP_BYTES(bmp_info_header->header_size);
         }
         if (bmp_info_header->header_size!=40) {
-            PIXEL_LOGE("invalid header size. only 40 is valid"); break;
+            PX_LOGE("invalid header size. only 40 is valid"); break;
         }
 
         // parse width and validate
@@ -189,7 +226,7 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
             PXL_SWAP_BYTES(bmp_info_header->width);
         }
         if (bmp_info_header->width <= 0) {
-            PIXEL_LOGE("invalid width, >0 required, but got %d", bmp_info_header->width); break;
+            PX_LOGE("invalid width, >0 required, but got %d", bmp_info_header->width); break;
         }
 
         // parse height and validate
@@ -198,7 +235,7 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
             PXL_SWAP_BYTES(bmp_info_header->height);
         }
         if (bmp_info_header->height <= 0) {
-            PIXEL_LOGE("invalid height, >0 required, but got %d", bmp_info_header->height); break;
+            PX_LOGE("invalid height, >0 required, but got %d", bmp_info_header->height); break;
         }
 
         // parse num_planes and validate
@@ -207,7 +244,7 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
             PXL_SWAP_BYTES(bmp_info_header->num_planes);
         }
         if (bmp_info_header->num_planes!=1) {
-            PIXEL_LOGE("invalid num_planes, must be 1"); break;
+            PX_LOGE("invalid num_planes, must be 1"); break;
         }
 
         // parse bits_per_pixel and validate
@@ -217,7 +254,7 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
         }
         int bpp = bmp_info_header->bits_per_pixel;
         if (bpp!=8 && bpp!=24 && bpp!=32) {
-            PIXEL_LOGE("not supported bpp, only 8, 24, 32 supported now"); break;
+            PX_LOGE("not supported bpp, only 8, 24, 32 supported now"); break;
         }
 
         // parse compression_type and validate
@@ -226,7 +263,7 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
             PXL_SWAP_BYTES(bmp_info_header->compression_type);
         }
         if (bmp_info_header->compression_type != BMP_RGB) {
-            PIXEL_LOGE("not supported compression_type, only BMP_RGB supported now"); break;
+            PX_LOGE("not supported compression_type, only BMP_RGB supported now"); break;
         }
 
         // parse image_size
@@ -275,10 +312,10 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
             // allocate and read-in palette's data
             bmp_image.palette = (BMP_palette_entry*)malloc(num_of_palette*sizeof(BMP_palette_entry));
             if (bmp_image.palette==NULL) {
-                PIXEL_LOGE("failed to allocate memory for palette"); break;
+                PX_LOGE("failed to allocate memory for palette"); break;
             }
             if (0==fread(bmp_image.palette, num_of_palette*sizeof(BMP_palette_entry), 1, fin)) {
-                PIXEL_LOGE("fread failed for reading palette"); break;
+                PX_LOGE("fread failed for reading palette"); break;
             }
         }
 
@@ -289,10 +326,10 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
         height = bmp_info_header->height;
         width  = bmp_info_header->width;
         src_channel = bpp / 8;
-        int src_linebytes = pxl_align_up(width*src_channel, 4);
+        int src_linebytes = px_align_up(width*src_channel, 4);
         if (bmp_image.palette==NULL) {
             dst_channel = 3;
-            int dst_linebytes = pxl_align_up(width*dst_channel, line_align);
+            int dst_linebytes = px_align_up(width*dst_channel, line_align);
             unsigned char bmp_gap[3] = {0};
             int src_gap = src_linebytes - width*src_channel;
             int buf_size = dst_linebytes * height;
@@ -316,22 +353,22 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
                 }
             }
             if (!fread_valid) {
-                PIXEL_LOGE("fread failed when read pixels"); break;
+                PX_LOGE("fread failed when read pixels"); break;
             }
         } else {
             // reading pixel color indices into bmp_image.data
             // then get real color from palette
             dst_channel = src_channel; // 1
             int buf_size = src_linebytes * height;
-            int dst_linebytes = pxl_align_up(width*dst_channel, line_align);
+            int dst_linebytes = px_align_up(width*dst_channel, line_align);
             bmp_image.data = (unsigned char*)malloc(buf_size);
             if (0==fread(bmp_image.data, buf_size, 1, fin)) {
-               PIXEL_LOGE("fread failed when read pixel color indices"); break;
+               PX_LOGE("fread failed when read pixel color indices"); break;
             }
 
             buffer = (unsigned char*)malloc(dst_linebytes * height);
             if (buffer==NULL) {
-                PIXEL_LOGE("malloc failed"); break;
+                PX_LOGE("malloc failed"); break;
             }
             int line_limit = dst_channel * width;
             int src_lineskip = src_linebytes - src_channel * width;
@@ -373,7 +410,7 @@ void pxl_decode_bmp(const char* fn, int line_align, int* _h, int* _w, int* _c, u
 
 
 
-void pxl_encode_bmp(const char* fn, int ht, int wt, int cn, const unsigned char* buf, int read_linebytes, bool swap_bgr)
+void px_write_bmp(const char* fn, int ht, int wt, int cn, const unsigned char* buf, int read_linebytes, bool swap_bgr)
 {
     //void nc_save_bmp(const uchar* buf, uint read_linebytes) {
     int height = ht;
@@ -384,11 +421,11 @@ void pxl_encode_bmp(const char* fn, int ht, int wt, int cn, const unsigned char*
     do {
         fout = fopen(fn, "wb");
         if (fout==NULL) {
-            PIXEL_LOGE("fopen failed"); break;
+            PX_LOGE("fopen failed"); break;
         }
 
         if (read_linebytes<width*channels) {
-            PIXEL_LOGE("the given read_linebytes is not valid"); break;
+            PX_LOGE("the given read_linebytes is not valid"); break;
         }
 
         unsigned char hd[54] = { //bmp header
@@ -427,7 +464,7 @@ void pxl_encode_bmp(const char* fn, int ht, int wt, int cn, const unsigned char*
         hd[28] = (uint8_t)channels*8;
 
         if (1!=fwrite(hd, 54, 1, fout)) {
-            PIXEL_LOGE("fwrite failed"); break;
+            PX_LOGE("fwrite failed"); break;
         }
 
         if (channels == 1) { //colorize with palette, required only when channels==1
@@ -440,13 +477,13 @@ void pxl_encode_bmp(const char* fn, int ht, int wt, int cn, const unsigned char*
                 palette[i * 4+3] = 0;
             }
             if (fwrite(palette, 1024, 1, fout)!=1) {
-                PIXEL_LOGE("fwrite failed"); break;
+                PX_LOGE("fwrite failed"); break;
             }
         }
 
         char bmp_pad[3] = {0, 0, 0};
-        uint32_t write_linebytes = pxl_align_up(width*channels, 4);
-        uint32_t line_limit = width * channels;
+        uint32_t write_linebytes = px_align_up(width*channels, 4);
+        int line_limit = width * channels;
         uint32_t line_pad = write_linebytes - line_limit;
 
         bool fwrite_valid = true;
@@ -455,24 +492,24 @@ void pxl_encode_bmp(const char* fn, int ht, int wt, int cn, const unsigned char*
         if (channels==3 && swap_bgr) {
             
             for (int y=height-1; y!=-1 && fwrite_valid; y--) {
-                for (int x=0; x<line_limit && fwrite_valid; x+=channels) {
+                for (int x=0; x < line_limit && fwrite_valid; x+=channels) {
                     // BGR -> RGB
                     if (fwrite(src_line+x+2, 1, 1, fout)!=1) {
                         fwrite_valid = false;
-                        PIXEL_LOGE("fwrite failed");
+                        PX_LOGE("fwrite failed");
                     }
                     if (fwrite(src_line+x+1, 1, 1, fout)!=1) {
                         fwrite_valid = false;
-                        PIXEL_LOGE("fwrite failed");
+                        PX_LOGE("fwrite failed");
                     }
                     if (fwrite(src_line+x, 1, 1, fout)!=1) {
                         fwrite_valid = false;
-                        PIXEL_LOGE("fwrite failed");
+                        PX_LOGE("fwrite failed");
                     }
                 }
                 if (fwrite(bmp_pad, 1, line_pad, fout)!=line_pad) {
                     fwrite_valid =false;
-                    PIXEL_LOGE("fwrite failed");
+                    PX_LOGE("fwrite failed");
                 }
                 src_line -= read_linebytes;
             }
@@ -481,11 +518,11 @@ void pxl_encode_bmp(const char* fn, int ht, int wt, int cn, const unsigned char*
             for(int y=height-1; y!=-1 && fwrite_valid; y--) {
                 if (fwrite(src_line, line_limit, 1, fout) != 1) {
                     fwrite_valid = false;
-                    PIXEL_LOGE("fwrite failed");
+                    PX_LOGE("fwrite failed");
                 }
                 if (fwrite(bmp_pad, 1, line_pad, fout) != line_pad) {
                     fwrite_valid = false;
-                    PIXEL_LOGE("fwrite failed");
+                    PX_LOGE("fwrite failed");
                 }
                 src_line -= read_linebytes;
             }

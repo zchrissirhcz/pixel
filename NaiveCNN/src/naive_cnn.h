@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "px_cnn.h"
 #include "px_log.h"
+#include "px_image.h"
 
 #define CHECK_WRITE_FILE(fp, filename) \
     if (fp == NULL)                    \
@@ -209,7 +210,7 @@ typedef struct NcTrainConfig
 typedef struct NcClsDataConfig
 {
     int num; // how many (x,y) pairs do we have?
-    NcImage** images;
+    px_image_t** images;
     int* labels;
     char dataset[NC_MAX_PATH];
     char splitset[NC_MAX_PATH];
@@ -257,7 +258,7 @@ void nc_train_backward_innerproduct(void* param_, NcLayerInput* input, NcLayerOu
 
 void nc_destroy_layer(NcLayer* layer);
 
-void nc_net_forward(NcNet* net, NcImage* image, int label);
+void nc_net_forward(NcNet* net, px_image_t* image, int label);
 void nc_net_backward(NcNet* net);
 void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* data_cfg);
 

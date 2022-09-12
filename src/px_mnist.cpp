@@ -1,8 +1,22 @@
-#include "mnist.h"
-#include "naive_cnn.h"
+#include "px_mnist.h"
 #include "px_cnn.h"
+#include "px_log.h"
+#include "px_bmp.h"
+#include "px_filesystem.h"
 
-#include <opencv2/opencv.hpp>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+#define CHECK_WRITE_FILE(fp, filename) \
+    if (fp == NULL)                    \
+        PX_LOGE("write file %s failed in line %d, file %s\n", filename, __LINE__, __FILE__);
+
+#define CHECK_READ_FILE(fp, filename) \
+    if (fp == NULL)                   \
+        PX_LOGE("read file %s failed in line %d, file %s\n", filename, __LINE__, __FILE__);
+
+#define PX_MAX_PATH 256
 
 // 英特尔处理器和其他低端机用户必须翻转头字节。
 static int mnist_reverse_int(int i)
@@ -15,11 +29,11 @@ static int mnist_reverse_int(int i)
     return ((int)ch1 << 24) + ((int)ch2 << 16) + ((int)ch3 << 8) + ch4;
 }
 
-static mnist_image_array_t* create_mnist_image_array(int number_of_images)
+static px_mnist_image_array_t* create_mnist_image_array(int number_of_images)
 {
-    mnist_image_array_t* imgarr = (mnist_image_array_t*)malloc(sizeof(mnist_image_array_t));
+    px_mnist_image_array_t* imgarr = (px_mnist_image_array_t*)malloc(sizeof(px_mnist_image_array_t));
     imgarr->size = number_of_images;
-    imgarr->images = (NcImage*)malloc(number_of_images * sizeof(NcImage));
+    imgarr->images = (px_image_t*)malloc(number_of_images * sizeof(px_image_t));
     return imgarr;
 }
 
@@ -68,13 +82,13 @@ static int get_mnist_image_width(FILE* fin)
 }
 
 // 获取第i幅图像，保存到vec中
-static void read_mnist_single_image(const int n_rows, const int n_cols, mnist_image_array_t* imgarr, FILE* fin, int index)
+static void read_mnist_single_image(const int n_rows, const int n_cols, px_mnist_image_array_t* imgarr, FILE* fin, int index)
 {
     uint8_t* u8_data = imgarr->images[index].data;
     fread(u8_data, n_rows * n_cols, 1, fin);
 }
 
-mnist_image_array_t* read_mnist_image(const char* filename)
+px_mnist_image_array_t* px_read_mnist_image(const char* filename)
 {
     FILE* fin = fopen(filename, "rb");
     CHECK_READ_FILE(fin, filename);
@@ -84,7 +98,7 @@ mnist_image_array_t* read_mnist_image(const char* filename)
     int n_rows = get_mnist_image_height(fin);
     int n_cols = get_mnist_image_width(fin);
 
-    mnist_image_array_t* imgarr = create_mnist_image_array(number_of_images);
+    px_mnist_image_array_t* imgarr = create_mnist_image_array(number_of_images);
     imgarr->n_cols = n_cols;
     imgarr->n_rows = n_rows;
 
@@ -101,13 +115,13 @@ mnist_image_array_t* read_mnist_image(const char* filename)
     return imgarr;
 }
 
-static mnist_label_array_t* create_mnist_label_array_t(int number_of_labels)
+static px_mnist_label_array_t* create_px_mnist_label_array_t(int number_of_labels)
 {
-    mnist_label_array_t* label_array = (mnist_label_array_t*)malloc(sizeof(mnist_label_array_t));
-    memset(label_array, 0, sizeof(mnist_label_array_t));
+    px_mnist_label_array_t* label_array = (px_mnist_label_array_t*)malloc(sizeof(px_mnist_label_array_t));
+    memset(label_array, 0, sizeof(px_mnist_label_array_t));
     label_array->size = number_of_labels;
     label_array->label = (int*)malloc(number_of_labels * sizeof(int));
-    label_array->one_hot_label = (mnist_label_t*)malloc(number_of_labels * sizeof(mnist_label_t));
+    label_array->one_hot_label = (px_mnist_label_t*)malloc(number_of_labels * sizeof(px_mnist_label_t));
     return label_array;
 }
 
@@ -118,7 +132,7 @@ static uint8_t read_mnist_single_label(FILE* fin)
     return label;
 }
 
-mnist_label_array_t* read_mnist_label(const char* filename)
+px_mnist_label_array_t* px_read_mnist_label(const char* filename)
 {
     FILE* fin = fopen(filename, "rb");
     CHECK_READ_FILE(fin, filename);
@@ -128,7 +142,7 @@ mnist_label_array_t* read_mnist_label(const char* filename)
     int magic_number = get_mnist_magic_number(fin);
     int number_of_labels = get_mnist_number_of_labels(fin);
 
-    mnist_label_array_t* label_array = create_mnist_label_array_t(number_of_labels);
+    px_mnist_label_array_t* label_array = create_px_mnist_label_array_t(number_of_labels);
 
     for (int i = 0; i < number_of_labels; ++i)
     {
@@ -146,32 +160,33 @@ mnist_label_array_t* read_mnist_label(const char* filename)
 // extract images from original mnist data
 // save each image to file
 // for simplicity, only do it on test images
-void extract_mnist_image_and_save(const char* mnist_data_dir)
+void px_extract_mnist_image_and_save(const char* mnist_data_dir)
 {
-    char test_image_pth[NC_MAX_PATH];
+    char test_image_pth[PX_MAX_PATH];
     sprintf(test_image_pth, "%s/t10k-images.idx3-ubyte", mnist_data_dir);
 
-    mnist_image_array_t* image_array = read_mnist_image(test_image_pth);
+    px_mnist_image_array_t* image_array = px_read_mnist_image(test_image_pth);
     PX_LOGE("=== got %d test images\n", image_array->size);
 
     for (int i = 0; i < image_array->size; i++)
     {
-        char save_pth[NC_MAX_PATH];
-        sprintf(save_pth, "%s/testImgs/%d.bmp", mnist_data_dir, i);
-        NcImage image = image_array->images[i];
-        cv::Size size;
-        size.height = image.height;
-        size.width = image.width;
+        char save_directory[PX_MAX_PATH] = {0};
+        sprintf(save_directory, "%s/testImgs", mnist_data_dir);
+        px_mkdir(save_directory);
 
-        cv::Mat mat(size, CV_8UC1, image.data);
-        cv::imwrite(save_pth, mat);
-        //printf("save_pth is %s\n", save_pth);
+        char save_path[PX_MAX_PATH];
+        sprintf(save_path, "%s/testImgs/%d.bmp", mnist_data_dir, i);
+        px_image_t image = image_array->images[i];
+
+        bool swap_bgr = false;
+        const int read_linebytes = image.channel * image.width;
+        px_write_bmp(save_path, image.height, image.width, image.channel, image.data, read_linebytes, swap_bgr);
     }
 
-    destroy_mnist_image_array(image_array);
+    px_destroy_mnist_image_array(image_array);
 }
 
-void destroy_mnist_image_array(mnist_image_array_t* image_array)
+void px_destroy_mnist_image_array(px_mnist_image_array_t* image_array)
 {
     for (int i = 0; i < image_array->size; i++)
     {
@@ -181,7 +196,7 @@ void destroy_mnist_image_array(mnist_image_array_t* image_array)
     free(image_array);
 }
 
-void destroy_mnist_label_array(mnist_label_array_t* label_array)
+void px_destroy_mnist_label_array(px_mnist_label_array_t* label_array)
 {
     for (int i = 0; i < label_array->size; i++)
     {
@@ -190,4 +205,40 @@ void destroy_mnist_label_array(mnist_label_array_t* label_array)
     free(label_array->one_hot_label);
     free(label_array->label);
     free(label_array);
+}
+
+px_mnist_data_t* px_read_mnist_data(const char* mnist_data_dir)
+{
+    char train_label_pth[PX_MAX_PATH];
+    sprintf(train_label_pth, "%s/train-labels.idx1-ubyte", mnist_data_dir);
+    px_mnist_label_array_t* train_labels = px_read_mnist_label(train_label_pth);
+
+    char train_image_pth[PX_MAX_PATH];
+    sprintf(train_image_pth, "%s/train-images.idx3-ubyte", mnist_data_dir);
+    px_mnist_image_array_t* train_images = px_read_mnist_image(train_image_pth);
+
+    char test_label_pth[PX_MAX_PATH];
+    sprintf(test_label_pth, "%s/t10k-labels.idx1-ubyte", mnist_data_dir);
+    px_mnist_label_array_t* test_labels = px_read_mnist_label(test_label_pth);
+
+    char test_image_pth[PX_MAX_PATH];
+    sprintf(test_image_pth, "%s/t10k-images.idx3-ubyte", mnist_data_dir);
+    px_mnist_image_array_t* test_images = px_read_mnist_image(test_image_pth);
+
+    px_mnist_data_t* mnist_data = (px_mnist_data_t*)malloc(sizeof(px_mnist_data_t));
+    mnist_data->train_images = train_images;
+    mnist_data->train_labels = train_labels;
+    mnist_data->test_images = test_images;
+    mnist_data->test_labels = test_labels;
+
+    return mnist_data;
+}
+
+void px_destroy_mnist_data(px_mnist_data_t* mnist_data)
+{
+    px_destroy_mnist_image_array(mnist_data->train_images);
+    px_destroy_mnist_image_array(mnist_data->test_images);
+    px_destroy_mnist_label_array(mnist_data->train_labels);
+    px_destroy_mnist_label_array(mnist_data->test_labels);
+    free(mnist_data);
 }
