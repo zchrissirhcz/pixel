@@ -169,7 +169,7 @@ float activation_sigma(float input, float bias) // sigma激活函数
     return (float)1.0 / ((float)(1.0 + exp(-temp)));
 }
 
-void forward_avg_pooling(matrix_t* input, matrix_t* output, px_size_t kernel_size)
+void forward_avg_pooling_for_matrix(matrix_t* input, matrix_t* output, px_size_t kernel_size)
 {
     int outputW = input->width / kernel_size.width;
     int outputH = input->height / kernel_size.height;
