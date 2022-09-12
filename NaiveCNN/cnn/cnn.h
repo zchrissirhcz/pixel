@@ -41,6 +41,11 @@ typedef struct ConvLayer
 
     int stride_height;
     int stride_width;
+
+    int pad_top;
+    int pad_bottom;
+    int pad_left;
+    int pad_right;
 } ConvLayer;
 
 typedef struct PoolingLayer
@@ -60,6 +65,11 @@ typedef struct PoolingLayer
 
     int stride_height;
     int stride_width;
+
+    int pad_top;
+    int pad_bottom;
+    int pad_left;
+    int pad_right;
 } PoolingLayer;
 
 typedef struct InnerproductLayer
@@ -82,11 +92,11 @@ typedef struct InnerproductLayer
 extern "C" {
 #endif
 
-ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, int in_channels, int out_channels);
-PoolingLayer* init_pooling_layer(px_size_t in_size, int map_size, px_size_t stride, int in_channels, int out_channels, int pool_type);
+ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, px_pad_t pad, int in_channels, int out_channels);
+PoolingLayer* init_pooling_layer(px_size_t in_size, int map_size, px_size_t stride, px_pad_t pad, int in_channels, int out_channels, int pool_type);
 InnerproductLayer* init_innerproduct_layer(int in_num, int out_num);
 
-void forward_avg_pooling_for_matrix(matrix_t* input, matrix_t* output, px_size_t kernel_size, px_size_t stride);
+void forward_avg_pooling_for_matrix(matrix_t* input, matrix_t* output, px_size_t kernel_size, px_size_t stride, px_pad_t pad);
 
 // 激活函数 input是数据，inputNum说明数据数目，bas表明偏置
 float activation_sigma(float input, float bias); // sigma激活函数
@@ -111,8 +121,8 @@ tensor_t* create_tensor(px_tensor_dim_t tensor_dim);
 void clear_tensor(tensor_t* tensor);
 void save_tensor_to_file(tensor_t* tensor, FILE* fout);
 
-px_size_t get_conv_output_size(px_size_t in_size, px_size_t kernel_size, px_size_t stride);
-px_size_t get_pooling_out_size(px_size_t in_size, px_size_t kernel_size, px_size_t stride);
+px_size_t get_conv_output_size(px_size_t in_size, px_size_t kernel_size, px_size_t stride, px_pad_t pad);
+px_size_t get_pooling_out_size(px_size_t in_size, px_size_t kernel_size, px_size_t stride, px_pad_t pad);
 
 #ifdef __cplusplus
 }

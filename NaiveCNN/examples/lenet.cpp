@@ -175,7 +175,8 @@ void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
         inSize.width = inputSize.width;
         inSize.height = inputSize.height;
         px_size_t stride = px_create_size(1, 1);
-        net->C1 = init_conv_layer(inSize, 5, stride, 1, 6);
+        px_pad_t pad = px_create_pad(0, 0, 0, 0);
+        net->C1 = init_conv_layer(inSize, 5, stride, pad, 1, 6);
     }
 
     // S2
@@ -183,7 +184,8 @@ void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
         inSize.width = inSize.width - mapSize + 1;
         inSize.height = inSize.height - mapSize + 1;
         px_size_t stride = px_create_size(2, 2);
-        net->S2 = init_pooling_layer(inSize, 2, stride, 6, 6, NC_AvePool);
+        px_pad_t pad = px_create_pad(0, 0, 0, 0);
+        net->S2 = init_pooling_layer(inSize, 2, stride, pad, 6, 6, NC_AvePool);
     }
 
     // C3
@@ -191,7 +193,8 @@ void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
         inSize.width = inSize.width / 2;
         inSize.height = inSize.height / 2;
         px_size_t stride = px_create_size(1, 1);
-        net->C3 = init_conv_layer(inSize, 5, stride, 6, 12);
+        px_pad_t pad = px_create_pad(0, 0, 0, 0);
+        net->C3 = init_conv_layer(inSize, 5, stride, pad, 6, 12);
     }
 
     // S4
@@ -199,7 +202,8 @@ void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
         inSize.width = inSize.width - mapSize + 1;
         inSize.height = inSize.height - mapSize + 1;
         px_size_t stride = px_create_size(2, 2);
-        net->S4 = init_pooling_layer(inSize, 2, stride, 12, 12, NC_AvePool);
+        px_pad_t pad = px_create_pad(0, 0, 0, 0);
+        net->S4 = init_pooling_layer(inSize, 2, stride, pad, 12, 12, NC_AvePool);
     }
 
     // O5

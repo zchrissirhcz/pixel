@@ -11,23 +11,23 @@
 #include <float.h>
 
 
-px_size_t get_conv_output_size(px_size_t in_size, px_size_t kernel_size, px_size_t stride)
+px_size_t get_conv_output_size(px_size_t in_size, px_size_t kernel_size, px_size_t stride, px_pad_t pad)
 {
-    int out_height = (in_size.height - kernel_size.height) / stride.height + 1;
-    int out_width = (in_size.width - kernel_size.width) / stride.width + 1;
+    int out_height = (in_size.height - kernel_size.height + pad.top + pad.bottom) / stride.height + 1;
+    int out_width = (in_size.width - kernel_size.width + pad.left + pad.right) / stride.width + 1;
     px_size_t out_size = px_create_size(out_height, out_width);
     return out_size;
 }
 
-px_size_t get_pooling_out_size(px_size_t in_size, px_size_t kernel_size, px_size_t stride)
+px_size_t get_pooling_out_size(px_size_t in_size, px_size_t kernel_size, px_size_t stride, px_pad_t pad)
 {
-    int out_height = (in_size.height - kernel_size.height) / stride.height + 1;
-    int out_width = (in_size.width - kernel_size.width) / stride.height + 1;
+    int out_height = (in_size.height - kernel_size.height + pad.top + pad.bottom) / stride.height + 1;
+    int out_width = (in_size.width - kernel_size.width + pad.left + pad.right) / stride.height + 1;
     px_size_t out_size = px_create_size(out_height, out_width);
     return out_size;
 }
 
-ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, int in_channels, int out_channels)
+ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, px_pad_t pad, int in_channels, int out_channels)
 {
     ConvLayer* conv_layer = (ConvLayer*)malloc(sizeof(ConvLayer));
 
@@ -42,6 +42,11 @@ ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, in
 
     conv_layer->stride_height = stride.height;
     conv_layer->stride_width = stride.width;
+
+    conv_layer->pad_bottom = pad.bottom;
+    conv_layer->pad_top = pad.top;
+    conv_layer->pad_left = pad.left;
+    conv_layer->pad_right = pad.right;
 
     // 权重空间的初始化，先行再列调用，[r][c]
     int i, j, c, r;
@@ -72,7 +77,7 @@ ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, in
     conv_layer->biasData = create_array(out_channels);
 
     px_size_t kernel_size = px_create_size(map_size, map_size);
-    px_size_t out_size = get_conv_output_size(in_size, kernel_size, stride);
+    px_size_t out_size = get_conv_output_size(in_size, kernel_size, stride, pad);
 
     px_cube_dim_t cube_dim = px_create_cube_dim(out_channels, out_size.height, out_size.width);
     conv_layer->d = create_cube(cube_dim);;
@@ -86,7 +91,7 @@ ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, in
     return conv_layer;
 }
 
-PoolingLayer* init_pooling_layer(px_size_t in_size, int mapSize, px_size_t stride, int inChannels, int outChannels, int pool_type)
+PoolingLayer* init_pooling_layer(px_size_t in_size, int mapSize, px_size_t stride, px_pad_t pad, int inChannels, int outChannels, int pool_type)
 {
     PoolingLayer* pool_layer = (PoolingLayer*)malloc(sizeof(PoolingLayer));
 
@@ -102,8 +107,13 @@ PoolingLayer* init_pooling_layer(px_size_t in_size, int mapSize, px_size_t strid
     pool_layer->stride_height = stride.height;
     pool_layer->stride_width = stride.width;
 
+    pool_layer->pad_bottom = pad.bottom;
+    pool_layer->pad_top = pad.top;
+    pool_layer->pad_left = pad.left;
+    pool_layer->pad_right = pad.right;
+
     px_size_t kernel_size = px_create_size(mapSize, mapSize);
-    px_size_t out_size = get_pooling_out_size(in_size, kernel_size, stride);
+    px_size_t out_size = get_pooling_out_size(in_size, kernel_size, stride, pad);
 
     px_cube_dim_t cube_dim = px_create_cube_dim(outChannels, out_size.height, out_size.width);
     pool_layer->d = create_cube(cube_dim);
@@ -171,10 +181,10 @@ float activation_sigma(float input, float bias)
     return (float)1.0 / ((float)(1.0 + exp(-temp)));
 }
 
-void forward_avg_pooling_for_matrix(matrix_t* input, matrix_t* output, px_size_t kernel_size, px_size_t stride)
+void forward_avg_pooling_for_matrix(matrix_t* input, matrix_t* output, px_size_t kernel_size, px_size_t stride, px_pad_t pad)
 {
     px_size_t in_size = px_create_size(input->height, input->width);
-    px_size_t out_size = get_pooling_out_size(in_size, kernel_size, stride);
+    px_size_t out_size = get_pooling_out_size(in_size, kernel_size, stride, pad);
     if (output->width != out_size.width || output->height != out_size.height)
     {
         PX_LOGE("ERROR: output size is wrong!!");
