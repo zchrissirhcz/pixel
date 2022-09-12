@@ -16,8 +16,6 @@
     if (fp == NULL)                   \
         PX_LOGE("read file %s failed in line %d, file %s\n", filename, __LINE__, __FILE__);
 
-#define PX_MAX_PATH 256
-
 // 英特尔处理器和其他低端机用户必须翻转头字节。
 static int mnist_reverse_int(int i)
 {
@@ -160,22 +158,20 @@ px_mnist_label_array_t* px_read_mnist_label(const char* filename)
 // extract images from original mnist data
 // save each image to file
 // for simplicity, only do it on test images
-void px_extract_mnist_image_and_save(const char* mnist_data_dir)
+void px_extract_mnist_image_and_save(const char* mnist_data_dir, const char* mnist_filename, const char* save_dir)
 {
     char test_image_pth[PX_MAX_PATH];
-    sprintf(test_image_pth, "%s/t10k-images.idx3-ubyte", mnist_data_dir);
+    sprintf(test_image_pth, "%s/%s", mnist_data_dir, mnist_filename);
+
+    px_mkdir(save_dir);
 
     px_mnist_image_array_t* image_array = px_read_mnist_image(test_image_pth);
     PX_LOGE("=== got %d test images\n", image_array->size);
 
     for (int i = 0; i < image_array->size; i++)
     {
-        char save_directory[PX_MAX_PATH] = {0};
-        sprintf(save_directory, "%s/testImgs", mnist_data_dir);
-        px_mkdir(save_directory);
-
         char save_path[PX_MAX_PATH];
-        sprintf(save_path, "%s/testImgs/%d.bmp", mnist_data_dir, i);
+        sprintf(save_path, "%s/%d.bmp", save_dir, i);
         px_image_t image = image_array->images[i];
 
         px_write_bmp(save_path, image.height, image.width, image.channel, image.data);

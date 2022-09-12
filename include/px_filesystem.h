@@ -4,6 +4,8 @@
 extern "C" {
 #endif
 
+#define PX_MAX_PATH 256
+
 typedef enum PX_MKDIR_ERROR
 {
     PX_MKDIR_CREATE_SUCCESS,

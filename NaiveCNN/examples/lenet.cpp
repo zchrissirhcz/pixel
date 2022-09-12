@@ -10,6 +10,7 @@
 
 #include "mat.h"
 #include "px_mnist.h"
+#include "px_filesystem.h"
 #include "cnn.h"
 
 #include "naive_cnn.h"
@@ -836,11 +837,7 @@ void nc_infer_trial()
 
 int main()
 {
-    char mnist_data_dir[256] = {0};
-    sprintf(mnist_data_dir, "%s/mnist", project_dir);
-    px_extract_mnist_image_and_save(mnist_data_dir);
-
-    //test_mnist_train_test();
+    test_mnist_train_test();
     //nc_train_trial();
     //nc_infer_trial();
 

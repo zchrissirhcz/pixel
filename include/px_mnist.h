@@ -35,7 +35,7 @@ extern "C" {
 
 px_mnist_label_array_t* px_read_mnist_label(const char* filename);
 px_mnist_image_array_t* px_read_mnist_image(const char* filename);
-void px_extract_mnist_image_and_save(const char* mnist_data_dir);
+void px_extract_mnist_image_and_save(const char* mnist_data_dir, const char* mnist_filename, const char* save_dir);
 void px_destroy_mnist_image_array(px_mnist_image_array_t* image_array);
 void px_destroy_mnist_label_array(px_mnist_label_array_t* label_array);
 px_mnist_data_t* px_read_mnist_data(const char* mnist_data_dir);

@@ -16,6 +16,7 @@ pixel_add_test(px_convolution_test)
 pixel_add_test(px_arithm_test)
 pixel_add_test(px_compare_test)
 pixel_add_test(px_bmp_test)
+pixel_add_test(px_mnist_test)
 
 
 execute_process(
