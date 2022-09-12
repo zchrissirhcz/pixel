@@ -2,6 +2,7 @@
 #include "px_bmp.h"
 #include "px_assert.h"
 #include "px_arithm.h"
+#include "px_endian.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -12,34 +13,6 @@
 // 3. https://www.cnblogs.com/wainiwann/p/7086844.html
 // 4. https://github.com/vallentin/LoadBMP
 // 5. opencv/modules/imgcodecs/src/grfmt_bmp.hpp
-
-// https://stackoverflow.com/a/2182581/2999096
-static void pxl_swap_bytes(void* pv, size_t n)
-{
-    PX_ASSERT(n > 0);
-
-    char* p = (char*)pv;
-    size_t lo, hi;
-    for (lo = 0, hi = n - 1; hi > lo; lo++, hi--)
-    {
-        char tmp = p[lo];
-        p[lo] = p[hi];
-        p[hi] = tmp;
-    }
-}
-#define PXL_SWAP_BYTES(x) pxl_swap_bytes(&(x), sizeof(x));
-
-// https://stackoverflow.com/a/12792056/2999096
-static inline bool px_is_little_endian()
-{
-    volatile uint32_t data = 0x01234567;
-    return (*((uint8_t*)(&data))) == 0x67;
-}
-
-static inline bool px_is_big_endian()
-{
-    return !px_is_little_endian();
-}
 
 typedef struct BMP_file_header
 {
@@ -190,7 +163,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         int big_endian = px_is_big_endian();
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_file_header->file_size);
+            PX_SWAP_BYTES(bmp_file_header->file_size);
         }
 
         // parse reserved
@@ -198,15 +171,15 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         bmp_file_header->reserved[1] = (uint16_t)hd[8] << 0 | (uint16_t)hd[9] << 8;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_file_header->reserved[0]);
-            PXL_SWAP_BYTES(bmp_file_header->reserved[1]);
+            PX_SWAP_BYTES(bmp_file_header->reserved[0]);
+            PX_SWAP_BYTES(bmp_file_header->reserved[1]);
         }
 
         // parse offset
         bmp_file_header->offset = (uint32_t)hd[10] << 0 | (uint32_t)hd[11] << 8 | (uint32_t)hd[12] << 16 | (uint32_t)hd[13] << 24;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_file_header->offset);
+            PX_SWAP_BYTES(bmp_file_header->offset);
         }
 
         // ----------------------------------------------------------------------
@@ -235,7 +208,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         bmp_info_header->header_size = (uint32_t)hd[0] << 0 | (uint32_t)hd[1] << 8 | (uint32_t)hd[2] << 16 | (uint32_t)hd[3] << 24;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_info_header->header_size);
+            PX_SWAP_BYTES(bmp_info_header->header_size);
         }
         if (bmp_info_header->header_size != 40)
         {
@@ -247,7 +220,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         bmp_info_header->width = (uint32_t)hd[4] << 0 | (uint32_t)hd[5] << 8 | (uint32_t)hd[6] << 16 | (uint32_t)hd[7] << 24;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_info_header->width);
+            PX_SWAP_BYTES(bmp_info_header->width);
         }
         if (bmp_info_header->width <= 0)
         {
@@ -259,7 +232,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         bmp_info_header->height = (uint32_t)hd[8] << 0 | (uint32_t)hd[9] << 8 | (uint32_t)hd[10] << 16 | (uint32_t)hd[11] << 24;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_info_header->height);
+            PX_SWAP_BYTES(bmp_info_header->height);
         }
         if (bmp_info_header->height <= 0)
         {
@@ -271,7 +244,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         bmp_info_header->num_planes = (uint16_t)hd[12] << 0 | (uint16_t)hd[13] << 8;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_info_header->num_planes);
+            PX_SWAP_BYTES(bmp_info_header->num_planes);
         }
         if (bmp_info_header->num_planes != 1)
         {
@@ -283,7 +256,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         bmp_info_header->bits_per_pixel = (uint16_t)hd[14] << 0 | (uint16_t)hd[15] << 8;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_info_header->bits_per_pixel);
+            PX_SWAP_BYTES(bmp_info_header->bits_per_pixel);
         }
         int bpp = bmp_info_header->bits_per_pixel;
         if (bpp != 8 && bpp != 24 && bpp != 32)
@@ -296,7 +269,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         bmp_info_header->compression_type = (uint32_t)hd[16] << 0 | (uint32_t)hd[17] << 8 | (uint32_t)hd[18] << 16 | (uint32_t)hd[19] << 24;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_info_header->compression_type);
+            PX_SWAP_BYTES(bmp_info_header->compression_type);
         }
         if (bmp_info_header->compression_type != BMP_RGB)
         {
@@ -308,35 +281,35 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         bmp_info_header->image_size = (uint32_t)hd[20] << 0 | (uint32_t)hd[21] << 8 | (uint32_t)hd[22] << 16 | (uint32_t)hd[23] << 24;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_info_header->image_size);
+            PX_SWAP_BYTES(bmp_info_header->image_size);
         }
 
         // parse x_resolution
         bmp_info_header->x_resolution = (uint32_t)hd[24] << 0 | (uint32_t)hd[25] << 8 | (uint32_t)hd[26] << 16 | (uint32_t)hd[27] << 24;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_info_header->x_resolution);
+            PX_SWAP_BYTES(bmp_info_header->x_resolution);
         }
 
         // parse y_resolution
         bmp_info_header->y_resolution = (uint32_t)hd[28] << 0 | (uint32_t)hd[29] << 8 | (uint32_t)hd[30] << 16 | (uint32_t)hd[31] << 24;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_info_header->y_resolution);
+            PX_SWAP_BYTES(bmp_info_header->y_resolution);
         }
 
         // parse num_colors
         bmp_info_header->num_colors = (uint32_t)hd[32] << 0 | (uint32_t)hd[33] << 8 | (uint32_t)hd[34] << 16 | (uint32_t)hd[35] << 24;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_info_header->num_colors);
+            PX_SWAP_BYTES(bmp_info_header->num_colors);
         }
 
         // parse num_important_colors
         bmp_info_header->num_important_colors = (uint32_t)hd[36] << 0 | (uint32_t)hd[37] << 8 | (uint32_t)hd[38] << 16 | (uint32_t)hd[39] << 24;
         if (big_endian)
         {
-            PXL_SWAP_BYTES(bmp_info_header->num_important_colors);
+            PX_SWAP_BYTES(bmp_info_header->num_important_colors);
         }
 
         // ----------------------------------------------------------------------

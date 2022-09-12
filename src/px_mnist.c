@@ -1,5 +1,6 @@
 #include "px_mnist.h"
 #include "px_cnn.h"
+#include "px_endian.h"
 #include "px_log.h"
 #include "px_bmp.h"
 #include "px_filesystem.h"
@@ -10,79 +11,65 @@
 
 #define CHECK_WRITE_FILE(fp, filename) \
     if (fp == NULL)                    \
-        PX_LOGE("write file %s failed in line %d, file %s\n", filename, __LINE__, __FILE__);
+        PX_LOGE("Failed to open file %s for write in %s:%d\n", filename, __FILE__, __LINE__);
 
 #define CHECK_READ_FILE(fp, filename) \
     if (fp == NULL)                   \
-        PX_LOGE("read file %s failed in line %d, file %s\n", filename, __LINE__, __FILE__);
-
-// 英特尔处理器和其他低端机用户必须翻转头字节。
-static int mnist_reverse_int(int i)
-{
-    unsigned char ch1, ch2, ch3, ch4;
-    ch1 = i & 255;
-    ch2 = (i >> 8) & 255;
-    ch3 = (i >> 16) & 255;
-    ch4 = (i >> 24) & 255;
-    return ((int)ch1 << 24) + ((int)ch2 << 16) + ((int)ch3 << 8) + ch4;
-}
+        PX_LOGE("Failed to open file %s for read in %s:%d\n", filename, __FILE__, __LINE__);
 
 static px_mnist_image_array_t* create_mnist_image_array(int number_of_images)
 {
-    px_mnist_image_array_t* imgarr = (px_mnist_image_array_t*)malloc(sizeof(px_mnist_image_array_t));
-    imgarr->size = number_of_images;
-    imgarr->images = (px_image_t*)malloc(number_of_images * sizeof(px_image_t));
-    return imgarr;
+    px_mnist_image_array_t* image_array = (px_mnist_image_array_t*)malloc(sizeof(px_mnist_image_array_t));
+    image_array->size = number_of_images;
+    image_array->images = (px_image_t*)malloc(number_of_images * sizeof(px_image_t));
+    return image_array;
 }
 
-static int read_number_from_mnist_file(FILE* fin)
+static int read_integer_from_mnist_file(FILE* fin)
 {
     int number = 0;
     fread((char*)&number, sizeof(number), 1, fin);
-    number = mnist_reverse_int(number);
+    if (px_is_little_endian())
+    {
+        number = px_reverse_int(number);
+    }
     return number;
 }
 
 // 从文件中读取sizeof(magic_number) 个字符到 &magic_number
 static int get_mnist_magic_number(FILE* fin)
 {
-    return read_number_from_mnist_file(fin);
+    return read_integer_from_mnist_file(fin);
 }
 
 // 获取训练或测试image的个数number_of_images
 static int get_mnist_number_of_images(FILE* fin)
 {
-    return read_number_from_mnist_file(fin);
+    return read_integer_from_mnist_file(fin);
 }
 
 //获取训练或测试image的个数number_of_images
 static int get_mnist_number_of_labels(FILE* fin)
 {
-    return read_number_from_mnist_file(fin);
+    return read_integer_from_mnist_file(fin);
 }
 
 // 获取训练或测试图像的高度Height
 static int get_mnist_image_height(FILE* fin)
 {
-    int n_rows = 0;
-    fread((char*)&n_rows, sizeof(n_rows), 1, fin);
-    n_rows = mnist_reverse_int(n_rows);
-    return n_rows;
+    return read_integer_from_mnist_file(fin);
 }
 
 // 获取训练或测试图像的宽度Width
 static int get_mnist_image_width(FILE* fin)
 {
-    int n_cols = 0;
-    fread((char*)&n_cols, sizeof(n_cols), 1, fin);
-    n_cols = mnist_reverse_int(n_cols);
-    return n_cols;
+    return read_integer_from_mnist_file(fin);
 }
 
 // 获取第i幅图像，保存到vec中
-static void read_mnist_single_image(const int n_rows, const int n_cols, px_mnist_image_array_t* imgarr, FILE* fin, int index)
+static void read_mnist_single_image(const int n_rows, const int n_cols, px_mnist_image_array_t* image_array, FILE* fin, int index)
 {
-    uint8_t* u8_data = imgarr->images[index].data;
+    uint8_t* u8_data = image_array->images[index].data;
     fread(u8_data, n_rows * n_cols, 1, fin);
 }
 
@@ -96,21 +83,21 @@ px_mnist_image_array_t* px_read_mnist_image(const char* filename)
     int n_rows = get_mnist_image_height(fin);
     int n_cols = get_mnist_image_width(fin);
 
-    px_mnist_image_array_t* imgarr = create_mnist_image_array(number_of_images);
-    imgarr->n_cols = n_cols;
-    imgarr->n_rows = n_rows;
+    px_mnist_image_array_t* image_array = create_mnist_image_array(number_of_images);
+    image_array->n_cols = n_cols;
+    image_array->n_rows = n_rows;
 
     for (int i = 0; i < number_of_images; i++)
     {
-        imgarr->images[i].height = n_rows;
-        imgarr->images[i].width = n_cols;
-        imgarr->images[i].channel = 1;
-        imgarr->images[i].data = (uint8_t*)malloc(n_rows * n_cols * sizeof(uint8_t));
-        read_mnist_single_image(n_rows, n_cols, imgarr, fin, i);
+        image_array->images[i].height = n_rows;
+        image_array->images[i].width = n_cols;
+        image_array->images[i].channel = 1;
+        image_array->images[i].data = (uint8_t*)malloc(n_rows * n_cols * sizeof(uint8_t));
+        read_mnist_single_image(n_rows, n_cols, image_array, fin, i);
     }
 
     fclose(fin);
-    return imgarr;
+    return image_array;
 }
 
 static px_mnist_label_array_t* create_px_mnist_label_array_t(int number_of_labels)
