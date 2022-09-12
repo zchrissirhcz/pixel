@@ -11,6 +11,21 @@
 #include <float.h>
 
 
+px_size_t get_conv_output_size(px_size_t in_size, px_size_t kernel_size)
+{
+    int out_height = in_size.height - kernel_size.height + 1;
+    int out_width = in_size.width - kernel_size.width + 1;
+    px_size_t out_size = px_create_size(out_height, out_width);
+    return out_size;
+}
+
+px_size_t get_pooling_out_size(px_size_t in_size, px_size_t kernel_size)
+{
+    int out_height = in_size.height / kernel_size.height;
+    int out_width = in_size.width / kernel_size.width;
+    px_size_t out_size = px_create_size(out_height, out_width);
+    return out_size;
+}
 
 ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_channels, int out_channels)
 {
@@ -53,10 +68,11 @@ ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_cha
 
     conv_layer->biasData = create_array(out_channels);
 
-    int outW = in_width - map_size + 1;
-    int outH = in_height - map_size + 1;
+    px_size_t in_size = px_create_size(in_height, in_width);
+    px_size_t kernel_size = px_create_size(map_size, map_size);
+    px_size_t out_size = get_conv_output_size(in_size, kernel_size);
 
-    px_cube_dim_t cube_dim = px_create_cube_dim(out_channels, outH, outW);
+    px_cube_dim_t cube_dim = px_create_cube_dim(out_channels, out_size.height, out_size.width);
     conv_layer->d = create_cube(cube_dim);;
     conv_layer->v = create_cube(cube_dim);
     conv_layer->y = create_cube(cube_dim);
@@ -70,28 +86,28 @@ ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_cha
 
 PoolingLayer* init_pooling_layer(int inputWidth, int inputHeight, int mapSize, int inChannels, int outChannels, int pool_type)
 {
-    PoolingLayer* poolL = (PoolingLayer*)malloc(sizeof(PoolingLayer));
+    PoolingLayer* pool_layer = (PoolingLayer*)malloc(sizeof(PoolingLayer));
 
-    poolL->in_height = inputHeight;
-    poolL->in_width = inputWidth;
-    poolL->map_size = mapSize;
-    poolL->in_channels = inChannels;
-    poolL->out_channels = outChannels;
-    poolL->pool_type = pool_type;
+    pool_layer->in_height = inputHeight;
+    pool_layer->in_width = inputWidth;
+    pool_layer->map_size = mapSize;
+    pool_layer->in_channels = inChannels;
+    pool_layer->out_channels = outChannels;
+    pool_layer->pool_type = pool_type;
 
-    poolL->biasData = create_array(outChannels);
+    pool_layer->biasData = create_array(outChannels);
 
-    int outW = inputWidth / mapSize;
-    int outH = inputHeight / mapSize;
+    px_size_t in_size = px_create_size(inputHeight, inputWidth);
+    px_size_t kernel_size = px_create_size(mapSize, mapSize);
+    px_size_t out_size = get_pooling_out_size(in_size, kernel_size);
 
-    int j, r;
-    px_cube_dim_t cube_dim = px_create_cube_dim(outChannels, outH, outW);
-    poolL->d = create_cube(cube_dim);
-    poolL->y = create_cube(cube_dim);
-    clear_cube(poolL->d);
-    clear_cube(poolL->y);
+    px_cube_dim_t cube_dim = px_create_cube_dim(outChannels, out_size.height, out_size.width);
+    pool_layer->d = create_cube(cube_dim);
+    pool_layer->y = create_cube(cube_dim);
+    clear_cube(pool_layer->d);
+    clear_cube(pool_layer->y);
 
-    return poolL;
+    return pool_layer;
 }
 
 InnerproductLayer* init_innerproduct_layer(int inputNum, int outputNum)
@@ -145,8 +161,7 @@ int argmax(array_t* array)
     return max_index;
 }
 
-// 激活函数 input是数据，inputNum说明数据数目，bias表明偏置
-float activation_sigma(float input, float bias) // sigma激活函数
+float activation_sigma(float input, float bias)
 {
     float temp = input + bias;
     return (float)1.0 / ((float)(1.0 + exp(-temp)));
@@ -154,17 +169,17 @@ float activation_sigma(float input, float bias) // sigma激活函数
 
 void forward_avg_pooling_for_matrix(matrix_t* input, matrix_t* output, px_size_t kernel_size)
 {
-    int outputW = input->width / kernel_size.width;
-    int outputH = input->height / kernel_size.height;
-    if (output->width != outputW || output->height != outputH)
+    px_size_t in_size = px_create_size(input->height, input->width);
+    px_size_t out_size = get_pooling_out_size(in_size, kernel_size);
+    if (output->width != out_size.width || output->height != out_size.height)
     {
         PX_LOGE("ERROR: output size is wrong!!");
         return;
     }
 
-    for (int i = 0; i < outputH; i++)
+    for (int i = 0; i < output->height; i++)
     {
-        for (int j = 0; j < outputW; j++)
+        for (int j = 0; j < output->width; j++)
         {
             float sum = 0.0f;
             for (int m = i * kernel_size.height; m < (i + 1) * kernel_size.height; m++)

@@ -105,6 +105,9 @@ tensor_t* create_tensor(px_tensor_dim_t tensor_dim);
 void clear_tensor(tensor_t* tensor);
 void save_tensor_to_file(tensor_t* tensor, FILE* fout);
 
+px_size_t get_pooling_out_size(px_size_t in_size, px_size_t kernel_size);
+px_size_t get_conv_output_size(px_size_t in_size, px_size_t kernel_size);
+
 #ifdef __cplusplus
 }
 #endif
