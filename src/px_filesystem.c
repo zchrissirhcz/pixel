@@ -8,13 +8,37 @@
 #include <direct.h>
 #endif
 
-PX_MKDIR_ERROR px_mkdir(const char* dirname)
+#include <stdbool.h>
+
+bool px_is_directory_exist(const char* dirname)
 {
 #if __linux__ || __APPLE__
     if (0 == access(dirname, W_OK))
     {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+#elif _MSC_VER
+    PX_LOGE("warning: %s is not implemented well for MSVC!", __FUNCTION__);
+    return false;
+#else
+    // TODO
+    PX_LOGE("warning: %s is not implemented well for current platform!", __FUNCTION__);
+    return false;
+#endif
+}
+
+PX_MKDIR_ERROR px_mkdir(const char* dirname)
+{
+#if __linux__ || __APPLE__
+    if (px_is_directory_exist(dirname))
+    {
         return PX_MKDIR_ALREADY_EXIST;
-    } else
+    }
+    else
     {
         if (0 != mkdir(dirname, 0744))
         {
@@ -42,7 +66,24 @@ PX_MKDIR_ERROR px_mkdir(const char* dirname)
         }
     }
 #else
-    PIXEL_LOGE("%s not implemented yet for current platform!\n", __FUNCTION__);
+    PX_LOGE("%s not implemented yet for current platform!\n", __FUNCTION__);
 #endif
 }
 
+char* px_getpwd()
+{
+    char* buffer = NULL;
+#ifdef _MSC_VER
+    buffer = _getcwd(NULL, 0);
+#elif defined(__GNUC__)
+    buffer = getcwd(NULL, 0);
+#else
+    PX_LOGE("%s not implemented yet for current platform!\n", __FUNCTION__);
+#endif
+
+    if (buffer == NULL)
+    {
+        PX_LOGE("Failed to get current directory\n");
+    }
+    return buffer;
+}
