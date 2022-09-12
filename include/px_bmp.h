@@ -7,8 +7,14 @@
 extern "C" {
 #endif
 
-void px_read_bmp(const char* filepath, int line_align, int* _h, int* _w, int* _c, unsigned char** _buffer, bool swap_bgr);
-void px_write_bmp(const char* filepath, int h, int w, int c, const unsigned char* buf, int read_linebytes, bool swap_bgr);
+// load image in BGR order if channel == 3
+void px_read_bmp(const char* filepath, int* _height, int* _width, int* _channel, unsigned char** _buffer);
+
+// save image in BGR order if channel == 3
+void px_write_bmp(const char* filepath, int height, int width, int channel, const unsigned char* buffer);
+
+void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _channel, unsigned char** _buffer, int line_align, bool swap_bgr);
+void px_write_bmp_custom(const char* filepath, int height, int width, int channel, const unsigned char* buf, int read_linebytes, bool swap_bgr);
 
 
 #ifdef __cplusplus

@@ -27,9 +27,9 @@ bool isImageNearlyEqual(const cv::Mat expected, const cv::Mat actual, const uint
                 uint32_t diff = abs(expected.data[idx] - actual.data[idx]);
                 if (diff > tolerance)
                 {
-                    PX_LOGE("pixel not equal, (%d,%d,%d)[%d]!=(%d,%d,%d)[%d]\n",
-                        i, j, k, expected.data[idx],
-                        i, j, k, actual.data[idx]
+                    PX_LOGE("pixel not equal, actual[%d,%d,%d](%d)!=expected[%d,%d,%d](%d)\n",
+                        i, j, k, actual.data[idx],
+                        i, j, k, expected.data[idx]
                     );
                     return false;
                 }

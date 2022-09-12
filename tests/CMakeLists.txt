@@ -16,3 +16,10 @@ pixel_add_test(px_convolution_test)
 pixel_add_test(px_arithm_test)
 pixel_add_test(px_compare_test)
 pixel_add_test(px_bmp_test)
+
+
+execute_process(
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/assets/mingren.bmp ${CMAKE_BINARY_DIR}/
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/assets/ring.bmp ${CMAKE_BINARY_DIR}/
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/assets/mingren_gray.bmp ${CMAKE_BINARY_DIR}/
+)

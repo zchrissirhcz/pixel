@@ -178,9 +178,7 @@ void px_extract_mnist_image_and_save(const char* mnist_data_dir)
         sprintf(save_path, "%s/testImgs/%d.bmp", mnist_data_dir, i);
         px_image_t image = image_array->images[i];
 
-        bool swap_bgr = false;
-        const int read_linebytes = image.channel * image.width;
-        px_write_bmp(save_path, image.height, image.width, image.channel, image.data, read_linebytes, swap_bgr);
+        px_write_bmp(save_path, image.height, image.width, image.channel, image.data);
     }
 
     px_destroy_mnist_image_array(image_array);
