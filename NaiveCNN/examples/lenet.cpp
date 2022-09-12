@@ -171,19 +171,19 @@ void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
     int mapSize = 5;
     inSize.width = inputSize.width;
     inSize.height = inputSize.height;
-    net->C1 = init_conv_layer(inSize.width, inSize.height, 5, 1, 6);
+    net->C1 = init_conv_layer(inSize, 5, 1, 6);
 
     inSize.width = inSize.width - mapSize + 1;
     inSize.height = inSize.height - mapSize + 1;
-    net->S2 = init_pooling_layer(inSize.width, inSize.height, 2, 6, 6, NC_AvePool);
+    net->S2 = init_pooling_layer(inSize, 2, 6, 6, NC_AvePool);
 
     inSize.width = inSize.width / 2;
     inSize.height = inSize.height / 2;
-    net->C3 = init_conv_layer(inSize.width, inSize.height, 5, 6, 12);
+    net->C3 = init_conv_layer(inSize, 5, 6, 12);
 
     inSize.width = inSize.width - mapSize + 1;
     inSize.height = inSize.height - mapSize + 1;
-    net->S4 = init_pooling_layer(inSize.width, inSize.height, 2, 12, 12, NC_AvePool);
+    net->S4 = init_pooling_layer(inSize, 2, 12, 12, NC_AvePool);
 
     inSize.width = inSize.width / 2;
     inSize.height = inSize.height / 2;

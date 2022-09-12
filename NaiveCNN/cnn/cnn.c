@@ -27,12 +27,12 @@ px_size_t get_pooling_out_size(px_size_t in_size, px_size_t kernel_size)
     return out_size;
 }
 
-ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_channels, int out_channels)
+ConvLayer* init_conv_layer(px_size_t in_size, int map_size, int in_channels, int out_channels)
 {
     ConvLayer* conv_layer = (ConvLayer*)malloc(sizeof(ConvLayer));
 
-    conv_layer->in_height = in_height;
-    conv_layer->in_width = in_width;
+    conv_layer->in_height = in_size.height;
+    conv_layer->in_width = in_size.width;
     conv_layer->map_size = map_size;
 
     conv_layer->in_channels = in_channels;
@@ -68,7 +68,6 @@ ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_cha
 
     conv_layer->biasData = create_array(out_channels);
 
-    px_size_t in_size = px_create_size(in_height, in_width);
     px_size_t kernel_size = px_create_size(map_size, map_size);
     px_size_t out_size = get_conv_output_size(in_size, kernel_size);
 
@@ -84,12 +83,12 @@ ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_cha
     return conv_layer;
 }
 
-PoolingLayer* init_pooling_layer(int inputWidth, int inputHeight, int mapSize, int inChannels, int outChannels, int pool_type)
+PoolingLayer* init_pooling_layer(px_size_t in_size, int mapSize, int inChannels, int outChannels, int pool_type)
 {
     PoolingLayer* pool_layer = (PoolingLayer*)malloc(sizeof(PoolingLayer));
 
-    pool_layer->in_height = inputHeight;
-    pool_layer->in_width = inputWidth;
+    pool_layer->in_height = in_size.height;
+    pool_layer->in_width = in_size.width;
     pool_layer->map_size = mapSize;
     pool_layer->in_channels = inChannels;
     pool_layer->out_channels = outChannels;
@@ -97,7 +96,6 @@ PoolingLayer* init_pooling_layer(int inputWidth, int inputHeight, int mapSize, i
 
     pool_layer->biasData = create_array(outChannels);
 
-    px_size_t in_size = px_create_size(inputHeight, inputWidth);
     px_size_t kernel_size = px_create_size(mapSize, mapSize);
     px_size_t out_size = get_pooling_out_size(in_size, kernel_size);
 

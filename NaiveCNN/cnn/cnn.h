@@ -76,8 +76,8 @@ typedef struct InnerproductLayer
 extern "C" {
 #endif
 
-ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_channels, int out_channels);
-PoolingLayer* init_pooling_layer(int in_width, int in_height, int map_size, int in_channels, int out_channels, int pool_type);
+ConvLayer* init_conv_layer(px_size_t in_size, int map_size, int in_channels, int out_channels);
+PoolingLayer* init_pooling_layer(px_size_t in_size, int map_size, int in_channels, int out_channels, int pool_type);
 InnerproductLayer* init_innerproduct_layer(int in_num, int out_num);
 
 void forward_avg_pooling_for_matrix(matrix_t* input, matrix_t* output, px_size_t kernel_size);
