@@ -22,12 +22,12 @@ static void apply_grads_on_lenet_C1_layer(Lenet* net, LenetTrainOpts opts, matri
             matrix_t res;
             res.height = mapSize.height;
             res.width = mapSize.width;
-            res.data = net->C1->mapData[j][i];
+            res.data = net->C1->mapData->data[j][i];
 
             matrix_t mat1;
             mat1.height = mapSize.height;
             mat1.width = mapSize.width;
-            mat1.data = net->C1->mapData[j][i];
+            mat1.data = net->C1->mapData->data[j][i];
 
             addmat(&mat1, C1dk, &res);
             destroy_matrix_ptr(C1dk);
@@ -74,12 +74,12 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
             matrix_t res;
             res.height = mapSize.height;
             res.width = mapSize.width;
-            res.data = net->C3->mapData[j][i];
+            res.data = net->C3->mapData->data[j][i];
 
             matrix_t mat1;
             mat1.height = mapSize.height;
             mat1.width = mapSize.width;
-            mat1.data = net->C3->mapData[j][i];
+            mat1.data = net->C3->mapData->data[j][i];
 
             addmat(&mat1, C3dk, &res);
             destroy_matrix_ptr(C3dk);

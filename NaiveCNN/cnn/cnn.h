@@ -25,8 +25,8 @@ typedef struct ConvLayer
     // 其大小为inChannels*outChannels*mapSize*mapSize大小
     // 这里用四维数组，主要是为了表现全连接的形式，实际上卷积层并没有用到全连接的形式
     // 这里的例子是DeapLearningToolboox里的CNN例子，其用到就是全连接
-    float**** mapData;  //存放特征模块的数据
-    float**** dmapData; //存放特征模块的数据的局部梯度
+    tensor_t* mapData;  //存放特征模块的数据
+    tensor_t* dmapData; //存放特征模块的数据的局部梯度
 
     array_t* biasData;    //偏置，偏置的大小，为outChannels
     bool isFullConnect; //是否为全连接
@@ -121,6 +121,9 @@ void save_array_to_file(array_t* array, FILE* fout);
 cube_t* create_cube(px_cube_dim_t cube_dim);
 void clear_cube(cube_t* cube);
 void save_cube_to_file(cube_t* cube, FILE* fout);
+
+tensor_t* create_tensor(px_tensor_dim_t tensor_dim);
+void clear_tensor(tensor_t* tensor);
 
 #ifdef __cplusplus
 }

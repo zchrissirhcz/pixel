@@ -74,7 +74,7 @@ static void backward_lenet_S2_layer(Lenet* net)
             matrix_t map;
             map.height = mapSize.height;
             map.width = mapSize.width;
-            map.data = net->C3->mapData[i][j];
+            map.data = net->C3->mapData->data[i][j];
 
             matrix_t input;
             input.height = inSize.height;

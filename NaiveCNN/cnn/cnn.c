@@ -29,7 +29,7 @@ ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_cha
     int i, j, c, r;
     
     px_tensor_dim_t tensor_dim = px_create_tensor_dim(in_channels, out_channels, map_size, map_size);
-    conv_layer->mapData = create_blob4d(tensor_dim);
+    conv_layer->mapData = create_tensor(tensor_dim);
 
     srand((unsigned)time(NULL));
     for (i = 0; i < in_channels; i++)
@@ -41,15 +41,15 @@ ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_cha
                 for (c = 0; c < map_size; c++)
                 {
                     float randnum = (((float)rand() / (float)RAND_MAX) - 0.5) * 2;
-                    conv_layer->mapData[i][j][r][c] = randnum * sqrt((float)6.0 / (float)(map_size * map_size * (in_channels + out_channels)));
+                    conv_layer->mapData->data[i][j][r][c] = randnum * sqrt((float)6.0 / (float)(map_size * map_size * (in_channels + out_channels)));
                 }
             }
         }
     }
 
     // 权重梯度变化
-    conv_layer->dmapData = create_blob4d(tensor_dim);
-    clear_blob4d(conv_layer->dmapData, tensor_dim);
+    conv_layer->dmapData = create_tensor(tensor_dim);
+    clear_tensor(conv_layer->dmapData);
 
     conv_layer->biasData = create_array(out_channels);
 
@@ -247,4 +247,22 @@ void save_cube_to_file(cube_t* cube, FILE* fout)
 {
     px_cube_dim_t cube_dim = px_create_cube_dim(cube->channel, cube->height, cube->width);
     save_blob3d_to_file(cube->data, cube_dim, fout);
+}
+
+tensor_t* create_tensor(px_tensor_dim_t tensor_dim)
+{
+    float**** data = create_blob4d(tensor_dim);
+    tensor_t* tensor = (tensor_t*)malloc(sizeof(tensor_t));
+    tensor->data = data;
+    tensor->batch = tensor_dim.batch;
+    tensor->channel = tensor_dim.channel;
+    tensor->height = tensor_dim.height;
+    tensor->width = tensor_dim.width;
+    return tensor;
+}
+
+void clear_tensor(tensor_t* tensor)
+{
+    px_tensor_dim_t tensor_dim = px_create_tensor_dim(tensor->batch, tensor->channel, tensor->height, tensor->width);
+    clear_blob4d(tensor->data, tensor_dim);
 }

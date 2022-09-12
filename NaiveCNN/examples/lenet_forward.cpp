@@ -14,7 +14,7 @@ static void forward_lenet_C1_layer(Lenet* net, matrix_t* input)
             matrix_t map;
             map.height = mapSize.height;
             map.width = mapSize.width;
-            map.data = net->C1->mapData[j][i];
+            map.data = net->C1->mapData->data[j][i];
             matrix_t* mapout = conv(&map, input, NC_VALID);
 
             matrix_t res;
@@ -82,7 +82,7 @@ static void forward_lenet_C3_layer(Lenet* net)
             matrix_t map;
             map.height = mapSize.height;
             map.width = mapSize.width;
-            map.data = net->C3->mapData[j][i];
+            map.data = net->C3->mapData->data[j][i];
 
             matrix_t tmp_input;
             tmp_input.height = inSize.height;

@@ -14,7 +14,7 @@ static void save_lenet_input_data(Lenet* net, FILE* fout, float** inputdata)
 static void save_conv_weight_data(ConvLayer* conv_layer, FILE* fout)
 {
     px_tensor_dim_t tensor_dim = px_create_tensor_dim(conv_layer->in_channels, conv_layer->out_channels, conv_layer->map_size, conv_layer->map_size);
-    save_blob4d_to_file(conv_layer->mapData, tensor_dim, fout);
+    save_blob4d_to_file(conv_layer->mapData->data, tensor_dim, fout);
 }
 
 static void save_bias_data(float* bias, int len, FILE* fout)
