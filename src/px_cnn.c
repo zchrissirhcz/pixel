@@ -252,3 +252,22 @@ px_matrix_dim_t px_create_matrix_dim(const int height, const int width)
 {
     return px_create_size(height, width);
 }
+
+px_cube_dim_t px_create_cube_dim(int channel, int height, int width)
+{
+    px_cube_dim_t cube_dim;
+    cube_dim.channel = channel;
+    cube_dim.height = height;
+    cube_dim.width = width;
+    return cube_dim;
+}
+
+px_tensor_dim_t px_create_tensor_dim(int batch, int channel, int height, int width)
+{
+    px_tensor_dim_t tensor_dim;
+    tensor_dim.batch = batch;
+    tensor_dim.channel = channel;
+    tensor_dim.height = height;
+    tensor_dim.width = width;
+    return tensor_dim;
+}

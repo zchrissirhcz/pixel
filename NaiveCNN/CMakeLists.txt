@@ -17,8 +17,10 @@ add_library(cnn STATIC
 target_link_libraries(cnn PUBLIC pixel m)
 
 add_executable(testbed_lenet
-  examples/lenet.cpp
   examples/lenet.h
+  examples/lenet.cpp
+  examples/lenet_io.cpp
+  examples/lenet_clear.cpp
 )
 target_include_directories(testbed_lenet PRIVATE "src")
 target_link_libraries(testbed_lenet cnn ${OpenCV_LIBS})

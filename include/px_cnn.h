@@ -47,6 +47,14 @@ typedef struct px_cube_dim_t
     int width;
 } px_cube_dim_t;
 
+typedef struct px_tensor_dim_t
+{
+    int batch;
+    int channel;
+    int height;
+    int width;
+} px_tensor_dim_t;
+
 typedef struct px_pad_t
 {
     int top;
@@ -133,6 +141,9 @@ px_pad_t px_get_pad_from_conv_param(const px_conv_param_t conv_param);
 px_cube_t* px_forward_convolution_layer_for_cube(const px_cube_t* input, px_cube_t** kernels, const int kernels_num, const px_conv_param_t conv_param, float* bias, const int bias_num);
 
 px_matrix_dim_t px_create_matrix_dim(const int height, const int width);
+
+px_cube_dim_t px_create_cube_dim(int channel, int height, int width);
+px_tensor_dim_t px_create_tensor_dim(int batch, int channel, int height, int width);
 
 #ifdef __cplusplus
 }
