@@ -15,16 +15,17 @@
 #include <opencv2/opencv.hpp>
 #include "load_prefix.h"
 
-matrix_t create_normalized_f32_matrix_from_u8_image(px_mnist_image_array_t* inputData, int n)
+matrix_t* create_normalized_f32_matrix_from_u8_image(px_mnist_image_array_t* inputData, int n)
 {
     const int height = inputData->images[n].height;
     const int width = inputData->images[n].width;
-    matrix_t normalized_image = create_matrix(height, width);
+    px_size_t size = px_create_size(height, width);
+    matrix_t* normalized_image = create_matrix(size);
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
-            normalized_image.data[i][j] = inputData->images->data[i * width + j] / 255.0f;
+            normalized_image->data[i][j] = inputData->images->data[i * width + j] / 255.0f;
         }
     }
     return normalized_image;
@@ -38,15 +39,15 @@ void train_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnis
     {
         for (int n = 0; n < trainNum; n++)
         {
-            matrix_t input = create_normalized_f32_matrix_from_u8_image(inputData, n);
+            matrix_t* input = create_normalized_f32_matrix_from_u8_image(inputData, n);
 
-            forward_lenet(net, &input);                             // 前向传播，这里主要计算各
+            forward_lenet(net, input);                             // 前向传播，这里主要计算各
             backward_lenet(net, outputData->one_hot_label[n].data); // 后向传播，这里主要计算各神经元的误差梯度
 
             //char* filedir="E:\\Code\\debug\\CNNData\\";
             //const char* filename=combine_strings(filedir,combine_strings(intTochar(n),".cnn"));
             //save_nndata(cnn,filename,inputData->ImgPtr[n].ImgData);
-            apply_grads_on_lenet(net, opts, &input); // 更新权重
+            apply_grads_on_lenet(net, opts, input); // 更新权重
 
             clear_lenet(net);
             // 计算并保存误差能量
@@ -73,7 +74,7 @@ void train_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnis
                     net->L[n]);
             }
 
-            destroy_matrix_data(&input);
+            destroy_matrix(input);
         }
     }
 }
@@ -85,8 +86,8 @@ float test_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnis
     int incorrectnum = 0;
     for (n = 0; n < testNum; n++)
     {
-        matrix_t cnn_input = create_normalized_f32_matrix_from_u8_image(inputData, n);
-        forward_lenet(net, &cnn_input);
+        matrix_t* cnn_input = create_normalized_f32_matrix_from_u8_image(inputData, n);
+        forward_lenet(net, cnn_input);
         array_t label_as_array;
         label_as_array.data = outputData->one_hot_label[n].data;
         label_as_array.len = net->O5->outputNum;
@@ -95,7 +96,7 @@ float test_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnis
             incorrectnum++;
         }
         clear_lenet(net);
-        destroy_matrix_data(&cnn_input);
+        destroy_matrix(cnn_input);
     }
     return (float)incorrectnum / (float)testNum;
 }

@@ -54,7 +54,7 @@ static void backward_lenet_C3_layer(Lenet* net)
                 net->C3->d->data[i][r][c] = C3e->data[r][c] * sigma_derivation(net->C3->y->data[i][r][c]) / (float)(net->S4->map_size * net->S4->map_size);
             }
         }
-        destroy_matrix_ptr(C3e);
+        destroy_matrix(C3e);
     }
 }
 
@@ -94,7 +94,7 @@ static void backward_lenet_S2_layer(Lenet* net)
             mat1.data = net->S2->d->data[i];
 
             addmat(&mat1, corr, &res);
-            destroy_matrix_ptr(corr);
+            destroy_matrix(corr);
         }
         /*
         for(r=0;r<cnn->C3->inputHeight;r++)
@@ -124,7 +124,7 @@ static void backward_lenet_C1_layer(Lenet* net)
                 net->C1->d->data[i][r][c] = C1e->data[r][c] * sigma_derivation(net->C1->y->data[i][r][c]) / (float)(net->S2->map_size * net->S2->map_size);
             }
         }
-        destroy_matrix_ptr(C1e);
+        destroy_matrix(C1e);
     }
 }
 

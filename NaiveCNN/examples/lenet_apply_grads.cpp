@@ -30,8 +30,8 @@ static void apply_grads_on_lenet_C1_layer(Lenet* net, LenetTrainOpts opts, matri
             mat1.data = net->C1->mapData->data[j][i];
 
             addmat(&mat1, C1dk, &res);
-            destroy_matrix_ptr(C1dk);
-            destroy_matrix_ptr(flipinput);
+            destroy_matrix(C1dk);
+            destroy_matrix(flipinput);
         }
         matrix_t mat2;
         mat2.height = dSize.height;
@@ -82,8 +82,8 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
             mat1.data = net->C3->mapData->data[j][i];
 
             addmat(&mat1, C3dk, &res);
-            destroy_matrix_ptr(C3dk);
-            destroy_matrix_ptr(flipinput);
+            destroy_matrix(C3dk);
+            destroy_matrix(flipinput);
         }
         matrix_t mat3;
         mat3.height = dSize.height;

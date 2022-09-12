@@ -21,15 +21,6 @@ static void init_matrix(matrix_t* matrix, int height, int width)
     }
 }
 
-void destroy_matrix_data(matrix_t* matrix)
-{
-    for (int i = 0; i < matrix->height; i++)
-    {
-        free(matrix->data[i]);
-    }
-    free(matrix->data);
-}
-
 matrix_t* create_matrix_ptr(px_size_t size)
 {
     int height = size.height;
@@ -39,17 +30,14 @@ matrix_t* create_matrix_ptr(px_size_t size)
     return matrix;
 }
 
-void destroy_matrix_ptr(matrix_t* matrix)
+void destroy_matrix(matrix_t* matrix)
 {
-    destroy_matrix_data(matrix);
+    for (int i = 0; i < matrix->height; i++)
+    {
+        free(matrix->data[i]);
+    }
+    free(matrix->data);
     free(matrix);
-}
-
-matrix_t create_matrix(int height, int width)
-{
-    matrix_t matrix;
-    init_matrix(&matrix, height, width);
-    return matrix;
 }
 
 // 每个点变换到矩阵中心点的对称点上
@@ -126,7 +114,7 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
         }
     }
 
-    destroy_matrix_ptr(expaned_input);
+    destroy_matrix(expaned_input);
 
     px_size_t outSize = px_create_size(outSizeH, outSizeW);
     switch (type)
@@ -137,7 +125,7 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
     {
         px_pad_t cut_pad = px_create_pad(halfmapsizeh, halfmapsizeh, halfmapsizew, halfmapsizew);
         matrix_t* sameres = matrix_cut_make_border(output, cut_pad);
-        destroy_matrix_ptr(output);
+        destroy_matrix(output);
         return sameres;
     }
     case NC_VALID:
@@ -153,7 +141,7 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
             px_pad_t cut_pad = px_create_pad(halfmapsizeh * 2, halfmapsizeh * 2, halfmapsizew * 2, halfmapsizew * 2);
             validres = matrix_cut_make_border(output, cut_pad);
         }
-        destroy_matrix_ptr(output);
+        destroy_matrix(output);
         return validres;
     }
     default:
@@ -167,7 +155,7 @@ matrix_t* conv(matrix_t* map, matrix_t* input, int type)
     // 卷积操作可以用旋转180度的特征模板相关来求
     matrix_t* flipmap = get_rotate180_matrix(map); //旋转180度的特征模板
     matrix_t* res = correlation(flipmap, input, type);
-    destroy_matrix_ptr(flipmap);
+    destroy_matrix(flipmap);
     return res;
 }
 

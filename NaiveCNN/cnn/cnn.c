@@ -268,6 +268,16 @@ void clear_tensor(tensor_t* tensor)
 }
 
 
+matrix_t* create_matrix(px_size_t size)
+{
+    float** data = create_blob2d(size);
+    matrix_t* matrix = (matrix_t*)malloc(sizeof(matrix_t));
+    matrix->data = data;
+    matrix->height = size.height;
+    matrix->width = size.width;
+    return matrix;
+}
+
 void save_matrix_to_file(matrix_t* matrix, FILE* fout)
 {
     px_size_t size = px_create_size(matrix->height, matrix->width);

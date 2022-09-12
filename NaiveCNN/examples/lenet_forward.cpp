@@ -28,7 +28,7 @@ static void forward_lenet_C1_layer(Lenet* net, matrix_t* input)
             mat1.data = net->C1->v->data[i];
 
             addmat(&mat1, mapout, &res);
-            destroy_matrix_ptr(mapout);
+            destroy_matrix(mapout);
         }
         for (int r = 0; r < outSize.height; r++)
         {
@@ -101,7 +101,7 @@ static void forward_lenet_C3_layer(Lenet* net)
             mat1.data = net->C3->v->data[i];
 
             addmat(&mat1, mapout, &res);
-            destroy_matrix_ptr(mapout);
+            destroy_matrix(mapout);
         }
         for (int r = 0; r < outSize.height; r++)
         {
