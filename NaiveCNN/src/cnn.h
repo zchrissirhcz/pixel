@@ -12,12 +12,11 @@
 #define NC_MaxPool 1
 #define NC_MinPool 2
 
-// 卷积层
 typedef struct ConvLayer
 {
     int in_width;  //输入图像的宽
     int in_height; //输入图像的长
-    int map_size;  //特征模板的大小，模板一般都是正方形
+    int map_size;  // kernel size
 
     int in_channels;  //输入图像的数目
     int out_channels; //输出图像的数目
@@ -41,7 +40,6 @@ typedef struct ConvLayer
     float*** d; // 网络的局部梯度,δ值
 } ConvLayer;
 
-// 池化层 pooling
 typedef struct PoolingLayer
 {
     int in_width;  //输入图像的宽
@@ -58,7 +56,6 @@ typedef struct PoolingLayer
     float*** d; // 网络的局部梯度,δ值
 } PoolingLayer;
 
-// 输出层 全连接的神经网络
 typedef struct InnerproductLayer
 {
     int inputNum;  //输入数据的数目
@@ -75,65 +72,28 @@ typedef struct InnerproductLayer
     bool isFullConnect; //是否为全连接
 } InnerproductLayer;
 
-typedef struct cnn_network
-{
-    int layerNum;
-    ConvLayer* C1;
-    PoolingLayer* S2;
-    ConvLayer* C3;
-    PoolingLayer* S4;
-    InnerproductLayer* O5;
-
-    float* e; // 训练误差
-    float* L; // 瞬时误差能量
-} CNN;
-
-typedef struct CnnTrainOpts
-{
-    int num_epochs; // 训练的迭代次数
-    float alpha;   // 学习速率
-} CnnTrainOpts;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// 保存cnn
-void save_cnn(CNN* cnn, const char* filename);
-
-// 导入cnn的数据
-void load_cnn(CNN* cnn, const char* filename);
-
-// 初始化卷积层
 ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_channels, int out_channels);
-
-// 初始化采样层
 PoolingLayer* init_pooling_layer(int in_width, int in_height, int map_size, int in_channels, int out_channels, int pool_type);
-
-// 初始化输出层
 InnerproductLayer* init_innerproduct_layer(int in_num, int out_num);
+
+void forward_avg_pooling(matrix_t* input, matrix_t* output, px_size_t kernel_size);
 
 // 激活函数 input是数据，inputNum说明数据数目，bas表明偏置
 float activation_sigma(float input, float bias); // sigma激活函数
 
-void cnn_forward(CNN* cnn, matrix_t* input_data); // 网络的前向传播
-
-void cnn_backward(CNN* cnn, float* output_data); // 网络的后向传播
-
-void cnn_applygrads(CNN* cnn, CnnTrainOpts opts, matrix_t* input);
-
-void cnn_clear(CNN* cnn); // 将数据vyd清零
-
-void avg_pooling(matrix_t* input, matrix_t* output, px_size_t kernel_size);
-
 // 单层全连接神经网络的前向传播
 void nnff(float* output, float* input, float** wdata, float* bias, NcSize2D nn_size);
 
-// 保存CNN网络中的相关数据
-void save_cnndata(CNN* cnn, const char* filename, float** inputdata);
-
 // 返回向量最大数的序号
 int argmax(float* data, int len);
+
+float sigma_derivation(float y);
+
+const char* layer_type_to_str(NcLayerType type);
 
 #ifdef __cplusplus
 }

@@ -196,14 +196,14 @@ typedef struct NcTrainConfig
     char log_pth[NC_MAX_PATH];
 } NcTrainConfig;
 
-typedef struct NcClsDataConfig
+typedef struct LenetDataConfig
 {
     int num; // how many (x,y) pairs do we have?
     px_image_t** images;
     int* labels;
     char dataset[NC_MAX_PATH];
     char splitset[NC_MAX_PATH];
-} NcClsDataConfig;
+} LenetDataConfig;
 
 #ifdef __cplusplus
 extern "C" {
@@ -246,7 +246,8 @@ void nc_destroy_layer(NcLayer* layer);
 
 void nc_net_forward(NcNet* net, px_image_t* image, int label);
 void nc_net_backward(NcNet* net);
-void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* data_cfg);
+void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, LenetDataConfig* data_cfg);
+void nc_cls_data_loader(LenetDataConfig* cfg);
 
 NcLayer* nc_create_layer();
 

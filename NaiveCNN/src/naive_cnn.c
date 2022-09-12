@@ -202,7 +202,7 @@ void nc_net_backward(NcNet* net)
 }
 
 // train a classification network
-void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, NcClsDataConfig* data_cfg)
+void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, LenetDataConfig* data_cfg)
 {
     // setup log
     FILE* fout = fopen(train_cfg->log_pth, "w");
