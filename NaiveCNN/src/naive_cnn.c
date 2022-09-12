@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include "px_filesystem.h"
+#include "px_assert.h"
 
 float nc_get_random_float(float min, float max)
 {
@@ -265,5 +266,23 @@ const char* layer_type_to_str(NcLayerType type)
         return "NC_LOSS";
     default:
         return "UNKNOWN";
+    }
+}
+
+void nc_swap_rgb_and_bgr_inplace(px_image_t* im)
+{
+    PX_ASSERT(im->channel == 3);
+
+    const int cn = im->channel;
+    for (int i = 0; i < im->height; i++)
+    {
+        uint8_t* ptr = im->data + i * im->width * im->channel;
+        for (int j = 0; j < im->width; j++)
+        {
+            uint8_t t = ptr[0];
+            ptr[0] = ptr[2];
+            ptr[2] = t;
+            ptr += cn;
+        }
     }
 }

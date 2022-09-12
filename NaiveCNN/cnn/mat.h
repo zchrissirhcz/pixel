@@ -9,6 +9,7 @@
 
 #include "px_typebase.h"
 #include "px_cnn.h"
+#include "types.h"
 
 #define NC_FULL  0
 #define NC_SAME  1
@@ -17,13 +18,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct matrix_t
-{
-    int height;
-    int width;
-    float** data;
-} matrix_t;
 
 matrix_t* create_matrix_ptr(int height, int width);
 void destroy_matrix_ptr(matrix_t* matrix);
