@@ -4,6 +4,10 @@ add_library(cnn STATIC
   cnn/mat.c
   cnn/mat.h
   cnn/blob.c
+
+  cnn/array.c
+  cnn/cube.c
+  cnn/tensor.c
 )
 
 add_library(naivecnn STATIC

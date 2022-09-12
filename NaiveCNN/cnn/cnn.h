@@ -93,27 +93,6 @@ int argmax(array_t* array);
 
 float sigma_derivation(float y);
 
-
-void clear_blob1d(float* data, int len);
-void clear_blob2d(float** data, px_size_t size);
-void clear_blob3d(float*** data, px_cube_dim_t cube_dim);
-void clear_blob4d(float**** data, px_tensor_dim_t tensor_dim);
-
-float* create_blob1d(int len);
-float** create_blob2d(px_size_t size);
-float*** create_blob3d(px_cube_dim_t cube_dim);
-float**** create_blob4d(px_tensor_dim_t tensor_dim);
-
-void destroy_blob1d(float* data);
-void destroy_blob2d(float** data, px_size_t size);
-void destroy_blob3d(float*** data, px_cube_dim_t cube_dim);
-void destroy_blob4d(float**** data, px_tensor_dim_t tensor_dim);
-
-void save_blob1d_to_file(float* data, int len, FILE* fout);
-void save_blob2d_to_file(float** data, px_size_t size, FILE* fout);
-void save_blob3d_to_file(float*** data, px_cube_dim_t cube_dim, FILE* fout);
-void save_blob4d_to_file(float**** data, px_tensor_dim_t tensor_dim, FILE* fout);
-
 array_t* create_array(int len);
 void clear_array(array_t* array);
 void save_array_to_file(array_t* array, FILE* fout);
@@ -124,6 +103,7 @@ void save_cube_to_file(cube_t* cube, FILE* fout);
 
 tensor_t* create_tensor(px_tensor_dim_t tensor_dim);
 void clear_tensor(tensor_t* tensor);
+void save_tensor_to_file(tensor_t* tensor, FILE* fout);
 
 #ifdef __cplusplus
 }

@@ -21,9 +21,6 @@ extern "C" {
 
 matrix_t* create_matrix_ptr(px_size_t size);
 matrix_t* get_rotate180_matrix(matrix_t* input);
-
-// matrix_t create_matrix(int height, int width);
-// void destroy_matrix_data(matrix_t* matrix);
 matrix_t* create_matrix(px_size_t size);
 void destroy_matrix(matrix_t* matrix);
 

@@ -8,6 +8,7 @@
 #include "px_assert.h"
 #include "px_filesystem.h"
 #include "px_image.h"
+#include "blob.h"
 
 static void init_matrix(matrix_t* matrix, int height, int width)
 {
@@ -293,4 +294,22 @@ float summat(matrix_t* mat)
         }
     }
     return sum;
+}
+
+
+
+matrix_t* create_matrix(px_size_t size)
+{
+    float** data = create_blob2d(size);
+    matrix_t* matrix = (matrix_t*)malloc(sizeof(matrix_t));
+    matrix->data = data;
+    matrix->height = size.height;
+    matrix->width = size.width;
+    return matrix;
+}
+
+void save_matrix_to_file(matrix_t* matrix, FILE* fout)
+{
+    px_size_t size = px_create_size(matrix->height, matrix->width);
+    save_blob2d_to_file(matrix->data, size, fout);
 }

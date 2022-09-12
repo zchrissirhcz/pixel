@@ -1,31 +1,32 @@
 #include "cnn.h"
 #include "lenet.h"
+#include "mat.h"
 #include "px_cnn.h"
 #include "px_typebase.h"
 #include "px_filesystem.h"
 
 
-static void save_lenet_input_data(Lenet* net, FILE* fout, float** inputdata)
+static void save_lenet_input_data(Lenet* net, FILE* fout, matrix_t* inputdata)
 {
-    px_size_t size = px_create_size(net->C1->in_height, net->C1->in_width);
-    save_blob2d_to_file(inputdata, size, fout);
+    save_matrix_to_file(inputdata, fout);
 }
 
 static void save_conv_weight_data(ConvLayer* conv_layer, FILE* fout)
 {
-    px_tensor_dim_t tensor_dim = px_create_tensor_dim(conv_layer->in_channels, conv_layer->out_channels, conv_layer->map_size, conv_layer->map_size);
-    save_blob4d_to_file(conv_layer->mapData->data, tensor_dim, fout);
+    // px_tensor_dim_t tensor_dim = px_create_tensor_dim(conv_layer->in_channels, conv_layer->out_channels, conv_layer->map_size, conv_layer->map_size);
+    save_tensor_to_file(conv_layer->mapData, fout);
 }
 
-static void save_bias_data(float* bias, int len, FILE* fout)
+static void save_bias_data(array_t* bias, FILE* fout)
 {
-    save_blob1d_to_file(bias, len, fout);
+    save_array_to_file(bias, fout);
 }
 
 static void save_conv_layer_inference_data(ConvLayer* conv_layer, FILE* fout)
 {
     save_conv_weight_data(conv_layer, fout);
-    save_bias_data(conv_layer->biasData->data, conv_layer->out_channels, fout);
+    // conv_layer->out_channels
+    save_bias_data(conv_layer->biasData, fout);
 }
 
 static void save_innerproduct_weight_data(InnerproductLayer* innerproduct_layer, FILE* fout)
@@ -39,7 +40,8 @@ static void save_innerproduct_weight_data(InnerproductLayer* innerproduct_layer,
 static void save_innerproduct_layer_inference_data(InnerproductLayer* ip_layer, FILE* fout)
 {
     save_innerproduct_weight_data(ip_layer, fout);
-    save_bias_data(ip_layer->biasData->data, ip_layer->outputNum, fout);
+    // ip_layer->outputNum
+    save_bias_data(ip_layer->biasData, fout);
 }
 
 static void save_conv_layer_train_data(ConvLayer* conv_layer, px_size_t output_size, FILE* fout)
@@ -110,7 +112,7 @@ static void save_lenet_O5_layer_train_data(Lenet* net, FILE* fout)
 }
 
 // 这是用于测试的函数, 保存CNN网络中的相关数据
-void save_lenet_train_data(Lenet* net, const char* filename, float** inputdata)
+void save_lenet_train_data(Lenet* net, const char* filename, matrix_t* inputdata)
 {
     FILE* fout = fopen(filename, "wb");
     PX_CHECK_WRITE_FILE(fout, filename);
