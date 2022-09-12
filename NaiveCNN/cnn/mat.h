@@ -19,12 +19,14 @@
 extern "C" {
 #endif
 
-matrix_t* create_matrix_ptr(int height, int width);
+matrix_t* create_matrix_ptr(px_size_t size);
 void destroy_matrix_ptr(matrix_t* matrix);
 matrix_t* get_rotate180_matrix(matrix_t* input);
 
 matrix_t create_matrix(int height, int width);
 void destroy_matrix_data(matrix_t* matrix);
+
+void save_matrix_to_file(matrix_t* matrix, FILE* fout);
 
 void addmat(matrix_t* src1, matrix_t* src2, matrix_t* dst);
 

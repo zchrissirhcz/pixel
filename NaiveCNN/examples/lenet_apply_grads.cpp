@@ -114,7 +114,7 @@ static void apply_grads_on_lenet_O5_layer(Lenet* net, LenetTrainOpts opts)
     {
         for (int i = 0; i < net->O5->inputNum; i++)
         {
-            net->O5->wData[j][i] = net->O5->wData[j][i] - opts.lr * net->O5->d->data[j] * O5inData[i];
+            net->O5->wData->data[j][i] = net->O5->wData->data[j][i] - opts.lr * net->O5->d->data[j] * O5inData[i];
         }
         net->O5->biasData->data[j] = net->O5->biasData->data[j] - opts.lr * net->O5->d->data[j];
     }

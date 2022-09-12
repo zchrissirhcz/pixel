@@ -73,7 +73,7 @@ static void load_lenet_O5_data(Lenet* net, FILE* fin)
     const int height = net->O5->outputNum;
     const int width = net->O5->inputNum;
     px_size_t size = px_create_size(height, width);
-    load_weight2d(net->O5->wData, size, fin);
+    load_weight2d(net->O5->wData->data, size, fin);
 
     load_bias(net->O5->biasData->data, net->O5->outputNum, fin);
 }

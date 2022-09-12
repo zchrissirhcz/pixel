@@ -30,8 +30,10 @@ void destroy_matrix_data(matrix_t* matrix)
     free(matrix->data);
 }
 
-matrix_t* create_matrix_ptr(int height, int width)
+matrix_t* create_matrix_ptr(px_size_t size)
 {
+    int height = size.height;
+    int width = size.width;
     matrix_t* matrix = (matrix_t*)malloc(sizeof(matrix_t));
     init_matrix(matrix, height, width);
     return matrix;
@@ -58,7 +60,8 @@ matrix_t* get_rotate180_matrix(matrix_t* input)
 {
     const int h = input->height;
     const int w = input->width;
-    matrix_t* output = create_matrix_ptr(h, w);
+    px_size_t size = px_create_size(h, w);
+    matrix_t* output = create_matrix_ptr(size);
     for (int i = 0; i < h; i++)
     {
         for (int j = 0; j < w; j++)
@@ -102,7 +105,8 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
     int outSizeH = input->height + (map->height - 1);
 
     // 互相关的结果扩大了
-    matrix_t* output = create_matrix_ptr(outSizeH, outSizeW);
+    px_size_t out_size = px_create_size(outSizeH, outSizeW);
+    matrix_t* output = create_matrix_ptr(out_size);
 
     // 为了方便计算，将inputData扩大一圈
     px_pad_t pad = px_create_pad(map->height - 1, map->height - 1, map->width - 1, map->width - 1);
@@ -175,7 +179,8 @@ matrix_t* matrix_upsample(matrix_t* input, int width_multiplier, int height_mult
 
     const int out_height = input->height * upr;
     const int out_width = input->width * upc;
-    matrix_t* output = create_matrix_ptr(out_height, out_width);
+    px_size_t out_size = px_create_size(out_height, out_width);
+    matrix_t* output = create_matrix_ptr(out_size);
 
     for (int j = 0; j < output->height; j = j + upr)
     {
@@ -205,7 +210,8 @@ matrix_t* matrix_copy_make_border(matrix_t* input, px_pad_t pad)
     // 向量边缘扩大
     const int out_height = input->height + pad.top + pad.bottom;
     const int out_width = input->width + pad.left + pad.right;
-    matrix_t* output = create_matrix_ptr(out_height, out_width);
+    px_size_t out_size = px_create_size(out_height, out_width);
+    matrix_t* output = create_matrix_ptr(out_size);
 
     for (int j = 0; j < out_height; j++)
     {
@@ -229,7 +235,8 @@ matrix_t* matrix_cut_make_border(matrix_t* input, px_pad_t pad)
 {
     const int out_height = input->height - pad.top - pad.bottom;
     const int out_width = input->width - pad.left - pad.right;
-    matrix_t* output = create_matrix_ptr(out_height, out_width);
+    px_size_t out_size = px_create_size(out_height, out_width);
+    matrix_t* output = create_matrix_ptr(out_size);
 
     for (int j = 0; j < input->height; j++)
     {

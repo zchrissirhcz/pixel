@@ -33,7 +33,7 @@ static void save_innerproduct_weight_data(InnerproductLayer* innerproduct_layer,
     const int height = innerproduct_layer->outputNum;
     const int width = innerproduct_layer->inputNum;
     px_size_t size = px_create_size(height, width);
-    save_blob2d_to_file(innerproduct_layer->wData, size, fout);
+    save_matrix_to_file(innerproduct_layer->wData, fout);
 }
 
 static void save_innerproduct_layer_inference_data(InnerproductLayer* ip_layer, FILE* fout)

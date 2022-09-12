@@ -113,7 +113,7 @@ InnerproductLayer* init_innerproduct_layer(int inputNum, int outputNum)
 
     // 权重的初始化
     px_size_t size = px_create_size(outputNum, inputNum);
-    ip_layer->wData = create_blob2d(size);
+    ip_layer->wData = create_matrix_ptr(size);
 
     srand((unsigned)time(NULL));
     for (int i = 0; i < outputNum; i++)
@@ -121,7 +121,7 @@ InnerproductLayer* init_innerproduct_layer(int inputNum, int outputNum)
         for (int j = 0; j < inputNum; j++)
         {
             float randnum = (((float)rand() / (float)RAND_MAX) - 0.5) * 2; // 产生一个-1到1的随机数
-            ip_layer->wData[i][j] = randnum * sqrt((float)6.0 / (float)(inputNum + outputNum));
+            ip_layer->wData->data[i][j] = randnum * sqrt((float)6.0 / (float)(inputNum + outputNum));
         }
     }
 
@@ -265,4 +265,11 @@ void clear_tensor(tensor_t* tensor)
 {
     px_tensor_dim_t tensor_dim = px_create_tensor_dim(tensor->batch, tensor->channel, tensor->height, tensor->width);
     clear_blob4d(tensor->data, tensor_dim);
+}
+
+
+void save_matrix_to_file(matrix_t* matrix, FILE* fout)
+{
+    px_size_t size = px_create_size(matrix->height, matrix->width);
+    save_blob2d_to_file(matrix->data, size, fout);
 }

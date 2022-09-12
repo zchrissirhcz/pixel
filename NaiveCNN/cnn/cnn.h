@@ -61,7 +61,7 @@ typedef struct InnerproductLayer
     int inputNum;  //输入数据的数目
     int outputNum; //输出数据的数目
 
-    float** wData;   // 权重数据，为一个inputNum*outputNum大小
+    matrix_t* wData;   // 权重数据，为一个inputNum*outputNum大小
     array_t* biasData; //偏置，大小为outputNum大小
 
     // 下面三者的大小同输出的维度相同

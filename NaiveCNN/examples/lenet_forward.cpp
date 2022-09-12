@@ -165,7 +165,7 @@ static void forward_lenet_O5_layer(Lenet* net)
     }
 
     px_size_t nnSize = px_create_size(net->O5->outputNum, net->O5->inputNum);
-    nnff(net->O5->v->data, O5inData, net->O5->wData, net->O5->biasData->data, nnSize);
+    nnff(net->O5->v->data, O5inData, net->O5->wData->data, net->O5->biasData->data, nnSize);
     for (int i = 0; i < net->O5->outputNum; i++)
     {
         net->O5->y->data[i] = activation_sigma(net->O5->v->data[i], net->O5->biasData->data[i]);
