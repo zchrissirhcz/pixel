@@ -127,7 +127,7 @@ InnerproductLayer* init_innerproduct_layer(int inputNum, int outputNum)
 
     // 权重的初始化
     px_size_t size = px_create_size(outputNum, inputNum);
-    ip_layer->wData = create_matrix_ptr(size);
+    ip_layer->wData = create_matrix(size);
 
     srand((unsigned)time(NULL));
     for (int i = 0; i < outputNum; i++)

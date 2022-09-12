@@ -44,7 +44,7 @@ void backward_lenet(Lenet* net, float* output_data);
 void apply_grads_on_lenet(Lenet* net, LenetTrainOpts opts, matrix_t* input);
 void clear_lenet(Lenet* net); // 将数据vyd清零
 
-void save_lenet_train_data(Lenet* lenet, const char* filename, float** inputdata);
+void save_lenet_train_data(Lenet* lenet, const char* filename, matrix_t* inputdata);
 void save_lenet_inference_data(Lenet* net, const char* filename);
 
 #ifdef __cplusplus
