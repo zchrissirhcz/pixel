@@ -19,7 +19,8 @@ target_link_libraries(cnn PUBLIC pixel m)
 add_executable(testbed_lenet
   examples/lenet.h
   examples/lenet.cpp
-  examples/lenet_io.cpp
+  examples/lenet_load.cpp
+  examples/lenet_save.cpp
   examples/lenet_clear.cpp
 )
 target_include_directories(testbed_lenet PRIVATE "src")

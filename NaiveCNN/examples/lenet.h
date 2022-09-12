@@ -35,10 +35,8 @@ extern "C" {
 void setup_lenet(Lenet* net, NcSize2D inputSize, int outputSize);
 
 void train_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnist_label_array_t* outputData, LenetTrainOpts opts, int trainNum, FILE* fout);
-
 float test_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnist_label_array_t* outputData, int testNum);
 
-void save_lenet(Lenet* net, const char* filename);
 void load_lenet(Lenet* net, const char* filename);
 
 void forward_lenet(Lenet* net, matrix_t* input_data);
@@ -46,7 +44,8 @@ void backward_lenet(Lenet* net, float* output_data);
 void apply_grads_on_lenet(Lenet* net, LenetTrainOpts opts, matrix_t* input);
 void clear_lenet(Lenet* net); // 将数据vyd清零
 
-void save_lenet_data(Lenet* lenet, const char* filename, float** inputdata);
+void save_lenet_train_data(Lenet* lenet, const char* filename, float** inputdata);
+void save_lenet_inference_data(Lenet* net, const char* filename);
 
 #ifdef __cplusplus
 }
