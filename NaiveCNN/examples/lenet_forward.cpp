@@ -64,7 +64,9 @@ static void forward_lenet_S2_layer(Lenet* net)
             pool_output.data = net->S2->y->data[i];
 
             px_size_t kernel_size = px_create_size(net->S2->map_size, net->S2->map_size);
-            forward_avg_pooling_for_matrix(&pool_input, &pool_output, kernel_size);
+
+            px_size_t stride = px_create_size(net->S2->stride_height, net->S2->stride_width);
+            forward_avg_pooling_for_matrix(&pool_input, &pool_output, kernel_size, stride);
         }
     }
 }
@@ -137,7 +139,8 @@ static void forward_lenet_S4_layer(Lenet* net)
             pool_output.data = net->S4->y->data[i];
 
             px_size_t kernel_size = px_create_size(net->S4->map_size, net->S4->map_size);
-            forward_avg_pooling_for_matrix(&pool_input, &pool_output, kernel_size);
+            px_size_t stride = px_create_stride(net->S4->stride_height, net->S4->stride_width);
+            forward_avg_pooling_for_matrix(&pool_input, &pool_output, kernel_size, stride);
         }
     }
 }

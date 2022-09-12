@@ -169,25 +169,45 @@ void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
 
     px_size_t inSize;
     int mapSize = 5;
-    inSize.width = inputSize.width;
-    inSize.height = inputSize.height;
-    net->C1 = init_conv_layer(inSize, 5, 1, 6);
 
-    inSize.width = inSize.width - mapSize + 1;
-    inSize.height = inSize.height - mapSize + 1;
-    net->S2 = init_pooling_layer(inSize, 2, 6, 6, NC_AvePool);
+    // C1
+    {
+        inSize.width = inputSize.width;
+        inSize.height = inputSize.height;
+        px_size_t stride = px_create_size(1, 1);
+        net->C1 = init_conv_layer(inSize, 5, stride, 1, 6);
+    }
 
-    inSize.width = inSize.width / 2;
-    inSize.height = inSize.height / 2;
-    net->C3 = init_conv_layer(inSize, 5, 6, 12);
+    // S2
+    {
+        inSize.width = inSize.width - mapSize + 1;
+        inSize.height = inSize.height - mapSize + 1;
+        px_size_t stride = px_create_size(2, 2);
+        net->S2 = init_pooling_layer(inSize, 2, stride, 6, 6, NC_AvePool);
+    }
 
-    inSize.width = inSize.width - mapSize + 1;
-    inSize.height = inSize.height - mapSize + 1;
-    net->S4 = init_pooling_layer(inSize, 2, 12, 12, NC_AvePool);
+    // C3
+    {
+        inSize.width = inSize.width / 2;
+        inSize.height = inSize.height / 2;
+        px_size_t stride = px_create_size(1, 1);
+        net->C3 = init_conv_layer(inSize, 5, stride, 6, 12);
+    }
 
-    inSize.width = inSize.width / 2;
-    inSize.height = inSize.height / 2;
-    net->O5 = init_innerproduct_layer(inSize.width * inSize.height * 12, outputSize);
+    // S4
+    {
+        inSize.width = inSize.width - mapSize + 1;
+        inSize.height = inSize.height - mapSize + 1;
+        px_size_t stride = px_create_size(2, 2);
+        net->S4 = init_pooling_layer(inSize, 2, stride, 12, 12, NC_AvePool);
+    }
+
+    // O5
+    {
+        inSize.width = inSize.width / 2;
+        inSize.height = inSize.height / 2;
+        net->O5 = init_innerproduct_layer(inSize.width * inSize.height * 12, outputSize);
+    }
 
     net->err = (float*)calloc(net->O5->outputNum, sizeof(float));
 }

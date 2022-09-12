@@ -38,6 +38,9 @@ typedef struct ConvLayer
 
     // 输出像素的局部梯度
     cube_t* d; // 网络的局部梯度,δ值
+
+    int stride_height;
+    int stride_width;
 } ConvLayer;
 
 typedef struct PoolingLayer
@@ -54,6 +57,9 @@ typedef struct PoolingLayer
 
     cube_t* y; // 采样函数后神经元的输出,无激活函数
     cube_t* d; // 网络的局部梯度,δ值
+
+    int stride_height;
+    int stride_width;
 } PoolingLayer;
 
 typedef struct InnerproductLayer
@@ -76,11 +82,11 @@ typedef struct InnerproductLayer
 extern "C" {
 #endif
 
-ConvLayer* init_conv_layer(px_size_t in_size, int map_size, int in_channels, int out_channels);
-PoolingLayer* init_pooling_layer(px_size_t in_size, int map_size, int in_channels, int out_channels, int pool_type);
+ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, int in_channels, int out_channels);
+PoolingLayer* init_pooling_layer(px_size_t in_size, int map_size, px_size_t stride, int in_channels, int out_channels, int pool_type);
 InnerproductLayer* init_innerproduct_layer(int in_num, int out_num);
 
-void forward_avg_pooling_for_matrix(matrix_t* input, matrix_t* output, px_size_t kernel_size);
+void forward_avg_pooling_for_matrix(matrix_t* input, matrix_t* output, px_size_t kernel_size, px_size_t stride);
 
 // 激活函数 input是数据，inputNum说明数据数目，bas表明偏置
 float activation_sigma(float input, float bias); // sigma激活函数
@@ -105,8 +111,8 @@ tensor_t* create_tensor(px_tensor_dim_t tensor_dim);
 void clear_tensor(tensor_t* tensor);
 void save_tensor_to_file(tensor_t* tensor, FILE* fout);
 
-px_size_t get_pooling_out_size(px_size_t in_size, px_size_t kernel_size);
-px_size_t get_conv_output_size(px_size_t in_size, px_size_t kernel_size);
+px_size_t get_conv_output_size(px_size_t in_size, px_size_t kernel_size, px_size_t stride);
+px_size_t get_pooling_out_size(px_size_t in_size, px_size_t kernel_size, px_size_t stride);
 
 #ifdef __cplusplus
 }
