@@ -53,7 +53,7 @@ static void load_lenet_C1_data(Lenet* net, FILE* fin)
     const int width = net->C1->map_size;
     px_tensor_dim_t tensor_dim = px_create_tensor_dim(batch, channel, height, width);
     load_weight4d(net->C1->mapData, tensor_dim, fin);
-    load_bias(net->C1->biasData, net->C1->out_channels, fin);
+    load_bias(net->C1->biasData->data, net->C1->out_channels, fin);
 }
 
 static void load_lenet_C3_data(Lenet* net, FILE* fin)
@@ -65,7 +65,7 @@ static void load_lenet_C3_data(Lenet* net, FILE* fin)
     px_tensor_dim_t tensor_dim = px_create_tensor_dim(batch, channel, height, width);
     load_weight4d(net->C3->mapData, tensor_dim, fin);
 
-    load_bias(net->C3->biasData, net->C3->out_channels, fin);
+    load_bias(net->C3->biasData->data, net->C3->out_channels, fin);
 }
 
 static void load_lenet_O5_data(Lenet* net, FILE* fin)
@@ -75,7 +75,7 @@ static void load_lenet_O5_data(Lenet* net, FILE* fin)
     px_size_t size = px_create_size(height, width);
     load_weight2d(net->O5->wData, size, fin);
 
-    load_bias(net->O5->biasData, net->O5->outputNum, fin);
+    load_bias(net->O5->biasData->data, net->O5->outputNum, fin);
 }
 
 void load_lenet(Lenet* net, const char* filename)

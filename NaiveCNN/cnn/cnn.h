@@ -28,7 +28,7 @@ typedef struct ConvLayer
     float**** mapData;  //存放特征模块的数据
     float**** dmapData; //存放特征模块的数据的局部梯度
 
-    float* biasData;    //偏置，偏置的大小，为outChannels
+    array_t* biasData;    //偏置，偏置的大小，为outChannels
     bool isFullConnect; //是否为全连接
     bool* connectModel; //连接模式（默认为全连接）
 
@@ -50,7 +50,7 @@ typedef struct PoolingLayer
     int out_channels; //输出图像的数目
 
     int pool_type;   //Pooling的方法
-    float* biasData; //偏置
+    array_t* biasData; //偏置
 
     float*** y; // 采样函数后神经元的输出,无激活函数
     float*** d; // 网络的局部梯度,δ值
@@ -62,7 +62,7 @@ typedef struct InnerproductLayer
     int outputNum; //输出数据的数目
 
     float** wData;   // 权重数据，为一个inputNum*outputNum大小
-    float* biasData; //偏置，大小为outputNum大小
+    array_t* biasData; //偏置，大小为outputNum大小
 
     // 下面三者的大小同输出的维度相同
     array_t* v;  // 进入激活函数的输入值

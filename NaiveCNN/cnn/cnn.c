@@ -50,7 +50,7 @@ ConvLayer* init_conv_layer(int in_width, int in_height, int map_size, int in_cha
     conv_layer->dmapData = create_blob4d(tensor_dim);
     clear_blob4d(conv_layer->dmapData, tensor_dim);
 
-    conv_layer->biasData = create_blob1d(out_channels);
+    conv_layer->biasData = create_array(out_channels);
 
     int outW = in_width - map_size + 1;
     int outH = in_height - map_size + 1;
@@ -78,7 +78,7 @@ PoolingLayer* init_pooling_layer(int inputWidth, int inputHeight, int mapSize, i
     poolL->out_channels = outChannels;
     poolL->pool_type = pool_type;
 
-    poolL->biasData = (float*)calloc(outChannels, sizeof(float));
+    poolL->biasData = create_array(outChannels);
 
     int outW = inputWidth / mapSize;
     int outH = inputHeight / mapSize;
@@ -100,12 +100,12 @@ InnerproductLayer* init_innerproduct_layer(int inputNum, int outputNum)
     ip_layer->inputNum = inputNum;
     ip_layer->outputNum = outputNum;
 
-    ip_layer->biasData = create_blob1d(outputNum);
+    ip_layer->biasData = create_array(outputNum);
     ip_layer->d = create_array(outputNum);
     ip_layer->v = create_array(outputNum);
     ip_layer->y = create_array(outputNum);
 
-    clear_blob1d(ip_layer->biasData, outputNum);
+    clear_array(ip_layer->biasData);
     clear_array(ip_layer->d);
     clear_array(ip_layer->v);
     clear_array(ip_layer->y);

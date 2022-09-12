@@ -37,7 +37,7 @@ static void apply_grads_on_lenet_C1_layer(Lenet* net, LenetTrainOpts opts, matri
         mat2.height = dSize.height;
         mat2.width = dSize.width;
         mat2.data = net->C1->d[i];
-        net->C1->biasData[i] = net->C1->biasData[i] - opts.lr * summat(&mat2);
+        net->C1->biasData->data[i] = net->C1->biasData->data[i] - opts.lr * summat(&mat2);
     }
 }
 
@@ -89,7 +89,7 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
         mat3.height = dSize.height;
         mat3.width = dSize.width;
         mat3.data = net->C3->d[i];
-        net->C3->biasData[i] = net->C3->biasData[i] - opts.lr * summat(&mat3);
+        net->C3->biasData->data[i] = net->C3->biasData->data[i] - opts.lr * summat(&mat3);
     }
 }
 
@@ -116,7 +116,7 @@ static void apply_grads_on_lenet_O5_layer(Lenet* net, LenetTrainOpts opts)
         {
             net->O5->wData[j][i] = net->O5->wData[j][i] - opts.lr * net->O5->d->data[j] * O5inData[i];
         }
-        net->O5->biasData[j] = net->O5->biasData[j] - opts.lr * net->O5->d->data[j];
+        net->O5->biasData->data[j] = net->O5->biasData->data[j] - opts.lr * net->O5->d->data[j];
     }
     free(O5inData);
 }

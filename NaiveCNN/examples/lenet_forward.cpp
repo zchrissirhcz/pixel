@@ -34,7 +34,7 @@ static void forward_lenet_C1_layer(Lenet* net, matrix_t* input)
         {
             for (int c = 0; c < outSize.width; c++)
             {
-                net->C1->y[i][r][c] = activation_sigma(net->C1->v[i][r][c], net->C1->biasData[i]);
+                net->C1->y[i][r][c] = activation_sigma(net->C1->v[i][r][c], net->C1->biasData->data[i]);
             }
         }
     }
@@ -107,7 +107,7 @@ static void forward_lenet_C3_layer(Lenet* net)
         {
             for (int c = 0; c < outSize.width; c++)
             {
-                net->C3->y[i][r][c] = activation_sigma(net->C3->v[i][r][c], net->C3->biasData[i]);
+                net->C3->y[i][r][c] = activation_sigma(net->C3->v[i][r][c], net->C3->biasData->data[i]);
             }
         }
     }
@@ -165,10 +165,10 @@ static void forward_lenet_O5_layer(Lenet* net)
     }
 
     px_size_t nnSize = px_create_size(net->O5->outputNum, net->O5->inputNum);
-    nnff(net->O5->v->data, O5inData, net->O5->wData, net->O5->biasData, nnSize);
+    nnff(net->O5->v->data, O5inData, net->O5->wData, net->O5->biasData->data, nnSize);
     for (int i = 0; i < net->O5->outputNum; i++)
     {
-        net->O5->y->data[i] = activation_sigma(net->O5->v->data[i], net->O5->biasData[i]);
+        net->O5->y->data[i] = activation_sigma(net->O5->v->data[i], net->O5->biasData->data[i]);
     }
     free(O5inData);
 }

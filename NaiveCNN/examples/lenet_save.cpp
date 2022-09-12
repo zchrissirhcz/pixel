@@ -25,7 +25,7 @@ static void save_bias_data(float* bias, int len, FILE* fout)
 static void save_conv_layer_inference_data(ConvLayer* conv_layer, FILE* fout)
 {
     save_conv_weight_data(conv_layer, fout);
-    save_bias_data(conv_layer->biasData, conv_layer->out_channels, fout);
+    save_bias_data(conv_layer->biasData->data, conv_layer->out_channels, fout);
 }
 
 static void save_innerproduct_weight_data(InnerproductLayer* innerproduct_layer, FILE* fout)
@@ -39,7 +39,7 @@ static void save_innerproduct_weight_data(InnerproductLayer* innerproduct_layer,
 static void save_innerproduct_layer_inference_data(InnerproductLayer* ip_layer, FILE* fout)
 {
     save_innerproduct_weight_data(ip_layer, fout);
-    save_bias_data(ip_layer->biasData, ip_layer->outputNum, fout);
+    save_bias_data(ip_layer->biasData->data, ip_layer->outputNum, fout);
 }
 
 static void save_conv_layer_train_data(ConvLayer* conv_layer, px_size_t output_size, FILE* fout)
