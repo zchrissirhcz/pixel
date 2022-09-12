@@ -16,7 +16,7 @@ static void backward_lenet_S4_layer(Lenet* net)
     // 这里没有激活函数
     const int out_height = net->S4->in_height / net->S4->map_size;
     const int out_width = net->S4->in_width / net->S4->map_size;
-    NcSize2D outSize = px_create_size(out_height, out_width);
+    px_size_t outSize = px_create_size(out_height, out_width);
     for (int i = 0; i < net->S4->out_channels; i++)
     {
         for (int r = 0; r < outSize.height; r++)
@@ -38,7 +38,7 @@ static void backward_lenet_C3_layer(Lenet* net)
     // C3层
     // 由S4层传递的各反向误差,这里只是在S4的梯度上扩充一倍
     int mapdata = net->S4->map_size;
-    NcSize2D S4dSize = px_create_size(net->S4->in_height / net->S4->map_size, net->S4->in_width / net->S4->map_size);
+    px_size_t S4dSize = px_create_size(net->S4->in_height / net->S4->map_size, net->S4->in_width / net->S4->map_size);
     // 这里的Pooling是求平均，所以反向传递到下一神经元的误差梯度没有变化
     for (int i = 0; i < net->C3->out_channels; i++)
     {

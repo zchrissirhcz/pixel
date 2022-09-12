@@ -1,5 +1,6 @@
 #include "lenet.h"
 #include "px_cnn.h"
+#include "px_filesystem.h"
 
 static void load_blob1d(float* data, int len, FILE* fin)
 {
@@ -80,7 +81,7 @@ static void load_lenet_O5_data(Lenet* net, FILE* fin)
 void load_lenet(Lenet* net, const char* filename)
 {
     FILE* fin = fopen(filename, "rb");
-    CHECK_READ_FILE(fin, filename);
+    PX_CHECK_READ_FILE(fin, filename);
 
     load_lenet_C1_data(net, fin);
     load_lenet_C3_data(net, fin);

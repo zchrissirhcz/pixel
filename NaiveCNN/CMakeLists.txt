@@ -1,9 +1,11 @@
 add_library(cnn STATIC
-  src/cnn.c
-  src/cnn.h
-  src/mat.c
-  src/mat.h
-  
+  cnn/cnn.c
+  cnn/cnn.h
+  cnn/mat.c
+  cnn/mat.h
+)
+
+add_library(naivecnn STATIC
   src/naive_cnn.h
   src/naive_cnn.c
 
@@ -15,6 +17,7 @@ add_library(cnn STATIC
   src/naive_relu.c
 )
 target_link_libraries(cnn PUBLIC pixel m)
+target_link_libraries(naivecnn PUBLIC pixel m)
 
 add_executable(testbed_lenet
   examples/lenet.h
@@ -26,11 +29,11 @@ add_executable(testbed_lenet
   examples/lenet_backward.cpp
   examples/lenet_apply_grads.cpp
 )
-target_include_directories(testbed_lenet PRIVATE "src")
+target_include_directories(testbed_lenet PRIVATE "cnn")
 target_link_libraries(testbed_lenet cnn ${OpenCV_LIBS})
 
 add_executable(testbed_nc_lenet
   examples/nc_lenet.cpp
 )
 target_include_directories(testbed_nc_lenet PRIVATE "src")
-target_link_libraries(testbed_nc_lenet cnn ${OpenCV_LIBS})
+target_link_libraries(testbed_nc_lenet naivecnn ${OpenCV_LIBS})

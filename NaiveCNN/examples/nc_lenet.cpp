@@ -1,14 +1,19 @@
 #include "naive_cnn.h"
-#include "cnn.h"
 #include <stdlib.h>
 
 #include "load_prefix.h"
 #include "px_mnist.h"
 #include "px_assert.h"
 
-void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size)
+#include <string.h>
+
+#define NC_AvePool 0
+#define NC_MaxPool 1
+#define NC_MinPool 2
+
+void nc_lenet5_train_setup(NcNet* net, px_size_t input_size, int output_size)
 {
-    //NcSize2D input_size;
+    //px_size_t input_size;
     //input_size.h = 28; input_size.w = 28;
     //int output_size = 10;
     //NcNet* net = (NcNet*)malloc(sizeof(NcNet));
@@ -46,7 +51,7 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size)
     // allocate network's input blobs
     net->blobs[0] = nc_create_blob3d(28, 28, 1);
 
-    NcSize2D in_size;
+    px_size_t in_size;
     int map_size;
     int in_channels;
     int out_channels;
@@ -250,7 +255,7 @@ void nc_lenet5_train_setup(NcNet* net, NcSize2D input_size, int output_size)
 
 void nc_train_trial()
 {
-    NcSize2D input_size;
+    px_size_t input_size;
     input_size.height = 28;
     input_size.width = 28;
     int output_size = 10;

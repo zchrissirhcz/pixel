@@ -9,14 +9,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#define CHECK_WRITE_FILE(fp, filename) \
-    if (fp == NULL)                    \
-        PX_LOGE("Failed to open file %s for write in %s:%d\n", filename, __FILE__, __LINE__);
-
-#define CHECK_READ_FILE(fp, filename) \
-    if (fp == NULL)                   \
-        PX_LOGE("Failed to open file %s for read in %s:%d\n", filename, __FILE__, __LINE__);
-
 static px_mnist_image_array_t* create_mnist_image_array(int number_of_images)
 {
     px_mnist_image_array_t* image_array = (px_mnist_image_array_t*)malloc(sizeof(px_mnist_image_array_t));
@@ -71,7 +63,7 @@ static void read_mnist_single_image(const int n_rows, const int n_cols, px_mnist
 px_mnist_image_array_t* px_read_mnist_image(const char* filename)
 {
     FILE* fin = fopen(filename, "rb");
-    CHECK_READ_FILE(fin, filename);
+    PX_CHECK_READ_FILE(fin, filename);
 
     int magic_number = get_mnist_magic_number(fin);
     int number_of_images = get_mnist_number_of_images(fin);
@@ -115,7 +107,7 @@ static uint8_t read_mnist_single_label(FILE* fin)
 px_mnist_label_array_t* px_read_mnist_label(const char* filename)
 {
     FILE* fin = fopen(filename, "rb");
-    CHECK_READ_FILE(fin, filename);
+    PX_CHECK_READ_FILE(fin, filename);
 
     int label_long = 10;
 

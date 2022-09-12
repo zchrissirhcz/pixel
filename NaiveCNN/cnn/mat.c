@@ -5,8 +5,9 @@
 #include <time.h>
 #include "mat.h"
 #include "px_arithm.h"
-#include "naive_cnn.h"
 #include "px_assert.h"
+#include "px_filesystem.h"
+#include "px_image.h"
 
 static void init_matrix(matrix_t* matrix, int height, int width)
 {
@@ -123,7 +124,7 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
 
     destroy_matrix_ptr(expaned_input);
 
-    NcSize2D outSize = px_create_size(outSizeH, outSizeW);
+    px_size_t outSize = px_create_size(outSizeH, outSizeW);
     switch (type)
     {             // 根据不同的情况，返回不同的结果
     case NC_FULL: // 完全大小的情况
@@ -246,7 +247,7 @@ matrix_t* matrix_cut_make_border(matrix_t* input, px_pad_t pad)
 void save_mat_to_file(matrix_t* mat, const char* filename)
 {
     FILE* fp = fopen(filename, "wb");
-    CHECK_WRITE_FILE(fp, filename);
+    PX_CHECK_WRITE_FILE(fp, filename);
 
     for (int i = 0; i < mat->height; i++)
     {

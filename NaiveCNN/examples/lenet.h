@@ -32,7 +32,7 @@ typedef struct LenetTrainOpts
 extern "C" {
 #endif
 
-void setup_lenet(Lenet* net, NcSize2D inputSize, int outputSize);
+void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize);
 
 void train_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnist_label_array_t* outputData, LenetTrainOpts opts, int trainNum, FILE* fout);
 float test_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnist_label_array_t* outputData, int testNum);

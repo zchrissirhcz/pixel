@@ -6,6 +6,7 @@
 #include <math.h>
 #include <string.h>
 #include <assert.h>
+#include "px_filesystem.h"
 
 float nc_get_random_float(float min, float max)
 {
@@ -206,7 +207,7 @@ void nc_train_cls_net(NcNet* net, NcTrainConfig* train_cfg, LenetDataConfig* dat
 {
     // setup log
     FILE* fout = fopen(train_cfg->log_pth, "w");
-    CHECK_WRITE_FILE(fout, train_cfg->log_pth);
+    PX_CHECK_WRITE_FILE(fout, train_cfg->log_pth);
 
     px_image_t* image = NULL;
     int label = 0;
@@ -246,4 +247,23 @@ void nc_blob_nchw_to_nhwc()
 void nc_blob_nhwc_to_nchw()
 {
     //TODO
+}
+
+const char* layer_type_to_str(NcLayerType type)
+{
+    switch (type)
+    {
+    case NC_LAYER_DATA:
+        return "NC_DATA";
+    case NC_LAYER_CONVOLUTION:
+        return "NC_CONVOLUTION";
+    case NC_LAYER_POOLING:
+        return "NC_POOLING";
+    case NC_LAYER_INNERPRODUCT:
+        return "NC_INNERPRODUCT";
+    case NC_LAYER_LOSS:
+        return "NC_LOSS";
+    default:
+        return "UNKNOWN";
+    }
 }

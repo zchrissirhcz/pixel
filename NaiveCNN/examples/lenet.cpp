@@ -99,7 +99,7 @@ int test_mnist_train_test()
     sprintf(mnist_data_dir, "%s/mnist", project_dir);
     px_mnist_data_t* mnist_data = px_read_mnist_data(mnist_data_dir);
 
-    NcSize2D inputSize = px_create_size(mnist_data->test_images->images[0].height, mnist_data->test_images->images[0].width);
+    px_size_t inputSize = px_create_size(mnist_data->test_images->images[0].height, mnist_data->test_images->images[0].width);
     int outSize = mnist_data->test_labels->one_hot_label[0].len;
 
     // CNN structure init
@@ -128,7 +128,7 @@ int test_mnist_train_test()
     sprintf(train_model_pth, "%s/model/mnist-train.cnn", project_dir);
     save_cnn(cnn, train_model_pth);
     // save training error
-    char train_err_pth[NC_MAX_PATH];
+    char train_err_pth[PX_MAX_PATH];
     sprintf(train_err_pth, "%s/debug/cnnL.ma", project_dir);
     FILE* fp = fopen(train_err_pth, "wb");
     CHECK_WRITE_FILE(fp, train_err_pth);
@@ -138,7 +138,7 @@ int test_mnist_train_test()
 
     // CNN test
     printf("--- mnist test start\n");
-    char test_model_pth[NC_MAX_PATH];
+    char test_model_pth[PX_MAX_PATH];
     sprintf(test_model_pth, "%s/model/mnist-train.cnn", project_dir);
     //sprintf(test_model_pth, "%s/model/mnist.cnn", project_dir);
     load_lenet(net, test_model_pth);
@@ -156,11 +156,11 @@ int test_mnist_train_test()
     return 0;
 }
 
-void setup_lenet(Lenet* net, NcSize2D inputSize, int outputSize)
+void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
 {
     net->layerNum = 5;
 
-    NcSize2D inSize;
+    px_size_t inSize;
     int mapSize = 5;
     inSize.width = inputSize.width;
     inSize.height = inputSize.height;
@@ -190,9 +190,9 @@ void setup_lenet(Lenet* net, NcSize2D inputSize, int outputSize)
 //    // 第一层的传播
 //    int i,j,r,c;
 //    // 第一层输出数据
-//    NcSize2D mapSize={cnn->C1->map_size,cnn->C1->map_size};
-//    NcSize2D inSize={cnn->C1->in_width,cnn->C1->in_height};
-//    NcSize2D outSize={cnn->S2->in_width,cnn->S2->in_height };
+//    px_size_t mapSize={cnn->C1->map_size,cnn->C1->map_size};
+//    px_size_t inSize={cnn->C1->in_width,cnn->C1->in_height};
+//    px_size_t outSize={cnn->S2->in_width,cnn->S2->in_height };
 //    for(i=0;i<(cnn->C1->out_channels);i++){
 //        for(j=0;j<(cnn->C1->in_channels);j++){
 //            float** mapout=conv(cnn->C1->mapData[j][i],mapSize,inputData,inSize,valid);

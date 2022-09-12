@@ -5,14 +5,6 @@
 #include "px_log.h"
 #include "px_image.h"
 
-#define CHECK_WRITE_FILE(fp, filename) \
-    if (fp == NULL)                    \
-        PX_LOGE("write file %s failed in line %d, file %s\n", filename, __LINE__, __FILE__);
-
-#define CHECK_READ_FILE(fp, filename) \
-    if (fp == NULL)                   \
-        PX_LOGE("read file %s failed in line %d, file %s\n", filename, __LINE__, __FILE__);
-
 #define NC_MAX_PATH           256
 #define NC_IMAGE_ALIGN        1 // for simplicity, we don't align now
 #define NC_CHANNEL_ALIGN      1 // for simplicity, we don't align now
@@ -186,7 +178,7 @@ typedef struct NcNet
     float* L; // 瞬时误差能量
 } NcNet;
 
-typedef px_size_t NcSize2D;
+typedef px_size_t px_size_t;
 
 typedef struct NcTrainConfig
 {
@@ -267,6 +259,8 @@ void nc_convolution_test_nhwc();
 px_size_t nc_get_conv_output_size(px_size_t input_size, px_size_t kernel_size, px_size_t stride);
 
 void nc_swap_rgb_and_bgr_inplace(px_image_t* im);
+
+const char* layer_type_to_str(NcLayerType type);
 
 #ifdef __cplusplus
 }

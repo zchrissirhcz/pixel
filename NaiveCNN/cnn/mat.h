@@ -7,7 +7,8 @@
 #include <math.h>
 #include <time.h>
 
-#include "naive_cnn.h"
+#include "px_typebase.h"
+#include "px_cnn.h"
 
 #define NC_FULL  0
 #define NC_SAME  1

@@ -86,14 +86,12 @@ void forward_avg_pooling_for_matrix(matrix_t* input, matrix_t* output, px_size_t
 float activation_sigma(float input, float bias); // sigma激活函数
 
 // 单层全连接神经网络的前向传播
-void nnff(float* output, float* input, float** wdata, float* bias, NcSize2D nn_size);
+void nnff(float* output, float* input, float** wdata, float* bias, px_size_t nn_size);
 
 // 返回向量最大数的序号
 int argmax(float* data, int len);
 
 float sigma_derivation(float y);
-
-const char* layer_type_to_str(NcLayerType type);
 
 #ifdef __cplusplus
 }

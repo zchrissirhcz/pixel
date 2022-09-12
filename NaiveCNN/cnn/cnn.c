@@ -206,7 +206,7 @@ float dot_product(float* vec1, float* vec2, int vec_length)
     return res;
 }
 
-void nnff(float* output, float* input, float** wdata, float* bas, NcSize2D nnSize)
+void nnff(float* output, float* input, float** wdata, float* bas, px_size_t nnSize)
 {
     const int w = nnSize.width;
     const int h = nnSize.height;
@@ -223,21 +223,3 @@ float sigma_derivation(float y)
     return y * (1 - y); // 这里y是指经过激活函数的输出值，而不是自变量
 }
 
-const char* layer_type_to_str(NcLayerType type)
-{
-    switch (type)
-    {
-    case NC_LAYER_DATA:
-        return "NC_DATA";
-    case NC_LAYER_CONVOLUTION:
-        return "NC_CONVOLUTION";
-    case NC_LAYER_POOLING:
-        return "NC_POOLING";
-    case NC_LAYER_INNERPRODUCT:
-        return "NC_INNERPRODUCT";
-    case NC_LAYER_LOSS:
-        return "NC_LOSS";
-    default:
-        return "UNKNOWN";
-    }
-}

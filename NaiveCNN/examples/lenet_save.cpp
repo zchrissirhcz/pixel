@@ -2,6 +2,7 @@
 #include "lenet.h"
 #include "px_cnn.h"
 #include "px_typebase.h"
+#include "px_filesystem.h"
 
 static void save_blob1d_to_file(float* data, int len, FILE* fout)
 {
@@ -142,7 +143,7 @@ static void save_lenet_O5_layer_train_data(Lenet* net, FILE* fout)
 void save_lenet_train_data(Lenet* net, const char* filename, float** inputdata)
 {
     FILE* fout = fopen(filename, "wb");
-    CHECK_WRITE_FILE(fout, filename);
+    PX_CHECK_WRITE_FILE(fout, filename);
 
     save_lenet_input_data(net, fout, inputdata);
     save_lenet_C1_layer_train_data(net, fout);
@@ -157,7 +158,7 @@ void save_lenet_train_data(Lenet* net, const char* filename, float** inputdata)
 void save_lenet_inference_data(Lenet* net, const char* filename)
 {
     FILE* fout = fopen(filename, "wb");
-    CHECK_WRITE_FILE(fout, filename);
+    PX_CHECK_WRITE_FILE(fout, filename);
 
     save_conv_layer_inference_data(net->C1, fout);
     save_conv_layer_inference_data(net->C3, fout);
