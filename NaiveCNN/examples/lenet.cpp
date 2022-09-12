@@ -776,12 +776,16 @@ void clear_lenet(Lenet* net)
     }
 }
 
-static void save_lenet_C1_layer_data(Lenet* net, FILE* fout)
+static void save_lenet_input_data(Lenet* net, FILE* fout, float** inputdata)
 {
     for (int i = 0; i < net->C1->in_height; i++)
     {
         fwrite(inputdata[i], sizeof(float), net->C1->in_width, fout);
     }
+}
+
+static void save_lenet_C1_layer_data(Lenet* net, FILE* fout)
+{
     for (int i = 0; i < net->C1->in_channels; i++)
     {
         for (int j = 0; j < net->C1->out_channels; j++)
@@ -894,6 +898,7 @@ void save_lenet_data(Lenet* net, const char* filename, float** inputdata)
     FILE* fout = fopen(filename, "wb");
     CHECK_WRITE_FILE(fout, filename);
 
+    save_lenet_input_data(net, fout, inputdata);
     save_lenet_C1_layer_data(net, fout);
     save_lenet_S2_layer_data(net, fout);
     save_lenet_C3_layer_data(net, fout);
