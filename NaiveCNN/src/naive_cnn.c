@@ -11,7 +11,7 @@
 
 float nc_get_random_float(float min, float max)
 {
-    float v = (float)(rand()) / RAND_MAX;
+    float v = (float)(rand()) / (double)RAND_MAX;
     v = v * (max - min) + min;
     return v;
 }
