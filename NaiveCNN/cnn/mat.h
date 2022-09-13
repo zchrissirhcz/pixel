@@ -39,8 +39,6 @@ matrix_t* matrix_copy_make_border(matrix_t* input, px_pad_t pad);
 
 matrix_t* matrix_cut_make_border(matrix_t* input, px_pad_t pad);
 
-void save_mat_to_file(matrix_t* mat, const char* filename);
-
 void multifactor(matrix_t* res, matrix_t* mat, float factor);
 
 float summat(matrix_t* mat);

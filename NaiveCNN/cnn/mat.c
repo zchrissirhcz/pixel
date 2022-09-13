@@ -219,18 +219,6 @@ matrix_t* matrix_cut_make_border(matrix_t* input, px_pad_t pad)
     return output;
 }
 
-void save_mat_to_file(matrix_t* mat, const char* filename)
-{
-    FILE* fp = fopen(filename, "wb");
-    PX_CHECK_WRITE_FILE(fp, filename);
-
-    for (int i = 0; i < mat->height; i++)
-    {
-        fwrite(mat->data[i], sizeof(float), mat->width, fp);
-    }
-    fclose(fp);
-}
-
 // 矩阵相加
 void addmat(matrix_t* src1, matrix_t* src2, matrix_t* dst)
 {
