@@ -289,3 +289,12 @@ matrix_t* get_matrix_from_tensor(tensor_t* tensor, int i, int j)
     matrix->data = tensor->data[i][j];
     return matrix;
 }
+
+matrix_t* get_matrix_from_cube(cube_t* cube, int i)
+{
+    matrix_t* matrix = (matrix_t*)malloc(sizeof(matrix_t));
+    matrix->height = cube->height;
+    matrix->width = cube->width;
+    matrix->data = cube->data[i];
+    return matrix;
+}

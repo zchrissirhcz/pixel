@@ -44,6 +44,7 @@ void matrix_multiply_lambda(matrix_t* res, matrix_t* mat, float lambda);
 float matrix_sum(matrix_t* mat);
 
 matrix_t* get_matrix_from_tensor(tensor_t* tensor, int i, int j);
+matrix_t* get_matrix_from_cube(cube_t* cube, int i);
 
 #ifdef __cplusplus
 }

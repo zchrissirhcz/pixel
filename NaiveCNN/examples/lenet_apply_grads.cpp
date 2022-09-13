@@ -12,11 +12,8 @@ static void apply_grads_on_lenet_C1_layer(Lenet* net, LenetTrainOpts opts, matri
         for (int j = 0; j < net->C1->in_channels; j++)
         {
             matrix_t* flipinput = get_rotate180_matrix(input);
-            matrix_t map;
-            map.height = dSize.height;
-            map.width = dSize.width;
-            map.data = net->C1->d->data[i];
-            matrix_t* C1dk = conv_for_matrix(&map, flipinput, NC_VALID);
+            matrix_t* map = get_matrix_from_cube(net->C1->d, i);
+            matrix_t* C1dk = conv_for_matrix(map, flipinput, NC_VALID);
             matrix_multiply_lambda(C1dk, C1dk, -1 * opts.lr);
 
             matrix_t* res = get_matrix_from_tensor(net->C1->mapData, j, i);
@@ -27,6 +24,7 @@ static void apply_grads_on_lenet_C1_layer(Lenet* net, LenetTrainOpts opts, matri
             destroy_matrix(flipinput);
             free(res);
             free(mat1);
+            free(map);
         }
         matrix_t mat2;
         mat2.height = dSize.height;
@@ -53,17 +51,11 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
     {
         for (int j = 0; j < net->C3->in_channels; j++)
         {
-            matrix_t tmp_input;
-            tmp_input.height = ySize.height;
-            tmp_input.width = ySize.width;
-            tmp_input.data = net->S2->y->data[j];
-            matrix_t* flipinput = get_rotate180_matrix(&tmp_input);
+            matrix_t* input = get_matrix_from_cube(net->S2->y, j);
+            matrix_t* flipinput = get_rotate180_matrix(input);
 
-            matrix_t map;
-            map.height = dSize.height;
-            map.width = dSize.width;
-            map.data = net->C3->d->data[i];
-            matrix_t* C3dk = conv_for_matrix(&map, flipinput, NC_VALID);
+            matrix_t* map = get_matrix_from_cube(net->C3->d, i);
+            matrix_t* C3dk = conv_for_matrix(map, flipinput, NC_VALID);
             matrix_multiply_lambda(C3dk, C3dk, -1.0 * opts.lr);
 
             matrix_t* res = get_matrix_from_tensor(net->C3->mapData, j, i);
@@ -75,6 +67,8 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
             destroy_matrix(flipinput);
             free(res);
             free(mat1);
+            free(input);
+            free(map);
         }
         matrix_t mat3;
         mat3.height = dSize.height;

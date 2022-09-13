@@ -42,11 +42,8 @@ static void backward_lenet_C3_layer(Lenet* net)
     // 这里的Pooling是求平均，所以反向传递到下一神经元的误差梯度没有变化
     for (int i = 0; i < net->C3->out_channels; i++)
     {
-        matrix_t input;
-        input.height = S4dSize.height;
-        input.width = S4dSize.width;
-        input.data = net->S4->d->data[i];
-        matrix_t* C3e = matrix_upsample(&input, net->S4->map_size, net->S4->map_size);
+        matrix_t* input = get_matrix_from_cube(net->S4->d, i);
+        matrix_t* C3e = matrix_upsample(input, net->S4->map_size, net->S4->map_size);
         for (int r = 0; r < net->S4->in_height; r++)
         {
             for (int c = 0; c < net->S4->in_width; c++)
@@ -55,6 +52,7 @@ static void backward_lenet_C3_layer(Lenet* net)
             }
         }
         destroy_matrix(C3e);
+        free(input);
     }
 }
 
@@ -73,26 +71,20 @@ static void backward_lenet_S2_layer(Lenet* net)
         {
             matrix_t* map = get_matrix_from_tensor(net->C3->mapData, i, j);
 
-            matrix_t input;
-            input.height = inSize.height;
-            input.width = inSize.width;
-            input.data = net->C3->d->data[j];
+            matrix_t* input = get_matrix_from_cube(net->C3->d, j);
 
-            matrix_t* corr = correlation_for_matrix(map, &input, NC_FULL);
+            matrix_t* corr = correlation_for_matrix(map, input, NC_FULL);
 
-            matrix_t res;
-            res.height = outSize.height;
-            res.width = outSize.width;
-            res.data = net->S2->d->data[i];
+            matrix_t* res = get_matrix_from_cube(net->S2->d, i);
 
-            matrix_t mat1;
-            mat1.height = outSize.height;
-            mat1.width = outSize.width;
-            mat1.data = net->S2->d->data[i];
+            matrix_t* mat1 = get_matrix_from_cube(net->S2->d, i);
 
-            matrix_add(&mat1, corr, &res);
+            matrix_add(mat1, corr, res);
             destroy_matrix(corr);
             free(map);
+            free(input);
+            free(res);
+            free(mat1);
         }
         /*
         for(r=0;r<cnn->C3->inputHeight;r++)
@@ -110,11 +102,8 @@ static void backward_lenet_C1_layer(Lenet* net)
     // 这里的Pooling是求平均，所以反向传递到下一神经元的误差梯度没有变化
     for (int i = 0; i < net->C1->out_channels; i++)
     {
-        matrix_t input;
-        input.height = S2dSize.height;
-        input.width = S2dSize.width;
-        input.data = net->S2->d->data[i];
-        matrix_t* C1e = matrix_upsample(&input, net->S2->map_size, net->S2->map_size);
+        matrix_t* input = get_matrix_from_cube(net->S2->d, i);
+        matrix_t* C1e = matrix_upsample(input, net->S2->map_size, net->S2->map_size);
         for (int r = 0; r < net->S2->in_height; r++)
         {
             for (int c = 0; c < net->S2->in_width; c++)
