@@ -33,6 +33,8 @@ add_executable(testbed_lenet
   examples/lenet_forward.cpp
   examples/lenet_backward.cpp
   examples/lenet_apply_grads.cpp
+  examples/lenet_create.cpp
+  examples/lenet_destroy.cpp
 )
 target_include_directories(testbed_lenet PRIVATE "cnn")
 target_link_libraries(testbed_lenet cnn ${OpenCV_LIBS})

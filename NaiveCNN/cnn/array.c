@@ -19,3 +19,9 @@ void save_array_to_file(array_t* array, FILE* fout)
 {
     save_blob1d_to_file(array->data, array->len, fout);
 }
+
+void destroy_array(array_t* array)
+{
+    free(array->data);
+    free(array);
+}

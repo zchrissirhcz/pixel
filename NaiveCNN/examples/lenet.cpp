@@ -77,7 +77,6 @@ void train_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnis
             destroy_matrix(input);
         }
     }
-    free(net->L);
 }
 
 // do inference
@@ -111,7 +110,6 @@ int test_mnist_train_test()
     px_size_t inputSize = px_create_size(mnist_data->test_images->images[0].height, mnist_data->test_images->images[0].width);
     int outSize = mnist_data->test_labels->one_hot_label[0].len;
 
-    // CNN structure init
     Lenet* net = create_lenet(inputSize, outSize);
 
     // CNN training
@@ -119,8 +117,8 @@ int test_mnist_train_test()
     LenetTrainOpts opts;
     opts.num_epochs = 1;
     opts.lr = 0.1;
-    //int trainNum = 10;
-    int trainNum = 10000;
+    int trainNum = 100;
+    //int trainNum = 10000;
     //int trainNum = 55000;
     char train_log_pth[PX_MAX_PATH];
     sprintf(train_log_pth, "%s/debug/train-log.txt", project_dir);
@@ -157,68 +155,10 @@ int test_mnist_train_test()
     printf("--- accuracy: %f\n", accuracy);
     printf("test finished!!\n");
 
-    free(net);
+    destroy_lenet(net);
     px_destroy_mnist_data(mnist_data);
 
     return 0;
-}
-
-Lenet* create_lenet(px_size_t inputSize, int outputSize)
-{
-    Lenet* net = (Lenet*)malloc(sizeof(Lenet));
-    memset(net, 0, sizeof(Lenet));
-
-    net->layerNum = 5;
-
-    px_size_t inSize;
-    int mapSize = 5;
-
-    // C1
-    {
-        inSize.width = inputSize.width;
-        inSize.height = inputSize.height;
-        px_size_t stride = px_create_size(1, 1);
-        px_pad_t pad = px_create_pad(0, 0, 0, 0);
-        net->C1 = init_conv_layer(inSize, 5, stride, pad, 1, 6);
-    }
-
-    // S2
-    {
-        inSize.width = net->C1->out_width;
-        inSize.height = net->C1->out_height;
-        px_size_t stride = px_create_size(2, 2);
-        px_pad_t pad = px_create_pad(0, 0, 0, 0);
-        net->S2 = init_pooling_layer(inSize, 2, stride, pad, 6, 6, NC_AvePool);
-    }
-
-    // C3
-    {
-        inSize.width = net->S2->out_width;
-        inSize.height = net->S2->out_height;
-        px_size_t stride = px_create_size(1, 1);
-        px_pad_t pad = px_create_pad(0, 0, 0, 0);
-        net->C3 = init_conv_layer(inSize, 5, stride, pad, 6, 12);
-    }
-
-    // S4
-    {
-        inSize.width = net->C3->out_width;
-        inSize.height = net->C3->out_height;
-        px_size_t stride = px_create_size(2, 2);
-        px_pad_t pad = px_create_pad(0, 0, 0, 0);
-        net->S4 = init_pooling_layer(inSize, 2, stride, pad, 12, 12, NC_AvePool);
-    }
-
-    // O5
-    {
-        inSize.width = net->S4->out_width;
-        inSize.height = net->S4->out_height;
-        net->O5 = init_innerproduct_layer(inSize.width * inSize.height * 12, outputSize);
-    }
-
-    net->err = (float*)calloc(net->O5->output_num, sizeof(float));
-
-    return net;
 }
 
 //

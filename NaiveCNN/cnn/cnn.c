@@ -240,3 +240,34 @@ float sigma_derivation(float y)
 {
     return y * (1 - y); // 这里y是指经过激活函数的输出值，而不是自变量
 }
+
+
+
+void destroy_conv_layer(ConvLayer* conv_layer)
+{
+    destroy_tensor(conv_layer->kernel);
+    destroy_tensor(conv_layer->d_kernel);
+    destroy_array(conv_layer->bias);
+    destroy_cube(conv_layer->d);
+    destroy_cube(conv_layer->v);
+    destroy_cube(conv_layer->y);
+    free(conv_layer);
+}
+
+void destroy_pooling_layer(PoolingLayer* pool_layer)
+{
+    destroy_array(pool_layer->bias);
+    destroy_cube(pool_layer->d);
+    destroy_cube(pool_layer->y);
+    free(pool_layer);
+}
+
+void destroy_innerproduct_layer(InnerproductLayer* ip_layer)
+{
+    destroy_array(ip_layer->bias);
+    destroy_array(ip_layer->d);
+    destroy_array(ip_layer->v);
+    destroy_array(ip_layer->y);
+
+    destroy_matrix(ip_layer->weight);
+}

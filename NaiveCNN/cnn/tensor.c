@@ -24,3 +24,9 @@ void save_tensor_to_file(tensor_t* tensor, FILE* fout)
     px_tensor_dim_t tensor_dim = px_create_tensor_dim(tensor->batch, tensor->channel, tensor->height, tensor->width);
     save_blob4d_to_file(tensor->data, tensor_dim, fout);
 }
+
+void destroy_tensor(tensor_t* tensor)
+{
+    free(tensor->data);
+    free(tensor);
+}

@@ -20,6 +20,10 @@ typedef struct Lenet
 
     float* err; // training error
     float* L; // 瞬时误差能量
+
+    int input_height;
+    int input_width;
+    int output_num;
 } Lenet;
 
 typedef struct LenetTrainOpts
@@ -32,7 +36,8 @@ typedef struct LenetTrainOpts
 extern "C" {
 #endif
 
-Lenet* create_lenet(px_size_t inputSize, int outputSize);
+Lenet* create_lenet(px_size_t in_size, int output_num);
+void destroy_lenet(Lenet* net);
 
 void train_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnist_label_array_t* outputData, LenetTrainOpts opts, int trainNum, FILE* fout);
 float test_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnist_label_array_t* outputData, int testNum);
