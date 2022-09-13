@@ -30,6 +30,7 @@ px_size_t get_pooling_out_size(px_size_t in_size, px_size_t kernel_size, px_size
 ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, px_pad_t pad, int in_channels, int out_channels)
 {
     ConvLayer* conv_layer = (ConvLayer*)malloc(sizeof(ConvLayer));
+    memset(conv_layer, 0, sizeof(ConvLayer));
 
     conv_layer->in_height = in_size.height;
     conv_layer->in_width = in_size.width;
@@ -78,6 +79,8 @@ ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, px
 
     px_size_t kernel_size = px_create_size(map_size, map_size);
     px_size_t out_size = get_conv_output_size(in_size, kernel_size, stride, pad);
+    conv_layer->out_height = out_size.height;
+    conv_layer->out_width = out_size.width;
 
     px_cube_dim_t cube_dim = px_create_cube_dim(out_channels, out_size.height, out_size.width);
     conv_layer->d = create_cube(cube_dim);;
@@ -94,6 +97,7 @@ ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, px
 PoolingLayer* init_pooling_layer(px_size_t in_size, int mapSize, px_size_t stride, px_pad_t pad, int inChannels, int outChannels, int pool_type)
 {
     PoolingLayer* pool_layer = (PoolingLayer*)malloc(sizeof(PoolingLayer));
+    memset(pool_layer, 0, sizeof(PoolingLayer));
 
     pool_layer->in_height = in_size.height;
     pool_layer->in_width = in_size.width;
@@ -114,6 +118,8 @@ PoolingLayer* init_pooling_layer(px_size_t in_size, int mapSize, px_size_t strid
 
     px_size_t kernel_size = px_create_size(mapSize, mapSize);
     px_size_t out_size = get_pooling_out_size(in_size, kernel_size, stride, pad);
+    pool_layer->out_height = out_size.height;
+    pool_layer->out_width = out_size.width;
 
     px_cube_dim_t cube_dim = px_create_cube_dim(outChannels, out_size.height, out_size.width);
     pool_layer->d = create_cube(cube_dim);

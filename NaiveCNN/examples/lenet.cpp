@@ -77,6 +77,7 @@ void train_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnis
             destroy_matrix(input);
         }
     }
+    free(net->L);
 }
 
 // do inference
@@ -181,8 +182,8 @@ void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
 
     // S2
     {
-        inSize.width = inSize.width - mapSize + 1;
-        inSize.height = inSize.height - mapSize + 1;
+        inSize.width = net->C1->out_width;
+        inSize.height = net->C1->out_height;
         px_size_t stride = px_create_size(2, 2);
         px_pad_t pad = px_create_pad(0, 0, 0, 0);
         net->S2 = init_pooling_layer(inSize, 2, stride, pad, 6, 6, NC_AvePool);
@@ -190,8 +191,8 @@ void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
 
     // C3
     {
-        inSize.width = inSize.width / 2;
-        inSize.height = inSize.height / 2;
+        inSize.width = net->S2->out_width;
+        inSize.height = net->S2->out_height;
         px_size_t stride = px_create_size(1, 1);
         px_pad_t pad = px_create_pad(0, 0, 0, 0);
         net->C3 = init_conv_layer(inSize, 5, stride, pad, 6, 12);
@@ -199,8 +200,8 @@ void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
 
     // S4
     {
-        inSize.width = inSize.width - mapSize + 1;
-        inSize.height = inSize.height - mapSize + 1;
+        inSize.width = net->C3->out_width;
+        inSize.height = net->C3->out_height;
         px_size_t stride = px_create_size(2, 2);
         px_pad_t pad = px_create_pad(0, 0, 0, 0);
         net->S4 = init_pooling_layer(inSize, 2, stride, pad, 12, 12, NC_AvePool);
@@ -208,8 +209,8 @@ void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
 
     // O5
     {
-        inSize.width = inSize.width / 2;
-        inSize.height = inSize.height / 2;
+        inSize.width = net->S4->out_width;
+        inSize.height = net->S4->out_height;
         net->O5 = init_innerproduct_layer(inSize.width * inSize.height * 12, outputSize);
     }
 

@@ -46,6 +46,9 @@ typedef struct ConvLayer
     int pad_bottom;
     int pad_left;
     int pad_right;
+
+    int out_height;
+    int out_width;
 } ConvLayer;
 
 typedef struct PoolingLayer
@@ -70,6 +73,9 @@ typedef struct PoolingLayer
     int pad_bottom;
     int pad_left;
     int pad_right;
+
+    int out_height;
+    int out_width;
 } PoolingLayer;
 
 typedef struct InnerproductLayer
