@@ -130,10 +130,10 @@ matrix_t* correlation_for_matrix(matrix_t* map, matrix_t* input, int type)
 }
 
 // 卷积操作
-matrix_t* conv_for_matrix(matrix_t* map, matrix_t* input, int type)
+matrix_t* conv_for_matrix(matrix_t* kernel, matrix_t* input, int type)
 {
     // 卷积操作可以用旋转180度的特征模板相关来求
-    matrix_t* flipped_kernel = get_rotate180_matrix(map); //旋转180度的特征模板
+    matrix_t* flipped_kernel = get_rotate180_matrix(kernel); //旋转180度的特征模板
     matrix_t* res = correlation_for_matrix(flipped_kernel, input, type);
     destroy_matrix(flipped_kernel);
     return res;
@@ -279,4 +279,13 @@ void save_matrix_to_file(matrix_t* matrix, FILE* fout)
 {
     px_size_t size = px_create_size(matrix->height, matrix->width);
     save_blob2d_to_file(matrix->data, size, fout);
+}
+
+matrix_t* get_matrix_from_tensor(tensor_t* tensor, int i, int j)
+{
+    matrix_t* matrix = (matrix_t*)malloc(sizeof(matrix_t));
+    matrix->height = tensor->height;
+    matrix->width = tensor->width;
+    matrix->data = tensor->data[i][j];
+    return matrix;
 }

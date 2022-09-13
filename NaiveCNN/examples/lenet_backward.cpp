@@ -71,17 +71,14 @@ static void backward_lenet_S2_layer(Lenet* net)
     {
         for (int j = 0; j < net->C3->out_channels; j++)
         {
-            matrix_t map;
-            map.height = mapSize.height;
-            map.width = mapSize.width;
-            map.data = net->C3->mapData->data[i][j];
+            matrix_t* map = get_matrix_from_tensor(net->C3->mapData, i, j);
 
             matrix_t input;
             input.height = inSize.height;
             input.width = inSize.width;
             input.data = net->C3->d->data[j];
 
-            matrix_t* corr = correlation_for_matrix(&map, &input, NC_FULL);
+            matrix_t* corr = correlation_for_matrix(map, &input, NC_FULL);
 
             matrix_t res;
             res.height = outSize.height;
@@ -95,6 +92,7 @@ static void backward_lenet_S2_layer(Lenet* net)
 
             matrix_add(&mat1, corr, &res);
             destroy_matrix(corr);
+            free(map);
         }
         /*
         for(r=0;r<cnn->C3->inputHeight;r++)
