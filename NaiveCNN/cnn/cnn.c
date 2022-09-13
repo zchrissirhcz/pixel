@@ -149,7 +149,7 @@ InnerproductLayer* init_innerproduct_layer(int inputNum, int outputNum)
 
     // 权重的初始化
     px_size_t size = px_create_size(outputNum, inputNum);
-    ip_layer->wData = create_matrix(size);
+    ip_layer->weight = create_matrix(size);
 
     srand((unsigned)time(NULL));
     for (int i = 0; i < outputNum; i++)
@@ -157,7 +157,7 @@ InnerproductLayer* init_innerproduct_layer(int inputNum, int outputNum)
         for (int j = 0; j < inputNum; j++)
         {
             float randnum = (((float)rand() / (float)RAND_MAX) - 0.5) * 2; // 产生一个-1到1的随机数
-            ip_layer->wData->data[i][j] = randnum * sqrt((float)6.0 / (float)(inputNum + outputNum));
+            ip_layer->weight->data[i][j] = randnum * sqrt((float)6.0 / (float)(inputNum + outputNum));
         }
     }
 

@@ -38,15 +38,15 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
 {
     px_size_t dSize;
     px_size_t ySize;
-    px_size_t mapSize;
+    px_size_t kernel_size;
 
     // C3层的权重更新
     dSize.width = net->S4->in_width;
     dSize.height = net->S4->in_height;
     ySize.width = net->C3->in_width;
     ySize.height = net->C3->in_height;
-    mapSize.width = net->C3->map_size;
-    mapSize.height = net->C3->map_size;
+    kernel_size.width = net->C3->map_size;
+    kernel_size.height = net->C3->map_size;
     for (int i = 0; i < net->C3->out_channels; i++)
     {
         for (int j = 0; j < net->C3->in_channels; j++)
@@ -83,14 +83,14 @@ static void apply_grads_on_lenet_O5_layer(Lenet* net, LenetTrainOpts opts)
     // 输出层
     // 首先需要将前面的多维输出展开成一维向量
     float* O5inData = (float*)malloc((net->O5->input_num) * sizeof(float));
-    px_size_t outSize = px_create_size(net->S4->in_height / net->S4->map_size, net->S4->in_width / net->S4->map_size);
+    px_size_t out_size = px_create_size(net->S4->in_height / net->S4->map_size, net->S4->in_width / net->S4->map_size);
     for (int i = 0; i < (net->S4->out_channels); i++)
     {
-        for (int r = 0; r < outSize.height; r++)
+        for (int r = 0; r < out_size.height; r++)
         {
-            for (int c = 0; c < outSize.width; c++)
+            for (int c = 0; c < out_size.width; c++)
             {
-                O5inData[i * outSize.height * outSize.width + r * outSize.width + c] = net->S4->y->data[i][r][c];
+                O5inData[i * out_size.height * out_size.width + r * out_size.width + c] = net->S4->y->data[i][r][c];
             }
         }
     }
@@ -99,7 +99,7 @@ static void apply_grads_on_lenet_O5_layer(Lenet* net, LenetTrainOpts opts)
     {
         for (int i = 0; i < net->O5->input_num; i++)
         {
-            net->O5->wData->data[j][i] = net->O5->wData->data[j][i] - opts.lr * net->O5->d->data[j] * O5inData[i];
+            net->O5->weight->data[j][i] = net->O5->weight->data[j][i] - opts.lr * net->O5->d->data[j] * O5inData[i];
         }
         net->O5->bias->data[j] = net->O5->bias->data[j] - opts.lr * net->O5->d->data[j];
     }

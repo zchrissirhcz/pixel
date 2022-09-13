@@ -26,7 +26,7 @@ static void backward_lenet_S4_layer(Lenet* net)
                 for (int j = 0; j < net->O5->output_num; j++)
                 {
                     int wInt = i * outSize.width * outSize.height + r * outSize.width + c;
-                    net->S4->d->data[i][r][c] = net->S4->d->data[i][r][c] + net->O5->d->data[j] * net->O5->wData->data[j][wInt];
+                    net->S4->d->data[i][r][c] = net->S4->d->data[i][r][c] + net->O5->d->data[j] * net->O5->weight->data[j][wInt];
                 }
             }
         }
