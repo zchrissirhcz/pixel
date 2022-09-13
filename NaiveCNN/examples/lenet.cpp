@@ -112,8 +112,7 @@ int test_mnist_train_test()
     int outSize = mnist_data->test_labels->one_hot_label[0].len;
 
     // CNN structure init
-    Lenet* net = (Lenet*)malloc(sizeof(Lenet));
-    setup_lenet(net, inputSize, outSize);
+    Lenet* net = create_lenet(inputSize, outSize);
 
     // CNN training
 #if 1
@@ -164,8 +163,11 @@ int test_mnist_train_test()
     return 0;
 }
 
-void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
+Lenet* create_lenet(px_size_t inputSize, int outputSize)
 {
+    Lenet* net = (Lenet*)malloc(sizeof(Lenet));
+    memset(net, 0, sizeof(Lenet));
+
     net->layerNum = 5;
 
     px_size_t inSize;
@@ -215,6 +217,8 @@ void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
     }
 
     net->err = (float*)calloc(net->O5->output_num, sizeof(float));
+
+    return net;
 }
 
 //
