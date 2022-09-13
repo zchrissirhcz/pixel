@@ -133,9 +133,9 @@ matrix_t* correlation_for_matrix(matrix_t* map, matrix_t* input, int type)
 matrix_t* conv_for_matrix(matrix_t* map, matrix_t* input, int type)
 {
     // 卷积操作可以用旋转180度的特征模板相关来求
-    matrix_t* flipmap = get_rotate180_matrix(map); //旋转180度的特征模板
-    matrix_t* res = correlation_for_matrix(flipmap, input, type);
-    destroy_matrix(flipmap);
+    matrix_t* flipped_kernel = get_rotate180_matrix(map); //旋转180度的特征模板
+    matrix_t* res = correlation_for_matrix(flipped_kernel, input, type);
+    destroy_matrix(flipped_kernel);
     return res;
 }
 
