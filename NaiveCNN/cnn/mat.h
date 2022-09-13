@@ -39,7 +39,7 @@ matrix_t* matrix_copy_make_border(matrix_t* input, px_pad_t pad);
 
 matrix_t* matrix_cut_make_border(matrix_t* input, px_pad_t pad);
 
-void matrix_multiply_lambda(matrix_t* res, matrix_t* mat, float factor);
+void matrix_multiply_lambda(matrix_t* res, matrix_t* mat, float lambda);
 
 float matrix_sum(matrix_t* mat);
 

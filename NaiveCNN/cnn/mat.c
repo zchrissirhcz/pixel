@@ -238,13 +238,13 @@ void matrix_add(matrix_t* src1, matrix_t* src2, matrix_t* dst)
 }
 
 // 矩阵乘以系数
-void matrix_multiply_lambda(matrix_t* res, matrix_t* mat, float factor)
+void matrix_multiply_lambda(matrix_t* res, matrix_t* mat, float lambda)
 {
     for (int i = 0; i < mat->height; i++)
     {
         for (int j = 0; j < mat->width; j++)
         {
-            res->data[i][j] = mat->data[i][j] * factor;
+            res->data[i][j] = mat->data[i][j] * lambda;
         }
     }
 }
