@@ -16,8 +16,8 @@ static void apply_grads_on_lenet_C1_layer(Lenet* net, LenetTrainOpts opts, matri
             map.height = dSize.height;
             map.width = dSize.width;
             map.data = net->C1->d->data[i];
-            matrix_t* C1dk = conv(&map, flipinput, NC_VALID);
-            multifactor(C1dk, C1dk, -1 * opts.lr);
+            matrix_t* C1dk = conv_for_matrix(&map, flipinput, NC_VALID);
+            matrix_multiply_lambda(C1dk, C1dk, -1 * opts.lr);
 
             matrix_t res;
             res.height = mapSize.height;
@@ -29,7 +29,7 @@ static void apply_grads_on_lenet_C1_layer(Lenet* net, LenetTrainOpts opts, matri
             mat1.width = mapSize.width;
             mat1.data = net->C1->mapData->data[j][i];
 
-            addmat(&mat1, C1dk, &res);
+            matrix_add(&mat1, C1dk, &res);
             destroy_matrix(C1dk);
             destroy_matrix(flipinput);
         }
@@ -37,7 +37,7 @@ static void apply_grads_on_lenet_C1_layer(Lenet* net, LenetTrainOpts opts, matri
         mat2.height = dSize.height;
         mat2.width = dSize.width;
         mat2.data = net->C1->d->data[i];
-        net->C1->biasData->data[i] = net->C1->biasData->data[i] - opts.lr * summat(&mat2);
+        net->C1->biasData->data[i] = net->C1->biasData->data[i] - opts.lr * matrix_sum(&mat2);
     }
 }
 
@@ -68,8 +68,8 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
             map.height = dSize.height;
             map.width = dSize.width;
             map.data = net->C3->d->data[i];
-            matrix_t* C3dk = conv(&map, flipinput, NC_VALID);
-            multifactor(C3dk, C3dk, -1.0 * opts.lr);
+            matrix_t* C3dk = conv_for_matrix(&map, flipinput, NC_VALID);
+            matrix_multiply_lambda(C3dk, C3dk, -1.0 * opts.lr);
 
             matrix_t res;
             res.height = mapSize.height;
@@ -81,7 +81,7 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
             mat1.width = mapSize.width;
             mat1.data = net->C3->mapData->data[j][i];
 
-            addmat(&mat1, C3dk, &res);
+            matrix_add(&mat1, C3dk, &res);
             destroy_matrix(C3dk);
             destroy_matrix(flipinput);
         }
@@ -89,7 +89,7 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
         mat3.height = dSize.height;
         mat3.width = dSize.width;
         mat3.data = net->C3->d->data[i];
-        net->C3->biasData->data[i] = net->C3->biasData->data[i] - opts.lr * summat(&mat3);
+        net->C3->biasData->data[i] = net->C3->biasData->data[i] - opts.lr * matrix_sum(&mat3);
     }
 }
 

@@ -81,7 +81,7 @@ static void backward_lenet_S2_layer(Lenet* net)
             input.width = inSize.width;
             input.data = net->C3->d->data[j];
 
-            matrix_t* corr = correlation(&map, &input, NC_FULL);
+            matrix_t* corr = correlation_for_matrix(&map, &input, NC_FULL);
 
             matrix_t res;
             res.height = outSize.height;
@@ -93,7 +93,7 @@ static void backward_lenet_S2_layer(Lenet* net)
             mat1.width = outSize.width;
             mat1.data = net->S2->d->data[i];
 
-            addmat(&mat1, corr, &res);
+            matrix_add(&mat1, corr, &res);
             destroy_matrix(corr);
         }
         /*

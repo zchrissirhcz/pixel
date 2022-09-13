@@ -19,17 +19,17 @@
 extern "C" {
 #endif
 
-matrix_t* get_rotate180_matrix(matrix_t* input);
 matrix_t* create_matrix(px_size_t size);
 void destroy_matrix(matrix_t* matrix);
-
 void save_matrix_to_file(matrix_t* matrix, FILE* fout);
 
-void addmat(matrix_t* src1, matrix_t* src2, matrix_t* dst);
+void matrix_add(matrix_t* src1, matrix_t* src2, matrix_t* dst);
 
-matrix_t* correlation(matrix_t* map, matrix_t* input, int type);
+matrix_t* get_rotate180_matrix(matrix_t* input);
 
-matrix_t* conv(matrix_t* map, matrix_t* input, int type);
+matrix_t* correlation_for_matrix(matrix_t* map, matrix_t* input, int type);
+
+matrix_t* conv_for_matrix(matrix_t* map, matrix_t* input, int type);
 
 // 这个是矩阵的上采样（等值内插），upc及upr是内插倍数
 matrix_t* matrix_upsample(matrix_t* input, int width_multiplier, int height_multiplier);
@@ -39,9 +39,9 @@ matrix_t* matrix_copy_make_border(matrix_t* input, px_pad_t pad);
 
 matrix_t* matrix_cut_make_border(matrix_t* input, px_pad_t pad);
 
-void multifactor(matrix_t* res, matrix_t* mat, float factor);
+void matrix_multiply_lambda(matrix_t* res, matrix_t* mat, float factor);
 
-float summat(matrix_t* mat);
+float matrix_sum(matrix_t* mat);
 
 #ifdef __cplusplus
 }

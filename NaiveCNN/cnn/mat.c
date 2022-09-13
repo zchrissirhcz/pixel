@@ -47,7 +47,7 @@ matrix_t* get_rotate180_matrix(matrix_t* input)
 // same指同输入相同大小
 // valid指完全操作后的大小，一般为inSize-(mapSize-1)大小，其不需要将输入添0扩大。
 
-matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
+matrix_t* correlation_for_matrix(matrix_t* map, matrix_t* input, int type)
 {
     // 这里的互相关是在后向传播时调用，类似于将Map反转180度再卷积
     // 为了方便计算，这里先将图像扩充一圈
@@ -130,11 +130,11 @@ matrix_t* correlation(matrix_t* map, matrix_t* input, int type)
 }
 
 // 卷积操作
-matrix_t* conv(matrix_t* map, matrix_t* input, int type)
+matrix_t* conv_for_matrix(matrix_t* map, matrix_t* input, int type)
 {
     // 卷积操作可以用旋转180度的特征模板相关来求
     matrix_t* flipmap = get_rotate180_matrix(map); //旋转180度的特征模板
-    matrix_t* res = correlation(flipmap, input, type);
+    matrix_t* res = correlation_for_matrix(flipmap, input, type);
     destroy_matrix(flipmap);
     return res;
 }
@@ -220,7 +220,7 @@ matrix_t* matrix_cut_make_border(matrix_t* input, px_pad_t pad)
 }
 
 // 矩阵相加
-void addmat(matrix_t* src1, matrix_t* src2, matrix_t* dst)
+void matrix_add(matrix_t* src1, matrix_t* src2, matrix_t* dst)
 {
     if (src1->width != src2->width || src1->height != src2->height)
     {
@@ -238,7 +238,7 @@ void addmat(matrix_t* src1, matrix_t* src2, matrix_t* dst)
 }
 
 // 矩阵乘以系数
-void multifactor(matrix_t* res, matrix_t* mat, float factor)
+void matrix_multiply_lambda(matrix_t* res, matrix_t* mat, float factor)
 {
     for (int i = 0; i < mat->height; i++)
     {
@@ -250,7 +250,7 @@ void multifactor(matrix_t* res, matrix_t* mat, float factor)
 }
 
 // 矩阵各元素的和
-float summat(matrix_t* mat)
+float matrix_sum(matrix_t* mat)
 {
     float sum = 0.0f;
     for (int i = 0; i < mat->height; i++)

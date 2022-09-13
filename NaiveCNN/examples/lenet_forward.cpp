@@ -15,7 +15,7 @@ static void forward_lenet_C1_layer(Lenet* net, matrix_t* input)
             map.height = mapSize.height;
             map.width = mapSize.width;
             map.data = net->C1->mapData->data[j][i];
-            matrix_t* mapout = conv(&map, input, NC_VALID);
+            matrix_t* mapout = conv_for_matrix(&map, input, NC_VALID);
 
             matrix_t res;
             res.height = mapSize.height;
@@ -27,7 +27,7 @@ static void forward_lenet_C1_layer(Lenet* net, matrix_t* input)
             mat1.width = outSize.width;
             mat1.data = net->C1->v->data[i];
 
-            addmat(&mat1, mapout, &res);
+            matrix_add(&mat1, mapout, &res);
             destroy_matrix(mapout);
         }
         for (int r = 0; r < outSize.height; r++)
@@ -91,7 +91,7 @@ static void forward_lenet_C3_layer(Lenet* net)
             tmp_input.height = inSize.height;
             tmp_input.width = inSize.height;
             tmp_input.data = net->S2->y->data[j];
-            matrix_t* mapout = conv(&map, &tmp_input, NC_VALID);
+            matrix_t* mapout = conv_for_matrix(&map, &tmp_input, NC_VALID);
 
             matrix_t res;
             res.height = mapSize.height;
@@ -103,7 +103,7 @@ static void forward_lenet_C3_layer(Lenet* net)
             mat1.width = outSize.width;
             mat1.data = net->C3->v->data[i];
 
-            addmat(&mat1, mapout, &res);
+            matrix_add(&mat1, mapout, &res);
             destroy_matrix(mapout);
         }
         for (int r = 0; r < outSize.height; r++)
