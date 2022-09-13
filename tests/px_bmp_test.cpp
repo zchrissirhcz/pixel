@@ -227,17 +227,3 @@ TEST(read_bmp, gray)
 
     free(buffer);
 }
-
-int main(int argc, char* argv[])
-{
-    testing::InitGoogleTest(&argc, argv);
-
-    // Run a specific test only
-    //testing::GTEST_FLAG(filter) = "MyLibrary.TestReading"; // I'm testing a new feature, run something quickly
-    testing::GTEST_FLAG(filter) = "read_bmp.gray";
-
-    // Exclude a specific test
-    //testing::GTEST_FLAG(filter) = "-cvtColorTwoPlane.yuv420sp_to_rgb:-cvtColorTwoPlane.rgb_to_yuv420sp"; // The writing test is broken, so skip it
-
-    return RUN_ALL_TESTS();
-}
