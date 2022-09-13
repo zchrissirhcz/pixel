@@ -102,7 +102,8 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
     int width = 0;
     int src_channel = 0;
     int dst_channel = 0;
-    BMP_image bmp_image = {0};
+    BMP_image bmp_image;
+    memset(&bmp_image, 0, sizeof(BMP_image));
     unsigned char* buffer = NULL;
     do {
         if (!is_valid_bmp_filename(filepath))
@@ -376,7 +377,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
                     }
                 }
                 dst_line -= dst_linebytes;
-                if (0 == fread(bmp_gap, 1, src_gap, fin))
+                if ((src_gap !=0) && (fread(bmp_gap, 1, src_gap, fin) != (size_t)src_gap))
                 {
                     fread_valid = false;
                 }
@@ -408,8 +409,6 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
                 break;
             }
             int line_limit = dst_channel * width;
-            int src_lineskip = src_linebytes - src_channel * width;
-            int dst_lineskip = dst_linebytes - line_limit;
             unsigned char* dst_line = buffer + (height - 1) * dst_linebytes;
             unsigned char* src_line = bmp_image.data;
             for (int y = height - 1; y != -1; y--)

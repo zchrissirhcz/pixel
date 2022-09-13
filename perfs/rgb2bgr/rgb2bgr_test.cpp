@@ -23,7 +23,7 @@ public:
     }
 
     virtual void TearDown() override {
-        EXPECT_TRUE(isImageNearlyEqual(expected, res, 0));
+        EXPECT_TRUE(almostEqual(expected, res, 0));
     }
 
     cv::Mat src;
@@ -73,8 +73,9 @@ public:
         width = src.cols;
     }
 
-    virtual void TearDown() override {
-        EXPECT_TRUE(isImageNearlyEqual(expected, src, 0));
+    virtual void TearDown() override
+    {
+        EXPECT_TRUE(almostEqual(expected, src, 0));
     }
 
     cv::Mat src;

@@ -21,7 +21,7 @@ void test_read_image_no_custom(const char* filename)
     cv::Mat actual(size, CV_8UC(channel), buffer);
 
     cv::Mat expected = cv::imread(filename, cv::IMREAD_UNCHANGED);
-    EXPECT_TRUE(isImageNearlyEqual(expected, actual));
+    EXPECT_TRUE(almostEqual(expected, actual));
 
     free(buffer);
 }
@@ -72,7 +72,7 @@ void test_read_bmp_with_custom(const char* filename)
     EXPECT_EQ(expected.channels(), actual.channels());
     EXPECT_EQ(expected.step1(), actual.step1());
 
-    EXPECT_TRUE(isImageNearlyEqual(expected, actual));
+    EXPECT_TRUE(almostEqual(expected, actual));
 
     free(buffer);
 }
@@ -105,7 +105,7 @@ void test_write_bmp_no_custom(const char* filepath)
     EXPECT_EQ(mat.cols, mat2.cols);
     EXPECT_EQ(mat.channels(), mat2.channels());
     EXPECT_EQ(mat.step1(), mat2.step1());
-    EXPECT_TRUE(isImageNearlyEqual(mat, mat2));
+    EXPECT_TRUE(almostEqual(mat, mat2));
 }
 
 TEST(write_bmp, no_custom)
@@ -169,4 +169,75 @@ TEST(write_bmp, custom_align_and_color_order)
     test_write_bmp_custom(gray_image_path, align, swap_color);
 }
 
+TEST(write_bmp, bgra_4_channels)
+{
+    cv::Mat src(256, 256, CV_8UC4);
+    for (int i = 0; i < src.rows; i++)
+    {
+        for (int j = 0; j < src.cols; j++)
+        {
+            src.ptr(i, j)[0] = i;
+            src.ptr(i, j)[1] = j;
+            src.ptr(i, j)[2] = (i + j) / 2;
+            src.ptr(i, j)[3] = 0; // alpha
+        }
+    }
 
+    //cv::imwrite("bgra_by_opencv.bmp", src);
+
+    const char* save_path = "bgra_by_pixel.bmp";
+    px_write_bmp(save_path, src.rows, src.cols, src.channels(), src.data);
+}
+
+TEST(read_bmp, bgra_4_channels)
+{
+    cv::Mat src(256, 256, CV_8UC4);
+    const char* image_path = "bgra_by_opencv.bmp";
+    cv::imwrite(image_path, src);
+
+    int height;
+    int width;
+    int channels;
+    uint8_t* buffer;
+    px_read_bmp(image_path, &height, &width, &channels, &buffer);
+    cv::Mat shadow(height, width, CV_8UC(channels), buffer);
+    EXPECT_EQ(channels, 3);
+    EXPECT_EQ(height, src.rows);
+    EXPECT_EQ(width, src.cols);
+
+    free(buffer);
+}
+
+TEST(read_bmp, gray)
+{
+    cv::Mat src(256, 256, CV_8UC1);
+    const char* image_path = "gray_by_opencv.bmp";
+    cv::imwrite(image_path, src);
+
+    int height;
+    int width;
+    int channels;
+    uint8_t* buffer;
+    px_read_bmp(image_path, &height, &width, &channels, &buffer);
+    cv::Mat shadow(height, width, CV_8UC(channels), buffer);
+
+    EXPECT_EQ(channels, 1);
+    EXPECT_EQ(height, src.rows);
+    EXPECT_EQ(width, src.cols);
+
+    free(buffer);
+}
+
+int main(int argc, char* argv[])
+{
+    testing::InitGoogleTest(&argc, argv);
+
+    // Run a specific test only
+    //testing::GTEST_FLAG(filter) = "MyLibrary.TestReading"; // I'm testing a new feature, run something quickly
+    testing::GTEST_FLAG(filter) = "read_bmp.gray";
+
+    // Exclude a specific test
+    //testing::GTEST_FLAG(filter) = "-cvtColorTwoPlane.yuv420sp_to_rgb:-cvtColorTwoPlane.rgb_to_yuv420sp"; // The writing test is broken, so skip it
+
+    return RUN_ALL_TESTS();
+}
