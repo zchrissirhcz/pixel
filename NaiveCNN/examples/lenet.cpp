@@ -53,7 +53,7 @@ void train_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnis
             // 计算并保存误差能量
             float l = 0.0;
             int i;
-            for (i = 0; i < net->O5->outputNum; i++)
+            for (i = 0; i < net->O5->output_num; i++)
             {
                 l = l + net->err[i] * net->err[i];
             }
@@ -91,7 +91,7 @@ float test_lenet_on_mnist(Lenet* net, px_mnist_image_array_t* inputData, px_mnis
         forward_lenet(net, cnn_input);
         array_t label_as_array;
         label_as_array.data = outputData->one_hot_label[n].data;
-        label_as_array.len = net->O5->outputNum;
+        label_as_array.len = net->O5->output_num;
         if (argmax(net->O5->y) != argmax(&label_as_array))
         {
             incorrectnum++;
@@ -214,7 +214,7 @@ void setup_lenet(Lenet* net, px_size_t inputSize, int outputSize)
         net->O5 = init_innerproduct_layer(inSize.width * inSize.height * 12, outputSize);
     }
 
-    net->err = (float*)calloc(net->O5->outputNum, sizeof(float));
+    net->err = (float*)calloc(net->O5->output_num, sizeof(float));
 }
 
 //

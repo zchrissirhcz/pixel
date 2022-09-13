@@ -14,7 +14,7 @@ static void save_lenet_input_data(Lenet* net, FILE* fout, matrix_t* inputdata)
 static void save_conv_weight_data(ConvLayer* conv_layer, FILE* fout)
 {
     // px_tensor_dim_t tensor_dim = px_create_tensor_dim(conv_layer->in_channels, conv_layer->out_channels, conv_layer->map_size, conv_layer->map_size);
-    save_tensor_to_file(conv_layer->mapData, fout);
+    save_tensor_to_file(conv_layer->kernel, fout);
 }
 
 static void save_bias_data(array_t* bias, FILE* fout)
@@ -26,13 +26,13 @@ static void save_conv_layer_inference_data(ConvLayer* conv_layer, FILE* fout)
 {
     save_conv_weight_data(conv_layer, fout);
     // conv_layer->out_channels
-    save_bias_data(conv_layer->biasData, fout);
+    save_bias_data(conv_layer->bias, fout);
 }
 
 static void save_innerproduct_weight_data(InnerproductLayer* innerproduct_layer, FILE* fout)
 {
-    const int height = innerproduct_layer->outputNum;
-    const int width = innerproduct_layer->inputNum;
+    const int height = innerproduct_layer->output_num;
+    const int width = innerproduct_layer->input_num;
     px_size_t size = px_create_size(height, width);
     save_matrix_to_file(innerproduct_layer->wData, fout);
 }
@@ -41,7 +41,7 @@ static void save_innerproduct_layer_inference_data(InnerproductLayer* ip_layer, 
 {
     save_innerproduct_weight_data(ip_layer, fout);
     // ip_layer->outputNum
-    save_bias_data(ip_layer->biasData, fout);
+    save_bias_data(ip_layer->bias, fout);
 }
 
 static void save_conv_layer_train_data(ConvLayer* conv_layer, px_size_t output_size, FILE* fout)
@@ -103,8 +103,8 @@ static void save_lenet_O5_layer_train_data(Lenet* net, FILE* fout)
 {
     save_innerproduct_layer_inference_data(net->O5, fout);
 
-    const int height = net->O5->outputNum;
-    const int width = net->O5->inputNum;
+    const int height = net->O5->output_num;
+    const int width = net->O5->input_num;
     px_size_t size = px_create_size(height, width);
     save_array_to_file(net->O5->v, fout);
     save_array_to_file(net->O5->d, fout);

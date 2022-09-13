@@ -59,7 +59,7 @@ static void clear_lenet_S4_layer(Lenet* net)
 
 static void clear_lenet_O5_layer(Lenet* net)
 {
-    const int len = net->O5->outputNum;
+    const int len = net->O5->output_num;
     clear_array(net->O5->d);
     clear_array(net->O5->v);
     clear_array(net->O5->y);

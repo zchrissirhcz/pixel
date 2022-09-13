@@ -4,7 +4,7 @@
 static void backward_lenet_O5_layer(Lenet* net)
 {
     // 输出层O5
-    for (int i = 0; i < net->O5->outputNum; i++)
+    for (int i = 0; i < net->O5->output_num; i++)
     {
         net->O5->d->data[i] = net->err[i] * sigma_derivation(net->O5->y->data[i]);
     }
@@ -23,7 +23,7 @@ static void backward_lenet_S4_layer(Lenet* net)
         {
             for (int c = 0; c < outSize.width; c++)
             {
-                for (int j = 0; j < net->O5->outputNum; j++)
+                for (int j = 0; j < net->O5->output_num; j++)
                 {
                     int wInt = i * outSize.width * outSize.height + r * outSize.width + c;
                     net->S4->d->data[i][r][c] = net->S4->d->data[i][r][c] + net->O5->d->data[j] * net->O5->wData->data[j][wInt];
@@ -69,7 +69,7 @@ static void backward_lenet_S2_layer(Lenet* net)
     {
         for (int j = 0; j < net->C3->out_channels; j++)
         {
-            matrix_t* map = get_matrix_from_tensor(net->C3->mapData, i, j);
+            matrix_t* map = get_matrix_from_tensor(net->C3->kernel, i, j);
 
             matrix_t* input = get_matrix_from_cube(net->C3->d, j);
 
@@ -118,7 +118,7 @@ static void backward_lenet_C1_layer(Lenet* net)
 void backward_lenet(Lenet* net, float* outputData)
 {
     int i, j, c, r; // 将误差保存到网络中
-    for (i = 0; i < net->O5->outputNum; i++)
+    for (i = 0; i < net->O5->output_num; i++)
     {
         net->err[i] = net->O5->y->data[i] - outputData[i];
     }

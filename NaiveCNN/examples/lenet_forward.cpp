@@ -14,7 +14,7 @@ static void forward_lenet_C1_layer(Lenet* net, matrix_t* input)
             matrix_t map;
             map.height = mapSize.height;
             map.width = mapSize.width;
-            map.data = net->C1->mapData->data[j][i];
+            map.data = net->C1->kernel->data[j][i];
             matrix_t* mapout = conv_for_matrix(&map, input, NC_VALID);
 
             matrix_t res;
@@ -34,7 +34,7 @@ static void forward_lenet_C1_layer(Lenet* net, matrix_t* input)
         {
             for (int c = 0; c < outSize.width; c++)
             {
-                net->C1->y->data[i][r][c] = activation_sigma(net->C1->v->data[i][r][c], net->C1->biasData->data[i]);
+                net->C1->y->data[i][r][c] = activation_sigma(net->C1->v->data[i][r][c], net->C1->bias->data[i]);
             }
         }
     }
@@ -85,7 +85,7 @@ static void forward_lenet_C3_layer(Lenet* net)
             matrix_t map;
             map.height = mapSize.height;
             map.width = mapSize.width;
-            map.data = net->C3->mapData->data[j][i];
+            map.data = net->C3->kernel->data[j][i];
 
             matrix_t tmp_input;
             tmp_input.height = inSize.height;
@@ -110,7 +110,7 @@ static void forward_lenet_C3_layer(Lenet* net)
         {
             for (int c = 0; c < outSize.width; c++)
             {
-                net->C3->y->data[i][r][c] = activation_sigma(net->C3->v->data[i][r][c], net->C3->biasData->data[i]);
+                net->C3->y->data[i][r][c] = activation_sigma(net->C3->v->data[i][r][c], net->C3->bias->data[i]);
             }
         }
     }
@@ -157,7 +157,7 @@ static void forward_lenet_O5_layer(Lenet* net)
     outSize.width = inSize.width / net->S4->map_size;
     outSize.height = inSize.height / net->S4->map_size;
 
-    float* O5inData = (float*)malloc((net->O5->inputNum) * sizeof(float));
+    float* O5inData = (float*)malloc((net->O5->input_num) * sizeof(float));
     for (int i = 0; i < (net->S4->out_channels); i++)
     {
         for (int r = 0; r < outSize.height; r++)
@@ -169,11 +169,11 @@ static void forward_lenet_O5_layer(Lenet* net)
         }
     }
 
-    px_size_t nnSize = px_create_size(net->O5->outputNum, net->O5->inputNum);
-    nnff(net->O5->v->data, O5inData, net->O5->wData->data, net->O5->biasData->data, nnSize);
-    for (int i = 0; i < net->O5->outputNum; i++)
+    px_size_t nnSize = px_create_size(net->O5->output_num, net->O5->input_num);
+    nnff(net->O5->v->data, O5inData, net->O5->wData->data, net->O5->bias->data, nnSize);
+    for (int i = 0; i < net->O5->output_num; i++)
     {
-        net->O5->y->data[i] = activation_sigma(net->O5->v->data[i], net->O5->biasData->data[i]);
+        net->O5->y->data[i] = activation_sigma(net->O5->v->data[i], net->O5->bias->data[i]);
     }
     free(O5inData);
 }

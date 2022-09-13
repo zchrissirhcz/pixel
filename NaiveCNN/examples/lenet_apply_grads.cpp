@@ -16,8 +16,8 @@ static void apply_grads_on_lenet_C1_layer(Lenet* net, LenetTrainOpts opts, matri
             matrix_t* C1dk = conv_for_matrix(map, flipinput, NC_VALID);
             matrix_multiply_lambda(C1dk, C1dk, -1 * opts.lr);
 
-            matrix_t* res = get_matrix_from_tensor(net->C1->mapData, j, i);
-            matrix_t* mat1 = get_matrix_from_tensor(net->C1->mapData, j, i);
+            matrix_t* res = get_matrix_from_tensor(net->C1->kernel, j, i);
+            matrix_t* mat1 = get_matrix_from_tensor(net->C1->kernel, j, i);
 
             matrix_add(mat1, C1dk, res);
             destroy_matrix(C1dk);
@@ -30,7 +30,7 @@ static void apply_grads_on_lenet_C1_layer(Lenet* net, LenetTrainOpts opts, matri
         mat2.height = dSize.height;
         mat2.width = dSize.width;
         mat2.data = net->C1->d->data[i];
-        net->C1->biasData->data[i] = net->C1->biasData->data[i] - opts.lr * matrix_sum(&mat2);
+        net->C1->bias->data[i] = net->C1->bias->data[i] - opts.lr * matrix_sum(&mat2);
     }
 }
 
@@ -58,9 +58,9 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
             matrix_t* C3dk = conv_for_matrix(map, flipinput, NC_VALID);
             matrix_multiply_lambda(C3dk, C3dk, -1.0 * opts.lr);
 
-            matrix_t* res = get_matrix_from_tensor(net->C3->mapData, j, i);
+            matrix_t* res = get_matrix_from_tensor(net->C3->kernel, j, i);
 
-            matrix_t* mat1 = get_matrix_from_tensor(net->C3->mapData, j, i);
+            matrix_t* mat1 = get_matrix_from_tensor(net->C3->kernel, j, i);
 
             matrix_add(mat1, C3dk, res);
             destroy_matrix(C3dk);
@@ -74,7 +74,7 @@ static void apply_grads_on_lenet_C3_layer(Lenet* net, LenetTrainOpts opts)
         mat3.height = dSize.height;
         mat3.width = dSize.width;
         mat3.data = net->C3->d->data[i];
-        net->C3->biasData->data[i] = net->C3->biasData->data[i] - opts.lr * matrix_sum(&mat3);
+        net->C3->bias->data[i] = net->C3->bias->data[i] - opts.lr * matrix_sum(&mat3);
     }
 }
 
@@ -82,7 +82,7 @@ static void apply_grads_on_lenet_O5_layer(Lenet* net, LenetTrainOpts opts)
 {
     // 输出层
     // 首先需要将前面的多维输出展开成一维向量
-    float* O5inData = (float*)malloc((net->O5->inputNum) * sizeof(float));
+    float* O5inData = (float*)malloc((net->O5->input_num) * sizeof(float));
     px_size_t outSize = px_create_size(net->S4->in_height / net->S4->map_size, net->S4->in_width / net->S4->map_size);
     for (int i = 0; i < (net->S4->out_channels); i++)
     {
@@ -95,13 +95,13 @@ static void apply_grads_on_lenet_O5_layer(Lenet* net, LenetTrainOpts opts)
         }
     }
 
-    for (int j = 0; j < net->O5->outputNum; j++)
+    for (int j = 0; j < net->O5->output_num; j++)
     {
-        for (int i = 0; i < net->O5->inputNum; i++)
+        for (int i = 0; i < net->O5->input_num; i++)
         {
             net->O5->wData->data[j][i] = net->O5->wData->data[j][i] - opts.lr * net->O5->d->data[j] * O5inData[i];
         }
-        net->O5->biasData->data[j] = net->O5->biasData->data[j] - opts.lr * net->O5->d->data[j];
+        net->O5->bias->data[j] = net->O5->bias->data[j] - opts.lr * net->O5->d->data[j];
     }
     free(O5inData);
 }

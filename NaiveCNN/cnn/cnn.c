@@ -39,7 +39,7 @@ ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, px
     conv_layer->in_channels = in_channels;
     conv_layer->out_channels = out_channels;
 
-    conv_layer->isFullConnect = true; // 默认为全连接
+    conv_layer->is_fully_connected = true; // 默认为全连接
 
     conv_layer->stride_height = stride.height;
     conv_layer->stride_width = stride.width;
@@ -53,7 +53,7 @@ ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, px
     int i, j, c, r;
     
     px_tensor_dim_t tensor_dim = px_create_tensor_dim(in_channels, out_channels, map_size, map_size);
-    conv_layer->mapData = create_tensor(tensor_dim);
+    conv_layer->kernel = create_tensor(tensor_dim);
 
     srand((unsigned)time(NULL));
     for (i = 0; i < in_channels; i++)
@@ -65,17 +65,17 @@ ConvLayer* init_conv_layer(px_size_t in_size, int map_size, px_size_t stride, px
                 for (c = 0; c < map_size; c++)
                 {
                     float randnum = (((float)rand() / (float)RAND_MAX) - 0.5) * 2;
-                    conv_layer->mapData->data[i][j][r][c] = randnum * sqrt((float)6.0 / (float)(map_size * map_size * (in_channels + out_channels)));
+                    conv_layer->kernel->data[i][j][r][c] = randnum * sqrt((float)6.0 / (float)(map_size * map_size * (in_channels + out_channels)));
                 }
             }
         }
     }
 
     // 权重梯度变化
-    conv_layer->dmapData = create_tensor(tensor_dim);
-    clear_tensor(conv_layer->dmapData);
+    conv_layer->d_kernel = create_tensor(tensor_dim);
+    clear_tensor(conv_layer->d_kernel);
 
-    conv_layer->biasData = create_array(out_channels);
+    conv_layer->bias = create_array(out_channels);
 
     px_size_t kernel_size = px_create_size(map_size, map_size);
     px_size_t out_size = get_conv_output_size(in_size, kernel_size, stride, pad);
@@ -106,7 +106,7 @@ PoolingLayer* init_pooling_layer(px_size_t in_size, int mapSize, px_size_t strid
     pool_layer->out_channels = outChannels;
     pool_layer->pool_type = pool_type;
 
-    pool_layer->biasData = create_array(outChannels);
+    pool_layer->bias = create_array(outChannels);
 
     pool_layer->stride_height = stride.height;
     pool_layer->stride_width = stride.width;
@@ -134,15 +134,15 @@ InnerproductLayer* init_innerproduct_layer(int inputNum, int outputNum)
 {
     InnerproductLayer* ip_layer = (InnerproductLayer*)malloc(sizeof(InnerproductLayer));
 
-    ip_layer->inputNum = inputNum;
-    ip_layer->outputNum = outputNum;
+    ip_layer->input_num = inputNum;
+    ip_layer->output_num = outputNum;
 
-    ip_layer->biasData = create_array(outputNum);
+    ip_layer->bias = create_array(outputNum);
     ip_layer->d = create_array(outputNum);
     ip_layer->v = create_array(outputNum);
     ip_layer->y = create_array(outputNum);
 
-    clear_array(ip_layer->biasData);
+    clear_array(ip_layer->bias);
     clear_array(ip_layer->d);
     clear_array(ip_layer->v);
     clear_array(ip_layer->y);
@@ -161,7 +161,7 @@ InnerproductLayer* init_innerproduct_layer(int inputNum, int outputNum)
         }
     }
 
-    ip_layer->isFullConnect = true;
+    ip_layer->is_fully_connected = true;
 
     return ip_layer;
 }

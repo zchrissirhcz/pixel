@@ -25,11 +25,11 @@ typedef struct ConvLayer
     // 其大小为inChannels*outChannels*mapSize*mapSize大小
     // 这里用四维数组，主要是为了表现全连接的形式，实际上卷积层并没有用到全连接的形式
     // 这里的例子是DeapLearningToolboox里的CNN例子，其用到就是全连接
-    tensor_t* mapData;  //存放特征模块的数据
-    tensor_t* dmapData; //存放特征模块的数据的局部梯度
+    tensor_t* kernel;  //存放特征模块的数据
+    tensor_t* d_kernel; //存放特征模块的数据的局部梯度
 
-    array_t* biasData;    //偏置，偏置的大小，为outChannels
-    bool isFullConnect; //是否为全连接
+    array_t* bias;    //偏置，偏置的大小，为outChannels
+    bool is_fully_connected; //是否为全连接
     bool* connectModel; //连接模式（默认为全连接）
 
     // 下面三者的大小同输出的维度相同
@@ -61,7 +61,7 @@ typedef struct PoolingLayer
     int out_channels; //输出图像的数目
 
     int pool_type;   //Pooling的方法
-    array_t* biasData; //偏置
+    array_t* bias; //偏置
 
     cube_t* y; // 采样函数后神经元的输出,无激活函数
     cube_t* d; // 网络的局部梯度,δ值
@@ -80,18 +80,18 @@ typedef struct PoolingLayer
 
 typedef struct InnerproductLayer
 {
-    int inputNum;  //输入数据的数目
-    int outputNum; //输出数据的数目
+    int input_num;  //输入数据的数目
+    int output_num; //输出数据的数目
 
     matrix_t* wData;   // 权重数据，为一个inputNum*outputNum大小
-    array_t* biasData; //偏置，大小为outputNum大小
+    array_t* bias; //偏置，大小为outputNum大小
 
     // 下面三者的大小同输出的维度相同
     array_t* v;  // 进入激活函数的输入值
-    array_t* y; // 激活函数后神经元的输出
+    array_t* y;  // 激活函数后神经元的输出
     array_t* d;  // 网络的局部梯度,δ值
 
-    bool isFullConnect; //是否为全连接
+    bool is_fully_connected; //是否为全连接
 } InnerproductLayer;
 
 #ifdef __cplusplus
