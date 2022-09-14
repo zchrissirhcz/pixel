@@ -88,6 +88,11 @@ void px_read_bmp(const char* filepath, int* _height, int* _width, int* _channel,
     px_read_bmp_custom(filepath, _height, _width, _channel, _buffer, 1, false);
 }
 
+static int read_int32_from_binary(unsigned char* buf)
+{
+    return (uint32_t)buf[0] << 0 | (uint32_t)buf[1] << 8 | (uint32_t)buf[2] << 16 | (uint32_t)buf[3] << 24;
+}
+
 /// decode bmp image
 /// when bmp is BGR(bpp=24), decoded as BGR image  (3 channel)
 /// when bmp is GRAY(bpp=8), decoded as GRAY image (1 channel)
@@ -159,7 +164,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         }
 
         // parse file_size
-        bmp_file_header->file_size = (uint32_t)hd[2] << 0 | (uint32_t)hd[3] << 8 | (uint32_t)hd[4] << 16 | (uint32_t)hd[5] << 24;
+        bmp_file_header->file_size = read_int32_from_binary(hd + 2);
 
         int big_endian = px_is_big_endian();
         if (big_endian)
