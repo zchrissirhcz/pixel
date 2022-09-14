@@ -4,26 +4,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #ifdef __cplusplus
 extern "C"{
 #endif
 
-// save float array as binary file
-// first store its len, then stores its data
-static int save_array_f32_as_bin(float* data, int len, const char* filename);
+// save array's length and elements
+static int save_array_f32_to_binary_file(float* data, int len, const char* filename);
 
-// load float array from binary file, together with array length
-static float* load_array_f32_as_bin(int* _len, const char* filename);
+// load array's length and elements
+static float* load_array_f32_from_binary_file(int* _len, const char* filename);
 
 #ifdef __cplusplus
 }
 #endif
 
-
 //----------------------------------------------------------------------
 
-int save_array_f32_as_bin(float* data, int len, const char* filename) {
+int save_array_f32_to_binary_file(float* data, int len, const char* filename)
+{
     FILE* fout = fopen(filename, "wb");
     fwrite(&len, sizeof(int), 1, fout);
     fwrite(data, sizeof(float), len, fout);
@@ -32,7 +30,7 @@ int save_array_f32_as_bin(float* data, int len, const char* filename) {
     return 0;
 }
 
-float* load_array_f32_as_bin(int* _len, const char* filename)
+float* load_array_f32_from_binary_file(int* _len, const char* filename)
 {
     FILE* fin = fopen(filename, "rb");
     int len;
