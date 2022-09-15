@@ -466,13 +466,13 @@ void px_write_bmp_custom(const char* filepath, int height, int width, int channe
 
         unsigned char hd[54] = {
             //bmp header
-            'B', 'M', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   //bmp file header, 14 bytes
-            40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 //bmp info header, 40 bytes
+            'B', 'M', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   // bmp file header, 14 bytes
+            40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 // bmp info header, 40 bytes
         };
         unsigned int size = 54 + height * width * channels;
         if (channels == 1)
         {
-            size += 1024; //256 colors * 4 bytes, 256 palette is 1<<8, 8 is bpp
+            size += 1024; // 256 colors * 4 bytes, 256 palette is 1<<8, 8 is bpp
         }
 
         hd[2] = (uint8_t)(size);
@@ -510,12 +510,12 @@ void px_write_bmp_custom(const char* filepath, int height, int width, int channe
         }
 
         if (channels == 1)
-        { //colorize with palette, required only when channels==1
-            uint8_t color_cnt = 0;
+        {
+            // colorize with palette, required only when channels==1
             uint8_t palette[1024];
             for (int i = 0; i < 256; i++)
             {
-                palette[i * 4] = i;
+                palette[i * 4 + 0] = i;
                 palette[i * 4 + 1] = i;
                 palette[i * 4 + 2] = i;
                 palette[i * 4 + 3] = 0;
