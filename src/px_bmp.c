@@ -88,9 +88,52 @@ void px_read_bmp(const char* filepath, int* _height, int* _width, int* _channel,
     px_read_bmp_custom(filepath, _height, _width, _channel, _buffer, 1, false);
 }
 
-static int read_int32_from_binary(unsigned char* buf)
+static int32_t read_int32_from_binary(unsigned char* buf)
 {
-    return (uint32_t)buf[0] << 0 | (uint32_t)buf[1] << 8 | (uint32_t)buf[2] << 16 | (uint32_t)buf[3] << 24;
+    int value = (uint32_t)buf[0] << 0 | (uint32_t)buf[1] << 8 | (uint32_t)buf[2] << 16 | (uint32_t)buf[3] << 24;
+
+    int big_endian = px_is_big_endian();
+    if (big_endian)
+    {
+        PX_SWAP_BYTES(value);
+    }
+    return value;
+}
+
+static uint32_t read_uint32_from_binary(unsigned char* buf)
+{
+    uint32_t value = (uint32_t)buf[0] << 0 | (uint32_t)buf[1] << 8 | (uint32_t)buf[2] << 16 | (uint32_t)buf[3] << 24;
+
+    int big_endian = px_is_big_endian();
+    if (big_endian)
+    {
+        PX_SWAP_BYTES(value);
+    }
+    return value;
+}
+
+static int16_t read_int16_from_binary(unsigned char* buf)
+{
+    int16_t value = (uint16_t)buf[0] << 0 | (uint16_t)buf[1] << 8;
+
+    int big_endian = px_is_big_endian();
+    if (big_endian)
+    {
+        PX_SWAP_BYTES(value);
+    }
+    return value;
+}
+
+static uint16_t read_uint16_from_binary(unsigned char* buf)
+{
+    uint16_t value = (uint16_t)buf[0] << 0 | (uint16_t)buf[1] << 8;
+
+    int big_endian = px_is_big_endian();
+    if (big_endian)
+    {
+        PX_SWAP_BYTES(value);
+    }
+    return value;
 }
 
 /// decode bmp image
@@ -166,27 +209,12 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         // parse file_size
         bmp_file_header->file_size = read_int32_from_binary(hd + 2);
 
-        int big_endian = px_is_big_endian();
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_file_header->file_size);
-        }
-
         // parse reserved
-        bmp_file_header->reserved[0] = (uint16_t)hd[6] << 0 | (uint16_t)hd[7] << 8;
-        bmp_file_header->reserved[1] = (uint16_t)hd[8] << 0 | (uint16_t)hd[9] << 8;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_file_header->reserved[0]);
-            PX_SWAP_BYTES(bmp_file_header->reserved[1]);
-        }
+        bmp_file_header->reserved[0] = read_int16_from_binary(hd + 6);
+        bmp_file_header->reserved[1] = read_int16_from_binary(hd + 8);
 
         // parse offset
-        bmp_file_header->offset = (uint32_t)hd[10] << 0 | (uint32_t)hd[11] << 8 | (uint32_t)hd[12] << 16 | (uint32_t)hd[13] << 24;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_file_header->offset);
-        }
+        bmp_file_header->offset = read_int32_from_binary(hd + 10);
 
         // ----------------------------------------------------------------------
         // => decode and validate bmp_info_header
@@ -211,11 +239,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
 
         // parse header_size and validate
         hd = bmp_info_header_buf;
-        bmp_info_header->header_size = (uint32_t)hd[0] << 0 | (uint32_t)hd[1] << 8 | (uint32_t)hd[2] << 16 | (uint32_t)hd[3] << 24;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_info_header->header_size);
-        }
+        bmp_info_header->header_size = read_uint32_from_binary(hd);
         if (bmp_info_header->header_size != 40)
         {
             PX_LOGE("invalid header size. only 40 is valid");
@@ -223,11 +247,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         }
 
         // parse width and validate
-        bmp_info_header->width = (uint32_t)hd[4] << 0 | (uint32_t)hd[5] << 8 | (uint32_t)hd[6] << 16 | (uint32_t)hd[7] << 24;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_info_header->width);
-        }
+        bmp_info_header->width = read_int32_from_binary(hd + 4);
         if (bmp_info_header->width <= 0)
         {
             PX_LOGE("invalid width, >0 required, but got %d", bmp_info_header->width);
@@ -235,11 +255,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         }
 
         // parse height and validate
-        bmp_info_header->height = (uint32_t)hd[8] << 0 | (uint32_t)hd[9] << 8 | (uint32_t)hd[10] << 16 | (uint32_t)hd[11] << 24;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_info_header->height);
-        }
+        bmp_info_header->height = read_int32_from_binary(hd + 8);
         if (bmp_info_header->height <= 0)
         {
             PX_LOGE("invalid height, >0 required, but got %d", bmp_info_header->height);
@@ -247,11 +263,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         }
 
         // parse num_planes and validate
-        bmp_info_header->num_planes = (uint16_t)hd[12] << 0 | (uint16_t)hd[13] << 8;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_info_header->num_planes);
-        }
+        bmp_info_header->num_planes = read_int16_from_binary(hd + 12);
         if (bmp_info_header->num_planes != 1)
         {
             PX_LOGE("invalid num_planes, must be 1");
@@ -259,11 +271,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         }
 
         // parse bits_per_pixel and validate
-        bmp_info_header->bits_per_pixel = (uint16_t)hd[14] << 0 | (uint16_t)hd[15] << 8;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_info_header->bits_per_pixel);
-        }
+        bmp_info_header->bits_per_pixel = read_uint16_from_binary(hd + 14);
         int bpp = bmp_info_header->bits_per_pixel;
         if (bpp != 8 && bpp != 24 && bpp != 32)
         {
@@ -272,11 +280,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         }
 
         // parse compression_type and validate
-        bmp_info_header->compression_type = (uint32_t)hd[16] << 0 | (uint32_t)hd[17] << 8 | (uint32_t)hd[18] << 16 | (uint32_t)hd[19] << 24;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_info_header->compression_type);
-        }
+        bmp_info_header->compression_type = read_uint32_from_binary(hd + 16);
         if (bmp_info_header->compression_type != BMP_RGB)
         {
             PX_LOGE("not supported compression_type, only BMP_RGB supported now");
@@ -284,39 +288,19 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         }
 
         // parse image_size
-        bmp_info_header->image_size = (uint32_t)hd[20] << 0 | (uint32_t)hd[21] << 8 | (uint32_t)hd[22] << 16 | (uint32_t)hd[23] << 24;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_info_header->image_size);
-        }
+        bmp_info_header->image_size = read_uint32_from_binary(hd + 20);
 
         // parse x_resolution
-        bmp_info_header->x_resolution = (uint32_t)hd[24] << 0 | (uint32_t)hd[25] << 8 | (uint32_t)hd[26] << 16 | (uint32_t)hd[27] << 24;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_info_header->x_resolution);
-        }
+        bmp_info_header->x_resolution = read_int32_from_binary(hd + 24);
 
         // parse y_resolution
-        bmp_info_header->y_resolution = (uint32_t)hd[28] << 0 | (uint32_t)hd[29] << 8 | (uint32_t)hd[30] << 16 | (uint32_t)hd[31] << 24;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_info_header->y_resolution);
-        }
+        bmp_info_header->y_resolution = read_int32_from_binary(hd + 28);
 
         // parse num_colors
-        bmp_info_header->num_colors = (uint32_t)hd[32] << 0 | (uint32_t)hd[33] << 8 | (uint32_t)hd[34] << 16 | (uint32_t)hd[35] << 24;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_info_header->num_colors);
-        }
+        bmp_info_header->num_colors = read_uint32_from_binary(hd + 32);
 
         // parse num_important_colors
-        bmp_info_header->num_important_colors = (uint32_t)hd[36] << 0 | (uint32_t)hd[37] << 8 | (uint32_t)hd[38] << 16 | (uint32_t)hd[39] << 24;
-        if (big_endian)
-        {
-            PX_SWAP_BYTES(bmp_info_header->num_important_colors);
-        }
+        bmp_info_header->num_important_colors = read_uint32_from_binary(hd + 36);
 
         // ----------------------------------------------------------------------
         // => read palette if necessary
