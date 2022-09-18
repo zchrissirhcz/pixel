@@ -18,13 +18,10 @@ static const char* project_dir = "/Users/zz/work/pixel/NaiveCNN/";
 
 TEST(mnist, extract_and_save_image)
 {
-    char mnist_data_dir[PX_MAX_PATH] = {0};
-    sprintf(mnist_data_dir, "%s/mnist", project_dir);
-    
-    char save_dir[PX_MAX_PATH] = {0};
-    sprintf(save_dir, "%s/testImgs", mnist_data_dir);
+    std::string mnist_data_dir = std::string(project_dir) + "/mnist";
+    std::string save_dir = mnist_data_dir + "/testImgs";
 
     const char* mnist_filename = "t10k-images.idx3-ubyte";
 
-    px_extract_mnist_image_and_save(mnist_data_dir, mnist_filename, save_dir);
+    px_extract_mnist_image_and_save(mnist_data_dir.c_str(), mnist_filename, save_dir.c_str());
 }
