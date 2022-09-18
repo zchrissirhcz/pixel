@@ -556,9 +556,9 @@ float array_mean_u8_asimd5(unsigned char* data, size_t len) {
 
         flag = true;
     }
-    vsum.val[0] = vaddq_s64(vsum.val[0], vsum.val[1]);
-    vsum.val[0] = vaddq_s64(vsum.val[0], vsum.val[2]);
-    vsum.val[0] = vaddq_s64(vsum.val[0], vsum.val[3]);
+    vsum.val[0] = vaddq_u64(vsum.val[0], vsum.val[1]);
+    vsum.val[0] = vaddq_u64(vsum.val[0], vsum.val[2]);
+    vsum.val[0] = vaddq_u64(vsum.val[0], vsum.val[3]);
 
     uint64_t sum_lst[2];
     vst1q_u64(sum_lst, vsum.val[0]);
