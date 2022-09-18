@@ -39,15 +39,15 @@ jobs:
         make install
         cp -r `pwd`/install $GITHUB_WORKSPACE/qemu-install
 
-    #- name: aarch64-gnu-toolchain
-    #   run: |
-    #     sudo apt-get update
-    #     sudo apt-get install g++-aarch64-linux-gnu
-    - name: Cache APT Packages
-      uses: awalsh128/cache-apt-pkgs-action@latest
-      with:
-        packages: g++-aarch64-linux-gnu
-        version: 1.0
+    - name: aarch64-gnu-toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install g++-aarch64-linux-gnu
+    # - name: Cache APT Packages
+    #   uses: awalsh128/cache-apt-pkgs-action@latest
+    #   with:
+    #     packages: g++-aarch64-linux-gnu
+    #     version: 1.0
 
     - name: cache-googletest
       id: cache-googletest
