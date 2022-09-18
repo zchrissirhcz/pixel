@@ -44,7 +44,14 @@ jobs:
         sudo apt-get update
         sudo apt-get install g++-aarch64-linux-gnu
 
+    - name: cache-googletest
+      id: cache-googletest
+      uses: actions/cache@v3.0.8
+      with:
+        path: googletest-install
+        key: googletest-install-1
     - name: googletest
+      if: steps.cache-googletest.outputs.cache-hit != 'true'
       run: |
         git clone https://github.com/google/googletest --depth 1
         cd googletest
@@ -53,7 +60,14 @@ jobs:
         cmake --build . -j 2
         cmake --install .
 
+    - name: cache-benchmark
+      id: cache-benchmark
+      uses: actions/cache@v3.0.8
+      with:
+        path: benchmark-install
+        key: benchmark-install-1
     - name: benchmark
+      if: steps.cache-benchmark.outputs.cache-hit != 'true'
       run: |
         git clone https://github.com/google/benchmark -b v1.7.0 --depth 1
         cd benchmark
@@ -62,7 +76,14 @@ jobs:
         cmake --build . -j 2
         cmake --install .
 
+    - name: cache-opencv
+      id: cache-opencv
+      uses: actions/cache@v3.0.8
+      with:
+        path: opencv-install
+        key: opencv-install-1
     - name: opencv
+      if: steps.cache-opencv.outputs.cache-hit != 'true'
       run: |
         git clone https://github.com/opencv/opencv -b 4.6.0 --depth 1
         cd opencv
@@ -79,5 +100,5 @@ jobs:
     - name: test
       run: |
         export PATH=$GITHUB_WORKSPACE/qemu-install/bin:$PATH
-        cd neon_ref/build-aarch64
+        cd build-aarch64
         TESTS_EXECUTABLE_LOADER=qemu-aarch64 TESTS_EXECUTABLE_LOADER_ARGUMENTS="-L;/usr/aarch64-linux-gnu" ctest --output-on-failure -j 2
