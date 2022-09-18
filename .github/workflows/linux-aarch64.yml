@@ -59,6 +59,8 @@ jobs:
         cd benchmark
         mkdir build && cd build
         cmake -DCMAKE_TOOLCHAIN_FILE=../../cmake/aarch64-linux-gnu.toolchain.cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/benchmark-install .. -DBENCHMARK_ENABLE_TESTING=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        cmake --build . -j 2
+        cmake --install .
 
     - name: opencv
       run: |
