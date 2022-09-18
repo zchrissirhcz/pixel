@@ -87,3 +87,25 @@ char* px_getpwd()
     }
     return buffer;
 }
+
+PX_FILE_STATE px_get_file_or_directory_state(const char* fname)
+{
+    if(access(fname, 0)!=-1)
+    {
+        if(access(fname, 2)!=-1)
+        {
+            return PX_FILE_EXIST_AND_WRITABLE;
+        }
+        else
+        {
+            return PX_FILE_EXIST_AND_NOT_WRITABLE;
+        }
+    } else {
+        return PX_FILE_NOT_EXIST;
+    }
+}
+
+bool px_is_file_exist(const char* fname)
+{
+    return px_get_file_or_directory_state(fname) != PX_FILE_NOT_EXIST;
+}
