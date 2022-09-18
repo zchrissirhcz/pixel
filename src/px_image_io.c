@@ -43,8 +43,9 @@ bool px_write_image(px_image_t* im, const char* filename)
 
     if (px_get_file_or_directory_state(filename) != PX_FILE_NOT_EXIST)
     {
-        PX_LOGE("failed to save image: filename already exist\n");
-        return false;
+        //PX_LOGE("failed to save image: filename already exist\n");
+        //return false;
+        PX_LOGE("warning: overwriting existing file");
     }
 
     const char* ext = filename + strlen(filename) - 4;

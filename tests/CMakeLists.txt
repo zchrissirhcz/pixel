@@ -17,7 +17,7 @@ pixel_add_test(px_arithm_test)
 pixel_add_test(px_compare_test)
 pixel_add_test(px_bmp_test)
 pixel_add_test(px_mnist_test)
-
+pixel_add_test(px_image_io_test)
 
 execute_process(
   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/assets/mingren.bmp ${CMAKE_BINARY_DIR}/
