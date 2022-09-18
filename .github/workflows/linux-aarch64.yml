@@ -53,6 +53,13 @@ jobs:
         cmake --build . -j 2
         cmake --install .
 
+    - name: benchmark
+      run: |
+        git clone https://github.com/google/benchmark -b v1.7.0 --depth 1
+        cd benchmark
+        mkdir build && cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=../../cmake/aarch64-linux-gnu.toolchain.cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/benchmark-install .. -DBENCHMARK_ENABLE_TESTING=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+
     - name: opencv
       run: |
         git clone https://github.com/opencv/opencv -b 4.6.0 --depth 1
@@ -64,7 +71,7 @@ jobs:
     - name: build
       run: |
         mkdir build-aarch64 && cd build-aarch64
-        cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/aarch64-linux-gnu.toolchain.cmake -DGTest_DIR=$GITHUB_WORKSPACE/googletest-install/lib/cmake/GTest ..
+        cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/aarch64-linux-gnu.toolchain.cmake -DGTest_DIR=$GITHUB_WORKSPACE/googletest-install/lib/cmake/GTest -Dbenchmark_DIR=$GITHUB_WORKSPACE/benchmark-install/lib/cmake/benchmark -DOpenCV_DIR=$GITHUB_WORKSPACE/opencv-install/lib/cmake/opencv4 ..
         cmake --build . -j 2
     - name: test
       run: |
