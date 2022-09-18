@@ -53,6 +53,14 @@ jobs:
         cmake --build . -j 2
         cmake --install .
 
+    - name: opencv
+      run: |
+        git clone https://github.com/opencv/opencv -b 4.6.0 --depth 1
+        cd opencv
+        cmake . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=../cmake/aarch64-linux-gnu.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opencv-install -DBUILD_LIST='core,imgcodecs,imgproc' -D BUILD_SHARED_LIBS=OFF -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF -D BUILD_DOCS=OFF  -D BUILD_opencv_python3=OFF -D WITH_IPP=OFF -D WITH_PROTOBUF=OFF -D WITH_QUIRC=OFF -D WITH_EIGEN=OFF -DWITH_WEBP=OFF -DBUILD_WEBP=OFF -DWITH_OPENCL=OFF -DWITH_JAVA=OFF  -DWITH_OPENEXR=OFF -DBUILD_OPENEXR=OFF -DWITH_JASPER=OFF -D BUILD_JASPER=OFF -DWITH_TIFF=OFF -D BUILD_TIFF=OFF -DWITH_OPENJPEG=OFF -D BUILD_OPENJPEG=OFF -DCV_DISABLE_OPTIMIZATION=OFF
+        cmake --build build -j 2
+        cmake --install build
+
     - name: build
       run: |
         mkdir build-aarch64 && cd build-aarch64
