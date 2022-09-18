@@ -15,7 +15,7 @@ if(OVERLOOK_INCLUDE_GUARD)
 endif()
 set(OVERLOOK_INCLUDE_GUARD TRUE)
 
-set(OVERLOOK_VERSION "2022.09.08")
+set(OVERLOOK_VERSION "2022.09.18")
 
 ###############################################################
 #
@@ -142,7 +142,9 @@ if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
   overlook_list_append(OVERLOOK_CXX_FLAGS /we4013)
 elseif(CMAKE_C_COMPILER_ID MATCHES "GNU")
   overlook_list_append(OVERLOOK_C_FLAGS -Werror=implicit-function-declaration)
-  overlook_list_append(OVERLOOK_CXX_FLAGS -Werror=implicit-function-declaration)
+  if(CMAKE_CXX_COMPILER_VERSION LESS 9.1)
+    overlook_list_append(OVERLOOK_CXX_FLAGS -Werror=implicit-function-declaration)
+  endif()
 elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
   overlook_list_append(OVERLOOK_C_FLAGS -Werror=implicit-function-declaration)
   overlook_list_append(OVERLOOK_CXX_FLAGS -Werror=implicit-function-declaration)
