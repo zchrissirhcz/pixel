@@ -43,9 +43,11 @@ px_size_t px_get_image_size(px_image_t* image);
 uint8_t px_get_pixel(px_image_t* image, int i, int j, int k);
 void px_set_pixel(px_image_t* image, int i, int j, int k, uint8_t value);
 
-void px_rgb2bgr(px_image_t* src, px_image_t* dst);
 void px_rgb2gray(px_image_t* src, px_image_t* dst);
 void px_rgb2gray_fixed(px_image_t* src, px_image_t* dst);
+
+void px_rgb2bgr(px_image_t* src, px_image_t* dst);
+void px_rgb2bgr_inplace(px_image_t* image);
 
 // flipmode
 // input     vertical    horizontal    both

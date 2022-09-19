@@ -25,3 +25,21 @@ void px_rgb2bgr(px_image_t* src, px_image_t* dst)
         }
     }
 }
+
+void px_rgb2bgr_inplace(px_image_t* image)
+{
+    PX_ASSERT(px_is_valid_rgb_image(image));
+
+    const int h = image->height;
+    const int w = image->width;
+    const int cn = image->channel;
+    for (int i = 0; i < h; i++)
+    {
+        uint8_t* sp = image->data + i * image->stride;
+        for (int j = 0; j < w; j++)
+        {
+            sp[0] ^= sp[2] ^= sp[0] ^= sp[2];
+            sp += cn;
+        }
+    }
+}
