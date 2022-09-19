@@ -5,6 +5,7 @@ extern "C" {
 #endif
 
 double px_get_current_time();
+void px_sleep(int milliseconds);
 
 #ifdef __cplusplus
 }

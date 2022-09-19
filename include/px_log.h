@@ -10,3 +10,6 @@
 #define PX_LOGE(...) do { \
     fprintf(stderr, ##__VA_ARGS__); fprintf(stderr, "\n"); } while(0)
 #endif // __ANDROID_API__ >= 8
+
+// the simples
+// #define PX_LOGE(...) fprintf(stderr, ##__VA_ARGS__)
