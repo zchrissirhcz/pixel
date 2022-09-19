@@ -1,13 +1,15 @@
 macro(pixel_add_test name)
   add_executable(${name} ${name}.cpp)
   target_link_libraries(${name} pixel ${OpenCV_LIBS} GTest::gtest GTest::gtest_main)
-  #gtest_add_tests(TARGET ${name} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
   if((NOT ANDROID) AND CMAKE_SYSTEM_NAME MATCHES "Linux" AND CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
     gtest_add_tests(TARGET ${name}
       COMMAND ${CMAKE_COMMAND} -DTEST_EXECUTABLE=$<TARGET_FILE:${name}> -P ${CMAKE_SOURCE_DIR}/cmake/qemu_run_test.cmake
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
   else()
-    gtest_add_tests(TARGET test_${name})
+    gtest_add_tests(TARGET test_${name}
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
   endif()
 endmacro()
 
