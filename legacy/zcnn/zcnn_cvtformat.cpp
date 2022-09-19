@@ -1,5 +1,5 @@
 #include "zcnn_cvtformat.h"
-#include "zcnn_base.h"
+#include "px_arithm.h"
 
 #define fix(x,n) (int)((x)*(1 << (n)) + 0.5)
 
@@ -19,16 +19,16 @@
 
 #define ALIGN(size) (((size)+3) & -4)
 #define EVEN_DOWN(x) (x&0xfffffffe)
-#define CLIP(x) (uchar)((x)&(~255)?((-x)>>31):(x))
+#define CLIP(x) (uint8_t)((x)&(~255)?((-x)>>31):(x))
 #define LINE_BYTES(Width, BitCt)    (((int)(Width) * (BitCt) + 31) / 32 * 4)
 
 
 // 要求开辟yuv_data时的宽和高均为偶数; width&height分别为原始图像的宽和高, 可以为奇数
-void bgr_to_yuv420(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uchar* yuv_data)
+void bgr_to_yuv420(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
 {
     int i, j;
     int YUVwidth, YUVheight;
-    uchar* pY, *pU, *pV;
+    uint8_t* pY, *pU, *pV;
 
     YUVwidth = ((bgr_width >> 1) << 1);
     YUVheight = ((bgr_height >> 1) << 1);
@@ -37,7 +37,7 @@ void bgr_to_yuv420(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_
     pU = yuv_data + YUVwidth * YUVheight;
     pV = pU + YUVwidth * YUVheight / 4;
 
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
 
     for (i = 0; i < YUVheight; i += 2)
     {
@@ -105,11 +105,11 @@ void bgr_to_yuv420(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_
     }
 }
 
-void bgr_to_yuv420_rotate90(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uchar* yuv_data)
+void bgr_to_yuv420_rotate90(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
 {
     int i, j;
     int YUVwidth, YUVheight;
-    uchar* pY, *pU, *pV;
+    uint8_t* pY, *pU, *pV;
 
     YUVwidth = ((bgr_width >> 1) << 1);
     YUVheight = ((bgr_height >> 1) << 1);
@@ -118,7 +118,7 @@ void bgr_to_yuv420_rotate90(uchar* bgr_data, int bgr_width, int bgr_height, int 
     pU = yuv_data + YUVwidth * YUVheight;
     pV = pU + YUVwidth * YUVheight / 4;
 
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
 
     for (j = 0; j < YUVwidth; j += 2)
     {
@@ -189,11 +189,11 @@ void bgr_to_yuv420_rotate90(uchar* bgr_data, int bgr_width, int bgr_height, int 
     }
 }
 
-void bgr_to_yuv420_rotate270(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uchar* yuv_data)
+void bgr_to_yuv420_rotate270(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
 {
     int i, j;
     int YUVwidth, YUVheight;
-    uchar* pY, *pU, *pV;
+    uint8_t* pY, *pU, *pV;
 
     YUVwidth = ((bgr_width >> 1) << 1);
     YUVheight = ((bgr_height >> 1) << 1);
@@ -202,7 +202,7 @@ void bgr_to_yuv420_rotate270(uchar* bgr_data, int bgr_width, int bgr_height, int
     pU = yuv_data + YUVwidth * YUVheight;
     pV = pU + YUVwidth * YUVheight / 4;
 
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
 
     for (j = 0; j < YUVwidth; j += 2)
     {
@@ -275,13 +275,13 @@ void bgr_to_yuv420_rotate270(uchar* bgr_data, int bgr_width, int bgr_height, int
 
 
 
-void bgr_to_yuv422(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uchar* yuv_data)
+void bgr_to_yuv422(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
 {
     int b, g, r, y1, y2, cr1, cr2, cb1, cb2, i, j;
     int YUVwidth = EVEN_DOWN(bgr_width);
     int YUVheight = EVEN_DOWN(bgr_height);
 
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
 
     for (i = 0; i < YUVheight; i++)
     {
@@ -311,10 +311,10 @@ void bgr_to_yuv422(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_
     }
 }
 
-void bgr_to_yvyu422(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uchar* yuv_data)
+void bgr_to_yvyu422(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
 {
     int b, g, r, y1, y2, cr1, cr2, cb1, cb2, i, j;
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
     for (i = 0; i < bgr_height; i++)
     {
         for (j = 0; j < bgr_width; j += 2)
@@ -343,10 +343,10 @@ void bgr_to_yvyu422(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line
     }
 }
 
-void bgr_to_uyvy422(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uchar* yuv_data)
+void bgr_to_uyvy422(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
 {
     int b, g, r, y1, y2, cr1, cr2, cb1, cb2, i, j;
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
     for (i = 0; i < bgr_height; i++)
     {
         for (j = 0; j < bgr_width; j += 2)
@@ -375,10 +375,10 @@ void bgr_to_uyvy422(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line
     }
 }
 
-void bgr_to_vyuy422(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uchar* yuv_data)
+void bgr_to_vyuy422(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
 {
     int b, g, r, y1, y2, cr1, cr2, cb1, cb2, i, j;
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
     for (i = 0; i < bgr_height; i++)
     {
         for (j = 0; j < bgr_width; j += 2)
@@ -412,12 +412,12 @@ void bgr_to_vyuy422(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line
 
 
 
-void bgr_to_gray(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uchar* gray_data)
+void bgr_to_gray(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* gray_data)
 {
     int i, j;
-    uchar* pY, *pU, *pV;
+    uint8_t* pY, *pU, *pV;
 
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
 
     for (i = 0; i < bgr_height; i++)
     {
@@ -437,7 +437,7 @@ void bgr_to_gray(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_al
 }
 
 
-void bgr_to_bgr565(uchar* bgr_data, int nW, int nH, uchar* bgr565_data)
+void bgr_to_bgr565(uint8_t* bgr_data, int nW, int nH, uint8_t* bgr565_data)
 {
     short *pdst = (short *)bgr565_data;
     int iSrcXStride = LINE_BYTES(nW, 24);
@@ -447,9 +447,9 @@ void bgr_to_bgr565(uchar* bgr_data, int nW, int nH, uchar* bgr565_data)
     {
         for (j = 0; j < nW; j++)
         {
-            uchar b = bgr_data[i*iSrcXStride + j * 3];
-            uchar g = bgr_data[i*iSrcXStride + j * 3 + 1];
-            uchar r = bgr_data[i*iSrcXStride + j * 3 + 2];
+            uint8_t b = bgr_data[i*iSrcXStride + j * 3];
+            uint8_t g = bgr_data[i*iSrcXStride + j * 3 + 1];
+            uint8_t r = bgr_data[i*iSrcXStride + j * 3 + 2];
             short wColor = (r >> 3 << 11) | (g >> 2 << 5) | (b >> 3);
             pdst[i*iDstYStride + j] = wColor;
         }
@@ -457,7 +457,7 @@ void bgr_to_bgr565(uchar* bgr_data, int nW, int nH, uchar* bgr565_data)
 }
 
 
-void bgr_to_bgra(uchar* bgr_data, int nW, int nH, uchar* bgra_data)
+void bgr_to_bgra(uint8_t* bgr_data, int nW, int nH, uint8_t* bgra_data)
 {
     int iSrcXStride = LINE_BYTES(nW, 24);
     int iDstXStride = LINE_BYTES(nW, 32);
@@ -475,10 +475,10 @@ void bgr_to_bgra(uchar* bgr_data, int nW, int nH, uchar* bgra_data)
 
 
 
-void bgr_to_nv21_separate(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uchar* yuv_data)
+void bgr_to_nv21_separate(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
 {
     int i, j, YUVwidth, YUVheight;
-    uchar* pY, *pU, *pV;
+    uint8_t* pY, *pU, *pV;
 
     YUVwidth = EVEN_DOWN(bgr_width);
     YUVheight = EVEN_DOWN(bgr_height);
@@ -486,7 +486,7 @@ void bgr_to_nv21_separate(uchar* bgr_data, int bgr_width, int bgr_height, int bg
     pY = yuv_data;
     pU = yuv_data + YUVwidth * YUVheight;
 
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
 
     for (i = 0; i < YUVheight; i += 2)
     {
@@ -552,7 +552,7 @@ void bgr_to_nv21_separate(uchar* bgr_data, int bgr_width, int bgr_height, int bg
     }
 }
 
-void bgr_to_yuv444(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uchar* yuv_data)
+void bgr_to_yuv444(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
 {
     int i, j;
     int YUVwidth, YUVheight;
@@ -560,7 +560,7 @@ void bgr_to_yuv444(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_
     YUVwidth = bgr_width;
     YUVheight = bgr_height;
 
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
 
     for (i = 0; i < YUVheight; i++)
     {
@@ -584,13 +584,13 @@ void bgr_to_yuv444(uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_
     }
 }
 
-void bgr_from_yuv444(uchar* yuv_data, uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment)
+void bgr_from_yuv444(uint8_t* yuv_data, uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment)
 {
     int i, j;
     int BGRwidth, BGRheight;
     int widthstep_yuv = 3 * bgr_width;
 
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
 
     for (i = 0; i < bgr_height; i++)
     {
@@ -618,11 +618,11 @@ void bgr_from_yuv444(uchar* yuv_data, uchar* bgr_data, int bgr_width, int bgr_he
     }
 }
 
-void bgr_from_yuv420(uchar* yuv_data, uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment)
+void bgr_from_yuv420(uint8_t* yuv_data, uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment)
 {
     int i, j;
     int BGRwidth, BGRheight;
-    uchar*py, *pu, *pv;
+    uint8_t*py, *pu, *pv;
     int widthstep_y = bgr_width;
     int widthstep_u = bgr_width / 2;
     int widthstep_v = bgr_width / 2;
@@ -630,7 +630,7 @@ void bgr_from_yuv420(uchar* yuv_data, uchar* bgr_data, int bgr_width, int bgr_he
     pu = yuv_data + bgr_width * bgr_height;
     pv = pu + bgr_width * bgr_height / 4;
 
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
 
     for (i = 0; i < bgr_height; i++)
     {
@@ -658,18 +658,18 @@ void bgr_from_yuv420(uchar* yuv_data, uchar* bgr_data, int bgr_width, int bgr_he
     }
 }
 
-void bgr_from_nv21(uchar* yuv_data, uchar* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment)
+void bgr_from_nv21(uint8_t* yuv_data, uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment)
 {
     int i, j;
     int BGRwidth, BGRheight;
-    uchar*py, *pv;
+    uint8_t*py, *pv;
     int widthstep_y = bgr_width;
     int widthstep_u = bgr_width / 2;
     int widthstep_v = bgr_width / 2;
     py = yuv_data;
     pv = yuv_data + bgr_width * bgr_height;
 
-    const int bgr_line_elem = align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
 
     for (i = 0; i < bgr_height; i++)
     {
