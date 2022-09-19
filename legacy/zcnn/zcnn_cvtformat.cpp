@@ -24,20 +24,20 @@
 
 
 // 要求开辟yuv_data时的宽和高均为偶数; width&height分别为原始图像的宽和高, 可以为奇数
-void bgr_to_yuv420(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
+void bgr_to_yuv420(px_image_t* bgr, uint8_t* yuv_data)
 {
     int i, j;
     int YUVwidth, YUVheight;
     uint8_t* pY, *pU, *pV;
 
-    YUVwidth = ((bgr_width >> 1) << 1);
-    YUVheight = ((bgr_height >> 1) << 1);
+    YUVwidth = ((bgr->width >> 1) << 1);
+    YUVheight = ((bgr->height >> 1) << 1);
 
     pY = yuv_data;
     pU = yuv_data + YUVwidth * YUVheight;
     pV = pU + YUVwidth * YUVheight / 4;
 
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = bgr->stride;
 
     for (i = 0; i < YUVheight; i += 2)
     {
@@ -45,9 +45,9 @@ void bgr_to_yuv420(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_lin
         {
             int b, g, r, y1, cr1, cb1;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -57,9 +57,9 @@ void bgr_to_yuv420(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_lin
 
             j++;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -70,9 +70,9 @@ void bgr_to_yuv420(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_lin
 
             i++; j--;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -82,9 +82,9 @@ void bgr_to_yuv420(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_lin
 
             j++;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -105,20 +105,20 @@ void bgr_to_yuv420(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_lin
     }
 }
 
-void bgr_to_yuv420_rotate90(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
+void bgr_to_yuv420_rotate90(px_image_t* bgr, uint8_t* yuv_data)
 {
     int i, j;
     int YUVwidth, YUVheight;
     uint8_t* pY, *pU, *pV;
 
-    YUVwidth = ((bgr_width >> 1) << 1);
-    YUVheight = ((bgr_height >> 1) << 1);
+    YUVwidth = ((bgr->width >> 1) << 1);
+    YUVheight = ((bgr->height >> 1) << 1);
 
     pY = yuv_data;
     pU = yuv_data + YUVwidth * YUVheight;
     pV = pU + YUVwidth * YUVheight / 4;
 
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = bgr->stride;
 
     for (j = 0; j < YUVwidth; j += 2)
     {
@@ -126,9 +126,9 @@ void bgr_to_yuv420_rotate90(uint8_t* bgr_data, int bgr_width, int bgr_height, in
         {
             int b, g, r, y1, cr1, cb1;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -138,9 +138,9 @@ void bgr_to_yuv420_rotate90(uint8_t* bgr_data, int bgr_width, int bgr_height, in
 
             j++;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
@@ -153,9 +153,9 @@ void bgr_to_yuv420_rotate90(uint8_t* bgr_data, int bgr_width, int bgr_height, in
 
             i++; j--;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
@@ -166,9 +166,9 @@ void bgr_to_yuv420_rotate90(uint8_t* bgr_data, int bgr_width, int bgr_height, in
 
             j++;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
@@ -189,20 +189,20 @@ void bgr_to_yuv420_rotate90(uint8_t* bgr_data, int bgr_width, int bgr_height, in
     }
 }
 
-void bgr_to_yuv420_rotate270(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
+void bgr_to_yuv420_rotate270(px_image_t* bgr, uint8_t* yuv_data)
 {
     int i, j;
     int YUVwidth, YUVheight;
     uint8_t* pY, *pU, *pV;
 
-    YUVwidth = ((bgr_width >> 1) << 1);
-    YUVheight = ((bgr_height >> 1) << 1);
+    YUVwidth = ((bgr->width >> 1) << 1);
+    YUVheight = ((bgr->height >> 1) << 1);
 
     pY = yuv_data;
     pU = yuv_data + YUVwidth * YUVheight;
     pV = pU + YUVwidth * YUVheight / 4;
 
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = bgr->stride;
 
     for (j = 0; j < YUVwidth; j += 2)
     {
@@ -210,9 +210,9 @@ void bgr_to_yuv420_rotate270(uint8_t* bgr_data, int bgr_width, int bgr_height, i
         {
             int b, g, r, y1, cr1, cb1;
 
-            b = bgr_data[(YUVheight - 1 - i)*bgr_line_elem + j * 3];
-            g = bgr_data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3];
+            g = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -222,9 +222,9 @@ void bgr_to_yuv420_rotate270(uint8_t* bgr_data, int bgr_width, int bgr_height, i
 
             j++;
 
-            b = bgr_data[(YUVheight - 1 - i)*bgr_line_elem + j * 3];
-            g = bgr_data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3];
+            g = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
@@ -235,9 +235,9 @@ void bgr_to_yuv420_rotate270(uint8_t* bgr_data, int bgr_width, int bgr_height, i
 
             i++; j--;
 
-            b = bgr_data[(YUVheight - 1 - i)*bgr_line_elem + j * 3];
-            g = bgr_data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3];
+            g = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
@@ -248,9 +248,9 @@ void bgr_to_yuv420_rotate270(uint8_t* bgr_data, int bgr_width, int bgr_height, i
 
             j++;
 
-            b = bgr_data[(YUVheight - 1 - i)*bgr_line_elem + j * 3];
-            g = bgr_data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3];
+            g = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
@@ -275,29 +275,29 @@ void bgr_to_yuv420_rotate270(uint8_t* bgr_data, int bgr_width, int bgr_height, i
 
 
 
-void bgr_to_yuv422(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
+void bgr_to_yuv422(px_image_t* bgr, uint8_t* yuv_data)
 {
     int b, g, r, y1, y2, cr1, cr2, cb1, cb2, i, j;
-    int YUVwidth = EVEN_DOWN(bgr_width);
-    int YUVheight = EVEN_DOWN(bgr_height);
+    int YUVwidth = EVEN_DOWN(bgr->width);
+    int YUVheight = EVEN_DOWN(bgr->height);
 
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = bgr->stride;
 
     for (i = 0; i < YUVheight; i++)
     {
         for (j = 0; j < YUVwidth; j += 2)
         {
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 = ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
-            b = bgr_data[i*bgr_line_elem + (j + 1) * 3];
-            g = bgr_data[i*bgr_line_elem + (j + 1) * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + (j + 1) * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + (j + 1) * 3];
+            g = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 2];
 
             y2 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb2 = ((b - y2)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -311,98 +311,98 @@ void bgr_to_yuv422(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_lin
     }
 }
 
-void bgr_to_yvyu422(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
+void bgr_to_yvyu422(px_image_t* bgr, uint8_t* yuv_data)
 {
     int b, g, r, y1, y2, cr1, cr2, cb1, cb2, i, j;
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
-    for (i = 0; i < bgr_height; i++)
+    const int bgr_line_elem = bgr->stride;
+    for (i = 0; i < bgr->height; i++)
     {
-        for (j = 0; j < bgr_width; j += 2)
+        for (j = 0; j < bgr->width; j += 2)
         {
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 = ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
-            b = bgr_data[i*bgr_line_elem + (j + 1) * 3];
-            g = bgr_data[i*bgr_line_elem + (j + 1) * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + (j + 1) * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + (j + 1) * 3];
+            g = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 2];
 
             y2 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb2 = ((b - y2)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr2 = ((r - y2)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
-            yuv_data[i*bgr_width * 2 + j * 2] = y2;
-            yuv_data[i*bgr_width * 2 + j * 2 + 1] = (cb1 + cb2) >> 1;
-            yuv_data[i*bgr_width * 2 + j * 2 + 2] = y1;
-            yuv_data[i*bgr_width * 2 + j * 2 + 3] = (cr1 + cr2) >> 1;
+            yuv_data[i*bgr->width * 2 + j * 2] = y2;
+            yuv_data[i*bgr->width * 2 + j * 2 + 1] = (cb1 + cb2) >> 1;
+            yuv_data[i*bgr->width * 2 + j * 2 + 2] = y1;
+            yuv_data[i*bgr->width * 2 + j * 2 + 3] = (cr1 + cr2) >> 1;
         }
     }
 }
 
-void bgr_to_uyvy422(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
+void bgr_to_uyvy422(px_image_t* bgr, uint8_t* yuv_data)
 {
     int b, g, r, y1, y2, cr1, cr2, cb1, cb2, i, j;
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
-    for (i = 0; i < bgr_height; i++)
+    const int bgr_line_elem = bgr->stride;
+    for (i = 0; i < bgr->height; i++)
     {
-        for (j = 0; j < bgr_width; j += 2)
+        for (j = 0; j < bgr->width; j += 2)
         {
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 = ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
-            b = bgr_data[i*bgr_line_elem + (j + 1) * 3];
-            g = bgr_data[i*bgr_line_elem + (j + 1) * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + (j + 1) * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + (j + 1) * 3];
+            g = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 2];
 
             y2 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb2 = ((b - y2)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr2 = ((r - y2)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
-            yuv_data[i*bgr_width * 2 + j * 2] = (cb1 + cb2) >> 1;
-            yuv_data[i*bgr_width * 2 + j * 2 + 1] = y1;
-            yuv_data[i*bgr_width * 2 + j * 2 + 2] = (cr1 + cr2) >> 1;
-            yuv_data[i*bgr_width * 2 + j * 2 + 3] = y2;
+            yuv_data[i*bgr->width * 2 + j * 2] = (cb1 + cb2) >> 1;
+            yuv_data[i*bgr->width * 2 + j * 2 + 1] = y1;
+            yuv_data[i*bgr->width * 2 + j * 2 + 2] = (cr1 + cr2) >> 1;
+            yuv_data[i*bgr->width * 2 + j * 2 + 3] = y2;
         }
     }
 }
 
-void bgr_to_vyuy422(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
+void bgr_to_vyuy422(px_image_t* bgr, uint8_t* yuv_data)
 {
     int b, g, r, y1, y2, cr1, cr2, cb1, cb2, i, j;
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
-    for (i = 0; i < bgr_height; i++)
+    const int bgr_line_elem = bgr->stride;
+    for (i = 0; i < bgr->height; i++)
     {
-        for (j = 0; j < bgr_width; j += 2)
+        for (j = 0; j < bgr->width; j += 2)
         {
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 = ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
-            b = bgr_data[i*bgr_line_elem + (j + 1) * 3];
-            g = bgr_data[i*bgr_line_elem + (j + 1) * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + (j + 1) * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + (j + 1) * 3];
+            g = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 2];
 
             y2 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb2 = ((b - y2)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr2 = ((r - y2)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
-            yuv_data[i*bgr_width * 2 + j * 2] = (cr1 + cr2) >> 1;
-            yuv_data[i*bgr_width * 2 + j * 2 + 1] = y1;
-            yuv_data[i*bgr_width * 2 + j * 2 + 2] = (cb1 + cb2) >> 1;
-            yuv_data[i*bgr_width * 2 + j * 2 + 3] = y2;
+            yuv_data[i*bgr->width * 2 + j * 2] = (cr1 + cr2) >> 1;
+            yuv_data[i*bgr->width * 2 + j * 2 + 1] = y1;
+            yuv_data[i*bgr->width * 2 + j * 2 + 2] = (cb1 + cb2) >> 1;
+            yuv_data[i*bgr->width * 2 + j * 2 + 3] = y2;
         }
     }
 }
@@ -412,34 +412,36 @@ void bgr_to_vyuy422(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_li
 
 
 
-void bgr_to_gray(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* gray_data)
+void bgr_to_gray(px_image_t* bgr, uint8_t* gray_data)
 {
     int i, j;
     uint8_t* pY, *pU, *pV;
 
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = bgr->stride;
 
-    for (i = 0; i < bgr_height; i++)
+    for (i = 0; i < bgr->height; i++)
     {
-        for (j = 0; j < bgr_width; j++)
+        for (j = 0; j < bgr->width; j++)
         {
             int b, g, r, y1, cr1, cb1;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
-            gray_data[i*bgr_width + j] = y1;
+            gray_data[i*bgr->width + j] = y1;
         }
     }
 }
 
 
-void bgr_to_bgr565(uint8_t* bgr_data, int nW, int nH, uint8_t* bgr565_data)
+void bgr_to_bgr565(px_image_t* bgr, uint8_t* bgr565_data)
 {
     short *pdst = (short *)bgr565_data;
+    const int nW = bgr->width;
+    const int nH = bgr->height;
     int iSrcXStride = LINE_BYTES(nW, 24);
     int iDstYStride = LINE_BYTES(nW, 16) / 2;
     int i, j;
@@ -447,9 +449,9 @@ void bgr_to_bgr565(uint8_t* bgr_data, int nW, int nH, uint8_t* bgr565_data)
     {
         for (j = 0; j < nW; j++)
         {
-            uint8_t b = bgr_data[i*iSrcXStride + j * 3];
-            uint8_t g = bgr_data[i*iSrcXStride + j * 3 + 1];
-            uint8_t r = bgr_data[i*iSrcXStride + j * 3 + 2];
+            uint8_t b = bgr->data[i*iSrcXStride + j * 3];
+            uint8_t g = bgr->data[i*iSrcXStride + j * 3 + 1];
+            uint8_t r = bgr->data[i*iSrcXStride + j * 3 + 2];
             short wColor = (r >> 3 << 11) | (g >> 2 << 5) | (b >> 3);
             pdst[i*iDstYStride + j] = wColor;
         }
@@ -457,8 +459,10 @@ void bgr_to_bgr565(uint8_t* bgr_data, int nW, int nH, uint8_t* bgr565_data)
 }
 
 
-void bgr_to_bgra(uint8_t* bgr_data, int nW, int nH, uint8_t* bgra_data)
+void bgr_to_bgra(px_image_t* bgr, uint8_t* bgra_data)
 {
+    const int nW = bgr->width;
+    const int nH = bgr->height;
     int iSrcXStride = LINE_BYTES(nW, 24);
     int iDstXStride = LINE_BYTES(nW, 32);
     int i, j;
@@ -466,27 +470,27 @@ void bgr_to_bgra(uint8_t* bgr_data, int nW, int nH, uint8_t* bgra_data)
     {
         for (j = 0; j < nW; j++)
         {
-            bgra_data[i * iDstXStride + (j << 2)] = bgr_data[i * iSrcXStride + j * 3];
-            bgra_data[i * iDstXStride + (j << 2) + 1] = bgr_data[i * iSrcXStride + j * 3 + 1];
-            bgra_data[i * iDstXStride + (j << 2) + 2] = bgr_data[i * iSrcXStride + j * 3 + 2];
+            bgra_data[i * iDstXStride + (j << 2)] = bgr->data[i * iSrcXStride + j * 3];
+            bgra_data[i * iDstXStride + (j << 2) + 1] = bgr->data[i * iSrcXStride + j * 3 + 1];
+            bgra_data[i * iDstXStride + (j << 2) + 2] = bgr->data[i * iSrcXStride + j * 3 + 2];
         }
     }
 }
 
 
 
-void bgr_to_nv21_separate(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
+void bgr_to_nv21_separate(px_image_t* bgr, uint8_t* yuv_data)
 {
     int i, j, YUVwidth, YUVheight;
     uint8_t* pY, *pU, *pV;
 
-    YUVwidth = EVEN_DOWN(bgr_width);
-    YUVheight = EVEN_DOWN(bgr_height);
+    YUVwidth = EVEN_DOWN(bgr->width);
+    YUVheight = EVEN_DOWN(bgr->height);
 
     pY = yuv_data;
     pU = yuv_data + YUVwidth * YUVheight;
 
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = bgr->stride;
 
     for (i = 0; i < YUVheight; i += 2)
     {
@@ -494,9 +498,9 @@ void bgr_to_nv21_separate(uint8_t* bgr_data, int bgr_width, int bgr_height, int 
         {
             int b, g, r, y1, cr1, cb1;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -506,9 +510,9 @@ void bgr_to_nv21_separate(uint8_t* bgr_data, int bgr_width, int bgr_height, int 
 
             j++;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -518,9 +522,9 @@ void bgr_to_nv21_separate(uint8_t* bgr_data, int bgr_width, int bgr_height, int 
 
             i++; j--;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -530,9 +534,9 @@ void bgr_to_nv21_separate(uint8_t* bgr_data, int bgr_width, int bgr_height, int 
 
             j++;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -552,15 +556,15 @@ void bgr_to_nv21_separate(uint8_t* bgr_data, int bgr_width, int bgr_height, int 
     }
 }
 
-void bgr_to_yuv444(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment, uint8_t* yuv_data)
+void bgr_to_yuv444(px_image_t* bgr, uint8_t* yuv_data)
 {
     int i, j;
     int YUVwidth, YUVheight;
-    int widthstep_yuv = 3 * bgr_width;
-    YUVwidth = bgr_width;
-    YUVheight = bgr_height;
+    int widthstep_yuv = 3 * bgr->width;
+    YUVwidth = bgr->width;
+    YUVheight = bgr->height;
 
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = bgr->stride;
 
     for (i = 0; i < YUVheight; i++)
     {
@@ -568,9 +572,9 @@ void bgr_to_yuv444(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_lin
         {
             int b, g, r, y, cr, cb;
 
-            b = bgr_data[i*bgr_line_elem + j * 3];
-            g = bgr_data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr_data[i*bgr_line_elem + j * 3 + 2];
+            b = bgr->data[i*bgr_line_elem + j * 3];
+            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
+            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
             y = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb = ((b - y)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -584,17 +588,17 @@ void bgr_to_yuv444(uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_lin
     }
 }
 
-void bgr_from_yuv444(uint8_t* yuv_data, uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment)
+void bgr_from_yuv444(uint8_t* yuv_data, px_image_t* bgr)
 {
     int i, j;
     int BGRwidth, BGRheight;
-    int widthstep_yuv = 3 * bgr_width;
+    int widthstep_yuv = 3 * bgr->width;
 
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = bgr->stride;
 
-    for (i = 0; i < bgr_height; i++)
+    for (i = 0; i < bgr->height; i++)
     {
-        for (j = 0; j < bgr_width; j++)
+        for (j = 0; j < bgr->width; j++)
         {
             int b, g, r, y, u, v;
 
@@ -610,31 +614,31 @@ void bgr_from_yuv444(uint8_t* yuv_data, uint8_t* bgr_data, int bgr_width, int bg
             b = y + ((u*rgbBu) >> FIX_SHIFT);
 
 
-            bgr_data[i*bgr_line_elem + j * 3] = b;
-            bgr_data[i*bgr_line_elem + j * 3 + 1] = g;
-            bgr_data[i*bgr_line_elem + j * 3 + 2] = r;
+            bgr->data[i*bgr_line_elem + j * 3] = b;
+            bgr->data[i*bgr_line_elem + j * 3 + 1] = g;
+            bgr->data[i*bgr_line_elem + j * 3 + 2] = r;
 
         }
     }
 }
 
-void bgr_from_yuv420(uint8_t* yuv_data, uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment)
+void bgr_from_yuv420(uint8_t* yuv_data, px_image_t* bgr)
 {
     int i, j;
     int BGRwidth, BGRheight;
     uint8_t*py, *pu, *pv;
-    int widthstep_y = bgr_width;
-    int widthstep_u = bgr_width / 2;
-    int widthstep_v = bgr_width / 2;
+    int widthstep_y = bgr->width;
+    int widthstep_u = bgr->width / 2;
+    int widthstep_v = bgr->width / 2;
     py = yuv_data;
-    pu = yuv_data + bgr_width * bgr_height;
-    pv = pu + bgr_width * bgr_height / 4;
+    pu = yuv_data + bgr->width * bgr->height;
+    pv = pu + bgr->width * bgr->height / 4;
 
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = bgr->stride;
 
-    for (i = 0; i < bgr_height; i++)
+    for (i = 0; i < bgr->height; i++)
     {
-        for (j = 0; j < bgr_width; j++)
+        for (j = 0; j < bgr->width; j++)
         {
             int b, g, r, y, u, v;
 
@@ -650,30 +654,30 @@ void bgr_from_yuv420(uint8_t* yuv_data, uint8_t* bgr_data, int bgr_width, int bg
             b = y + ((u*rgbBu) >> FIX_SHIFT);
 
 
-            bgr_data[i*bgr_line_elem + j * 3] = b;
-            bgr_data[i*bgr_line_elem + j * 3 + 1] = g;
-            bgr_data[i*bgr_line_elem + j * 3 + 2] = r;
+            bgr->data[i*bgr_line_elem + j * 3] = b;
+            bgr->data[i*bgr_line_elem + j * 3 + 1] = g;
+            bgr->data[i*bgr_line_elem + j * 3 + 2] = r;
 
         }
     }
 }
 
-void bgr_from_nv21(uint8_t* yuv_data, uint8_t* bgr_data, int bgr_width, int bgr_height, int bgr_line_alignment)
+void bgr_from_nv21(uint8_t* yuv_data, px_image_t* bgr)
 {
     int i, j;
     int BGRwidth, BGRheight;
     uint8_t*py, *pv;
-    int widthstep_y = bgr_width;
-    int widthstep_u = bgr_width / 2;
-    int widthstep_v = bgr_width / 2;
+    int widthstep_y = bgr->width;
+    int widthstep_u = bgr->width / 2;
+    int widthstep_v = bgr->width / 2;
     py = yuv_data;
-    pv = yuv_data + bgr_width * bgr_height;
+    pv = yuv_data + bgr->width * bgr->height;
 
-    const int bgr_line_elem = px_align_up(bgr_width*3, bgr_line_alignment);
+    const int bgr_line_elem = bgr->stride;
 
-    for (i = 0; i < bgr_height; i++)
+    for (i = 0; i < bgr->height; i++)
     {
-        for (j = 0; j < bgr_width; j++)
+        for (j = 0; j < bgr->width; j++)
         {
             int b, g, r, y, u, v;
 
@@ -690,9 +694,9 @@ void bgr_from_nv21(uint8_t* yuv_data, uint8_t* bgr_data, int bgr_width, int bgr_
 
             // 溢出问题：没有对b，g和r做clip到[0,255]的操作
 
-            bgr_data[i*bgr_line_elem + j * 3] = b;
-            bgr_data[i*bgr_line_elem + j * 3 + 1] = g;
-            bgr_data[i*bgr_line_elem + j * 3 + 2] = r;
+            bgr->data[i*bgr_line_elem + j * 3] = b;
+            bgr->data[i*bgr_line_elem + j * 3 + 1] = g;
+            bgr->data[i*bgr_line_elem + j * 3 + 2] = r;
 
         }
     }
