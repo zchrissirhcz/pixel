@@ -1,5 +1,0 @@
-#include "zcnn_file.h"
-#include "zcnn_cnn.h"
-#include "zcnn_bmp.h"
-#include "zcnn_flip.h"
-#include "zcnn_random.h"
