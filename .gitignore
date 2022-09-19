@@ -42,3 +42,9 @@ neon_ref/arm_neon.h
 
 # macOSX
 .DS_Store
+
+# mnist .gz files
+t10k-images-idx3-ubyte.gz
+t10k-labels-idx1-ubyte.gz
+train-images-idx3-ubyte.gz
+train-labels-idx1-ubyte.gz

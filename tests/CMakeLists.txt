@@ -7,7 +7,7 @@ macro(pixel_add_test name)
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
   else()
-    gtest_add_tests(TARGET test_${name}
+    gtest_add_tests(TARGET ${name}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
   endif()
@@ -25,7 +25,7 @@ pixel_add_test(px_convolution_test)
 pixel_add_test(px_arithm_test)
 pixel_add_test(px_compare_test)
 pixel_add_test(px_bmp_test)
-#pixel_add_test(px_mnist_test)
+pixel_add_test(px_mnist_test)
 pixel_add_test(px_image_io_test)
 
 execute_process(
@@ -33,3 +33,15 @@ execute_process(
   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/assets/ring.bmp ${CMAKE_BINARY_DIR}/
   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/assets/mingren_gray.bmp ${CMAKE_BINARY_DIR}/
 )
+
+configure_file(px_directories.h.in
+               ${CMAKE_CURRENT_LIST_DIR}/px_directories.h
+               @ONLY)
+
+set(mnist_file_lst t10k-images.idx3-ubyte t10k-labels.idx1-ubyte train-images.idx3-ubyte train-labels.idx1-ubyte)
+foreach(mnist_file ${mnist_file_lst})
+  if(NOT (EXISTS "${CMAKE_SOURCE_DIR}/NaiveCNN/mnist/${mnist_file}"))
+    execute_process(COMMAND bash ${CMAKE_SOURCE_DIR}/NaiveCNN/mnist/get_data.sh)
+    break()
+  endif()
+endforeach()
