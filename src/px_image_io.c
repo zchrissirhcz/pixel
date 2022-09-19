@@ -50,7 +50,7 @@ bool px_write_image(px_image_t* im, const char* filename)
 
     const char* ext = filename + strlen(filename) - 4;
 
-    if(strcmp(ext, ".bmp")!=0 && strcmp(ext, ".jpg")!=0 && strcmp(ext, ".png")!=0)
+    if(strcmp(ext, ".bmp") != 0 && strcmp(ext, ".jpg") != 0 && strcmp(ext, ".png") != 0)
     {
         PX_LOGE("failed to save image: not supported extension %s\n", ext);
         return false;

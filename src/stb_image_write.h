@@ -1,4 +1,4 @@
-/* stb_image_write - v1.16 - public domain - http://nothings.org/stb
+/* stb_image_write - v1.15-mod - public domain - http://nothings.org/stb
    writes out PNG/BMP/TGA/JPEG/HDR images to C stdio - Sean Barrett 2010-2015
                                      no warranty implied; use at your own risk
 
@@ -140,8 +140,6 @@ CREDITS:
       Ivan Tikhonov
       github:ignotion
       Adam Schackart
-      Andrew Kensler
-      Zhuo Zhang
 
 LICENSE
 
@@ -168,9 +166,9 @@ LICENSE
 #endif
 
 #ifndef STB_IMAGE_WRITE_STATIC  // C++ forbids static forward declarations
-STBIWDEF int stbi_write_tga_with_rle;
-STBIWDEF int stbi_write_png_compression_level;
-STBIWDEF int stbi_write_force_png_filter;
+extern int stbi_write_tga_with_rle;
+extern int stbi_write_png_compression_level;
+extern int stbi_write_force_png_filter;
 #endif
 
 #ifndef STBI_WRITE_NO_STDIO
@@ -180,7 +178,7 @@ STBIWDEF int stbi_write_tga(char const *filename, int w, int h, int comp, const 
 STBIWDEF int stbi_write_hdr(char const *filename, int w, int h, int comp, const float *data);
 STBIWDEF int stbi_write_jpg(char const *filename, int x, int y, int comp, const void  *data, int quality);
 
-#ifdef STBIW_WINDOWS_UTF8
+#ifdef STBI_WINDOWS_UTF8
 STBIWDEF int stbiw_convert_wchar_to_utf8(char *buffer, size_t bufferlen, const wchar_t* input);
 #endif
 #endif
@@ -287,7 +285,7 @@ static void stbi__stdio_write(void *context, void *data, int size)
    fwrite(data,1,size,(FILE*) context);
 }
 
-#if defined(_WIN32) && defined(STBIW_WINDOWS_UTF8)
+#if defined(_MSC_VER) && defined(STBI_WINDOWS_UTF8)
 #ifdef __cplusplus
 #define STBIW_EXTERN extern "C"
 #else
@@ -305,16 +303,16 @@ STBIWDEF int stbiw_convert_wchar_to_utf8(char *buffer, size_t bufferlen, const w
 static FILE *stbiw__fopen(char const *filename, char const *mode)
 {
    FILE *f;
-#if defined(_WIN32) && defined(STBIW_WINDOWS_UTF8)
+#if defined(_MSC_VER) && defined(STBI_WINDOWS_UTF8)
    wchar_t wMode[64];
    wchar_t wFilename[1024];
-   if (0 == MultiByteToWideChar(65001 /* UTF8 */, 0, filename, -1, wFilename, sizeof(wFilename)/sizeof(*wFilename)))
+   if (0 == MultiByteToWideChar(65001 /* UTF8 */, 0, filename, -1, wFilename, sizeof(wFilename)))
       return 0;
 
-   if (0 == MultiByteToWideChar(65001 /* UTF8 */, 0, mode, -1, wMode, sizeof(wMode)/sizeof(*wMode)))
+   if (0 == MultiByteToWideChar(65001 /* UTF8 */, 0, mode, -1, wMode, sizeof(wMode)))
       return 0;
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#if _MSC_VER >= 1400
    if (0 != _wfopen_s(&f, wFilename, wMode))
       f = 0;
 #else
@@ -399,7 +397,7 @@ static void stbiw__putc(stbi__write_context *s, unsigned char c)
 
 static void stbiw__write1(stbi__write_context *s, unsigned char a)
 {
-   if ((size_t)s->buf_used + 1 > sizeof(s->buffer))
+   if ((size_t)(s->buf_used + 1) > sizeof(s->buffer))
       stbiw__write_flush(s);
    s->buffer[s->buf_used++] = a;
 }
@@ -407,13 +405,26 @@ static void stbiw__write1(stbi__write_context *s, unsigned char a)
 static void stbiw__write3(stbi__write_context *s, unsigned char a, unsigned char b, unsigned char c)
 {
    int n;
-   if ((size_t)s->buf_used + 3 > sizeof(s->buffer))
+   if ((size_t)(s->buf_used + 3) > sizeof(s->buffer))
       stbiw__write_flush(s);
    n = s->buf_used;
    s->buf_used = n+3;
    s->buffer[n+0] = a;
    s->buffer[n+1] = b;
    s->buffer[n+2] = c;
+}
+
+static void stbiw__write4(stbi__write_context *s, unsigned char a, unsigned char b, unsigned char c, unsigned char d)
+{
+   int n;
+   if ((size_t)(s->buf_used + 4) > sizeof(s->buffer))
+      stbiw__write_flush(s);
+   n = s->buf_used;
+   s->buf_used = n+4;
+   s->buffer[n+0] = a;
+   s->buffer[n+1] = b;
+   s->buffer[n+2] = c;
+   s->buffer[n+3] = d;
 }
 
 static void stbiw__write_pixel(stbi__write_context *s, int rgb_dir, int comp, int write_alpha, int expand_mono, unsigned char *d)
@@ -490,16 +501,16 @@ static int stbiw__outfile(stbi__write_context *s, int rgb_dir, int vdir, int x, 
    }
 }
 
+// https://en.wikipedia.org/wiki/BMP_file_format
 static int stbi_write_bmp_core(stbi__write_context *s, int x, int y, int comp, const void *data)
 {
-   if (comp != 4) {
-      // write RGB bitmap
-      int pad = (-x*3) & 3;
-      return stbiw__outfile(s,-1,-1,x,y,comp,1,(void *) data,0,pad,
-              "11 4 22 4" "4 44 22 444444",
-              'B', 'M', 14+40+(x*3+pad)*y, 0,0, 14+40,  // file header
-               40, x,y, 1,24, 0,0,0,0,0,0);             // bitmap header
-   } else {
+   if (y < 0 || x < 0)
+      return 0;
+   if (comp != 1 && comp != 3 && comp != 4)
+      return 0;
+
+   if (comp == 4)
+   {
       // RGBA bitmaps need a v4 header
       // use BI_BITFIELDS mode with 32bpp and alpha mask
       // (straight BI_RGB with alpha mask doesn't work in most readers)
@@ -507,6 +518,23 @@ static int stbi_write_bmp_core(stbi__write_context *s, int x, int y, int comp, c
          "11 4 22 4" "4 44 22 444444 4444 4 444 444 444 444",
          'B', 'M', 14+108+x*y*4, 0, 0, 14+108, // file header
          108, x,y, 1,32, 3,0,0,0,0,0, 0xff0000,0xff00,0xff,0xff000000u, 0, 0,0,0, 0,0,0, 0,0,0, 0,0,0); // bitmap V4 header
+   }
+   else {
+      int pad = (-x*comp) & 3;
+      int clr_used = comp == 1 ? 256 : 0;
+      int clr_important = comp == 1 ? 256 : 0;
+      int offset = 14+40+clr_used*4;
+      stbiw__writef(s, "11 4 22 4" "4 44 22 444444",
+         'B', 'M', offset+(x*comp+pad)*y, 0,0, offset,  // file header
+         40, x,y, 1,comp*8, 0,0,0,0, clr_used,clr_important);                   // bitmap header
+      if (comp == 1) {
+         for (int i = 0; i < 256; ++i) {
+            unsigned char v = (unsigned char) i;
+            stbiw__write4(s, v, v, v, 255);
+         }
+      }
+      stbiw__write_pixels(s,-1,-1,x,y,comp,(void*) data,0,pad,0);
+      return 1;
    }
 }
 
@@ -634,8 +662,6 @@ STBIWDEF int stbi_write_tga(char const *filename, int x, int y, int comp, const 
 // by Baldur Karlsson
 
 #define stbiw__max(a, b)  ((a) > (b) ? (a) : (b))
-
-#ifndef STBI_WRITE_NO_STDIO
 
 static void stbiw__linear_to_rgbe(unsigned char *rgbe, float *linear)
 {
@@ -771,7 +797,7 @@ static int stbi_write_hdr_core(stbi__write_context *s, int x, int y, int comp, f
       char header[] = "#?RADIANCE\n# Written by stb_image_write.h\nFORMAT=32-bit_rle_rgbe\n";
       s->func(s->context, header, sizeof(header)-1);
 
-#ifdef __STDC_LIB_EXT1__
+#ifdef __STDC_WANT_SECURE_LIB__
       len = sprintf_s(buffer, sizeof(buffer), "EXPOSURE=          1.0000000000000\n\n-Y %d +X %d\n", y, x);
 #else
       len = sprintf(buffer, "EXPOSURE=          1.0000000000000\n\n-Y %d +X %d\n", y, x);
@@ -792,6 +818,7 @@ STBIWDEF int stbi_write_hdr_to_func(stbi_write_func *func, void *context, int x,
    return stbi_write_hdr_core(&s, x, y, comp, (float *) data);
 }
 
+#ifndef STBI_WRITE_NO_STDIO
 STBIWDEF int stbi_write_hdr(char const *filename, int x, int y, int comp, const float *data)
 {
    stbi__write_context s = { 0 };
@@ -981,23 +1008,6 @@ STBIWDEF unsigned char * stbi_zlib_compress(unsigned char *data, int data_len, i
    for (i=0; i < stbiw__ZHASH; ++i)
       (void) stbiw__sbfree(hash_table[i]);
    STBIW_FREE(hash_table);
-
-   // store uncompressed instead if compression was worse
-   if (stbiw__sbn(out) > data_len + 2 + ((data_len+32766)/32767)*5) {
-      stbiw__sbn(out) = 2;  // truncate to DEFLATE 32K window and FLEVEL = 1
-      for (j = 0; j < data_len;) {
-         int blocklen = data_len - j;
-         if (blocklen > 32767) blocklen = 32767;
-         stbiw__sbpush(out, data_len - j == blocklen); // BFINAL = ?, BTYPE = 0 -- no compression
-         stbiw__sbpush(out, STBIW_UCHAR(blocklen)); // LEN
-         stbiw__sbpush(out, STBIW_UCHAR(blocklen >> 8));
-         stbiw__sbpush(out, STBIW_UCHAR(~blocklen)); // NLEN
-         stbiw__sbpush(out, STBIW_UCHAR(~blocklen >> 8));
-         memcpy(out+stbiw__sbn(out), data+j, blocklen);
-         stbiw__sbn(out) += blocklen;
-         j += blocklen;
-      }
-   }
 
    {
       // compute adler32 on input
@@ -1376,7 +1386,7 @@ static int stbiw__jpg_processDU(stbi__write_context *s, int *bitBuf, int *bitCnt
       int startpos = i;
       int nrzeroes;
       unsigned short bits[2];
-      for (; i<=end0pos && DU[i]==0; ++i) {
+      for (; DU[i]==0 && i<=end0pos; ++i) {
       }
       nrzeroes = i-startpos;
       if ( nrzeroes >= 16 ) {
@@ -1629,10 +1639,7 @@ STBIWDEF int stbi_write_jpg(char const *filename, int x, int y, int comp, const 
 #endif // STB_IMAGE_WRITE_IMPLEMENTATION
 
 /* Revision history
-      1.16  (2021-07-11)
-             make Deflate code emit uncompressed blocks when it would otherwise expand
-             support writing BMPs with alpha channel
-      1.15  (2020-07-13) unknown
+      1.15-mod (2022-09-14) by Zhuo Zhang, Support BGRA 4-channel BMP image encoding.
       1.14  (2020-02-02) updated JPEG writer to downsample chroma channels
       1.13
       1.12
