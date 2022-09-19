@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake/modules")
+
 include("cmake/overlook.cmake")
 include("cmake/cvbuild.cmake")
 include("cmake/deps.cmake")
@@ -18,5 +20,5 @@ enable_testing()
 
 add_subdirectory(src)
 add_subdirectory(tests)
-add_subdirectory(perfs)
-add_subdirectory(NaiveCNN)
+# add_subdirectory(perfs)
+# add_subdirectory(NaiveCNN)
