@@ -4,9 +4,9 @@
 //==============================================================
 // function implementations
 //==============================================================
-inline FcBGR* fc_bgr_pixels(const image_t* im, const int x, const int y)
+inline FcBGR* fc_bgr_pixels(const px_image_t* im, const int x, const int y)
 {
-    const int line_elem = im->width * im->channels;
+    const int line_elem = im->width * im->channel;
     return ((FcBGR*)((unsigned char*)im->data + y*line_elem)) + x;
 }
 
@@ -26,15 +26,15 @@ inline FcBGR* fc_bgr_pixels(const image_t* im, const int x, const int y)
 #define FC_BGR_RESIZE_NEAREST_OPT3 //0.794 fps
 //#define FC_BGR_RESIZE_NEAREST_FIXPT1 //0.549 fps
 //#define FC_BGR_RESIZE_NEAREST_FIXPT2 //0.98 fps
-void bgr_resize_nearest(const image_t* src, image_t* dst) {
+void bgr_resize_nearest(const px_image_t* src, px_image_t* dst) {
 
     const int src_width = src->width;
     const int src_height = src->height;
     const int dst_height = dst->height;
     const int dst_width = dst->width;
-    const int channels = src->channels;
-    const int src_line_elem = src->width * src->channels;
-    const int dst_line_elem = dst->width * dst->channels;
+    const int channels = src->channel;
+    const int src_line_elem = src->width * src->channel;
+    const int dst_line_elem = dst->width * dst->channel;
 
 
 #ifdef FC_BGR_RESIZE_NEAREST_NAIVE
@@ -185,93 +185,6 @@ void bgr_resize_nearest(const image_t* src, image_t* dst) {
         sh_fix += scale_h_fix;
         //((unsigned char*&)dst_line) += dst->linebytes;
         ((unsigned char*)dst_line) += dst->linebytes;
-    }
-#endif
-}
-
-
-
-
-//--------------------------------------------------------------
-// fc_bgr_resize_bilinear
-//--------------------------------------------------------------
-// @description: bi-linear interpolation for image resize
-// @param image_tBGR* src: source image
-// @param image_tBGR* dst: result image
-//--------------------------------------------------------------
-#define FC_BGR_RESIZE_BILINEAR_NAIVE //0.03 fps
-//#define FC_BGR_RESIZE_BILINEAR_OPT1  //  fps
-//#define FC_BGR_RESIZE_BILINEAR_FIXPT1
-//#define FC_BGR_RESIZE_BILINEAR_FIXPT2
-void bgr_resize_bilinear(const image_t* src, image_t* dst) {
-#ifdef FC_BGR_RESIZE_BILINEAR_NAIVE
-    //   A---- u ---M--------- 1-u -------B
-    //   |          |                     |
-    //   v          |                     |
-    //   |          |                     |
-    //   |----------P---------------------|
-    //   |          |                     |
-    //   |          |                     |
-    //   C----------N---------------------D
-    //     AM=u, MP=v, MB=1-u, PN=1-v
-    //     M=(1-u)A+uB,  N=(1-u)C+uD
-    //     P=(1-v)M+vN = (1-v)(1-u)A+(1-v)uB+v(1-u)C+vuD
-
-    const int src_width = src->width;
-    const int src_height = src->height;
-    const int dst_height = dst->height;
-    const int dst_width = dst->width;
-    const int channels = src->channels;
-    const int src_line_elem = src->width * src->channels;
-    const int dst_line_elem = dst->width * dst->channels;
-    for (int h = 0; h < dst_height; h++) {
-        float sh = (h+0.5) * src_height / dst_height - 0.5;
-        float v = sh - floor(sh);
-        for (int w = 0; w < dst_width; w++) {
-            float sw = (w+0.5) * src_width / dst_width - 0.5;
-            float u = sw - floor(sw);
-
-            float wA = (1 - v)*(1 - u);
-            float wB = (1 - v)*u;
-            float wC = v * (1 - u);
-            float wD = v * u;
-
-            for (int c = 0; c < channels; c++) {
-                int dst_idx = h * dst_line_elem + w * channels + c;
-                
-                float sum = 0;
-
-                int A_h = (int)sh;
-                int A_w = (int)sw;
-                if (A_h>=0 && A_h<src_height && A_w>=0 && A_w<src_width) {
-                    int idx_A = A_h*src_line_elem + A_w* channels + c;
-                    sum += src->data[idx_A] * wA;
-                }
-
-                int B_h = (int)sh;
-                int B_w = (int)sw+1;
-                if (B_h>=0 && B_h<src_height && B_w>=0 && B_w<src_width) {
-                    int idx_B = B_h*src_line_elem + B_w*channels + c;
-                    sum += src->data[idx_B] * wB;
-                }
-                
-                int C_h = (int)sh + 1;
-                int C_w = (int)sw;
-                if (C_h>=0 && C_h<src_height && C_w>=0 && C_w<src_width) {
-                    int idx_C = C_h * src_line_elem + C_w * channels + c;
-                    sum += src->data[idx_C] * wC;
-                }
-                
-                int D_h = (int)sh + 1;
-                int D_w = (int)sw + 1;
-                if (D_h >= 0 && D_h < src_height && D_w >= 0 && D_w < src_width) {
-                    int idx_D = D_h * src_line_elem + D_w * channels + c;
-                    sum += src->data[idx_D] * wD;
-                }
-
-                dst->data[dst_idx] = sum;
-            }
-        }
     }
 #endif
 }

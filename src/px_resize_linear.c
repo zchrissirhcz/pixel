@@ -29,20 +29,19 @@ void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize)
             double y = si - (int)si;
             double x = sj - (int)sj;
 
-            //   |-- x --|-- 1-x --|
-            // - A       |         B
-            // |         |
-            // |         |
-            // y         |
-            // |         |
-            // |         |
-            // ------(si, sj)
-            // |
-            // |
-            //1-y
-            // |
-            // |
-            // - C                 D
+            //   A---- x ---M--------- 1-x -------B
+            //   |          |                     |
+            //   y          |                     |
+            //   |          |                     |
+            //   |----------P(si, sj)-------------|
+            //   |          |                     |
+            //  1-y         |                     |
+            //   |          |                     |
+            //   C----------N---------------------D
+            //     AM=x, MP=y, MB=1-x, PN=1-y
+            //     M=(1-x)A+uB,  N=(1-x)C+xD
+            //     P=(1-y)M+yN = (1-y)(1-x)A+(1-y)xB+y(1-x)C+yxD
+
 
             Ai = floor(si);
             Aj = floor(sj);
