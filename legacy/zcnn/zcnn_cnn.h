@@ -9,14 +9,6 @@ typedef enum LayerType {
     kRELU
 } LayerType;
 
-//enum type as key of unordered_map requires this
-struct MyEnumClassHash {
-    template <typename T>
-    std::size_t operator()(T t) const {
-        return static_cast<std::size_t>(t);
-    }
-};
-
 class Blob {
 public:
     Blob();

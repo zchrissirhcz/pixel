@@ -104,16 +104,29 @@ void ReluLayer::Forward() {
     }
 }
 
-string getLayerTypeStr(LayerType type) {
+// enum type as key of unordered_map requires this
+struct MyEnumClassHash
+{
+    template <typename T>
+    std::size_t operator()(T t) const
+    {
+        return static_cast<std::size_t>(t);
+    }
+};
+
+string getLayerTypeStr(LayerType type)
+{
     unordered_map<LayerType, string, MyEnumClassHash> type_map;
     type_map[kINPUT] = "Input";
     type_map[kCONVOLUTION] = "Convolution";
     type_map[kRELU] = "ReLU";
 
-    if (type_map.count(type)) {
+    if (type_map.count(type))
+    {
         return type_map[type];
     }
-    else {
+    else
+    {
         return "unknown";
     }
 }
