@@ -49,7 +49,7 @@ void bgr_to_yuv420(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 = ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -61,7 +61,7 @@ void bgr_to_yuv420(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 += ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -74,7 +74,7 @@ void bgr_to_yuv420(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 += ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -86,7 +86,7 @@ void bgr_to_yuv420(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 += ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -130,7 +130,7 @@ void bgr_to_yuv420_rotate90(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 = ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -142,7 +142,7 @@ void bgr_to_yuv420_rotate90(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 += ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -157,7 +157,7 @@ void bgr_to_yuv420_rotate90(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 += ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -170,7 +170,7 @@ void bgr_to_yuv420_rotate90(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 += ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -214,7 +214,7 @@ void bgr_to_yuv420_rotate270(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 1];
             r = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 = ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -226,7 +226,7 @@ void bgr_to_yuv420_rotate270(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 1];
             r = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 += ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -239,7 +239,7 @@ void bgr_to_yuv420_rotate270(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 1];
             r = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 += ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -252,7 +252,7 @@ void bgr_to_yuv420_rotate270(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 1];
             r = bgr->data[(YUVheight - 1 - i)*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
 
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 += ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
@@ -291,7 +291,7 @@ void bgr_to_yuv422(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 = ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -299,7 +299,7 @@ void bgr_to_yuv422(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 1];
             r = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 2];
 
-            y2 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y2 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb2 = ((b - y2)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr2 = ((r - y2)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -323,7 +323,7 @@ void bgr_to_yvyu422(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 = ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -331,7 +331,7 @@ void bgr_to_yvyu422(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 1];
             r = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 2];
 
-            y2 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y2 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb2 = ((b - y2)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr2 = ((r - y2)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -355,7 +355,7 @@ void bgr_to_uyvy422(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 = ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -363,7 +363,7 @@ void bgr_to_uyvy422(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 1];
             r = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 2];
 
-            y2 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y2 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb2 = ((b - y2)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr2 = ((r - y2)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -387,7 +387,7 @@ void bgr_to_vyuy422(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 = ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 = ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -395,7 +395,7 @@ void bgr_to_vyuy422(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 1];
             r = bgr->data[i*bgr_line_elem + (j + 1) * 3 + 2];
 
-            y2 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y2 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb2 = ((b - y2)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr2 = ((r - y2)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -506,7 +506,7 @@ void bgr_to_nv21_separate(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 += ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -518,7 +518,7 @@ void bgr_to_nv21_separate(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 += ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -530,7 +530,7 @@ void bgr_to_nv21_separate(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y1 = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb1 += ((b - y1)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr1 += ((r - y1)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
@@ -568,7 +568,7 @@ void bgr_to_yuv444(px_image_t* bgr, uint8_t* yuv_data)
             g = bgr->data[i*bgr_line_elem + j * 3 + 1];
             r = bgr->data[i*bgr_line_elem + j * 3 + 2];
 
-            y = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            y = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
             cb = ((b - y)*yuvCb + (128 << FIX_SHIFT)) >> FIX_SHIFT;
             cr = ((r - y)*yuvCr + (128 << FIX_SHIFT)) >> FIX_SHIFT;
 
