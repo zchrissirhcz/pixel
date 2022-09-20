@@ -21,7 +21,7 @@ void bgr_to_yvyu422(px_image_t* bgr, uint8_t* yuv_data);
 void bgr_to_uyvy422(px_image_t* bgr, uint8_t* yuv_data);
 void bgr_to_vyuy422(px_image_t* bgr, uint8_t* yuv_data);
 
-void bgr_to_gray(px_image_t* bgr, uint8_t* gray_data);
+void bgr_to_gray(px_image_t* bgr, px_image_t* gray);
 void bgr_to_bgr565(px_image_t* bgr, uint8_t* bgr565_data);
 void bgr_to_bgra(px_image_t* bgr, uint8_t* bgra_data);
 

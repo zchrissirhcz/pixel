@@ -407,35 +407,27 @@ void bgr_to_vyuy422(px_image_t* bgr, uint8_t* yuv_data)
     }
 }
 
-
-
-
-
-
-void bgr_to_gray(px_image_t* bgr, uint8_t* gray_data)
+void bgr_to_gray(px_image_t* bgr, px_image_t* gray)
 {
-    int i, j;
-    uint8_t* pY, *pU, *pV;
-
-    const int bgr_line_elem = bgr->stride;
-
-    for (i = 0; i < bgr->height; i++)
+    const int bIdx = 0;
+    const int rgbCn = 3;
+    for (int i = 0; i < bgr->height; i++)
     {
-        for (j = 0; j < bgr->width; j++)
+        uint8_t* sp = bgr->data + i * bgr->stride;
+        uint8_t* dp = gray->data + i * gray->stride;
+        for (int j = 0; j < bgr->width; j++)
         {
-            int b, g, r, y1, cr1, cb1;
+            int b = sp[bIdx];
+            int g = sp[1];
+            int r = sp[2-bIdx];
 
-            b = bgr->data[i*bgr_line_elem + j * 3];
-            g = bgr->data[i*bgr_line_elem + j * 3 + 1];
-            r = bgr->data[i*bgr_line_elem + j * 3 + 2];
+            int y = (b * yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
+            *dp++ = y;
 
-            y1 = (b*yuvYb + g * yuvYg + r * yuvYr) >> FIX_SHIFT;
-
-            gray_data[i*bgr->width + j] = y1;
+            sp += rgbCn;
         }
     }
 }
-
 
 void bgr_to_bgr565(px_image_t* bgr, uint8_t* bgr565_data)
 {
