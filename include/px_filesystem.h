@@ -10,14 +10,16 @@ extern "C" {
 #define PX_MAX_PATH 256
 
 #define PX_CHECK_WRITE_FILE(fp, filename) \
-    if (fp == NULL)                    \
+    if ((fp) == NULL) {                   \
         PX_LOGE("Failed to open file %s for write in %s:%d", filename, __FILE__, __LINE__); \
-        exit(1);
+        exit(1); \
+    }
 
 #define PX_CHECK_READ_FILE(fp, filename) \
-    if (fp == NULL)                   \
+    if ((fp) == NULL) {                  \
         PX_LOGE("Failed to open file %s for read in %s:%d", filename, __FILE__, __LINE__); \
-        exit(1);
+        exit(1); \
+    }
 
 typedef enum PX_MKDIR_ERROR
 {
