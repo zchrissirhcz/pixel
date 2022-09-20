@@ -130,6 +130,8 @@ static void test_write_bmp_custom(const char* filepath, int align, bool swap_col
     
     int linebytes = px_align_up(width*channel, align);
     px_write_bmp_custom("result2.bmp", height, width, channel, buffer, linebytes, swap_color);
+
+    free(buffer);
 }
 
 TEST(write_bmp, custom_align)

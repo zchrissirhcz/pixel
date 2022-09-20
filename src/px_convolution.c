@@ -61,6 +61,7 @@ px_cube_t* px_forward_convolution_layer_for_cube(const px_cube_t* input, px_cube
         void* src = output_matrix->data;
         const int buf_size = output_h * output_w * sizeof(float);
         memcpy(dst, src, buf_size);
+        px_destroy_matrix(output_matrix);
     }
     return output_cube;
 }
@@ -110,6 +111,10 @@ px_matrix_t* px_forward_convolution_layer_for_cube_with_one_kernel(const px_cube
         px_matrix_add_matrix(output, output_matrix);
         // PCNN_LOGE(">>> after adding, output is:\n");
         // dump_matrix(output);
+
+        px_destroy_matrix(input_matrix);
+        px_destroy_matrix(output_matrix);
+        px_destroy_matrix(kernel_matrix);
     }
     px_matrix_add_scalar(output, bias);
 
