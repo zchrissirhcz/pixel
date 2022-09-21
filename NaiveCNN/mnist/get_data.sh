@@ -10,6 +10,7 @@ echo "Script location: ${BASEDIR}"
 # -P : specifies the saving directory ("prefix")
 download()
 {
+    # You may also download mnist data from [BaiduYun](https://pan.baidu.com/s/1TqVk_0un_HaKN38262X2Jg), password: 990m
     wget -N http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz -P ${BASEDIR}
     wget -N http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz -P ${BASEDIR}
     wget -N http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz -P ${BASEDIR}
