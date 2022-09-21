@@ -18,6 +18,10 @@ add_library(pixel STATIC
   px_resize_nearest.c
   px_rgb_to_nv21.cpp
   px_threshold.c
+  px_border.c
+  px_copy_make_border.c
+  px_copy_cut_border.c
+  improc_zcx.cpp
 
   px_cnn.c
   px_relu.c

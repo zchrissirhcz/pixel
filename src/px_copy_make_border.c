@@ -1,6 +1,8 @@
-#include "copy_make_border.h"
+#include "px_image.h"
+#include "px_assert.h"
+
+#include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 // copy_make_border_naive( ) 仅支持单通道图像的补边、且只补0；用来形象的说明补边的基本原理
 // 对于多通道图像、多种类型补边策略的支持，请用 copy_make_border2_naive( )
@@ -41,7 +43,7 @@ void copy_make_border_naive(unsigned char* src, int src_height, int src_width, i
     }
 }
 
-void copy_make_border2_naive(unsigned char* src, int src_height, int src_width, int channels, unsigned char* dst, int top, int bottom, int left, int right, BorderType border_type)
+void copy_make_border2_naive(unsigned char* src, int src_height, int src_width, int channels, unsigned char* dst, int top, int bottom, int left, int right, px_border_type border_type)
 {
     assert(border_type==kBorderConstant || 
            border_type==kBorderReflect  ||
@@ -64,10 +66,10 @@ void copy_make_border2_naive(unsigned char* src, int src_height, int src_width, 
             memset(dst+i*dst_linebytes, 0, dst_linebytes);
         }
         else {
-            int src_i = border_clip(border_type, -top+i, src_height);
+            int src_i = px_border_clip(border_type, -top+i, src_height);
 
             for (int j=0; j<left; j++) {
-                int src_j = border_clip(border_type, -left+j, src_width);
+                int src_j = px_border_clip(border_type, -left+j, src_width);
                 for (int k=0; k<channels; k++) {
                     *(dst+i*dst_linebytes+j*channels+k) = *(src+src_i*src_linebytes+src_j*channels+k);
                 }
@@ -80,7 +82,7 @@ void copy_make_border2_naive(unsigned char* src, int src_height, int src_width, 
             memcpy(dst+i*dst_linebytes+left_bytes, src+src_i*src_linebytes, src_linebytes);
 
             for (int j=0; j<right; j++) {
-                int src_j = border_clip(border_type, src_width+j, src_width);
+                int src_j = px_border_clip(border_type, src_width+j, src_width);
                 for (int k=0; k<channels; k++) {
                     *(dst+i*dst_linebytes+left_bytes+src_linebytes+j*channels + k) = *(src+src_i*src_linebytes+src_j*channels + k);
                 }
@@ -96,7 +98,7 @@ void copy_make_border2_naive(unsigned char* src, int src_height, int src_width, 
             memset(dst+dst_i*dst_linebytes, 0, left_bytes);
         } else {
             for (int j=0; j<left; j++) {
-                int src_j = border_clip(border_type, j-left, src_width);
+                int src_j = px_border_clip(border_type, j-left, src_width);
                 for (int k=0; k<channels; k++) {
                     *(dst+dst_i*dst_linebytes+j*channels + k) = *(src+i*src_linebytes+src_j*channels + k);
                 }
@@ -112,7 +114,7 @@ void copy_make_border2_naive(unsigned char* src, int src_height, int src_width, 
             memset(dst+dst_i*dst_linebytes + left_bytes + src_linebytes, 0, right_bytes);
         } else {
             for (int j=0; j<right; j++) {
-                int src_j = border_clip(border_type, src_width+j, src_width);
+                int src_j = px_border_clip(border_type, src_width+j, src_width);
                 for (int k=0; k<channels; k++) {
                     *(dst+dst_i*dst_linebytes + left_bytes + src_linebytes + j*channels + k) = *(src+i*src_linebytes+src_j*channels + k);
                 }
@@ -128,11 +130,11 @@ void copy_make_border2_naive(unsigned char* src, int src_height, int src_width, 
             memset(dst+dst_i*dst_linebytes, 0, dst_linebytes);
         }
         else {
-            int src_i = border_clip(border_type, src_height+i, src_height);
+            int src_i = px_border_clip(border_type, src_height+i, src_height);
 
             //memset(dst+dst_i*dst_linebytes, 0, left_bytes);
             for (int j=0; j<left; j++) {
-                int src_j = border_clip(border_type, j-left, src_width);
+                int src_j = px_border_clip(border_type, j-left, src_width);
                 for (int k=0; k<channels; k++) {
                     *(dst+dst_i*dst_linebytes+j*channels+k) = *(src+src_i*src_linebytes+src_j*channels+k);
                 }
@@ -145,7 +147,7 @@ void copy_make_border2_naive(unsigned char* src, int src_height, int src_width, 
 
             //memset(dst+dst_i*dst_linebytes+left_bytes+src_linebytes, 0, right_bytes);
             for (int j=0; j<right; j++) {
-                int src_j = border_clip(border_type, src_width+j, src_width);
+                int src_j = px_border_clip(border_type, src_width+j, src_width);
                 for (int k=0; k<channels; k++) {
                     *(dst+dst_i*dst_linebytes+left_bytes+src_linebytes+j*channels+k) = *(src+src_i*src_linebytes+src_j*channels+k);
                 }

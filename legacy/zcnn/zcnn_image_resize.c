@@ -1,6 +1,13 @@
 #include "zcnn_image_resize.h"
 #include <math.h>
 
+typedef struct FcBGR {
+    unsigned char b, g, r;
+} FcBGR;
+
+// get bgr pixel
+inline FcBGR* bgr_pixels(const px_image_t* im, const int x, const int y);
+
 //==============================================================
 // function implementations
 //==============================================================

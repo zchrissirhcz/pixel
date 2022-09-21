@@ -55,14 +55,6 @@ typedef struct px_tensor_dim_t
     int width;
 } px_tensor_dim_t;
 
-typedef struct px_pad_t
-{
-    int top;
-    int bottom;
-    int left;
-    int right;
-} px_pad_t;
-
 typedef struct px_conv_param_t
 {
     int stride_h;

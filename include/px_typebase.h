@@ -10,6 +10,13 @@ typedef struct px_size_t
     int height;
 } px_size_t;
 
+typedef struct px_pad_t
+{
+    int top;
+    int bottom;
+    int left;
+    int right;
+} px_pad_t;
 
 #ifdef __cplusplus
 extern "C" {

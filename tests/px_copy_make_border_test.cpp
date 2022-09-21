@@ -1,11 +1,9 @@
 
 #include <opencv2/opencv.hpp>
-#include <iostream>
 
-#include "copy_make_border.h"
+
+#include "px_image.h"
 #include "improc_zcx.h"
-
-#include "common/pixel_benchmark.h"
 
 int main_old()
 {
@@ -129,20 +127,8 @@ int main()
     cv::Mat dst_zcx(dst_size, src_image.type());
     cv::Mat dst_opencv(dst_size, src_image.type());
 
-    double t_start, t_cost;
-    
-    t_start = pixel_get_current_time();
     cv_image_padding(src_image.data, src_height, src_width, pad, dst_zcx.data);
-    t_cost = pixel_get_current_time() - t_start;
-    printf("cv_image_padding cost %.4lf ms\n", t_cost);
-
-    t_start = pixel_get_current_time();
     cv::copyMakeBorder(src_image, dst_opencv, pad_top, pad_bottom, pad_left, pad_right, cv::BORDER_REFLECT101);
-    t_cost = pixel_get_current_time() - t_start;
-    printf("cv_image_padding cost %.4lf ms\n", t_cost);
-
-    cv::imwrite("result_zcx.png", dst_zcx);
-    cv::imwrite("result_opencv.png", dst_opencv);
 
     return 0;
 }
