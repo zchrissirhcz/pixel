@@ -1,0 +1,112 @@
+name: linux-aarch64-asan
+on: [push, pull_request]
+
+jobs:
+  linux-gcc-aarch64-asan:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: cancel-previous-runs
+      uses: styfle/cancel-workflow-action@0.10.0
+      with:
+        access_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Clone repo
+      uses: actions/checkout@v3
+
+    - name: Setup Ninja
+      uses: seanmiddleditch/gha-setup-ninja@v3
+
+    - name: cache-qemu
+      id: cache-qemu
+      uses: actions/cache@v3.0.8
+      with:
+        path: qemu-install
+        key: qemu-aarch64-install-1
+    - name: checkout-qemu
+      if: steps.cache-qemu.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        repository: qemu/qemu
+        path: qemu
+        ref: f5643914a9e8f79c606a76e6a9d7ea82a3fc3e65
+    - name: qemu
+      if: steps.cache-qemu.outputs.cache-hit != 'true'
+      run: |
+        cd qemu
+        ./configure --prefix=$GITHUB_WORKSPACE/qemu-install --target-list=aarch64-linux-user --disable-system
+        make -j2
+        make install
+
+    - name: aarch64-gnu-toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install g++-aarch64-linux-gnu
+    # - name: Cache APT Packages
+    #   uses: awalsh128/cache-apt-pkgs-action@latest
+    #   with:
+    #     packages: g++-aarch64-linux-gnu
+    #     version: 1.0
+
+    - name: cache-googletest
+      id: cache-googletest
+      uses: actions/cache@v3.0.8
+      with:
+        path: googletest-install
+        key: googletest-install-asan
+    - name: googletest
+      if: steps.cache-googletest.outputs.cache-hit != 'true'
+      run: |
+        git clone https://github.com/google/googletest --depth 1
+        cd googletest
+        echo "include(../cmake/asan.cmake)" >> CMakeLists.txt
+        mkdir build && cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=../../cmake/aarch64-linux-gnu.toolchain.cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/googletest-install ..
+        cmake --build . -j 2
+        cmake --install .
+
+    - name: cache-benchmark
+      id: cache-benchmark
+      uses: actions/cache@v3.0.8
+      with:
+        path: benchmark-install
+        key: benchmark-install-1
+    - name: benchmark
+      if: steps.cache-benchmark.outputs.cache-hit != 'true'
+      run: |
+        git clone https://github.com/google/benchmark -b v1.7.0 --depth 1
+        cd benchmark
+        mkdir build && cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=../../cmake/aarch64-linux-gnu.toolchain.cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/benchmark-install .. -DBENCHMARK_ENABLE_TESTING=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        cmake --build . -j 2
+        cmake --install .
+
+    - name: cache-opencv
+      id: cache-opencv
+      uses: actions/cache@v3.0.8
+      with:
+        path: opencv-install
+        key: opencv-install-1
+    - name: opencv
+      if: steps.cache-opencv.outputs.cache-hit != 'true'
+      run: |
+        git clone https://github.com/opencv/opencv -b 4.6.0 --depth 1
+        cd opencv
+        rm -rf modules/gapi
+        mkdir build && cd build
+        cmake .. -G Ninja -DCMAKE_TOOLCHAIN_FILE=../../cmake/aarch64-linux-gnu.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opencv-install -DBUILD_LIST='core,imgcodecs,imgproc' -D BUILD_SHARED_LIBS=OFF -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF -D BUILD_DOCS=OFF  -D BUILD_opencv_python3=OFF -D WITH_IPP=OFF -D WITH_PROTOBUF=OFF -D WITH_QUIRC=OFF -D WITH_EIGEN=OFF -DWITH_WEBP=OFF -DBUILD_WEBP=OFF -DWITH_OPENCL=OFF -DWITH_JAVA=OFF  -DWITH_OPENEXR=OFF -DBUILD_OPENEXR=OFF -DWITH_JASPER=OFF -D BUILD_JASPER=OFF -DWITH_TIFF=OFF -D BUILD_TIFF=OFF -DWITH_OPENJPEG=OFF -D BUILD_OPENJPEG=OFF -DCV_DISABLE_OPTIMIZATION=OFF
+        cmake --build . -j 2
+        cmake --install .
+
+    - name: build
+      run: |
+        mkdir build-aarch64 && cd build-aarch64
+        cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/aarch64-linux-gnu.toolchain.cmake -DGTest_DIR=$GITHUB_WORKSPACE/googletest-install/lib/cmake/GTest -Dbenchmark_DIR=$GITHUB_WORKSPACE/benchmark-install/lib/cmake/benchmark -DOpenCV_DIR=$GITHUB_WORKSPACE/opencv-install/lib/cmake/opencv4 -DPIXEL_USE_ASAN=ON -DCMAKE_BUILD_TYPE=Debug ..
+        cmake --build . -j 2
+    - name: test
+      run: |
+        export PATH=$GITHUB_WORKSPACE/qemu-install/bin:$PATH
+        echo "pwd: `pwd`"
+        cd build-aarch64
+        echo "pwd: `pwd`"
+        echo "`which qemu-aarch64`"
+        ASAN_OPTIONS=detect_leaks=0 TESTS_EXECUTABLE_LOADER=qemu-aarch64 TESTS_EXECUTABLE_LOADER_ARGUMENTS="-L;/usr/aarch64-linux-gnu" ctest --output-on-failure -j 2
