@@ -50,6 +50,8 @@ void px_bgr2gray(px_image_t* src, px_image_t* dst);
 
 void px_rgb2bgr(px_image_t* src, px_image_t* dst);
 void px_rgb2bgr_inplace(px_image_t* image);
+void px_rgba2bgra(px_image_t* src, px_image_t* dst);
+void px_rgba2bgra_inplace(px_image_t* image);
 
 // flipmode
 // input     vertical    horizontal    both

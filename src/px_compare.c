@@ -229,6 +229,11 @@ bool px_is_valid_rgb_image(px_image_t* image)
     return (image != NULL && image->data != NULL && image->channel == 3);
 }
 
+bool px_is_valid_rgba_image(px_image_t* image)
+{
+    return (image != NULL && image->data != NULL && image->channel == 4);
+}
+
 bool px_is_valid_gray_image(px_image_t* image)
 {
     return (image != NULL && image->data != NULL && image->channel == 1);

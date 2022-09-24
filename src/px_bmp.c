@@ -342,7 +342,8 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         int src_linebytes = px_align_up(width * src_channel, 4);
         if (bmp_image.palette == NULL)
         {
-            dst_channel = 3;
+            //dst_channel = 3;
+            dst_channel = src_channel;
             int dst_linebytes = px_align_up(width * dst_channel, line_align);
             unsigned char bmp_gap[3] = {0};
             int src_gap = src_linebytes - width * src_channel;

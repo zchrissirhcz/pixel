@@ -109,3 +109,5 @@ jobs:
         echo "pwd: `pwd`"
         echo "`which qemu-aarch64`"
         TESTS_EXECUTABLE_LOADER=qemu-aarch64 TESTS_EXECUTABLE_LOADER_ARGUMENTS="-L;/usr/aarch64-linux-gnu" ctest --output-on-failure -j 2
+        qemu-aarch64 "-L;/usr/aarch64-linux-gnu" ./px_image_io_test
+        qemu-aarch64 "-L;/usr/aarch64-linux-gnu" ./px_bmp_test

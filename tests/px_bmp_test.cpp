@@ -204,7 +204,7 @@ TEST(read_bmp, bgra_4_channels)
     uint8_t* buffer;
     px_read_bmp(image_path, &height, &width, &channels, &buffer);
     cv::Mat shadow(height, width, CV_8UC(channels), buffer);
-    EXPECT_EQ(channels, 3);
+    EXPECT_EQ(channels, 4);
     EXPECT_EQ(height, src.rows);
     EXPECT_EQ(width, src.cols);
 

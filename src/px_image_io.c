@@ -1,4 +1,6 @@
 #include "px_image_io.h"
+#include "px_bmp.h"
+#include "px_image.h"
 #include "px_log.h"
 #include "px_filesystem.h"
 
@@ -19,6 +21,19 @@
 
 px_image_t* px_read_image(const char* filename)
 {
+    char* ext = strstr(filename, ".");
+    if (strcmp(ext, ".bmp")==0)
+    {
+        int height;
+        int width;
+        int channel;
+        uint8_t* buffer;
+        px_read_bmp(filename, &height, &width, &channel, &buffer);
+        px_image_t* image = px_create_image_header(height, width, channel);
+        image->data = buffer;
+        return image;
+    }
+
     int width, height, channels;
     unsigned char* data = stbi_load(filename, &width, &height, &channels, 0);
     if (!data)
@@ -32,6 +47,23 @@ px_image_t* px_read_image(const char* filename)
     image->width = width;
     image->channel = channels;
     image->data = data;
+
+    printf("!! channel = %d\n", channels);
+
+    if (strcmp(ext, ".ppm") == 0)
+    {
+        return image;
+    }
+
+    if (image->channel == 3)
+    {
+        px_rgb2bgr_inplace(image);
+    }
+    else if (image->channel == 4)
+    {
+        px_rgba2bgra_inplace(image);
+    }
+
     return image;
 }
 
@@ -44,7 +76,23 @@ static bool is_valid_image_extension(const char* ext)
     return false;
 }
 
-bool px_write_image(px_image_t* im, const char* filename)
+static px_image_t* transform_for_stb_order(px_image_t* im0)
+{
+    px_image_t* im = im0;
+    if (im0->channel == 3)
+    {
+        im = px_create_image(im0->height, im0->width, im0->channel);
+        px_rgb2bgr(im0, im);
+    }
+    else if (im0->channel == 4)
+    {
+        im = px_create_image(im0->height, im0->width, im0->channel);
+        px_rgba2bgra(im0, im);
+    }
+    return im;
+}
+
+bool px_write_image(px_image_t* im0, const char* filename)
 {
     if (strlen(filename) < 5)
     {
@@ -68,21 +116,23 @@ bool px_write_image(px_image_t* im, const char* filename)
         return false;
     }
 
-    uint8_t* save_data = im->data;
-
+    px_image_t* im = im0;
     if (strcmp(ext, ".bmp") == 0)
     {
-        stbi_write_bmp(filename, im->width, im->height, im->channel, save_data);
+        //stbi_write_bmp(filename, im->width, im->height, im->channel, im->data);
+        px_write_bmp(filename, im0->height, im0->width, im0->channel, im0->data);
     }
     else if(strcmp(ext, ".jpg") == 0)
     {
         const int quality = 95; // or 100
-        stbi_write_jpg(filename, im->width, im->height, im->channel, save_data, quality);
+        im = transform_for_stb_order(im0);
+        stbi_write_jpg(filename, im->width, im->height, im->channel, im->data, quality);
     }
     else if(strcmp(ext, ".png") == 0)
     {
         int stride_in_bytes = im->width * im->channel;
-        stbi_write_png(filename, im->width, im->height, im->channel, save_data, stride_in_bytes);
+        im = transform_for_stb_order(im0);
+        stbi_write_png(filename, im->width, im->height, im->channel, im->data, stride_in_bytes);
     }
     else if (strcmp(ext, ".ppm") == 0)
     {
@@ -91,6 +141,11 @@ bool px_write_image(px_image_t* im, const char* filename)
     else if (strcmp(ext, ".pgm") == 0)
     {
         px_write_pgm(filename, im->data, im->height, im->width);
+    }
+
+    if (im != im0)
+    {
+        px_destroy_image(im);
     }
 
     return true;
