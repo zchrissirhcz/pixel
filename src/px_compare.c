@@ -40,7 +40,7 @@ bool px_image_almost_equal(px_image_t* expected, px_image_t* actual, int eps)
         uint8_t* dp = actual->data + i * actual->stride;
         for (int j = 0; j < rowlen; j++)
         {
-            const int diff = abs(sp[i] - dp[i]);
+            const int diff = abs(sp[j] - dp[j]);
             if (diff > eps)
             {
                 const int x = i / cn;
@@ -119,7 +119,7 @@ bool px_matrix_almost_equal(px_matrix_t* expected, px_matrix_t* actual, float ep
         float* dp = actual->data + i * actual->width;
         for (int j = 0; j < w; j++)
         {
-            const float diff = fabs(sp[i] - dp[i]);
+            const float diff = fabs(sp[j] - dp[j]);
             if (diff > eps)
             {
                 PX_LOGE("actual[%d,%d] (%f) != expected[%d,%d] (%f), diff = %f, EPS = %f\n",
