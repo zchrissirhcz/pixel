@@ -1,14 +1,5 @@
 #include <stdio.h>
 
-//----- gettime -----
-#include <time.h>
-#ifdef _MSC_VER
-#include <windows.h>
-#else
-#include <unistd.h>
-#include <sys/time.h>
-#endif
-
 //----- log -----
 #include "fc_log.h"
 #include <stdarg.h>
