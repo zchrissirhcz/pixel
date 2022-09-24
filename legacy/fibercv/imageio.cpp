@@ -36,10 +36,6 @@ namespace fc {
     unsigned char* imread_ppm(const char* filename, int* width, int* height, int* channel);
     unsigned char* imread_pgm(const char* filename, int* width, int* height, int* channel);
 
-    unsigned char* imread_bmp(const char* filename, int* _width, int* _height, int* _channel);
-    void imwrite_bmp(const char* filename, int width, int height, int channel,
-                     const unsigned char* data, const int src_align = 1);
-
     // load an image as BGR order
 Image* imread(const char* filename) {
     if (strlen(filename) < 5) {
