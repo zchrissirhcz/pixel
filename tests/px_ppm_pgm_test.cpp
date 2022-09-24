@@ -69,4 +69,8 @@ TEST(pgm, io)
     px_image_t* new_image = px_create_image_header(new_height, new_width, cn);
     new_image->data = data;
     EXPECT_TRUE(px_image_almost_equal(image, new_image, 0));
+
+    px_destroy_image(image);
+    px_destroy_image_header(new_image);
+    free(data);
 }
