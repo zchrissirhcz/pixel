@@ -18,46 +18,6 @@
 #define LOG_TAG "FC_LOG"
 #endif
 
-int fc_gettimeofday(struct timeval* tp, struct timezone* tzp) {
-#ifdef _MSC_VER
-    time_t clock;
-    struct tm tm;
-    SYSTEMTIME wtm;
-
-    GetLocalTime(&wtm);
-    tm.tm_year = wtm.wYear - 1900;
-    tm.tm_mon = wtm.wMonth - 1;
-    tm.tm_mday = wtm.wDay;
-    tm.tm_hour = wtm.wHour;
-    tm.tm_min = wtm.wMinute;
-    tm.tm_sec = wtm.wSecond;
-    tm.tm_isdst = -1;
-    clock = mktime(&tm);
-    tp->tv_sec = clock;
-    tp->tv_usec = wtm.wMilliseconds * 1000;
-
-    return (0);
-#else
-    return gettimeofday(tp, tzp);
-#endif
-}
-
-// return current time in milli-second format
-long fc_gettime() {
-    struct timeval time;
-    fc_gettimeofday(&time, NULL);
-    return (time.tv_sec * 1000 + time.tv_usec / 1000);
-}
-
-
-void fc_sleep(int milli_secs) {
-#ifdef _MSC_VER
-    Sleep(milli_secs);
-#elif defined(__linux__)
-    usleep(milli_secs * 1000); // 1 ms = 1000 us
-#endif
-}
-
 void fc_echo_platform() {
 #ifdef _MSC_VER
     FC_LOGD("MSVC platform\n");
