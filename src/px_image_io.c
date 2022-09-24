@@ -15,6 +15,8 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#include "px_ppm_pgm.h"
+
 px_image_t* px_read_image(const char* filename)
 {
     int width, height, channels;
@@ -31,6 +33,15 @@ px_image_t* px_read_image(const char* filename)
     image->channel = channels;
     image->data = data;
     return image;
+}
+
+static bool is_valid_image_extension(const char* ext)
+{
+    if(strcmp(ext, ".bmp") == 0 || strcmp(ext, ".jpg") == 0 || strcmp(ext, ".png") == 0 || strcmp(ext, ".ppm") == 0 || strcmp(ext, ".pgm") == 0)
+    {
+        return true;
+    }
+    return false;
 }
 
 bool px_write_image(px_image_t* im, const char* filename)
@@ -50,26 +61,14 @@ bool px_write_image(px_image_t* im, const char* filename)
 
     const char* ext = filename + strlen(filename) - 4;
 
-    if(strcmp(ext, ".bmp") != 0 && strcmp(ext, ".jpg") != 0 && strcmp(ext, ".png") != 0)
+    bool valid_ext = is_valid_image_extension(ext);
+    if (!valid_ext)
     {
         PX_LOGE("failed to save image: not supported extension %s\n", ext);
         return false;
     }
 
     uint8_t* save_data = im->data;
-    if (im->channel == 3)
-    {
-        // bgr => rgb
-        // image_t* bgr = im;
-        // image_t rgb;
-        // rgb.height = im->height;
-        // rgb.width = im->width;
-        // rgb.channels = im->channels;
-        // size_t buf_size = rgb.height * rgb.width * rgb.channels;
-        // rgb.data = (uchar*)malloc(buf_size);
-        // convert_bgr_to_rgb(bgr, &rgb);
-        // save_data = rgb.data;
-    }
 
     if (strcmp(ext, ".bmp") == 0)
     {
@@ -80,14 +79,18 @@ bool px_write_image(px_image_t* im, const char* filename)
         const int quality = 95; // or 100
         stbi_write_jpg(filename, im->width, im->height, im->channel, save_data, quality);
     }
-    else if(strcmp(ext, ".png") == 0) {
+    else if(strcmp(ext, ".png") == 0)
+    {
         int stride_in_bytes = im->width * im->channel;
         stbi_write_png(filename, im->width, im->height, im->channel, save_data, stride_in_bytes);
     }
-
-    if (im->channel == 3)
+    else if (strcmp(ext, ".ppm") == 0)
     {
-        //free(save_data);
+        px_write_ppm(filename, im->data, im->height, im->width);
+    }
+    else if (strcmp(ext, ".pgm") == 0)
+    {
+        px_write_pgm(filename, im->data, im->height, im->width);
     }
 
     return true;

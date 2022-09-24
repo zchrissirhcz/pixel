@@ -1,7 +1,9 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/opencv.hpp>
 #include "gtest/gtest.h"
+#include "px_image.h"
 #include "px_image_io.h"
+#include "px_compare.h"
 
 TEST(image_io, read)
 {
@@ -19,7 +21,12 @@ TEST(image_io, read)
             EXPECT_EQ(mat.cols, image->width);
             ASSERT_EQ(mat.channels(), image->channel) << "channel=" << channel << ", ext=" << ext;
 
+            px_image_t* new_image = px_create_image_header(mat.rows, mat.cols, channel);
+            new_image->data = mat.data;
+            EXPECT_TRUE(px_image_almost_equal(image, new_image, 0));
+
             px_destroy_image(image);
+            px_destroy_image_header(new_image);
         }
     }
 }
@@ -41,22 +48,74 @@ TEST(image_io, write)
             EXPECT_EQ(image->width, mat.cols);
             ASSERT_EQ(image->channel, mat.channels()) << "channel=" << channel << ", ext=" << ext;
 
+            px_image_t* new_image = px_create_image_header(mat.rows, mat.cols, channel);
+            new_image->data = mat.data;
+            EXPECT_TRUE(px_image_almost_equal(image, new_image, 0));
+
             px_destroy_image(image);
+            px_destroy_image_header(new_image);
         }
     }
 }
 
+TEST(image_io, ppm)
+{
+    const int w = 256;
+    const int h = 250;
+    const int cn = 3;
+    px_image_t* image = px_create_image(h, w, cn);
+    for (int i = 0; i < h; i++)
+    {
+        uint8_t* sp = image->data + i * image->stride;
+        for (int j = 0; j < w; j++)
+        {
+            sp[0] = i;
+            sp[1] = j;
+            sp[2] = (i + j) / 2;
+            sp += cn;
+        }
+    }
 
-// int main(int argc, char* argv[])
-// {
-//     testing::InitGoogleTest(&argc, argv);
+    const char* filename = "test.ppm";
+    px_write_image(image, filename);
 
-//     // Run a specific test only
-//     //testing::GTEST_FLAG(filter) = "MyLibrary.TestReading"; // I'm testing a new feature, run something quickly
-//     testing::GTEST_FLAG(filter) = "image_io.write";
+    px_image_t* new_image = px_read_image(filename);
 
-//     // Exclude a specific test
-//     //testing::GTEST_FLAG(filter) = "-cvtColorTwoPlane.yuv420sp_to_rgb:-cvtColorTwoPlane.rgb_to_yuv420sp"; // The writing test is broken, so skip it
+    EXPECT_EQ(image->height, new_image->height);
+    EXPECT_EQ(image->width, new_image->width);
 
-//     return RUN_ALL_TESTS();
-// }
+    EXPECT_TRUE(px_image_almost_equal(image, new_image, 0));
+
+    px_destroy_image(image);
+    px_destroy_image(new_image);
+}
+
+TEST(image_io, pgm)
+{
+    const int w = 256;
+    const int h = 250;
+    const int cn = 1;
+    px_image_t* image = px_create_image(h, w, cn);
+    for (int i = 0; i < h; i++)
+    {
+        uint8_t* sp = image->data + i * image->stride;
+        for (int j = 0; j < w; j++)
+        {
+            sp[0] = i;
+            sp += cn;
+        }
+    }
+
+    const char* filename = "test.pgm";
+    px_write_image(image, filename);
+
+    px_image_t* new_image = px_read_image(filename);
+
+    EXPECT_EQ(image->height, new_image->height);
+    EXPECT_EQ(image->width, new_image->width);
+
+    EXPECT_TRUE(px_image_almost_equal(image, new_image, 0));
+
+    px_destroy_image(image);
+    px_destroy_image(new_image);
+}

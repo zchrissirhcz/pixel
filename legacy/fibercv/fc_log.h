@@ -13,17 +13,6 @@ extern "C" {
     void fc_platform_print();
 
     //--------------------------------------------------
-    // get time functions
-    //--------------------------------------------------
-    long fc_gettime();
-    int fc_gettimeofday(struct timeval *tp, struct timezone *tzp);
-
-    //--------------------------------------------------
-    // sleep function
-    //--------------------------------------------------
-    void fc_sleep(int milli_secs);
-
-    //--------------------------------------------------
     // log (print) macro
     //--------------------------------------------------
 #define FC_DEBUG
