@@ -1,5 +1,4 @@
-#ifndef FC_LOG_H
-#define FC_LOG_H
+#pragma once
 
 #include <time.h>
 
@@ -7,27 +6,23 @@
 extern "C" {
 #endif
 
-    //--------------------------------------------------
-    // platform name test
-    //--------------------------------------------------
-    void fc_platform_print();
-
-    //--------------------------------------------------
-    // log (print) macro
-    //--------------------------------------------------
+//--------------------------------------------------
+// log (print) macro
+//--------------------------------------------------
 #define FC_DEBUG
 
-    //we must define `FC_LOGD` macro for any platform.
-    //it is a replacement for printf when printing log info
+//we must define `FC_LOGD` macro for any platform.
+//it is a replacement for printf when printing log info
 
-    typedef enum FcLogLevel {
-        kFcLogLevel_Begin = -1,
+typedef enum FcLogLevel
+{
+    kFcLogLevel_Begin = -1,
 
-        kFcLogLevel_Debug,
-        kFcLogLevel_Error,
+    kFcLogLevel_Debug,
+    kFcLogLevel_Error,
 
-        kFcLogLevel_End
-    }FcLogLevel;
+    kFcLogLevel_End
+}FcLogLevel;
 
 #ifdef FC_DEBUG
 
@@ -43,10 +38,7 @@ extern "C" {
 
 #endif // FC_DEBUG
 
-    void fc_log(FcLogLevel level, const char* file, int line, const char* fmt, ...);
-
-
-
+void fc_log(FcLogLevel level, const char* file, int line, const char* fmt, ...);
 
 
 #ifdef FC_DEBUG_OLD // debug mode
@@ -84,6 +76,4 @@ extern "C" {
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif
