@@ -44,8 +44,8 @@ configure_file(px_directories.h.in
 
 set(mnist_file_lst t10k-images.idx3-ubyte t10k-labels.idx1-ubyte train-images.idx3-ubyte train-labels.idx1-ubyte)
 foreach(mnist_file ${mnist_file_lst})
-  if(NOT (EXISTS "${CMAKE_SOURCE_DIR}/NaiveCNN/mnist/${mnist_file}"))
-    execute_process(COMMAND bash ${CMAKE_SOURCE_DIR}/NaiveCNN/mnist/get_data.sh)
+  if(NOT (EXISTS "${CMAKE_SOURCE_DIR}/legacy/NaiveCNN/mnist/${mnist_file}"))
+    execute_process(COMMAND bash ${CMAKE_SOURCE_DIR}/legacy/NaiveCNN/mnist/get_data.sh)
     break()
   endif()
 endforeach()

@@ -5,7 +5,7 @@
 
 TEST(mnist, extract_and_save_image)
 {
-    std::string mnist_data_dir = project_dir + "/NaiveCNN/mnist";
+    std::string mnist_data_dir = project_dir + "/legacy/NaiveCNN/mnist";
     std::string save_dir = mnist_data_dir + "/testImgs";
 
     const char* mnist_filename = "t10k-images.idx3-ubyte";
