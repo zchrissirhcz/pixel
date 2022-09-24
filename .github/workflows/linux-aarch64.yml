@@ -99,7 +99,7 @@ jobs:
     - name: build
       run: |
         mkdir build-aarch64 && cd build-aarch64
-        cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/aarch64-linux-gnu.toolchain.cmake -DGTest_DIR=$GITHUB_WORKSPACE/googletest-install/lib/cmake/GTest -Dbenchmark_DIR=$GITHUB_WORKSPACE/benchmark-install/lib/cmake/benchmark -DOpenCV_DIR=$GITHUB_WORKSPACE/opencv-install/lib/cmake/opencv4 ..
+        cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/aarch64-linux-gnu.toolchain.cmake -DGTest_DIR=$GITHUB_WORKSPACE/googletest-install/lib/cmake/GTest -Dbenchmark_DIR=$GITHUB_WORKSPACE/benchmark-install/lib/cmake/benchmark -DOpenCV_DIR=$GITHUB_WORKSPACE/opencv-install/lib/cmake/opencv4 -DPIXEL_USE_ASAN=OFF ..
         cmake --build . -j 2
     - name: test
       run: |
