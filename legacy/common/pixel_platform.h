@@ -20,6 +20,10 @@ void pxl_platform_echo()
     PIXEL_LOGI("Apple\n");
 #endif
 
+#ifdef TI_C66
+    PIXEL_LOGI("TI_C66 DSP platform\n");
+#endif
+
     PIXEL_LOGI("hello\n");
 }
 

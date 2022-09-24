@@ -18,29 +18,6 @@
 #define LOG_TAG "FC_LOG"
 #endif
 
-void fc_echo_platform() {
-#ifdef _MSC_VER
-    FC_LOGD("MSVC platform\n");
-#endif
-
-#ifdef __linux__
-    FC_LOGD("linux platform\n");
-#endif
-
-#ifdef ANDROID
-    FC_LOGD("android platform\n");
-#endif
-
-#ifdef __APPLE__
-    FC_LOGD("Apple\n");
-#endif
-
-#ifdef TI_C66
-    FC_LOGD("TI_C66 DSP platform\n");
-#endif
-}
-
-
 static const char* level_names[] = {
     //"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
     "DEBUG", "ERROR"
