@@ -3,13 +3,12 @@
 #include "px_compare.h"
 #include "px_arithm.h"
 
-void px_rgb2gray(px_image_t* src, px_image_t* dst)
+static void px_rgb_like_to_gray(px_image_t* src, px_image_t* dst, int bIdx)
 {
     PX_ASSERT(px_is_valid_rgb_image(src));
     PX_ASSERT(px_is_valid_gray_image(dst));
     PX_ASSERT(px_image_equal_in_size(src, dst));
 
-    const int bIdx = 2;
     const int h = src->height;
     const int w = src->width;
     const int cn = src->channel;
@@ -27,6 +26,18 @@ void px_rgb2gray(px_image_t* src, px_image_t* dst)
             sp += cn;
         }
     }
+}
+
+void px_rgb2gray(px_image_t* src, px_image_t* dst)
+{
+    const int b_idx = 2;
+    px_rgb_like_to_gray(src, dst, b_idx);
+}
+
+void px_bgr2gray(px_image_t* src, px_image_t* dst)
+{
+    const int b_idx = 0;
+    px_rgb_like_to_gray(src, dst, b_idx);
 }
 
 void px_rgb2gray_fixed(px_image_t* src, px_image_t* dst)

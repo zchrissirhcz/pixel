@@ -32,12 +32,8 @@ typedef struct Rect
     int y2;
 } Rect;
 
-// image resize, support nearest/bilinear
-void resize(px_image_t* im_src, px_image_t* im_dst, ResizeMethod method=kNEAREST);
-
-// create histgram
-px_image_t* histgram(px_image_t* im);
-
+// create histogram
+px_image_t* histogram(px_image_t* im);
 
 // drawing
 // draw (solid) circle on image
