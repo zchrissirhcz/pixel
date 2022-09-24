@@ -201,3 +201,55 @@ TEST(flip, opencv)
     // D, C
     // B, A
 }
+
+TEST(flip_inplace, rgb)
+{
+    px_image_t* src = px_create_image(2, 2, 3);
+    // ABC  BCD
+    // CDE  DEF
+    src->data[0] = 'A';
+    src->data[1] = 'B';
+    src->data[2] = 'C';
+
+    src->data[3] = 'B';
+    src->data[4] = 'C';
+    src->data[5] = 'D';
+
+    src->data[6] = 'C';
+    src->data[7] = 'D';
+    src->data[8] = 'E';
+
+    src->data[9] = 'D';
+    src->data[10] = 'E';
+    src->data[11] = 'F';
+
+    px_image_t* expected = px_create_image(2, 2, 3);
+
+    {
+        // CDE  DEF
+        // ABC  BCD
+        PX_FLIP_MODE flipmode = PX_FLIP_VERTICAL;
+        expected->data[0] = 'C';
+        expected->data[1] = 'D';
+        expected->data[2] = 'E';
+
+        expected->data[3] = 'D';
+        expected->data[4] = 'E';
+        expected->data[5] = 'F';
+
+        expected->data[6] = 'A';
+        expected->data[7] = 'B';
+        expected->data[8] = 'C';
+
+        expected->data[9] = 'B';
+        expected->data[10] = 'C';
+        expected->data[11] = 'D';
+
+        px_flip_inplace(src, flipmode);
+
+        EXPECT_TRUE(px_image_almost_equal(expected, src, 0));
+    }
+
+    px_destroy_image(src);
+    px_destroy_image(expected);
+}

@@ -127,12 +127,12 @@ static unsigned int create_texture(const Image* im)
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    Image im_upsd;
-    fc_upside_down_image(im, &im_upsd);
+    Image* im_upsd = px_create_image(im->height, im->width, im->channel);
+    px_flip(im, im_upsd);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, im->align);
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 256, 256, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, im_upsd.width, im_upsd.height, 0, GL_BGR, GL_UNSIGNED_BYTE, im_upsd.data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, im_upsd->width, im_upsd->height, 0, GL_BGR, GL_UNSIGNED_BYTE, im_upsd->data);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
