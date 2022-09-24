@@ -9,6 +9,7 @@ add_library(pixel STATIC
   px_mnist.c
   px_filesystem.c
   px_image_io.c
+  px_ppm_pgm.c
   
   px_rgb2bgr.c
   px_rgb2gray.c
