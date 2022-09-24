@@ -40,6 +40,7 @@ px_image_t* px_read_image(const char* filename)
     {
         PX_LOGE("Cannot load image \"%s\"\nSTB Reason: %s\n",
             filename, stbi_failure_reason());
+        return NULL;
     }
     
     px_image_t* image = px_create_image_header(height, width, channels);

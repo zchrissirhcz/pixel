@@ -367,7 +367,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
                     }
                 }
                 dst_line -= dst_linebytes;
-                if ((src_gap !=0) && (fread(bmp_gap, 1, src_gap, fin) != (size_t)src_gap))
+                if ((src_gap !=0) && (fread(bmp_gap, src_gap, 1, fin) != 1))
                 {
                     fread_valid = false;
                 }

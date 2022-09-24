@@ -32,7 +32,17 @@ TEST(image_io, read)
             }
 
             std::string image_path = "read." + ext;
-            cv::imwrite(image_path, mat);
+            if (ext == "png" && channel == 4)
+            {
+                std::vector<int> compression_params;
+                compression_params.push_back(cv::IMWRITE_PNG_COMPRESSION);
+                compression_params.push_back(9);
+                cv::imwrite(image_path, mat, compression_params);
+            }
+            else
+            {
+                cv::imwrite(image_path, mat);
+            }
             px_image_t* image = px_read_image(image_path.c_str());
 
             EXPECT_EQ(mat.rows, image->height);
