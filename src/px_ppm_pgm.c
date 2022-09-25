@@ -17,18 +17,20 @@ static void write_ppm_pgm(const char* filename, uint8_t* data, int height, int w
 
     if (channel == 3) // ppm
     {
-        fprintf(fp, "P6\n%d %d\n255\n", width, height);
+        int ret = fprintf(fp, "P6\n%d %d\n255\n", width, height);
+        fprintf(stderr, "! in write_ppm_pgm(), fprintf() returns %d in line %d, width=%d, height=%d\n", ret, __LINE__, width, height);
     }
     else if (channel == 1) // pgm
     {
-        fprintf(fp, "P5\n%d %d\n255\n", width, height);
+        int ret = fprintf(fp, "P5\n%d %d\n255\n", width, height);
+        fprintf(stderr, "! in write_ppm_pgm(), fprintf() returns %d in line %d, width=%d, height=%d\n", ret, __LINE__, width, height);
     }
     const int bufsize = height * width * channel;
     if (fwrite(data, bufsize, 1, fp) != 1)
     {
         PX_LOGE("fwrite() failed in %s\n", __FUNCTION__);
     }
-
+    fflush(fp);
     fclose(fp);
 }
 
@@ -55,7 +57,10 @@ static uint8_t* read_ppm_pgm(const char* filename, int* height, int* width, int 
     int nscan = fscanf(fp, "%2s\n%d %d\n255\n", magic, width, height);
     if (nscan != 3)
     {
-        PX_LOGE("fscanf() failed in %s\n", __FUNCTION__);
+        PX_LOGE("fscanf() failed in %s:%d, filename=%s, nscan=%d, magic=%d, width=%d, height=%d\n",
+            __FILE__, __LINE__, filename, nscan, *magic, *width, *height
+        );
+        PX_LOGE("EOF = %d\n", EOF);
         return NULL;
     }
     if (magic[0] == 'P' && ( (channel == 3 && magic[1] == '6') || (channel == 1 && magic[1] == '5') ))

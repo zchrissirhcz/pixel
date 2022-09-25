@@ -4,7 +4,6 @@
 #include "px_png.h"
 #include "px_log.h"
 #include "px_arithm.h"
-#include "px_timer.h"
 #include "gtest/gtest.h"
 
 static void test_read_write_png(int channel)
@@ -30,7 +29,7 @@ static void test_read_write_png(int channel)
     }
     const char* filename = "bgr.png";
     px_write_png(filename, image->height, image->width, image->channel, image->data);
-    
+
     int new_height;
     int new_width;
     int new_channel;

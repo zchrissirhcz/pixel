@@ -177,12 +177,12 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
             PX_LOGE("failed to open file %s", filepath);
             break;
         }
-        if (fread(bmp_file_header_buf, sizeof(bmp_file_header_buf), 1, fin) == 0)
+        if (fread(bmp_file_header_buf, sizeof(bmp_file_header_buf), 1, fin) != 1)
         {
             PX_LOGE("fread error");
             break;
         }
-        if (fread(bmp_info_header_buf, sizeof(bmp_info_header_buf), 1, fin) == 0)
+        if (fread(bmp_info_header_buf, sizeof(bmp_info_header_buf), 1, fin) != 1)
         {
             PX_LOGE("fread error");
             break;
@@ -275,7 +275,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         int bpp = bmp_info_header->bits_per_pixel;
         if (bpp != 8 && bpp != 24 && bpp != 32)
         {
-            PX_LOGE("not supported bpp, only 8, 24, 32 supported now");
+            PX_LOGE("not supported bpp(%d), only 8, 24, 32 supported now", bpp);
             break;
         }
 
@@ -283,7 +283,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         bmp_info_header->compression_type = read_uint32_from_binary(hd + 16);
         if (bmp_info_header->compression_type != BMP_RGB)
         {
-            PX_LOGE("not supported compression_type, only BMP_RGB supported now");
+            PX_LOGE("not supported compression_type(%d), only BMP_RGB supported now", bmp_info_header->compression_type);
             break;
         }
 
@@ -325,7 +325,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
                 PX_LOGE("failed to allocate memory for palette");
                 break;
             }
-            if (0 == fread(bmp_image.palette, num_of_palette * sizeof(BMP_palette_entry), 1, fin))
+            if (fread(bmp_image.palette, num_of_palette * sizeof(BMP_palette_entry), 1, fin) != 1)
             {
                 PX_LOGE("fread failed for reading palette");
                 break;
@@ -342,8 +342,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
         int src_linebytes = px_align_up(width * src_channel, 4);
         if (bmp_image.palette == NULL)
         {
-            //dst_channel = 3;
-            dst_channel = src_channel;
+            dst_channel = 3;
             int dst_linebytes = px_align_up(width * dst_channel, line_align);
             unsigned char bmp_gap[3] = {0};
             int src_gap = src_linebytes - width * src_channel;
@@ -357,8 +356,15 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
             {
                 for (int x = 0; x < line_limit && fread_valid; x += dst_channel)
                 {
-                    if (0 == fread(dst_line + x, dst_channel, 1, fin))
+                    if (fread(dst_line + x, dst_channel, 1, fin) != 1)
                     {
+                        PX_LOGE("fread failed in %s:%d , y=%d(%d), x=%d(%d) (filepath=%s, dst_channel=%d)\n", 
+                            __FILE__, __LINE__,
+                            y, height,
+                            x, line_limit,
+                            filepath, dst_channel
+                        );
+                        exit(1);
                         fread_valid = false;
                     }
                     if (swap_bgr)
@@ -369,6 +375,12 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
                 dst_line -= dst_linebytes;
                 if ((src_gap !=0) && (fread(bmp_gap, src_gap, 1, fin) != 1))
                 {
+                        PX_LOGE("fread failed in %s:%d , y=%d(%d) (filepath=%s, dst_channel=%d)\n", 
+                            __FILE__, __LINE__,
+                            y, height,
+                            filepath, dst_channel
+                        );
+                    exit(1);
                     fread_valid = false;
                 }
             }
@@ -386,7 +398,7 @@ void px_read_bmp_custom(const char* filepath, int* _height, int* _width, int* _c
             int buf_size = src_linebytes * height;
             int dst_linebytes = px_align_up(width * dst_channel, line_align);
             bmp_image.data = (unsigned char*)malloc(buf_size);
-            if (0 == fread(bmp_image.data, buf_size, 1, fin))
+            if (fread(bmp_image.data, buf_size, 1, fin) != 1)
             {
                 PX_LOGE("fread failed when read pixel color indices");
                 break;

@@ -24,14 +24,17 @@ pixel_add_test(px_inner_product_test)
 pixel_add_test(px_convolution_test)
 pixel_add_test(px_arithm_test)
 pixel_add_test(px_compare_test)
-pixel_add_test(px_bmp_test)
 pixel_add_test(px_mnist_test)
-pixel_add_test(px_image_io_test)
-pixel_add_test(px_ppm_pgm_test)
 pixel_add_test(px_border_test)
 pixel_add_test(px_copy_make_border_test)
 pixel_add_test(px_copy_cut_border_test)
-pixel_add_test(px_png_test)
+
+if(NOT CMAKE_CROSSCOMPILING)
+  pixel_add_test(px_image_io_test)
+  pixel_add_test(px_ppm_pgm_test)
+  pixel_add_test(px_png_test)
+  pixel_add_test(px_bmp_test)
+endif()
 
 execute_process(
   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/assets/mingren.bmp ${CMAKE_BINARY_DIR}/

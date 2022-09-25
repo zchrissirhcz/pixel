@@ -5,59 +5,63 @@
 #include "px_image_io.h"
 #include "px_compare.h"
 
-// TEST(image_io, read)
-// {
-//     const int height = 256;
-//     const int width = 250;
-//     for (int channel : {1, 3, 4})
-//     {
-//         //for (std::string ext : {"bmp", "jpg", "png"}) // jpg sucks if channel=1
-//         for (std::string ext : {"bmp", "png"})
-//         {
-//             cv::Mat mat(height, width, CV_8UC(channel));
-//             for (int i = 0; i < mat.rows; i++)
-//             {
-//                 uint8_t* sp = mat.data + i * mat.step1();
-//                 for (int j = 0; j < mat.cols; j++)
-//                 {
-//                     sp[0] = i;
-//                     if (channel > 1)
-//                         sp[1] = j;
-//                     if (channel > 2)
-//                         sp[2] = (i + j);
-//                     if (channel > 3)
-//                         sp[3] = 255;
-//                     sp += channel;
-//                 }
-//             }
+TEST(image_io, read)
+{
+    const int height = 256;
+    const int width = 250;
+    for (int channel : {1, 3, 4})
+    {
+        //for (std::string ext : {"bmp", "jpg", "png"}) // jpg sucks if channel=1
+        for (std::string ext : {"bmp", "png"})
+        {
+            if (channel == 4 && ext == "bmp")
+            {
+                continue;
+            }
+            cv::Mat mat(height, width, CV_8UC(channel));
+            for (int i = 0; i < mat.rows; i++)
+            {
+                uint8_t* sp = mat.data + i * mat.step1();
+                for (int j = 0; j < mat.cols; j++)
+                {
+                    sp[0] = i;
+                    if (channel > 1)
+                        sp[1] = j;
+                    if (channel > 2)
+                        sp[2] = (i + j);
+                    if (channel > 3)
+                        sp[3] = 255;
+                    sp += channel;
+                }
+            }
 
-//             std::string image_path = "read." + ext;
-//             if (ext == "png" && channel == 4)
-//             {
-//                 std::vector<int> compression_params;
-//                 compression_params.push_back(cv::IMWRITE_PNG_COMPRESSION);
-//                 compression_params.push_back(9);
-//                 cv::imwrite(image_path, mat, compression_params);
-//             }
-//             else
-//             {
-//                 cv::imwrite(image_path, mat);
-//             }
-//             px_image_t* image = px_read_image(image_path.c_str());
+            std::string image_path = "read." + ext;
+            if (ext == "png" && channel == 4)
+            {
+                std::vector<int> compression_params;
+                compression_params.push_back(cv::IMWRITE_PNG_COMPRESSION);
+                compression_params.push_back(9);
+                cv::imwrite(image_path, mat, compression_params);
+            }
+            else
+            {
+                cv::imwrite(image_path, mat);
+            }
+            px_image_t* image = px_read_image(image_path.c_str());
 
-//             EXPECT_EQ(mat.rows, image->height);
-//             EXPECT_EQ(mat.cols, image->width);
-//             ASSERT_EQ(mat.channels(), image->channel) << "channel=" << channel << ", ext=" << ext;
+            EXPECT_EQ(mat.rows, image->height);
+            EXPECT_EQ(mat.cols, image->width);
+            ASSERT_EQ(mat.channels(), image->channel) << "channel=" << channel << ", ext=" << ext;
 
-//             px_image_t* new_image = px_create_image_header(mat.rows, mat.cols, channel);
-//             new_image->data = mat.data;
-//             EXPECT_TRUE(px_image_almost_equal(image, new_image, 0));
+            px_image_t* new_image = px_create_image_header(mat.rows, mat.cols, channel);
+            new_image->data = mat.data;
+            EXPECT_TRUE(px_image_almost_equal(image, new_image, 0));
 
-//             px_destroy_image(image);
-//             px_destroy_image_header(new_image);
-//         }
-//     }
-// }
+            px_destroy_image(image);
+            px_destroy_image_header(new_image);
+        }
+    }
+}
 
 TEST(image_io, write)
 {
@@ -68,6 +72,10 @@ TEST(image_io, write)
         //for (std::string ext : {"bmp", "jpg", "png"}) // jpg sucks if channel=1
         for (std::string ext : {"bmp", "png"})
         {
+            if (channel == 4 && ext == "bmp")
+            {
+                continue;
+            }
             px_image_t* image = px_create_image(height, width, channel);
             for (int i = 0; i < image->height; i++)
             {

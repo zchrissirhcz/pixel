@@ -169,6 +169,7 @@ int px_write_png_custom(const char* filepath, int height, int width, int channel
     /* Free context memory */
     spng_ctx_free(ctx);
 
+    fflush(f);
     if(f) fclose(f);
 
     return 0;

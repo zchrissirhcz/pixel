@@ -23,7 +23,6 @@ TEST(ppm, io)
 
     const char* filename = "test.ppm";
     px_write_ppm(filename, image->data, image->height, image->width);
-
     int new_height;
     int new_width;
     uint8_t* data = px_read_ppm(filename, &new_height, &new_width);
@@ -36,15 +35,14 @@ TEST(ppm, io)
     EXPECT_TRUE(px_image_almost_equal(image, new_image, 0));
 
     px_destroy_image(image);
-    px_destroy_image_header(new_image);
-    free(data);
+    px_destroy_image(new_image);
 }
 
 
 TEST(pgm, io)
 {
     const int w = 256;
-    const int h = 250;
+    const int h = 256;
     const int cn = 1;
     px_image_t* image = px_create_image(h, w, cn);
     for (int i = 0; i < h; i++)
@@ -60,6 +58,8 @@ TEST(pgm, io)
     const char* filename = "test.pgm";
     px_write_pgm(filename, image->data, image->height, image->width);
 
+    //px_sleep(2); // work around for QEMU fscanf() failure. However, it still fail sometimes. I doubt it QEMU has bug (v7.1.0)
+
     int new_height;
     int new_width;
     uint8_t* data = px_read_pgm(filename, &new_height, &new_width);
@@ -71,6 +71,5 @@ TEST(pgm, io)
     EXPECT_TRUE(px_image_almost_equal(image, new_image, 0));
 
     px_destroy_image(image);
-    px_destroy_image_header(new_image);
-    free(data);
+    px_destroy_image(new_image);
 }

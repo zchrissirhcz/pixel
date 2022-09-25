@@ -1,0 +1,212 @@
+
+void test_read_image_no_custom(const char* filename)
+{
+    unsigned char* buffer = NULL;
+    int height;
+    int width;
+    int channel;
+    px_read_bmp(filename, &height, &width, &channel, &buffer);
+
+    cv::Size size;
+    size.height = height;
+    size.width = width;
+    cv::Mat actual(size, CV_8UC(channel), buffer);
+
+    cv::Mat expected = cv::imread(filename, cv::IMREAD_UNCHANGED);
+    printf("!! filename is %s\n", filename);
+    EXPECT_TRUE(almostEqual(expected, actual));
+
+    free(buffer);
+}
+
+TEST(read_bmp, no_align)
+{
+    // bpp=24, BGR image, not aligned
+    const char* bgr_image_path = "mingren.bmp"; //width=450, not multiple of 4
+    test_read_image_no_custom(bgr_image_path);
+
+    // gray image (bpp=8, using palette to fill color), not aligned
+    const char* gray_image_path = "ring.bmp";
+    test_read_image_no_custom(gray_image_path);
+}
+
+void test_read_bmp_with_custom(const char* filename, int align, bool swap_color)
+{
+    unsigned char* buffer = NULL;
+    int height;
+    int width;
+    int channel;
+    px_read_bmp_custom(filename, &height, &width, &channel, &buffer, align, swap_color);
+    
+    cv::Size size;
+    size.height = height;
+    size.width = width;
+    int step = px_align_up(width*channel, align); //!! important
+    cv::Mat actual(size, CV_8UC(channel), buffer, step);
+
+    cv::Mat im0 = cv::imread(filename, cv::IMREAD_UNCHANGED);
+    std::vector<uint8_t> tmp_buf(step * height);
+    cv::Mat expected = cv::Mat(im0.size(), im0.type(), tmp_buf.data(), step);
+    for (int i = 0; i < expected.rows; i++)
+    {
+        expected.row(i) = im0.row(i);
+        for (int j = 0; j < width; j++)
+        {
+            for (int k = 0; k < channel; k++)
+            {
+                expected.ptr(i, j)[k] = im0.ptr(i, j)[k];
+            }
+        }
+    }
+
+    EXPECT_EQ(expected.rows, actual.rows);
+    EXPECT_EQ(expected.cols, actual.cols);
+    EXPECT_EQ(expected.channels(), actual.channels());
+    EXPECT_EQ(expected.step1(), actual.step1());
+
+    EXPECT_TRUE(almostEqual(expected, actual));
+
+    free(buffer);
+}
+
+TEST(read_bmp, align)
+{
+    const int align = 4;
+    const bool swap_color = false;
+
+    // bpp=24, BGR image, aligned
+    const char* bgr_image_path = "mingren.bmp";
+    test_read_bmp_with_custom(bgr_image_path, align, swap_color);
+
+    // gray image (bpp=8, using palette to fill color), align = 4
+    const char* gray_image_path = "mingren_gray.bmp";
+    test_read_bmp_with_custom(gray_image_path, align, swap_color);
+}
+
+
+
+
+
+
+static void test_write_bmp_custom(const char* filepath, int align, bool swap_color)
+{
+    unsigned char* buffer = NULL;
+    int height;
+    int width;
+    int channel;
+    px_read_bmp_custom(filepath, &height, &width, &channel, &buffer, align, swap_color);
+    
+    int linebytes = px_align_up(width*channel, align);
+    px_write_bmp_custom("result2.bmp", height, width, channel, buffer, linebytes, swap_color);
+
+    free(buffer);
+}
+
+TEST(write_bmp, custom_align)
+{
+    const int align = 4;
+    const bool swap_color = false;
+
+    // bpp=24, align, save image
+    const char* bgr_image_path = "mingren.bmp";
+    test_write_bmp_custom(bgr_image_path, align, swap_color);
+
+    // bpp=1, save image, align=4
+    const char* gray_image_path = "mingren_gray.bmp";
+    test_write_bmp_custom(gray_image_path, align, swap_color);
+}
+
+TEST(write_bmp, custom_color_order)
+{
+    const int align = 1;
+    const bool swap_color = true;
+
+    // bpp=24, no align, save image, rgb/bgr swap
+    const char* bgr_image_path = "mingren.bmp";
+    test_write_bmp_custom(bgr_image_path, align, swap_color);
+}
+
+TEST(write_bmp, custom_align_and_color_order)
+{
+    const int align = 4;
+    const bool swap_color = true;
+
+    // bpp=24, align, save image, rgb/bgr swap
+    const char* bgr_image_path = "mingren.bmp";
+    test_write_bmp_custom(bgr_image_path, align, swap_color);
+
+    // bpp=1, save image, align=4
+    const char* gray_image_path = "mingren_gray.bmp";
+    test_write_bmp_custom(gray_image_path, align, swap_color);
+}
+
+TEST(write_bmp, bgra_4_channels)
+{
+    cv::Mat src(256, 256, CV_8UC4);
+    for (int i = 0; i < src.rows; i++)
+    {
+        for (int j = 0; j < src.cols; j++)
+        {
+            src.ptr(i, j)[0] = i;
+            src.ptr(i, j)[1] = j;
+            src.ptr(i, j)[2] = (i + j) / 2;
+            src.ptr(i, j)[3] = 0; // alpha
+        }
+    }
+
+    const char* save_path = "bgra_by_pixel.bmp";
+    px_write_bmp(save_path, src.rows, src.cols, src.channels(), src.data);
+}
+
+
+static void test_read_write_bmp(int channel)
+{
+    const int height = 256;
+    const int width = 250;
+
+    const int cn = channel;
+    px_image_t* image = px_create_image(height, width, channel);
+    for (int i = 0; i < image->height; i++)
+    {
+        uint8_t* sp = image->data + i * image->stride;
+        for (int j = 0; j < image->width; j++)
+        {
+            sp[0] = i;
+            if (cn > 1)
+                sp[1] = j;
+            if (cn > 2)
+                sp[2] = (i + j);
+            if (cn > 3)
+                sp[3] = 255;
+            sp += cn;
+        }
+    }
+
+    std::string filepath = "test-" + std::to_string(channel) + ".bmp";
+    px_write_bmp(filepath.c_str(), image->height, image->width, image->channel, image->data);
+
+    int new_height;
+    int new_width;
+    int new_channels;
+    uint8_t* new_data = NULL;
+    px_read_bmp(filepath.c_str(), &new_height, &new_width, &new_channels, &new_data);
+    px_image_t* new_image = px_create_image_header(new_height, new_width, new_channels);
+    new_image->data = new_data;
+
+    EXPECT_TRUE(px_image_almost_equal(image, new_image, 0));
+
+    px_destroy_image(image);
+    px_destroy_image(new_image);
+}
+
+
+TEST(read_bmp, gray)
+{
+    test_read_write_bmp(1);
+}
+
+TEST(read_bmp, bgr)
+{
+    test_read_write_bmp(3);
+}
+
