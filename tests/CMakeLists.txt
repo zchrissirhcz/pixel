@@ -31,6 +31,7 @@ pixel_add_test(px_ppm_pgm_test)
 pixel_add_test(px_border_test)
 pixel_add_test(px_copy_make_border_test)
 pixel_add_test(px_copy_cut_border_test)
+pixel_add_test(px_png_test)
 
 execute_process(
   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/assets/mingren.bmp ${CMAKE_BINARY_DIR}/

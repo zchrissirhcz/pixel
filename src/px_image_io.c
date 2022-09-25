@@ -1,5 +1,4 @@
 #include "px_image_io.h"
-#include "px_bmp.h"
 #include "px_image.h"
 #include "px_log.h"
 #include "px_filesystem.h"
@@ -17,7 +16,9 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#include "px_bmp.h"
 #include "px_ppm_pgm.h"
+#include "px_png.h"
 
 px_image_t* px_read_image(const char* filename)
 {
@@ -48,8 +49,6 @@ px_image_t* px_read_image(const char* filename)
     image->width = width;
     image->channel = channels;
     image->data = data;
-
-    printf("!! channel = %d\n", channels);
 
     if (strcmp(ext, ".ppm") == 0)
     {
@@ -131,9 +130,10 @@ bool px_write_image(px_image_t* im0, const char* filename)
     }
     else if(strcmp(ext, ".png") == 0)
     {
-        int stride_in_bytes = im->width * im->channel;
+        //int stride_in_bytes = im->width * im->channel;
         im = transform_for_stb_order(im0);
-        stbi_write_png(filename, im->width, im->height, im->channel, im->data, stride_in_bytes);
+        //stbi_write_png(filename, im->width, im->height, im->channel, im->data, stride_in_bytes);
+        px_write_png(filename, im->height, im->width, im->channel, im->data);
     }
     else if (strcmp(ext, ".ppm") == 0)
     {
