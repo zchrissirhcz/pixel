@@ -18,7 +18,7 @@
 
 #include "px_bmp.h"
 #include "px_ppm_pgm.h"
-#include "px_png.h"
+#include "px_png_libspng.h"
 
 px_image_t* px_read_image(const char* filename)
 {

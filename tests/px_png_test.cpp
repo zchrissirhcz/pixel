@@ -1,7 +1,7 @@
 #include "px_compare.h"
 #include "px_image.h"
 #include "px_image_io.h"
-#include "px_png.h"
+#include "px_png_libspng.h"
 #include "px_log.h"
 #include "px_arithm.h"
 #include "gtest/gtest.h"

@@ -1,5 +1,5 @@
 
-#include "px_png.h"
+#include "px_png_libspng.h"
 #include "px_image.h"
 #include "spng.h"
 #include "px_log.h"
