@@ -3,6 +3,7 @@
 #define SPNG__BUILD
 
 #include "spng.h"
+#include "miniz.h"
 
 #include <limits.h>
 #include <string.h>

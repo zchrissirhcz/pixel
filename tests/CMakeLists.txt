@@ -32,7 +32,6 @@ pixel_add_test(px_copy_cut_border_test)
 if(NOT CMAKE_CROSSCOMPILING)
   pixel_add_test(px_image_io_test)
   pixel_add_test(px_ppm_pgm_test)
-  pixel_add_test(px_png_test)
   pixel_add_test(px_bmp_test)
 endif()
 

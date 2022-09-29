@@ -12,9 +12,6 @@ add_library(pixel STATIC
   px_ppm_pgm.c
   px_resize.c
   px_image_drawing.cpp
-  spng.c
-  px_png_libspng.cpp
-  px_png_libpng.c
   
   px_rgb2bgr.c
   px_rgb2gray.c

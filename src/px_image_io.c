@@ -18,7 +18,6 @@
 
 #include "px_bmp.h"
 #include "px_ppm_pgm.h"
-#include "px_png_libspng.h"
 
 px_image_t* px_read_image(const char* filename)
 {
@@ -130,10 +129,10 @@ bool px_write_image(px_image_t* im0, const char* filename)
     }
     else if(strcmp(ext, ".png") == 0)
     {
-        //int stride_in_bytes = im->width * im->channel;
+        int stride_in_bytes = im->stride;
         im = transform_for_stb_order(im0);
-        //stbi_write_png(filename, im->width, im->height, im->channel, im->data, stride_in_bytes);
-        px_write_png(filename, im->height, im->width, im->channel, im->data);
+        stbi_write_png(filename, im->width, im->height, im->channel, im->data, stride_in_bytes);
+        //px_write_png(filename, im->height, im->width, im->channel, im->data);
     }
     else if (strcmp(ext, ".ppm") == 0)
     {
