@@ -1,5 +1,3 @@
-#pragma once
-
 #include "px_png_libpng.h"
 
 #include <assert.h>
