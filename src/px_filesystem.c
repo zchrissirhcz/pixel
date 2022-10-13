@@ -6,9 +6,11 @@
 #include <unistd.h>
 #elif _MSC_VER
 #include <direct.h>
+#include <io.h>
 #endif
 
 #include <stdbool.h>
+#include <errno.h>
 
 bool px_is_directory_exist(const char* dirname)
 {
@@ -50,9 +52,9 @@ PX_MKDIR_ERROR px_mkdir(const char* dirname)
         }
     }
 #elif _MSC_VER
-    if( _mkdir(dirname) == 0 )
+    if(_mkdir(dirname) == 0)
     {
-        return PX_MKDIR_CREATE_SUCCESS
+        return PX_MKDIR_CREATE_SUCCESS;
     }
     else
     {
@@ -68,6 +70,7 @@ PX_MKDIR_ERROR px_mkdir(const char* dirname)
 #else
     PX_LOGE("%s not implemented yet for current platform!\n", __FUNCTION__);
 #endif
+    return PX_MKDIR_CREATE_FAILED;
 }
 
 char* px_getpwd()
@@ -90,9 +93,12 @@ char* px_getpwd()
 
 PX_FILE_STATE px_get_file_or_directory_state(const char* fname)
 {
-    if(access(fname, 0)!=-1)
+#if _MSC_VER
+    #define access _access
+#endif
+    if (access(fname, 0)!=-1)
     {
-        if(access(fname, 2)!=-1)
+        if (access(fname, 2)!=-1)
         {
             return PX_FILE_EXIST_AND_WRITABLE;
         }
@@ -100,7 +106,9 @@ PX_FILE_STATE px_get_file_or_directory_state(const char* fname)
         {
             return PX_FILE_EXIST_AND_NOT_WRITABLE;
         }
-    } else {
+    }
+    else
+    {
         return PX_FILE_NOT_EXIST;
     }
 }

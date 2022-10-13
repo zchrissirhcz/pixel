@@ -33,7 +33,7 @@ double px_get_current_time()
 void px_sleep(int milliseconds)
 {
 #ifdef _MSC_VER
-    Sleep(milli_secs);
+    Sleep(milliseconds);
 #elif defined(__linux__)
     usleep(milliseconds * 1000); // 1 ms = 1000 us
 #endif

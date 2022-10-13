@@ -403,11 +403,13 @@ endif()
 
 ## Rule 35. double 型转 float 型，可能有精度丢失（尤其在 float 较大时）
 # MSVC 默认是放在 /W3
+if (0)
 if(OVERLOOK_STRICT_FLAGS)
   if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     overlook_list_append(OVERLOOK_C_FLAGS /we4244)
     overlook_list_append(OVERLOOK_CXX_FLAGS /we4244)
   endif()
+endif()
 endif()
 
 ## Rule 36. 父类有 virtual 的成员函数，但析构函数是 public 并且不是 virtual，会导致 UB

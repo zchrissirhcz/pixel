@@ -14,7 +14,7 @@ static void circle(unsigned char* src, int w, int h, int channels, int stride, i
         return;
     auto size = sizeof(unsigned char);
     double ddr = dr*dr;
-    int offset = channels*size;
+    int offset = channels*(int)size;
     for(int i=0; i<2*dr; i++)
     {
         memcpy(ddcolor+i*channels, dcolor, offset);
