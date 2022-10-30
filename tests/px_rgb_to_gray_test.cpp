@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "px_compare.h"
 
-TEST(rgb2gray, naive)
+TEST(rgb_to_gray, naive)
 {
     px_image_t* src = px_create_image(1, 2, 3);
 
@@ -18,7 +18,7 @@ TEST(rgb2gray, naive)
     expected->data[1] = 6;
 
     px_image_t* actual = px_create_image(1, 2, 1);
-    px_rgb2gray(src, actual);
+    px_rgb_to_gray(src, actual);
 
     EXPECT_TRUE(px_image_almost_equal(expected, actual, 0));
 

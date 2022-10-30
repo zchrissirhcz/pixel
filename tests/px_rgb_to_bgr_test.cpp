@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include "px_compare.h"
 
-TEST(rgb2bgr, naive)
+TEST(rgb_to_bgr, naive)
 {
     px_image_t* src = px_create_image(1, 2, 3);
 
@@ -22,7 +22,7 @@ TEST(rgb2bgr, naive)
     expected->data[5] = 3;
 
     px_image_t* actual = px_create_image(1, 2, 3);
-    px_rgb2bgr(src, actual);
+    px_rgb_to_bgr(src, actual);
 
     EXPECT_TRUE(px_image_almost_equal(expected, actual, 0));
 
@@ -31,7 +31,7 @@ TEST(rgb2bgr, naive)
     px_destroy_image(expected);
 }
 
-TEST(rgb2bgr, inplace)
+TEST(rgb_to_bgr, inplace)
 {
     px_image_t* src = px_create_image(1, 2, 3);
 
@@ -50,7 +50,7 @@ TEST(rgb2bgr, inplace)
     expected->data[4] = 4;
     expected->data[5] = 3;
 
-    px_rgb2bgr_inplace(src);
+    px_rgb_to_bgr_inplace(src);
     EXPECT_TRUE(px_image_almost_equal(expected, src, 0));
 
     px_destroy_image(src);

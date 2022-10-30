@@ -56,11 +56,11 @@ px_image_t* px_read_image(const char* filename)
 
     if (image->channel == 3)
     {
-        px_rgb2bgr_inplace(image);
+        px_rgb_to_bgr_inplace(image);
     }
     else if (image->channel == 4)
     {
-        px_rgba2bgra_inplace(image);
+        px_rgba_to_bgra_inplace(image);
     }
 
     return image;
@@ -81,12 +81,12 @@ static px_image_t* transform_for_stb_order(px_image_t* im0)
     if (im0->channel == 3)
     {
         im = px_create_image(im0->height, im0->width, im0->channel);
-        px_rgb2bgr(im0, im);
+        px_rgb_to_bgr(im0, im);
     }
     else if (im0->channel == 4)
     {
         im = px_create_image(im0->height, im0->width, im0->channel);
-        px_rgba2bgra(im0, im);
+        px_rgba_to_bgra(im0, im);
     }
     return im;
 }

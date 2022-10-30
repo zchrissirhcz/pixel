@@ -30,7 +30,7 @@ static void px_rgbx_to_bgrx(px_image_t* src, px_image_t* dst)
     }
 }
 
-void px_rgb2bgr(px_image_t* src, px_image_t* dst)
+void px_rgb_to_bgr(px_image_t* src, px_image_t* dst)
 {
     PX_ASSERT(px_is_valid_rgb_image(src));
     PX_ASSERT(px_is_valid_rgb_image(dst));
@@ -38,7 +38,7 @@ void px_rgb2bgr(px_image_t* src, px_image_t* dst)
     px_rgbx_to_bgrx(src, dst);
 }
 
-void px_rgba2bgra(px_image_t* src, px_image_t* dst)
+void px_rgba_to_bgra(px_image_t* src, px_image_t* dst)
 {
     PX_ASSERT(px_is_valid_rgba_image(src));
     PX_ASSERT(px_is_valid_rgba_image(dst));
@@ -64,13 +64,13 @@ static void px_rgbx_to_bgrx_inplace(px_image_t* image)
     }
 }
 
-void px_rgb2bgr_inplace(px_image_t* image)
+void px_rgb_to_bgr_inplace(px_image_t* image)
 {
     PX_ASSERT(px_is_valid_rgb_image(image));
     px_rgbx_to_bgrx_inplace(image);
 }
 
-void px_rgba2bgra_inplace(px_image_t* image)
+void px_rgba_to_bgra_inplace(px_image_t* image)
 {
     PX_ASSERT(px_is_valid_rgba_image(image));
     px_rgbx_to_bgrx_inplace(image);

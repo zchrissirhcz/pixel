@@ -28,19 +28,19 @@ static void px_rgb_like_to_gray(px_image_t* src, px_image_t* dst, int bIdx)
     }
 }
 
-void px_rgb2gray(px_image_t* src, px_image_t* dst)
+void px_rgb_to_gray(px_image_t* src, px_image_t* dst)
 {
     const int b_idx = 2;
     px_rgb_like_to_gray(src, dst, b_idx);
 }
 
-void px_bgr2gray(px_image_t* src, px_image_t* dst)
+void px_bgr_to_gray(px_image_t* src, px_image_t* dst)
 {
     const int b_idx = 0;
     px_rgb_like_to_gray(src, dst, b_idx);
 }
 
-void px_rgb2gray_fixed(px_image_t* src, px_image_t* dst)
+void px_rgb_to_gray_fixed(px_image_t* src, px_image_t* dst)
 {
     PX_ASSERT(px_is_valid_rgb_image(src));
     PX_ASSERT(px_is_valid_gray_image(dst));

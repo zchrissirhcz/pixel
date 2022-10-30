@@ -13,8 +13,8 @@ add_library(pixel STATIC
   px_resize.c
   px_image_drawing.cpp
   
-  px_rgb2bgr.c
-  px_rgb2gray.c
+  px_rgb_to_bgr.c
+  px_rgb_to_gray.c
   px_flip.c
   px_histogram.c
   px_resize_linear.c
