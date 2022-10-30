@@ -119,6 +119,10 @@ int px_border_clip(px_border_type border_type, int x, int size);
 void px_copy_cut_border(px_image_t* src, px_image_t* dst, px_pad_t pad);
 void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_border_type border_type);
 
+/// rotate
+void px_image_rotate90(px_image_t* src, px_image_t* dst); // clockwise
+void px_image_rotate270(px_image_t* src, px_image_t* dst); // clockwise
+
 #ifdef __cplusplus
 }
 #endif

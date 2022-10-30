@@ -12,6 +12,7 @@ add_library(pixel STATIC
   px_ppm_pgm.c
   px_resize.c
   px_image_drawing.cpp
+  px_image_rotate.c
   
   px_rgb_to_bgr.c
   px_rgb_to_gray.c

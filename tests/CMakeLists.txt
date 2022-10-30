@@ -28,6 +28,7 @@ pixel_add_test(px_mnist_test)
 pixel_add_test(px_border_test)
 pixel_add_test(px_copy_make_border_test)
 pixel_add_test(px_copy_cut_border_test)
+pixel_add_test(px_image_rotate_test)
 
 if(NOT CMAKE_CROSSCOMPILING)
   pixel_add_test(px_image_io_test)
