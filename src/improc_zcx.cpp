@@ -1,16 +1,16 @@
-#include <cstdlib>
+#include "improc_zcx.h"
+#include "px_assert.h"
+
+#include <stdlib.h>
 #include <string.h>
+
 #include <string>
 #include <vector>
 #include <memory>
-#include <algorithm> 
+#include <algorithm>
 #include <stack>
-#include "improc_zcx.h"
-#include <iostream>
 #include <cmath>
-//#include <iomanip>
-//#include "opencv_std.h"
-using namespace std;
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846	/* pi */
 #endif
@@ -24,7 +24,7 @@ void cv_image_padding(unsigned char* image, int height, int width, int* pad, uns
     int channel = 3;
     int new_height = height + pad[1] + pad[3];
     int new_width = width + pad[0] + pad[2];
-    if (method == "reflect") // 对应到 OpenCV 中的 BORDER_REFLECT101 
+    if (method == "reflect") // 对应到 OpenCV 中的 BORDER_REFLECT101
     {
         for (int h = 0; h < height + pad[1] + pad[3]; h++)
         {
@@ -47,37 +47,7 @@ void cv_image_padding(unsigned char* image, int height, int width, int* pad, uns
             }
         }
     }
-    //cv::Mat pad_image_(new_height, new_width, CV_8UC3, out);
-    //cv::imwrite("./pad_image_.png", pad_image_);
 }
-//static int iter = 0;
-void cv_image_remove_padding(unsigned char* pad_image, int pad_height, int pad_width, int* pad, unsigned char* out)
-//memory must be premalloced
-{
-    //iter++;
-    //cv::Mat pad_image_(pad_height, pad_width, CV_8UC3, pad_image);
-    //cv::imwrite("./pad_image_.png", pad_image_);
-    ///for (int i = 0; i < 4; i++)
-    //	std::cout << pad[i] << std::endl;
-    int channel = 3;
-    int new_height = pad_height - (pad[1] + pad[3]);
-    int new_width = pad_width - (pad[0] + pad[2]);
-    
-    for (int h = pad[1]; h < new_height + pad[1] ; h++)
-    {
-        for (int w = pad[0]; w < new_width + pad[0]; w++)
-        {
-            for (int c = 0; c < 3; c++)
-            {
-                //std::cout << h << "	" << w << " " << c << " " << std::endl;
-                out[(h-pad[1])*new_width * channel + (w-pad[0])*channel + c] = pad_image[h*pad_width*channel + w*channel + c];
-            }
-        }
-    }
-    //cv::Mat remov_pad_image_(new_height, new_width, CV_8UC3, out);
-    //cv::imwrite("./remov_pad_image_.png", remov_pad_image_);
-}
-
 
 template<class T>
 void createFilter(T* gKernel, int kernel_size = 5)
@@ -103,10 +73,14 @@ void createFilter(T* gKernel, int kernel_size = 5)
 
     // normalize the Kernel
     for (int i = 0; i < kernel_size; ++i)
+    {
         for (int j = 0; j < kernel_size; ++j)
+        {
             gKernel[i*kernel_size + j] /= sum;
-
+        }
+    }
 }
+
 void cv_gaussian_filter(unsigned char* image, unsigned char* out_image, int height, int width, int kernel_size)
 {
     int channel = 3;
@@ -165,10 +139,10 @@ void cv_gaussian_filter(unsigned char* image, unsigned char* out_image, int heig
 
 
 int transform_bilinear2d(unsigned char* output_data, int output_height, int output_width, int channels,
-    unsigned char* input_data, int input_orig_height, int input_orig_width, FPOINT_* quad, bool align_corners)
+    unsigned char* input_data, int input_orig_height, int input_orig_width, px_pointf_t* quad, bool align_corners)
 {
-    FPOINT_& point_start = quad[0];
-    FPOINT_& point_end = quad[3];
+    px_pointf_t& point_start = quad[0];
+    px_pointf_t& point_end = quad[3];
     float distance_orig = (point_end.y - point_start.y)*(point_end.y - point_start.y) +
         (point_end.x - point_start.x)*(point_end.x - point_start.x);
     distance_orig = std::sqrt(distance_orig);
@@ -267,10 +241,10 @@ int transform_bilinear2d(unsigned char* output_data, int output_height, int outp
 
 //#define USE_OPENCV
 int  back_to_image_bilinear2d(unsigned char* output_data, int output_height, int output_width, int channels,
-    unsigned char* input_data, int input_orig_height, int input_orig_width, FPOINT_* quad, bool align_corners)
+    unsigned char* input_data, int input_orig_height, int input_orig_width, px_pointf_t* quad, bool align_corners)
 {
-    FPOINT_& point_start = quad[0];
-    FPOINT_& point_end = quad[3];
+    px_pointf_t& point_start = quad[0];
+    px_pointf_t& point_end = quad[3];
     float distance_orig = (point_end.y - point_start.y)*(point_end.y - point_start.y) +
         (point_end.x - point_start.x)*(point_end.x - point_start.x);
     distance_orig = std::sqrt(distance_orig);

@@ -24,6 +24,12 @@ typedef struct px_point_t
     int y;
 } px_point_t;
 
+typedef struct px_pointf_t
+{
+    float x;
+    float y;
+} px_pointf_t;
+
 typedef struct px_rect_t
 {
     int x1;

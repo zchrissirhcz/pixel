@@ -2,7 +2,7 @@
 #include <string>
 #include "px_image_io.h"
 
-int main2()
+int main()
 {
     std::string image_path = "/Users/zz/Downloads/OpenCL异构并行计算随书源码/util/example/lena.ppm";
     px_image_t* image = px_read_image(image_path.c_str());
@@ -13,7 +13,7 @@ int main2()
     return 0;
 }
 
-int main()
+int main2()
 {
     px_image_t* image = px_read_image("lena.bmp");
     px_write_image(image, "lena.ppm");
