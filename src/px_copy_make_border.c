@@ -10,7 +10,6 @@ void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_bord
     PX_ASSERT(border_type == PX_BORDER_CONSTANT ||
             border_type == PX_BORDER_REFLECT  ||
             border_type == PX_BORDER_WRAP     ||
-            border_type == PX_BORDER_REFLECT  ||
             border_type == PX_BORDER_REPLICATE);
 
     int dst_height = src->height + pad.top + pad.bottom;
@@ -33,7 +32,8 @@ void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_bord
         {
             memset(dst+i*dst_linebytes, 0, dst_linebytes);
         }
-        else {
+        else
+        {
             int src_i = px_border_clip(border_type, -pad.top+i, src_height);
 
             for (int j = 0; j < pad.left; j++) {
@@ -63,7 +63,7 @@ void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_bord
     for (int i = 0; i < src_height; i++)
     {
         int dst_i = i+pad.top;
-        if (border_type==PX_BORDER_CONSTANT)
+        if (border_type == PX_BORDER_CONSTANT)
         {
             memset(dst+dst_i*dst_linebytes, 0, left_bytes);
         }
@@ -72,7 +72,7 @@ void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_bord
             for (int j = 0; j < pad.left; j++)
             {
                 int src_j = px_border_clip(border_type, j-pad.left, src_width);
-                for (int k=0; k<channels; k++)
+                for (int k = 0; k < channels; k++)
                 {
                     *(dst+dst_i*dst_linebytes+j*channels + k) = *(src+i*src_linebytes+src_j*channels + k);
                 }
@@ -82,7 +82,7 @@ void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_bord
         int src_i = i;
         memcpy(dst+dst_i*dst_linebytes+left_bytes, src+src_i*src_linebytes, src_linebytes);
 
-        if (border_type==PX_BORDER_CONSTANT)
+        if (border_type == PX_BORDER_CONSTANT)
         {
             memset(dst+dst_i*dst_linebytes + left_bytes + src_linebytes, 0, right_bytes);
         }
@@ -102,7 +102,7 @@ void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_bord
     for (int i = 0; i < pad.bottom; i++)
     {
         int dst_i = i + pad.top + src_height;
-        if (border_type==PX_BORDER_CONSTANT)
+        if (border_type == PX_BORDER_CONSTANT)
         {
             memset(dst+dst_i*dst_linebytes, 0, dst_linebytes);
         }
@@ -114,7 +114,7 @@ void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_bord
             for (int j = 0; j < pad.left; j++)
             {
                 int src_j = px_border_clip(border_type, j-pad.left, src_width);
-                for (int k=0; k<channels; k++)
+                for (int k = 0; k < channels; k++)
                 {
                     *(dst+dst_i*dst_linebytes+j*channels+k) = *(src+src_i*src_linebytes+src_j*channels+k);
                 }

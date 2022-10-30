@@ -1,8 +1,7 @@
 #pragma once
 
-#include "zcnn_base.h"
-
 #include <time.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

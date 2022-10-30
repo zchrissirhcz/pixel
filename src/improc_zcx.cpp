@@ -16,39 +16,6 @@
 #endif
 //#define ROTATE_IMAGE
 
-void cv_image_padding(unsigned char* image, int height, int width, int* pad, unsigned char* out, std::string method)
-//memory must be premalloced
-{
-    //cv::Mat before_pad_image_(height, width, CV_8UC3, image);
-    //cv::imwrite("./before_pad_image_.png", before_pad_image_);
-    int channel = 3;
-    int new_height = height + pad[1] + pad[3];
-    int new_width = width + pad[0] + pad[2];
-    if (method == "reflect") // 对应到 OpenCV 中的 BORDER_REFLECT101
-    {
-        for (int h = 0; h < height + pad[1] + pad[3]; h++)
-        {
-            int orig_h = h - pad[1];
-            if (orig_h < 0)
-                orig_h = -orig_h;
-            if (orig_h >= height)
-                orig_h = 2 * height - orig_h - 2;
-            for (int w = 0; w < width + pad[0] + pad[2]; w++)
-            {
-                int orig_w = w - pad[0];
-                if (orig_w < 0)
-                    orig_w = -orig_w;
-                if (orig_w >= width)
-                    orig_w = 2 * width - orig_w - 2;
-                for (int c = 0; c < 3; c++)
-                {
-                    out[h*new_width * channel + w*channel + c] = image[orig_h*width*channel + orig_w*channel + c];
-                }
-            }
-        }
-    }
-}
-
 template<class T>
 void createFilter(T* gKernel, int kernel_size = 5)
 {
