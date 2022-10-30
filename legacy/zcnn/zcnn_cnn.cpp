@@ -65,7 +65,7 @@ Blob* BlobFactory(unordered_map<string, Blob*> blob_map, const string& blob_name
 InputLayer::InputLayer(const string& _name)
 {
     name = _name;
-    type = kINPUT;
+    type = LayerType::INPUT;
 }
 
 void InputLayer::Forward()
@@ -81,7 +81,7 @@ void InputLayer::Forward()
 ConvolutionLayer::ConvolutionLayer(const string& _name)
 {
     name = _name;
-    type = kCONVOLUTION;
+    type = LayerType::CONVOLUTION;
     stride.h = 0;
     stride.w = 0;
     filters = nullptr;
@@ -107,7 +107,7 @@ ConvolutionLayer::~ConvolutionLayer()
 ReluLayer::ReluLayer(const string& _name)
 {
     name = _name;
-    type = kRELU;
+    type = LayerType::RELU;
 }
 
 void ReluLayer::Forward()
@@ -133,9 +133,9 @@ struct MyEnumClassHash
 string getLayerTypeStr(LayerType type)
 {
     unordered_map<LayerType, string, MyEnumClassHash> type_map;
-    type_map[kINPUT] = "Input";
-    type_map[kCONVOLUTION] = "Convolution";
-    type_map[kRELU] = "ReLU";
+    type_map[LayerType::INPUT] = "Input";
+    type_map[LayerType::CONVOLUTION] = "Convolution";
+    type_map[LayerType::RELU] = "ReLU";
 
     if (type_map.count(type))
     {
