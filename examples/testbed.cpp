@@ -54,6 +54,7 @@ void rotate270_example()
 
 int main()
 {
+    imageio_example();
     histogram_example();
     rotate270_example();
 }

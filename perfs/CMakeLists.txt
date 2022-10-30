@@ -12,10 +12,12 @@
 execute_process(
   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/assets/sky.jpg ${CMAKE_BINARY_DIR}/
   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/assets/river_bank2.jpg ${CMAKE_BINARY_DIR}/
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/assets/lena.bmp ${CMAKE_BINARY_DIR}/
 )
 
-add_subdirectory(flip)
-add_subdirectory(array_mean)
-add_subdirectory(histogram)
-add_subdirectory(rgb2bgr)
-add_subdirectory(threshold)
+# add_subdirectory(flip)
+# add_subdirectory(array_mean)
+# add_subdirectory(histogram)
+# add_subdirectory(rgb2bgr)
+# add_subdirectory(threshold)
+add_subdirectory(resize_by_two)

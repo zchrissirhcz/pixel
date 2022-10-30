@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 #if __ANDROID_API__ >= 8
 #include <android/log.h>
 #define PX_LOGE(...) do { \
