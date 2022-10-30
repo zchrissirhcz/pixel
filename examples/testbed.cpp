@@ -37,7 +37,23 @@ void histogram_example()
     px_destroy_image(hist);
 }
 
+void rotate270_example()
+{
+    std::string image_path = "lena.bmp";
+    px_image_t* src = px_read_image(image_path.c_str());
+    const int dst_height = src->width;
+    const int dst_width = src->height;
+    px_image_t* dst = px_create_image(dst_height, dst_width, src->channel);
+
+    px_image_rotate270(src, dst);
+    px_write_image(dst, "lena_rotate270.bmp");
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
+}
+
 int main()
 {
     histogram_example();
+    rotate270_example();
 }

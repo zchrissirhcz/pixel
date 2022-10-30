@@ -25,6 +25,9 @@ TEST(image_rotate90, 1x2_c1)
 
     EXPECT_TRUE(dst->data[0] == 1);
     EXPECT_TRUE(dst->data[1] == 2);
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
 }
 
 TEST(image_rotate90, 1x2_c3)
@@ -53,6 +56,9 @@ TEST(image_rotate90, 1x2_c3)
     {
         EXPECT_TRUE(dst->data[i] == i + 1);
     }
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
 }
 
 static bool array_equal_u8(uint8_t* expected, uint8_t* actual, int len)
@@ -100,6 +106,9 @@ TEST(image_rotate90, 2x2_c1)
     };
 
     EXPECT_TRUE(array_equal_u8(expected, dst->data, total));
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
 }
 
 
@@ -136,6 +145,9 @@ TEST(image_rotate90, 2x2_c3)
     };
 
     EXPECT_TRUE(array_equal_u8(expected, dst->data, total));
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
 }
 
 
@@ -164,6 +176,9 @@ TEST(image_rotate270, 1x2_c1)
     };
 
     EXPECT_TRUE(array_equal_u8(expected, dst->data, total));
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
 }
 
 TEST(image_rotate270, 1x2_c3)
@@ -193,6 +208,9 @@ TEST(image_rotate270, 1x2_c3)
     };
 
     EXPECT_TRUE(array_equal_u8(expected, dst->data, total));
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
 }
 
 TEST(image_rotate270, 2x2_c1)
@@ -223,6 +241,9 @@ TEST(image_rotate270, 2x2_c1)
     };
 
     EXPECT_TRUE(array_equal_u8(expected, dst->data, total));
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
 }
 
 TEST(image_rotate270, 2x2_c3)
@@ -258,4 +279,7 @@ TEST(image_rotate270, 2x2_c3)
     };
 
     EXPECT_TRUE(array_equal_u8(expected, dst->data, total));
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
 }
