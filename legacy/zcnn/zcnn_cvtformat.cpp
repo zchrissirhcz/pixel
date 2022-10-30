@@ -271,10 +271,6 @@ void bgr_to_yuv420_rotate270(px_image_t* bgr, uint8_t* yuv_data)
     }
 }
 
-
-
-
-
 void bgr_to_yuv422(px_image_t* bgr, uint8_t* yuv_data)
 {
     int b, g, r, y1, y2, cr1, cr2, cb1, cb2, i, j;
@@ -449,26 +445,6 @@ void bgr_to_bgr565(px_image_t* bgr, uint8_t* bgr565_data)
         }
     }
 }
-
-
-void bgr_to_bgra(px_image_t* bgr, uint8_t* bgra_data)
-{
-    const int nW = bgr->width;
-    const int nH = bgr->height;
-    int iSrcXStride = LINE_BYTES(nW, 24);
-    int iDstXStride = LINE_BYTES(nW, 32);
-    int i, j;
-    for (i = 0; i < nH; i++)
-    {
-        for (j = 0; j < nW; j++)
-        {
-            bgra_data[i * iDstXStride + (j << 2)] = bgr->data[i * iSrcXStride + j * 3];
-            bgra_data[i * iDstXStride + (j << 2) + 1] = bgr->data[i * iSrcXStride + j * 3 + 1];
-            bgra_data[i * iDstXStride + (j << 2) + 2] = bgr->data[i * iSrcXStride + j * 3 + 2];
-        }
-    }
-}
-
 
 
 void bgr_to_nv21_separate(px_image_t* bgr, uint8_t* yuv_data)

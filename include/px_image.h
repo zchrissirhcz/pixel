@@ -43,6 +43,7 @@ px_size_t px_get_image_size(px_image_t* image);
 uint8_t px_get_pixel(px_image_t* image, int i, int j, int k);
 void px_set_pixel(px_image_t* image, int i, int j, int k, uint8_t value);
 
+/// color format conversion
 void px_rgb_to_gray(px_image_t* src, px_image_t* dst);
 void px_rgb_to_gray_fixed(px_image_t* src, px_image_t* dst);
 
@@ -52,6 +53,10 @@ void px_rgb_to_bgr(px_image_t* src, px_image_t* dst);
 void px_rgb_to_bgr_inplace(px_image_t* image);
 void px_rgba_to_bgra(px_image_t* src, px_image_t* dst);
 void px_rgba_to_bgra_inplace(px_image_t* image);
+void px_rgb_to_rgba(px_image_t* rgb, px_image_t* rgba);
+
+void px_rgb_to_nv21(px_image_t* rgb, px_image_t* y_plane, px_image_t* uv_plane);
+void px_nv21_to_rgb(px_image_t* y_plane, px_image_t* uv_plane, px_image_t* rgb);
 
 // flipmode
 // input     vertical    horizontal    both
@@ -94,16 +99,15 @@ typedef enum px_border_type
     // PX_BORDER_ISOLATED = 16
 } px_border_type;
 
+/// image resize
 void px_resize_nearest(px_image_t* src, px_image_t* dst, px_size_t dsize);
 void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize);
 void px_resize_cubic(px_image_t* src, px_image_t* dst, px_size_t dsize); // TODO
 void px_resize(px_image_t* src, px_image_t* dst, px_size_t dsize, PX_INTERP_MODE interp_mode);
 
-void px_rgb_to_nv21(px_image_t* rgb, px_image_t* y_plane, px_image_t* uv_plane);
-void px_nv21_to_rgb(px_image_t* y_plane, px_image_t* uv_plane, px_image_t* rgb);
-
 void px_threshold(px_image_t* gray, px_image_t* binary, uint8_t thresh, uint8_t minval, uint8_t maxval);
 
+/// border handling
 int px_border_clip_constant(int x, int size, int i);
 int px_border_clip_replicate(int x, int size);
 int px_border_clip_reflect(int x, int size);

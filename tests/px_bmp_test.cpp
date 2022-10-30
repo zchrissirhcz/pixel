@@ -9,7 +9,7 @@
 #include "px_opencv.hpp"
 #include "px_image.h"
 
-void test_write_bmp_no_custom(const char* filepath)
+static void test_write_bmp_no_custom(const char* filepath)
 {
     cv::Mat mat = cv::imread(filepath, cv::IMREAD_UNCHANGED);
     unsigned char* buffer = mat.data;

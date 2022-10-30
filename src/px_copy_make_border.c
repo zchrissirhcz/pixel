@@ -7,11 +7,11 @@
 
 void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_border_type border_type)
 {
-    PX_ASSERT(border_type==PX_BORDER_CONSTANT ||
-           border_type==PX_BORDER_REFLECT  ||
-           border_type==PX_BORDER_WRAP     ||
-           border_type==PX_BORDER_REFLECT  ||
-           border_type==PX_BORDER_REPLICATE);
+    PX_ASSERT(border_type == PX_BORDER_CONSTANT ||
+            border_type == PX_BORDER_REFLECT  ||
+            border_type == PX_BORDER_WRAP     ||
+            border_type == PX_BORDER_REFLECT  ||
+            border_type == PX_BORDER_REPLICATE);
 
     int dst_height = src->height + pad.top + pad.bottom;
     int dst_width = src->width + pad.left + pad.right;
@@ -60,7 +60,7 @@ void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_bord
         }
     }
 
-    for (int i=0; i<src_height; i++)
+    for (int i = 0; i < src_height; i++)
     {
         int dst_i = i+pad.top;
         if (border_type==PX_BORDER_CONSTANT)
