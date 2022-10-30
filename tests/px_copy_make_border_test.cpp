@@ -4,6 +4,47 @@
 
 #include "px_image.h"
 #include "improc_zcx.h"
+#include <iostream>
+
+
+// copy_make_border_naive( ) 仅支持单通道图像的补边、且只补0；用来形象的说明补边的基本原理
+// 对于多通道图像、多种类型补边策略的支持，请用 copy_make_border2_naive( )
+void copy_make_border_naive(unsigned char* src, int src_height, int src_width, int channels, unsigned char* dst, int top, int bottom, int left, int right)
+{
+    int dst_height = src_height + top + bottom;
+    int dst_width = src_width + left + right;
+
+    int src_linebytes = src_width * channels * sizeof(unsigned char);
+    int dst_linebytes = dst_width * channels * sizeof(unsigned char);
+    for (int i=0; i<top; i++) {
+        // for (int j=0; j<dst_width; j++){
+        // }
+        memset(dst+i*dst_linebytes, 0, dst_linebytes);
+    }
+
+    int left_bytes = left * sizeof(unsigned char) * channels;
+    int right_bytes = right * sizeof(unsigned char) * channels;
+    for (int i=0; i<src_height; i++) {
+        // for (int j=0; j<left; j++) {
+        // }
+        int dst_i = i+top;
+        memset(dst+dst_i*dst_linebytes, 0, left_bytes);
+
+        int src_i = i;
+        memcpy(dst+dst_i*dst_linebytes+left_bytes, src+src_i*src_linebytes, src_linebytes);
+
+        // for (int j=0; j<left; j++) {
+        // }
+        memset(dst+dst_i*dst_linebytes + left_bytes + src_linebytes, 0, right_bytes);
+    }
+
+    for (int i=0; i<bottom; i++) {
+        // for (int j=0; j<dst_width; j++){
+        // }
+        int dst_i = i + top + src_height;
+        memset(dst+dst_i*dst_linebytes, 0, dst_linebytes);
+    }
+}
 
 int main_old()
 {
@@ -64,11 +105,22 @@ int main_old()
     //-----------------------------
 
     int channels = src_image.channels();
-    unsigned char* dst = dst_image_naive.data;
-    unsigned char* src = src_image.data;
 
-    //copy_make_border2_naive(src, src_height, src_width, channels, dst, top, bottom, left, right, kBorderConstant);
-    copy_make_border2_naive(src, src_height, src_width, channels, dst, top, bottom, left, right, kBorderReplicate);
+    px_image_t* px_src_image = px_create_image_header(src_height, src_width, channels);
+    px_src_image->data = src_image.data;
+
+    px_image_t* px_dst_image = px_create_image_header(dst_size.height, dst_size.width, channels);
+    px_dst_image->data = dst_image_naive.data;
+
+    px_pad_t pad;
+    pad.top = top;
+    pad.bottom = bottom;
+    pad.left = left;
+    pad.right = right;
+
+    //copy_make_border2_naive(src, src_height, src_width, channels, dst, top, bottom, left, right, PX_BORDER_CONSTANT);
+    //px_copy_make_border(src, src_height, src_width, channels, dst, top, bottom, left, right, PX_BORDER_REPLICATE);
+    px_copy_make_border(px_src_image, px_dst_image, pad, PX_BORDER_REPLICATE);
     
     if (print_mat) {
         std::cout << "--- src_image: " << std::endl;
@@ -102,7 +154,7 @@ int main_old()
     return 0;
 }
 
-int main()
+int test_with_opencv()
 {
     cv::Mat src_image = cv::imread("IU.bmp");
     

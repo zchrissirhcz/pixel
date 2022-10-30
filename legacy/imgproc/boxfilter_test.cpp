@@ -238,11 +238,11 @@ int main()
 
     t_start = pixel_get_current_time();
 
-    //boxfilter_naive(src, dst, height, width, channels, kernel_size.height, kernel_size.width, anchor.y, anchor.x, norm, kBorderDefault);
+    //boxfilter_naive(src, dst, height, width, channels, kernel_size.height, kernel_size.width, anchor.y, anchor.x, norm, PX_BORDER_DEFAULT);
     //t_cost = pixel_get_current_time() - t_start;
     //printf("boxfilter_naive() time cost %.4lf ms\n", t_cost);
 
-    boxfilter_xydir(src, dst, height, width, channels, kernel_size.height, kernel_size.width, anchor.y, anchor.x, norm, kBorderDefault);
+    boxfilter_xydir(src, dst, height, width, channels, kernel_size.height, kernel_size.width, anchor.y, anchor.x, norm, PX_BORDER_DEFAULT);
     t_cost = pixel_get_current_time() - t_start;
     printf("boxfilter_xydir() time cost %.4lf ms\n", t_cost);
 

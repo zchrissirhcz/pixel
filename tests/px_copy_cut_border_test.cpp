@@ -3,14 +3,6 @@
 #include "px_image.h"
 #include "px_typebase.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <iostream>
-#include <string>
-#include <vector>
-
 #include <opencv2/opencv.hpp>
 
 namespace cv {

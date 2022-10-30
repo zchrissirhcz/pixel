@@ -6,9 +6,9 @@
 void boxfilter_naive(unsigned char* src, unsigned char* dst, int height, int width, int channels, int kernel_h, int kernel_w, int anchor_y, int anchor_x, bool norm, BorderType border_type)
 {
     // param checking
-    assert(border_type==kBorderReplicate ||
-           border_type==kBorderReflect ||
-           border_type==kBorderReflect101);
+    assert(border_type==PX_BORDER_REPLICATE ||
+           border_type==PX_BORDER_REFLECT ||
+           border_type==PX_BORDER_REFLECT101);
     assert(kernel_h>0 && kernel_w>0);
 
     int kernel_size = kernel_h * kernel_w;

@@ -84,19 +84,19 @@ typedef enum PX_INTERP_MODE
 
 typedef enum px_border_type
 {
-    kBorderConstant = 0,
-    kBorderReplicate = 1,
-    kBorderReflect = 2,
-    kBorderWrap = 3,
-    kBorderReflect101 = 4,
-    //BORDER_TRANSPARENT = 5,
-    kBorderDefault = kBorderReflect101,
-    //BORDER_ISOLATED = 16
+    PX_BORDER_CONSTANT = 0,
+    PX_BORDER_REPLICATE = 1,
+    PX_BORDER_REFLECT = 2,
+    PX_BORDER_WRAP = 3,
+    PX_BORDER_REFLECT101 = 4,
+    // PX_BORDER_TRANSPARENT = 5,
+    PX_BORDER_DEFAULT = PX_BORDER_REFLECT101,
+    // PX_BORDER_ISOLATED = 16
 } px_border_type;
 
 void px_resize_nearest(px_image_t* src, px_image_t* dst, px_size_t dsize);
 void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize);
-void px_resize_cubic(px_image_t* src, px_image_t* dst, px_size_t dsize);
+void px_resize_cubic(px_image_t* src, px_image_t* dst, px_size_t dsize); // TODO
 void px_resize(px_image_t* src, px_image_t* dst, px_size_t dsize, PX_INTERP_MODE interp_mode);
 
 void px_rgb_to_nv21(px_image_t* rgb, px_image_t* y_plane, px_image_t* uv_plane);
@@ -112,11 +112,7 @@ int px_border_clip_reflect101(int x, int size);
 int px_border_clip(px_border_type border_type, int x, int size);
 
 void px_copy_cut_border(px_image_t* src, px_image_t* dst, px_pad_t pad);
-
 void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_border_type border_type);
-void copy_make_border_naive(unsigned char* src, int src_height, int src_width, int channels, unsigned char* dst, int top, int bottom, int left, int right);
-void copy_make_border2_naive(unsigned char* src, int src_height, int src_width, int channels, unsigned char* dst, int top, int bottom, int left, int right, px_border_type border_type);
-
 
 #ifdef __cplusplus
 }

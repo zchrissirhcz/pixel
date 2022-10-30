@@ -1,4 +1,5 @@
 #include "px_image.h"
+#include "px_log.h"
 
 // https://docs.opencv.org/4.5.2/d2/de8/group__core__array.html
 // https://vovkos.github.io/doxyrest-showcase/opencv/sphinx_rtd_theme/enum_cv_BorderTypes.html
@@ -81,19 +82,20 @@ int px_border_clip_reflect101(int x, int size)
 
 int px_border_clip(px_border_type border_type, int x, int size)
 {
-    switch(border_type)
+    switch (border_type)
     {
-    case kBorderConstant:
+    case PX_BORDER_CONSTANT:
         return px_border_clip_constant(x, size, 0);
-    case kBorderReplicate:
+    case PX_BORDER_REPLICATE:
         return px_border_clip_replicate(x, size);
-    case kBorderReflect:
+    case PX_BORDER_REFLECT:
         return px_border_clip_reflect(x, size);
-    case kBorderWrap:
+    case PX_BORDER_WRAP:
         return px_border_clip_wrap(x, size);
-    case kBorderReflect101:
+    case PX_BORDER_REFLECT101:
         return px_border_clip_reflect101(x, size);
     default:
+        PX_LOGE("not suported px_border_type: %d\n", border_type);
         return -233;
     }
 }

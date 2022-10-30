@@ -6,7 +6,6 @@
 #include <string>
 
 void cv_image_padding(unsigned char* image, int height, int width, int* pad, unsigned char* out, std::string method = "reflect");
-void copy_cut_border(px_image_t* src, px_image_t* dst, px_pad_t pad);
 
 void cv_gaussian_filter(unsigned char* image, unsigned char* out_image, int height, int width, int kernel_size);
 
