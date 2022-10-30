@@ -18,12 +18,12 @@ static void write_ppm_pgm(const char* filename, uint8_t* data, int height, int w
     if (channel == 3) // ppm
     {
         int ret = fprintf(fp, "P6\n%d %d\n255\n", width, height);
-        fprintf(stderr, "! in write_ppm_pgm(), fprintf() returns %d in line %d, width=%d, height=%d\n", ret, __LINE__, width, height);
+        //fprintf(stderr, "! in write_ppm_pgm(), fprintf() returns %d in %s:%d, width=%d, height=%d\n", ret, __FILE__, __LINE__, width, height);
     }
     else if (channel == 1) // pgm
     {
         int ret = fprintf(fp, "P5\n%d %d\n255\n", width, height);
-        fprintf(stderr, "! in write_ppm_pgm(), fprintf() returns %d in line %d, width=%d, height=%d\n", ret, __LINE__, width, height);
+        //fprintf(stderr, "! in write_ppm_pgm(), fprintf() returns %d in %s:%d, width=%d, height=%d\n", ret, __FILE__, __LINE__, width, height);
     }
     const int bufsize = height * width * channel;
     if (fwrite(data, bufsize, 1, fp) != 1)
