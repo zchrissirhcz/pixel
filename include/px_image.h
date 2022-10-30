@@ -78,7 +78,8 @@ typedef enum PX_HISTOGRAM_MODE
     PX_HISTOGRAM_G = 2,
     PX_HISTOGRAM_B = 3
 } PX_HISTOGRAM_MODE;
-void px_histogram_rgb(px_image_t* src, px_image_t* hist, PX_HISTOGRAM_MODE mode);
+px_image_t* px_histogram_rgb(px_image_t* src, PX_HISTOGRAM_MODE mode);
+px_image_t* px_histogram(px_image_t* im);
 
 typedef enum PX_INTERP_MODE
 {

@@ -6,6 +6,8 @@
 #include "improc_zcx.h"
 #include <iostream>
 
+#include "px_opencv_adapter.hpp"
+
 
 // copy_make_border_naive( ) 仅支持单通道图像的补边、且只补0；用来形象的说明补边的基本原理
 // 对于多通道图像、多种类型补边策略的支持，请用 copy_make_border2_naive( )
@@ -16,29 +18,26 @@ void copy_make_border_naive(unsigned char* src, int src_height, int src_width, i
 
     int src_linebytes = src_width * channels * sizeof(unsigned char);
     int dst_linebytes = dst_width * channels * sizeof(unsigned char);
-    for (int i=0; i<top; i++) {
-        // for (int j=0; j<dst_width; j++){
-        // }
+    for (int i=0; i<top; i++)
+    {
         memset(dst+i*dst_linebytes, 0, dst_linebytes);
     }
 
     int left_bytes = left * sizeof(unsigned char) * channels;
     int right_bytes = right * sizeof(unsigned char) * channels;
-    for (int i=0; i<src_height; i++) {
-        // for (int j=0; j<left; j++) {
-        // }
+    for (int i=0; i<src_height; i++)
+    {
         int dst_i = i+top;
         memset(dst+dst_i*dst_linebytes, 0, left_bytes);
 
         int src_i = i;
         memcpy(dst+dst_i*dst_linebytes+left_bytes, src+src_i*src_linebytes, src_linebytes);
 
-        // for (int j=0; j<left; j++) {
-        // }
         memset(dst+dst_i*dst_linebytes + left_bytes + src_linebytes, 0, right_bytes);
     }
 
-    for (int i=0; i<bottom; i++) {
+    for (int i=0; i<bottom; i++)
+    {
         // for (int j=0; j<dst_width; j++){
         // }
         int dst_i = i + top + src_height;
@@ -162,16 +161,14 @@ int test_with_opencv()
     int src_height = size.height;
     int src_width = size.width;
     
-    int pad_top = 2;
-    int pad_bottom = 2;
-    int pad_left = 2;
-    int pad_right = 2;
-    int pad[4] = {
-        pad_left, pad_top, pad_right, pad_bottom
-    };
+    px_pad_t pad;
+    pad.top = 2;
+    pad.bottom = 2;
+    pad.left = 2;
+    pad.right = 2;
 
-    int dst_height = src_height + pad_top + pad_bottom;
-    int dst_width = src_width + pad_left + pad_right;
+    int dst_height = src_height + pad.top + pad.bottom;
+    int dst_width = src_width + pad.left + pad.right;
 
     cv::Size dst_size;
     dst_size.height = dst_height;
@@ -179,8 +176,13 @@ int test_with_opencv()
     cv::Mat dst_zcx(dst_size, src_image.type());
     cv::Mat dst_opencv(dst_size, src_image.type());
 
-    cv_image_padding(src_image.data, src_height, src_width, pad, dst_zcx.data);
-    cv::copyMakeBorder(src_image, dst_opencv, pad_top, pad_bottom, pad_left, pad_right, cv::BORDER_REFLECT101);
+    px_image_t* px_src = px_image_from_opencv(src_image);
+    px_image_t* px_dst = px_image_from_opencv(dst_zcx);
+    px_copy_make_border(px_src, px_dst, pad, PX_BORDER_REFLECT101);
+    cv::copyMakeBorder(src_image, dst_opencv, pad.top, pad.bottom, pad.left, pad.right, cv::BORDER_REFLECT101);
+
+    px_destroy_image_header(px_src);
+    px_destroy_image_header(px_dst);
 
     return 0;
 }
