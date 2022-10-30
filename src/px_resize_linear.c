@@ -55,6 +55,16 @@ void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize)
             Di = ceil(si);
             Dj = ceil(sj);
 
+            Ai = px_clamp(Ai, 0, src->height - 1);
+            Bi = px_clamp(Bi, 0, src->height - 1);
+            Ci = px_clamp(Ci, 0, src->height - 1);
+            Di = px_clamp(Di, 0, src->height - 1);
+
+            Aj = px_clamp(Aj, 0, src->width - 1);
+            Bj = px_clamp(Bj, 0, src->width - 1);
+            Cj = px_clamp(Cj, 0, src->width - 1);
+            Dj = px_clamp(Dj, 0, src->width - 1);
+
             for (int k = 0; k < channel; k++)
             {
                 uint8_t A = px_get_pixel(src, Ai, Aj, k);
