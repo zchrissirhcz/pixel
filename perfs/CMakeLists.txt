@@ -20,4 +20,6 @@ execute_process(
 # add_subdirectory(histogram)
 # add_subdirectory(rgb2bgr)
 # add_subdirectory(threshold)
-add_subdirectory(resize_by_two)
+if(CVBUILD_ARCH MATCHES "arm")
+  add_subdirectory(resize_by_two)
+endif()
