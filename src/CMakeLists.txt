@@ -21,6 +21,7 @@ add_library(pixel STATIC
   px_resize_linear.c
   px_resize_nearest.c
   px_rgb_to_nv21.cpp
+  px_nv21_to_rgb.cpp
   px_threshold.c
   px_border.c
   px_copy_make_border.c

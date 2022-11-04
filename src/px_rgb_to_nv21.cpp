@@ -57,6 +57,45 @@ public:
     }
 };
 
+// https://blog.csdn.net/denisyq/article/details/52625692
+class RgbToYuv_Converter_v3
+{
+public:
+    static int get_y(int r, int g, int b, bool require_shift_right = true)
+    {
+        int y = (C2 * r + C1 * g + C0 * b + offset1);
+        if (require_shift_right)
+        {
+            y = y >> shift;
+        }
+        return y;
+    }
+
+    static int get_u(int r, int g, int b)
+    {
+        int y = get_y(r, g, b);
+        int u = (C4 * (b - y) + offset2) >> shift;
+        return px_clamp(u, 0, 255);
+    }
+
+    static int get_v(int r, int g, int b)
+    {
+        int y = get_y(r, g, b);
+        int v = (C3 * (r - y) + offset2) >> shift;
+        return px_clamp(v, 0, 255);
+    }
+
+private:
+    const static int shift = 14;
+    const static int offset1 = 8192;
+    const static int offset2 = 2105344;
+    const static int C0 = 1868;
+    const static int C1 = 9617;
+    const static int C2 = 4899;
+    const static int C3 = 11682;
+    const static int C4 = 9241;
+};
+
 } // namespace
 
 void px_rgb_to_nv21(px_image_t* rgb, px_image_t* y_plane, px_image_t* uv_plane)
@@ -90,7 +129,7 @@ void px_rgb_to_nv21(px_image_t* rgb, px_image_t* y_plane, px_image_t* uv_plane)
 
             y = converter.get_y(r, g, b);
             *(ypt++) = px_clamp(y, 0, 255);
-            ;
+            
             if (i % 2 == 0 && j % 2 == 0)
             {
                 u = converter.get_u(r, g, b);

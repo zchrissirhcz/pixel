@@ -63,6 +63,43 @@ public:
     }
 };
 
+// https://blog.csdn.net/denisyq/article/details/52625692
+class YuvToRgb_Converter_v3
+{
+public:
+    static int get_r(int y, int u, int v)
+    {
+        v = v - 128;
+
+        int r = y + ((v * C0 + offset) >> shift);
+        return px_clamp(r, 0, 255);
+    }
+
+    static int get_g(int y, int u, int v)
+    {
+        u = u - 128;
+        v = v - 128;
+
+        int g = y + ((u * C2 + v * C1 + offset) >> shift);
+        return px_clamp(g, 0, 255);
+    }
+
+    static int get_b(int y, int u, int v)
+    {
+        u = u - 128;
+        int b = y + ((u * C3 + offset) >> shift);
+        return px_clamp(b, 0, 255);
+    }
+private:
+    const static int shift = 14;
+    const static int offset = 8192;
+    const static int C0 = 22987;
+    const static int C1 = -11698;
+    const static int C2 = -5636;
+    const static int C3 = 29049;
+};
+
+
 } // namespace
 
 void px_nv21_to_rgb(px_image_t* y_plane, px_image_t* uv_plane, px_image_t* rgb)

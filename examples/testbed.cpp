@@ -37,6 +37,42 @@ void histogram_example()
     px_destroy_image(hist);
 }
 
+void nv21_to_rgb_example()
+{
+    std::string image_path = "/Users/zz/data/1920x1080.NV21";
+    FILE* fin = fopen(image_path.c_str(), "rb");
+    const int width = 1920;
+    const int height = 1080;
+    const int bufsize = width * height * 3 / 2;
+    uint8_t* buf = (uint8_t*)malloc(bufsize);
+    fread(buf, bufsize, 1, fin);
+    fclose(fin);
+
+    px_image_t* y_plane = px_create_image_header(height, width, 1);
+    y_plane->data = buf;
+    px_image_t* uv_plane = px_create_image_header(height/2, width/2, 2);
+    uv_plane->data = buf + height * width;
+
+    px_image_t* rgb = px_create_image(height, width, 3);
+
+    px_nv21_to_rgb(y_plane, uv_plane, rgb);
+
+    px_rgb_to_nv21(rgb, y_plane, uv_plane);
+    FILE* fout = fopen("1920x1080.NV21", "wb");
+    fwrite(buf, bufsize, 1, fout);
+    fclose(fout);
+
+    px_image_t* bgr = px_create_image(height, width, 3);
+    px_rgb_to_bgr(rgb, bgr);
+    px_write_image(bgr, "1920x1080_v3.png");
+
+    px_destroy_image_header(y_plane);
+    px_destroy_image_header(uv_plane);
+    px_destroy_image(bgr);
+    px_destroy_image(rgb);
+    free(buf);
+}
+
 void rotate270_example()
 {
     std::string image_path = "lena.bmp";
@@ -57,4 +93,5 @@ int main()
     imageio_example();
     histogram_example();
     rotate270_example();
+    //nv21_to_rgb_example();
 }
