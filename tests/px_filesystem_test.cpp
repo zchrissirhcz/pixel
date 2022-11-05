@@ -18,6 +18,7 @@ TEST(filesystem, get_pwd)
 {
     char* pwd = px_getpwd();
     EXPECT_TRUE(strlen(pwd) > 0);
+    free(pwd);
 }
 
 TEST(filesystem, file_not_exist)
