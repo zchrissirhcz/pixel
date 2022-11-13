@@ -2,6 +2,7 @@
 #include <string>
 #include "px_image_io.h"
 #include "px_image.h"
+#include "px_digits.h"
 
 int imageio_example()
 {
@@ -107,13 +108,26 @@ void sobel3x3_example()
     px_destroy_image(dst);
 }
 
+void digit_test()
+{
+    int digits[8];
+    int x = -128;
+    px_decimal_to_binary_signed(x, digits, 8);
+    for (int i = 0; i < 8; i++)
+    {
+        printf("%d, ", digits[i]);
+    }
+    printf("\n");
+}
+
 int main()
 {
     //imageio_example();
     //histogram_example();
     //rotate270_example();
     //nv21_to_rgb_example();
-    sobel3x3_example();
+    //sobel3x3_example();
+    digit_test();
 
     return 0;
 }

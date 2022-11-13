@@ -39,7 +39,7 @@ add_library(pixel STATIC
   px_eltwise.c
 
   px_array_mean.c
-  px_digits.c
+  px_digits.cpp
 )
 target_include_directories(pixel PUBLIC
   ${CMAKE_SOURCE_DIR}/include
