@@ -93,5 +93,7 @@ int main()
     imageio_example();
     histogram_example();
     rotate270_example();
-    //nv21_to_rgb_example();
+    nv21_to_rgb_example();
+
+    return 0;
 }

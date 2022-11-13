@@ -31,6 +31,7 @@ pixel_add_test(px_copy_cut_border_test)
 pixel_add_test(px_image_rotate_test)
 pixel_add_test(px_resize_linear_test)
 pixel_add_test(px_filesystem_test)
+pixel_add_test(px_digits_test)
 
 if(NOT CMAKE_CROSSCOMPILING)
   pixel_add_test(px_image_io_test)
