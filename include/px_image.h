@@ -11,7 +11,8 @@ typedef struct px_image_t
     int stride;
 } px_image_t;
 
-typedef enum px_fourcc_fmt_t{
+typedef enum px_fourcc_fmt_t
+{
     PX_FOURCC_FMT_NV21,
     PX_FOURCC_FMT_NV12,
     PX_FOURCC_FMT_BGR,
@@ -123,6 +124,8 @@ void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_bord
 void px_image_rotate90(px_image_t* src, px_image_t* dst); // clockwise
 void px_image_rotate270(px_image_t* src, px_image_t* dst); // clockwise
 
+void px_sobel3x3(px_image_t* src, px_image_t* dst);
+  
 #ifdef __cplusplus
 }
 #endif
