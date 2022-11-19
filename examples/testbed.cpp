@@ -88,12 +88,32 @@ void rotate270_example()
     px_destroy_image(dst);
 }
 
+void sobel3x3_example()
+{
+    std::string image_path = "lena.bmp";
+    px_image_t* src = px_read_image(image_path.c_str());
+
+    px_image_t* gray = px_create_image(src->height, src->width, 1);
+    px_rgb_to_gray(src, gray);
+
+    const int dst_height = src->height;
+    const int dst_width = src->width;
+    px_image_t* dst = px_create_image(dst_height, dst_width, 1);
+
+    px_sobel3x3(gray, dst);
+    px_write_image(dst, "lena_sobel3x3.jpg");
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
+}
+
 int main()
 {
-    imageio_example();
-    histogram_example();
-    rotate270_example();
-    nv21_to_rgb_example();
+    //imageio_example();
+    //histogram_example();
+    //rotate270_example();
+    //nv21_to_rgb_example();
+    sobel3x3_example();
 
     return 0;
 }
