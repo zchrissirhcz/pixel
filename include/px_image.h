@@ -101,6 +101,14 @@ typedef enum px_border_type
     // PX_BORDER_ISOLATED = 16
 } px_border_type;
 
+typedef enum PX_ROTATE_MODE
+{
+    PX_ROTATE_CLOCK_WISE_90 = 0,
+    PX_ROTATE_CLOCK_WISE_180 = 1,
+    PX_ROTATE_CLOCK_WISE_270 = 2,
+    PX_ROTATE_COUNTER_CLOCK_WISE_90 = PX_ROTATE_CLOCK_WISE_270
+} PX_ROTATE_MODE;
+
 /// image resize
 void px_resize_nearest(px_image_t* src, px_image_t* dst, px_size_t dsize);
 void px_resize_linear(px_image_t* src, px_image_t* dst, px_size_t dsize);
@@ -121,8 +129,7 @@ void px_copy_cut_border(px_image_t* src, px_image_t* dst, px_pad_t pad);
 void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_border_type border_type);
 
 /// rotate
-void px_image_rotate90(px_image_t* src, px_image_t* dst); // clockwise
-void px_image_rotate270(px_image_t* src, px_image_t* dst); // clockwise
+void px_image_rotate(px_image_t* src, px_image_t* dst, PX_ROTATE_MODE mode);
 
 void px_sobel3x3(px_image_t* src, px_image_t* dst);
 

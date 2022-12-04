@@ -4,6 +4,65 @@
 #include "px_compare.h"
 #include "px_log.h"
 
+TEST(image_rotate180, 1x2_c1)
+{
+    //
+    // 1 2    =>   2  1
+    //             
+
+    const int src_height = 1;
+    const int src_width = 2;
+    const int channel = 1;
+    px_image_t* src = px_create_image(src_height, src_width, channel);
+    src->data[0] = 1;
+    src->data[1] = 2;
+
+    const int dst_height = src_height;
+    const int dst_width = src_width;
+    px_image_t* dst = px_create_image(dst_height, dst_width, channel);
+
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_180);
+
+    EXPECT_TRUE(dst->data[0] == 2);
+    EXPECT_TRUE(dst->data[1] == 1);
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
+}
+
+TEST(image_rotate180, 1x2_c3)
+{
+    //
+    // 1 2 3 4 5 6    =>   4 5 6 1 2 3
+    //                     
+
+    const int src_height = 1;
+    const int src_width = 2;
+    const int channel = 3;
+    px_image_t* src = px_create_image(src_height, src_width, channel);
+    const int total = src_height * src_width * channel;
+    for (int i = 0; i < total; i++)
+    {
+        src->data[i] = i + 1;
+    }
+
+    const int dst_height = src_height;
+    const int dst_width = src_width;
+    px_image_t* dst = px_create_image(dst_height, dst_width, channel);
+
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_180);
+
+    uint8_t expected[6] = {4, 5, 6, 1, 2, 3};
+    for (int i = 0; i < total; i++)
+    {
+        EXPECT_TRUE(dst->data[i] == expected[i]);
+    }
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
+}
+
+
 TEST(image_rotate90, 1x2_c1)
 {
     //
@@ -21,7 +80,7 @@ TEST(image_rotate90, 1x2_c1)
     const int dst_width = src_height;
     px_image_t* dst = px_create_image(dst_height, dst_width, channel);
 
-    px_image_rotate90(src, dst);
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_90);
 
     EXPECT_TRUE(dst->data[0] == 1);
     EXPECT_TRUE(dst->data[1] == 2);
@@ -50,7 +109,7 @@ TEST(image_rotate90, 1x2_c3)
     const int dst_width = src_height;
     px_image_t* dst = px_create_image(dst_height, dst_width, channel);
 
-    px_image_rotate90(src, dst);
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_90);
 
     for (int i = 0; i < total; i++)
     {
@@ -98,7 +157,7 @@ TEST(image_rotate90, 2x2_c1)
     const int dst_width = src_height;
     px_image_t* dst = px_create_image(dst_height, dst_width, channel);
 
-    px_image_rotate90(src, dst);
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_90);
 
     uint8_t expected[] = {
         3, 1,
@@ -111,6 +170,38 @@ TEST(image_rotate90, 2x2_c1)
     px_destroy_image(dst);
 }
 
+TEST(image_rotate180, 2x2_c1)
+{
+    //
+    // 1 2    =>   4 3
+    // 3 4         2 1
+
+    const int src_height = 2;
+    const int src_width = 2;
+    const int channel = 1;
+    px_image_t* src = px_create_image(src_height, src_width, channel);
+    const int total = src_height * src_width * channel;
+    for (int i = 0; i < total; i++)
+    {
+        src->data[i] = i + 1;
+    }
+
+    const int dst_height = src_height;
+    const int dst_width = src_width;
+    px_image_t* dst = px_create_image(dst_height, dst_width, channel);
+
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_180);
+
+    uint8_t expected[] = {
+        4, 3,
+        2, 1
+    };
+
+    EXPECT_TRUE(array_equal_u8(expected, dst->data, total));
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
+}
 
 TEST(image_rotate90, 2x2_c3)
 {
@@ -137,7 +228,7 @@ TEST(image_rotate90, 2x2_c3)
     const int dst_width = src_height;
     px_image_t* dst = px_create_image(dst_height, dst_width, channel);
 
-    px_image_rotate90(src, dst);
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_90);
 
     uint8_t expected[] = {
         31, 32, 33,  11, 12, 13,
@@ -150,6 +241,43 @@ TEST(image_rotate90, 2x2_c3)
     px_destroy_image(dst);
 }
 
+TEST(image_rotate180, 2x2_c3)
+{
+    //
+    // 11 12 13  21 22 23   =>   41 42 43  31 32 33
+    // 31 32 33  41 42 43        21 22 23  11 12 13
+
+    const int src_height = 2;
+    const int src_width = 2;
+    const int channel = 3;
+    px_image_t* src = px_create_image(src_height, src_width, channel);
+    const int total = src_height * src_width * channel;
+
+    uint8_t input[] = {
+        11, 12, 13,  21, 22, 23,
+        31, 32, 33,  41, 42, 43
+    };
+    for (int i = 0; i < total; i++)
+    {
+        src->data[i] = input[i];
+    }
+
+    const int dst_height = src_height;
+    const int dst_width = src_width;
+    px_image_t* dst = px_create_image(dst_height, dst_width, channel);
+
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_180);
+
+    uint8_t expected[] = {
+        41, 42, 43,  31, 32, 33,
+        21, 22, 23,  11, 12, 13
+    };
+
+    EXPECT_TRUE(array_equal_u8(expected, dst->data, total));
+
+    px_destroy_image(src);
+    px_destroy_image(dst);
+}
 
 TEST(image_rotate270, 1x2_c1)
 {
@@ -168,7 +296,7 @@ TEST(image_rotate270, 1x2_c1)
     const int dst_width = src_height;
     px_image_t* dst = px_create_image(dst_height, dst_width, channel);
 
-    px_image_rotate270(src, dst);
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_270);
     const int total = src_height * src_width * channel;
 
     uint8_t expected[] = {
@@ -201,7 +329,7 @@ TEST(image_rotate270, 1x2_c3)
     const int dst_width = src_height;
     px_image_t* dst = px_create_image(dst_height, dst_width, channel);
 
-    px_image_rotate270(src, dst);
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_270);
     uint8_t expected[] = {
         4, 5, 6,
         1, 2, 3
@@ -233,7 +361,7 @@ TEST(image_rotate270, 2x2_c1)
     const int dst_width = src_height;
     px_image_t* dst = px_create_image(dst_height, dst_width, channel);
 
-    px_image_rotate270(src, dst);
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_270);
 
     uint8_t expected[] = {
         2, 4,
@@ -271,7 +399,7 @@ TEST(image_rotate270, 2x2_c3)
     const int dst_width = src_height;
     px_image_t* dst = px_create_image(dst_height, dst_width, channel);
 
-    px_image_rotate270(src, dst);
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_270);
 
     uint8_t expected[] = {
         21, 22, 23,  41, 42, 43,

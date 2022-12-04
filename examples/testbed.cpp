@@ -82,7 +82,7 @@ void rotate270_example()
     const int dst_width = src->height;
     px_image_t* dst = px_create_image(dst_height, dst_width, src->channel);
 
-    px_image_rotate270(src, dst);
+    px_image_rotate(src, dst, PX_ROTATE_CLOCK_WISE_270);
     px_write_image(dst, "lena_rotate270.bmp");
 
     px_destroy_image(src);
