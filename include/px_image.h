@@ -125,7 +125,10 @@ void px_image_rotate90(px_image_t* src, px_image_t* dst); // clockwise
 void px_image_rotate270(px_image_t* src, px_image_t* dst); // clockwise
 
 void px_sobel3x3(px_image_t* src, px_image_t* dst);
-  
+
+// I(x, y) = 255 - I(x, y)
+void px_negative_image(px_image_t* src, px_image_t* dst);
+
 #ifdef __cplusplus
 }
 #endif
