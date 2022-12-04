@@ -29,3 +29,6 @@ indent_size = 4
 
 [*.{md,markdown}]
 indent_size = 4
+
+[*.yml]
+indent_size = 2
