@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_border_type border_type)
+void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, PX_BORDER_TYPE border_type)
 {
     PX_ASSERT(border_type == PX_BORDER_CONSTANT ||
             border_type == PX_BORDER_REFLECT  ||

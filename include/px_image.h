@@ -89,7 +89,7 @@ typedef enum PX_INTERP_MODE
     PX_INTERP_CUBIC
 } PX_INTERP_MODE;
 
-typedef enum px_border_type
+typedef enum PX_BORDER_TYPE
 {
     PX_BORDER_CONSTANT = 0,
     PX_BORDER_REPLICATE = 1,
@@ -99,7 +99,7 @@ typedef enum px_border_type
     // PX_BORDER_TRANSPARENT = 5,
     PX_BORDER_DEFAULT = PX_BORDER_REFLECT101,
     // PX_BORDER_ISOLATED = 16
-} px_border_type;
+} PX_BORDER_TYPE;
 
 typedef enum PX_ROTATE_MODE
 {
@@ -123,10 +123,10 @@ int px_border_clip_replicate(int x, int size);
 int px_border_clip_reflect(int x, int size);
 int px_border_clip_wrap(int x, int size);
 int px_border_clip_reflect101(int x, int size);
-int px_border_clip(px_border_type border_type, int x, int size);
+int px_border_clip(PX_BORDER_TYPE border_type, int x, int size);
 
 void px_copy_cut_border(px_image_t* src, px_image_t* dst, px_pad_t pad);
-void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, px_border_type border_type);
+void px_copy_make_border(px_image_t* src, px_image_t* dst, px_pad_t pad, PX_BORDER_TYPE border_type);
 
 /// rotate
 void px_image_rotate(px_image_t* src, px_image_t* dst, PX_ROTATE_MODE mode);

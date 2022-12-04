@@ -80,7 +80,7 @@ int px_border_clip_reflect101(int x, int size)
 // int border_clip_transparent(){
 // }
 
-int px_border_clip(px_border_type border_type, int x, int size)
+int px_border_clip(PX_BORDER_TYPE border_type, int x, int size)
 {
     switch (border_type)
     {
@@ -95,7 +95,7 @@ int px_border_clip(px_border_type border_type, int x, int size)
     case PX_BORDER_REFLECT101:
         return px_border_clip_reflect101(x, size);
     default:
-        PX_LOGE("not suported px_border_type: %d\n", border_type);
+        PX_LOGE("not suported PX_BORDER_TYPE: %d\n", border_type);
         return -233;
     }
 }
