@@ -1,7 +1,7 @@
 /*
  * Header-only CPU helper library
- * Created by Zhuo Zhang (zz9555@arcsoft.com.cn)
- * Last modified: 2022-07-21 21:00:00
+ * Created by Zhuo Zhang (imzhuo@foxmail.com)
+ * Last update: 2022-12-04 20:26:00
  *
  * Usage:
  *
