@@ -29,7 +29,7 @@ jobs:
 
     - name: cache-googletest
       id: cache-googletest
-      uses: actions/cache@v3.2.0
+      uses: actions/cache@v3.2.1
       with:
         path: googletest-install
         key: googletest-install-x64
@@ -45,7 +45,7 @@ jobs:
 
     - name: cache-benchmark
       id: cache-benchmark
-      uses: actions/cache@v3.2.0
+      uses: actions/cache@v3.2.1
       with:
         path: benchmark-install
         key: benchmark-install-x64
@@ -61,7 +61,7 @@ jobs:
 
     - name: cache-opencv
       id: cache-opencv
-      uses: actions/cache@v3.2.0
+      uses: actions/cache@v3.2.1
       with:
         path: opencv-install
         key: opencv-install-x64
