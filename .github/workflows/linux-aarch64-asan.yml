@@ -21,7 +21,7 @@ jobs:
 
     - name: cache-qemu
       id: cache-qemu
-      uses: actions/cache@v3.3.1
+      uses: actions/cache@v3.3.2
       with:
         path: qemu-install
         key: qemu-install-linux-aarch64-asan-7.1.0
@@ -52,7 +52,7 @@ jobs:
 
     - name: cache-googletest
       id: cache-googletest
-      uses: actions/cache@v3.3.1
+      uses: actions/cache@v3.3.2
       with:
         path: googletest-install
         key: googletest-install-asan
@@ -69,7 +69,7 @@ jobs:
 
     - name: cache-benchmark
       id: cache-benchmark
-      uses: actions/cache@v3.3.1
+      uses: actions/cache@v3.3.2
       with:
         path: benchmark-install
         key: benchmark-install-1
@@ -85,7 +85,7 @@ jobs:
 
     - name: cache-opencv
       id: cache-opencv
-      uses: actions/cache@v3.3.1
+      uses: actions/cache@v3.3.2
       with:
         path: opencv-install
         key: opencv-install-1
