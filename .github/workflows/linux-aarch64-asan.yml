@@ -11,7 +11,7 @@ jobs:
         access_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Clone repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Ninja
       #uses: seanmiddleditch/gha-setup-ninja@v3
@@ -27,7 +27,7 @@ jobs:
         key: qemu-install-linux-aarch64-asan-7.1.0
     - name: checkout-qemu
       if: steps.cache-qemu.outputs.cache-hit != 'true'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: qemu/qemu
         path: qemu
